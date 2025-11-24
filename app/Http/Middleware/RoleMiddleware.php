@@ -28,7 +28,7 @@ class RoleMiddleware
 
         if (! $request->user()->hasRole($allowed)) {
             // akses ditolak
-            abort(403, 'Anda tidak memiliki akses ke halaman ini.');
+            return redirect($request->user()->getDashboardUrl());
         }
 
         return $next($request);

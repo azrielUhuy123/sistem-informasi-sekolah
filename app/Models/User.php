@@ -65,4 +65,16 @@ class User extends Authenticatable
     {
         return $this->role === $role;
     }
+    public function getDashboardUrl()
+    {
+        return match ($this->role) {
+            'kepsek' => '/kepsek/dashboard',
+            'tu'     => '/tu/dashboard',
+            'guru'   => '/guru/dashboard',
+            'murid'  => '/murid/dashboard',
+            'spmb'   => '/spmb/dashboard',
+            default  => '/dashboard'
+        };
+    }
+
 }

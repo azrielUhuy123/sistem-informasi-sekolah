@@ -24,12 +24,6 @@ Route::middleware(['auth', 'role:guru'])->group(function () {
     Route::get('/guru/dashboard', [GuruDashboard::class, 'index'])->name('guru.dashboard');
 });
 
-// 2. KEPSEK
-use App\Http\Controllers\Kepsek\DashboardController as KepsekDashboard;
-Route::middleware(['auth', 'role:kepsek'])->group(function () {
-    Route::get('/kepsek/dashboard', [KepsekDashboard::class, 'index'])->name('kepsek.dashboard');
-});
-
 // 3. TATA USAHA (TU)
 use App\Http\Controllers\Tu\DashboardController as TuDashboard;
 Route::middleware(['auth', 'role:tu'])->group(function () {
@@ -57,6 +51,9 @@ Route::middleware('auth')->group(function () {
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 });
+
+// Route auth Kepsek
+require __DIR__.'/kepsek.php';
 
 // Route auth Breeze
 require __DIR__.'/auth.php';
