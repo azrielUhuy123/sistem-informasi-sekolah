@@ -32,29 +32,15 @@
             </div>
 
             <div class="mb-3">
-                <label>Mata Pelajaran</label>
-                <select name="mapel" class="form-control" required>
-                    <option value="">-- Pilih Mata Pelajaran --</option>
+    <label>Mata Pelajaran</label>
+    <select name="mapel_id" class="form-control" required>
+        <option value="">-- Pilih Mata Pelajaran --</option>
+        @foreach($mapel as $m)
+            <option value="{{ $m->id }}">{{ $m->nama_mapel }}</option>
+        @endforeach
+    </select>
+</div>
 
-                    @php
-                        $mapelList = [
-                            'Matematika',
-                            'Bahasa Indonesia',
-                            'Bahasa Inggris',
-                            'IPA',
-                            'IPS',
-                            'PPKn',
-                            'Penjaskes',
-                            'Seni Budaya',
-                            'TIK',
-                            'Agama',
-                        ];
-                    @endphp
-
-                    @foreach($mapelList as $m)
-                        <option value="{{ $m }}">{{ $m }}</option>
-                    @endforeach
-                </select>
             </div>
 
             <div class="mb-3">

@@ -112,4 +112,11 @@ class KelasController extends Controller
         return redirect()->route('tu.kelas.index')
             ->with('success', 'Kelas berhasil dihapus');
     }
+    public function detail($id)
+{
+    $kelas = Kelas::with('siswa')->findOrFail($id);
+
+    return view('tu.kelas.detail', compact('kelas'));
+}
+
 }

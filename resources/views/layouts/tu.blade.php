@@ -54,11 +54,58 @@
         <h4>Menu TU</h4>
         <hr>
 
-        <a href="{{ route('tu.dashboard') }}">🏠 Dashboard</a>
-        <a href="{{ route('tu.kelas.index') }}">🏫 Manajemen Kelas</a>
-        <a href="{{ route('tu.siswa.index') }}">👨‍🎓 Manajemen Siswa</a>
-        <a href="{{ route('tu.guru.index') }}">👨‍🏫 Manajemen Guru</a>
-        <a href="#">📅 Manajemen Jadwal</a>
+        <ul class="nav flex-column">
+
+    <li class="nav-item">
+        <a class="nav-link" href="{{ route('tu.dashboard') }}">
+            <i class="bi bi-speedometer2"></i> Dashboard
+        </a>
+    </li>
+
+    <!-- DROPDOWN MANAJEMEN SEKOLAH -->
+    <li class="nav-item">
+        <a class="nav-link dropdown-toggle" data-bs-toggle="collapse" href="#menuSekolah" role="button">
+            <i class="bi bi-building"></i> Manajemen Sekolah
+        </a>
+
+        <div class="collapse ms-3" id="menuSekolah">
+
+            <a class="nav-link" href="{{ route('tu.kelas.index') }}">
+                Kelas
+            </a>
+
+            <a class="nav-link" href="{{ route('tu.tahun.index') }}">
+                Tahun Ajaran
+            </a>
+
+            <a class="nav-link" href="{{ route('tu.siswa.index') }}">
+                Siswa
+            </a>
+
+            <a class="nav-link" href="{{ route('tu.guru.index') }}">
+                Guru
+            </a>
+
+            <a class="nav-link" href="{{ route('tu.jadwal.index') }}">
+                Jadwal
+            </a>
+
+            <a class="nav-link" href="{{ route('tu.mapel.index') }}">
+                Mata Pelajaran
+            </a>
+
+            <a class="nav-link" href="{{ route('tu.ruangan.index') }}">
+                Ruangan
+            </a>
+
+            <a class="nav-link" href="{{ route('tu.rwakajai angan.index') }}">
+                Ruangan
+            </a>
+        </div>
+    </li>
+
+</ul>
+
     </div>
 
     <!-- KANAN -->

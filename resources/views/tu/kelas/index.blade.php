@@ -35,6 +35,8 @@
                     <td>{{ $k->tingkat }}</td>
                     <td>{{ $k->tahun_ajaran }}</td>
                     <td>
+                        <a href="{{ route('tu.kelas.detail', $k->id) }}" class="btn btn-info btn-sm">Detail</a>
+
                         <a href="{{ route('tu.kelas.edit', $k->id) }}"
                            class="btn btn-warning btn-sm">Edit</a>
 

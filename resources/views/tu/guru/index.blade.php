@@ -13,7 +13,6 @@
     <div class="alert alert-success">{{ session('success') }}</div>
 @endif
 
-
 <div class="card mt-3">
     <div class="card-body">
 
@@ -25,8 +24,9 @@
                     <th>Foto</th>
                     <th>{!! sortLink('nama', 'Nama') !!}</th>
                     <th>{!! sortLink('jenis_kelamin', 'Jenis Kelamin') !!}</th>
-                    <th>{!! sortLink('mapel', 'Mapel') !!}</th>
+                    <th>{!! sortLink('mapel_id', 'Mapel') !!}</th>
                     <th>Telepon</th>
+                    <th>Export</th>
                     <th>Aksi</th>
                 </tr>
             </thead>
@@ -39,7 +39,8 @@
 
                     <td>
                         @if($g->foto)
-                            <img src="{{ asset('foto-guru/'.$g->foto) }}" width="55" height="55" class="rounded" style="object-fit: cover;">
+                            <img src="{{ asset('foto-guru/'.$g->foto) }}" width="55" height="55"
+                                 class="rounded" style="object-fit: cover;">
                         @else
                             -
                         @endif
@@ -47,14 +48,21 @@
 
                     <td>{{ $g->nama }}</td>
                     <td>{{ $g->jenis_kelamin }}</td>
-                    <td>{{ $g->mapel }}</td>
+                    <td>{{ $g->mapel->nama_mapel ?? '-' }}</td>
                     <td>{{ $g->telepon ?? '-' }}</td>
+
+                    <!-- TOMBOL EXPORT JADWAL PDF PER GURU -->
+                    <td>
+                        <a href="{{ route('tu.jadwal.guru.export.pdf', $g->id) }}"
+                           class="btn btn-danger btn-sm">
+                           Export PDF
+                        </a>
+                    </td>
 
                     <td>
                         <a href="{{ route('tu.guru.edit', $g->id) }}" class="btn btn-warning btn-sm">Edit</a>
 
-                        <form action="{{ route('tu.guru.destroy', $g->id) }}"
-                              method="POST"
+                        <form action="{{ route('tu.guru.destroy', $g->id) }}" method="POST"
                               class="d-inline">
                             @csrf
                             @method('DELETE')
