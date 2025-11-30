@@ -5,7 +5,7 @@ use Illuminate\Support\Facades\Route;
 
 // Halaman depan
 Route::get('/', function () {
-    return view('welcome');
+    return redirect('/login');
 });
 
 // Dashboard default Laravel (bisa dipakai sebagai general dashboard)
@@ -24,11 +24,11 @@ Route::middleware(['auth', 'role:guru'])->group(function () {
     Route::get('/guru/dashboard', [GuruDashboard::class, 'index'])->name('guru.dashboard');
 });
 
-// 3. TATA USAHA (TU)
-use App\Http\Controllers\Tu\DashboardController as TuDashboard;
-Route::middleware(['auth', 'role:tu'])->group(function () {
-    Route::get('/tu/dashboard', [TuDashboard::class, 'index'])->name('tu.dashboard');
-});
+// 2. KEPSEK → ADA DI FILE TERPISAH kepsek.php
+
+
+// 3. TATA USAHA (TU) SUDAH TERPISAH
+
 
 // 4. MURID / WALI MURID
 use App\Http\Controllers\Murid\DashboardController as MuridDashboard;
@@ -44,7 +44,7 @@ Route::middleware(['auth', 'role:spmb'])->group(function () {
 
 
 // ===============================================
-// ROUTE UNTUK PROFILE (Bawaaan Breeze)
+// ROUTE UNTUK PROFILE (Bawaan Breeze)
 // ===============================================
 Route::middleware('auth')->group(function () {
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
@@ -52,8 +52,16 @@ Route::middleware('auth')->group(function () {
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 });
 
-// Route auth Kepsek
+
+// ===============================================
+// IMPORT FILE ROUTE TAMBAHAN
+// ===============================================
+
+// Route KEPSEK
 require __DIR__.'/kepsek.php';
+
+// Route TU → PENTING! WAJIB ADA
+require __DIR__.'/tu.php';
 
 // Route auth Breeze
 require __DIR__.'/auth.php';
