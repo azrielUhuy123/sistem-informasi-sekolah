@@ -10,7 +10,7 @@ use App\Http\Controllers\Tu\JadwalController;
 use App\Http\Controllers\Tu\RuanganController;
 use App\Http\Controllers\Tu\TahunAjaranController;
 use App\Http\Controllers\Tu\WaliKelasController;
-
+use App\Http\Controllers\Tu\ArsipDokumenController;
 
 Route::middleware(['auth', 'role:tu'])
     ->prefix('tu')
@@ -71,6 +71,25 @@ Route::middleware(['auth', 'role:tu'])
 
         // Wali Kelas
         Route::resource('walikelas', WaliKelasController::class)->except(['show','edit','update']);
+
+        // Arsip Dokumen
+Route::resource('arsip-dokumen', ArsipDokumenController::class);
+
+// Tambahan route khusus preview & download
+Route::get('arsip-dokumen/{id}/preview', [ArsipDokumenController::class, 'preview'])
+    ->name('arsip-dokumen.preview');
+
+Route::get('arsip-dokumen/{id}/download', [ArsipDokumenController::class, 'download'])
+    ->name('arsip-dokumen.download');
+
+    Route::get('/arsip-dokumen/{id}/viewer', function($id) {
+    $doc = \App\Models\ArsipDokumen::findOrFail($id);
+
+    $pdfPath = '/storage/' . $doc->file_path;
+
+    return view('tu.arsip.viewer', compact('pdfPath'));
+})->name('tu.arsip-dokumen.viewer');
+
 
 
     });

@@ -6,29 +6,34 @@ use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration
 {
-    /**
-     * Run the migrations.
-     */
     public function up()
-{
-    Schema::create('jadwal', function (Blueprint $table) {
-        $table->id();
-        $table->unsignedBigInteger('kelas_id');
-        $table->string('mapel');
-        $table->unsignedBigInteger('guru_id');
-        $table->string('hari'); // Senin - Jumat
-        $table->time('jam_mulai');
-        $table->time('jam_selesai');
-        $table->timestamps();
+    {
+        Schema::create('jadwal', function (Blueprint $table) {
+            $table->id();
 
-        $table->foreign('kelas_id')->references('id')->on('kelas')->onDelete('cascade');
-        $table->foreign('guru_id')->references('id')->on('guru')->onDelete('cascade');
-    });
-}
+            // Relasi ke kelas
+            $table->unsignedBigInteger('kelas_id');
+            
+            // Relasi ke mata pelajaran
+            $table->unsignedBigInteger('mapel_id'); 
 
-public function down()
-{
-    Schema::dropIfExists('jadwal');
-}
+            // Relasi ke guru
+            $table->unsignedBigInteger('guru_id');
 
+            $table->string('hari'); // Senin - Jumat
+            $table->time('jam_mulai');
+            $table->time('jam_selesai');
+            $table->timestamps();
+
+            // Foreign keys
+            $table->foreign('kelas_id')->references('id')->on('kelas')->onDelete('cascade');
+            $table->foreign('mapel_id')->references('id')->on('mata_pelajaran')->onDelete('cascade');
+            $table->foreign('guru_id')->references('id')->on('guru')->onDelete('cascade');
+        });
+    }
+
+    public function down()
+    {
+        Schema::dropIfExists('jadwal');
+    }
 };

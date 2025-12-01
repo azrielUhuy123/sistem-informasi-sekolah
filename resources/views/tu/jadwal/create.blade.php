@@ -31,7 +31,12 @@
 
                 <div class="col-md-4 mb-3">
                     <label>Mata Pelajaran</label>
-                    <input type="text" name="mapel" class="form-control" required>
+                        <select name="mapel_id" class="form-control" required>
+                             <option value="">-- Pilih Mata Pelajaran --</option>
+                                    @foreach($mapel as $m)
+                            <option value="{{ $m->id }}">{{ $m->nama_mapel }}</option>
+                                 @endforeach
+                        </select>
                 </div>
 
                 <div class="col-md-4 mb-3">

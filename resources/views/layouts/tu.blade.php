@@ -98,12 +98,20 @@
                 Ruangan
             </a>
 
-            <a class="nav-link" href="{{ route('tu.rwakajai angan.index') }}">
-                Ruangan
+            <a class="nav-link" href="{{ route('tu.walikelas.index') }}">
+                Wali Kelas
             </a>
         </div>
     </li>
 
+    <!-- ARSIP DOKUMEN -->
+<li class="nav-item mt-2">
+    <a class="nav-link" href="{{ route('tu.arsip-dokumen.index') }}">
+        <i class="bi bi-folder"></i> Arsip Dokumen
+    </a>
+</li>
+
+    
 </ul>
 
     </div>

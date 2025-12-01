@@ -11,11 +11,10 @@ class Jadwal extends Model
     protected $fillable = [
         'kelas_id',
         'guru_id',
-        'mapel_id', // baru
+        'mapel_id',
         'hari',
         'jam_mulai',
         'jam_selesai',
-        'jenis_kunjungan', // contoh
     ];
 
     public function mapel()
