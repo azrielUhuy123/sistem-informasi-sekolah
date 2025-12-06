@@ -48,11 +48,12 @@
                     <option value="">-- Pilih --</option>
                     @foreach($tahun as $t)
                     <option value="{{ $t->id }}">
-                        {{ $t->tahun_mulai }} / {{ $t->tahun_akhir }}
+                        {{ $t->tahun }} ({{ $t->semester }})
                     </option>
                     @endforeach
                 </select>
             </div>
+
 
             <button class="btn btn-primary">Simpan</button>
 

@@ -15,7 +15,7 @@ class ArsipDokumenController extends Controller
     public function index()
     {
         $data = ArsipDokumen::latest()->get();
-        return view('tu.arsip.index', compact('data'));
+        return view('tu.surat.index', compact('data'));
     }
 
     /**
@@ -23,7 +23,7 @@ class ArsipDokumenController extends Controller
      */
     public function create()
     {
-        return view('tu.arsip.create');
+        return view('tu.surat.create');
     }
 
     /**
@@ -52,25 +52,25 @@ class ArsipDokumenController extends Controller
             'keterangan'     => $request->keterangan,
         ]);
 
-        return redirect()->route('tu.arsip-dokumen.index')->with('success', 'Dokumen berhasil disimpan.');
+        return redirect()->route('tu.surat.index')->with('success', 'Dokumen berhasil disimpan.');
     }
 
     /**
      * Preview PDF tanpa download.
      */
     public function preview($id)
-{
-    $doc = ArsipDokumen::findOrFail($id);
+    {
+        $doc = ArsipDokumen::findOrFail($id);
 
-    // hanya bisa untuk PDF
-    if (pathinfo($doc->file_path, PATHINFO_EXTENSION) !== 'pdf') {
-        return redirect()->back()->with('error', 'Preview hanya tersedia untuk file PDF.');
+        // hanya bisa untuk PDF
+        if (pathinfo($doc->file_path, PATHINFO_EXTENSION) !== 'pdf') {
+            return redirect()->back()->with('error', 'Preview hanya tersedia untuk file PDF.');
+        }
+
+        $fileUrl = asset('storage/' . $doc->file_path);
+
+        return view('tu.surat.preview', compact('fileUrl'));
     }
-
-    $fileUrl = asset('storage/' . $doc->file_path);
-
-    return view('arsip.preview', compact('fileUrl'));
-}
 
     /**
      * Download file dokumen.
@@ -87,7 +87,7 @@ class ArsipDokumenController extends Controller
     public function edit($id)
     {
         $doc = ArsipDokumen::findOrFail($id);
-        return view('arsip.edit', compact('doc'));
+        return view('tu.surat.edit', compact('doc'));
     }
 
     /**
@@ -113,7 +113,7 @@ class ArsipDokumenController extends Controller
             'keterangan'     => $request->keterangan,
         ]);
 
-        return redirect()->route('tu.arsip-dokumen.index')->with('success', 'Data berhasil diperbarui.');
+        return redirect()->route('tu.surat.index')->with('success', 'Data berhasil diperbarui.');
     }
 
     /**
@@ -130,6 +130,6 @@ class ArsipDokumenController extends Controller
 
         $doc->delete();
 
-        return redirect()->route('tu.arsip-dokumen.index')->with('success', 'Dokumen berhasil dihapus.');
+        return redirect()->route('tu.surat.index')->with('success', 'Dokumen berhasil dihapus.');
     }
 }

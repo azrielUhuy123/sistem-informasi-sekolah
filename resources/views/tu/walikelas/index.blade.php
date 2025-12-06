@@ -30,7 +30,13 @@
                 <tr>
                     <td>{{ $w->kelas->nama_kelas }}</td>
                     <td>{{ $w->guru->nama }}</td>
-                    <td>{{ $w->tahun->tahun_mulai }} / {{ $w->tahun->tahun_akhir }}</td>
+                    <td>
+                    @if($w->tahun) {{ $w->tahun->tahun }} ({{ $w->tahun->semester }})
+                    @else
+                        /
+                    @endif
+                    </td>
+
                     <td>
                         <form action="{{ route('tu.walikelas.destroy', $w->id) }}"
                               method="POST" class="d-inline">

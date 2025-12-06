@@ -2,146 +2,273 @@
 <html>
 <head>
     <title>@yield('title')</title>
+
+    <!-- Bootstrap + Icons -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-
-    <style>
-        body {
-            display: flex;
-            min-height: 100vh;
-        }
-        .sidebar {
-            width: 250px;
-            background: #2c3e50;
-            color: white;
-            min-height: 100vh;
-            padding: 20px;
-        }
-        .sidebar a {
-            color: white;
-            text-decoration: none;
-            display: block;
-            padding: 10px 0;
-            margin-bottom: 5px;
-        }
-        .sidebar a:hover {
-            background: #34495e;
-            padding-left: 5px;
-            transition: 0.2s;
-        }
-        .content-wrapper {
-            flex: 1;
-            display: flex;
-            flex-direction: column;
-            background: #f8f9fa;
-        }
-        .topbar {
-            background: white;
-            padding: 15px 25px;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-        .content {
-            padding: 25px;
-        }
-    </style>
-</head>
-<body>
-
-    <!-- SIDEBAR -->
-    <div class="sidebar">
-        <h4>Menu TU</h4>
-        <hr>
-
-        <ul class="nav flex-column">
-
-    <li class="nav-item">
-        <a class="nav-link" href="{{ route('tu.dashboard') }}">
-            <i class="bi bi-speedometer2"></i> Dashboard
-        </a>
-    </li>
-
-    <!-- DROPDOWN MANAJEMEN SEKOLAH -->
-    <li class="nav-item">
-        <a class="nav-link dropdown-toggle" data-bs-toggle="collapse" href="#menuSekolah" role="button">
-            <i class="bi bi-building"></i> Manajemen Sekolah
-        </a>
-
-        <div class="collapse ms-3" id="menuSekolah">
-
-            <a class="nav-link" href="{{ route('tu.kelas.index') }}">
-                Kelas
-            </a>
-
-            <a class="nav-link" href="{{ route('tu.tahun.index') }}">
-                Tahun Ajaran
-            </a>
-
-            <a class="nav-link" href="{{ route('tu.siswa.index') }}">
-                Siswa
-            </a>
-
-            <a class="nav-link" href="{{ route('tu.guru.index') }}">
-                Guru
-            </a>
-
-            <a class="nav-link" href="{{ route('tu.jadwal.index') }}">
-                Jadwal
-            </a>
-
-            <a class="nav-link" href="{{ route('tu.mapel.index') }}">
-                Mata Pelajaran
-            </a>
-
-            <a class="nav-link" href="{{ route('tu.ruangan.index') }}">
-                Ruangan
-            </a>
-
-            <a class="nav-link" href="{{ route('tu.walikelas.index') }}">
-                Wali Kelas
-            </a>
-        </div>
-    </li>
-
-    <!-- ARSIP DOKUMEN -->
-<li class="nav-item mt-2">
-    <a class="nav-link" href="{{ route('tu.arsip-dokumen.index') }}">
-        <i class="bi bi-folder"></i> Arsip Dokumen
-    </a>
-</li>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css" rel="stylesheet">
+    <meta name="csrf-token" content="{{ csrf_token() }}">
 
     
-</ul>
+    <style>
+        body {
+            margin: 0;
+            font-family: 'Segoe UI', sans-serif;
+            background: #eef1f8;
+            transition: 0.3s;
+        }
 
-    </div>
+        .layout-wrapper {
+            width: 100%;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
 
-    <!-- KANAN -->
-    <div class="content-wrapper">
+        /* TOPBAR */
+        .topbar {
+            background: #ffffff;
+            height: 70px;
+            border-bottom: 1px solid #e7e7e7;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 25px;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.04);
+        }
 
-        <!-- TOPBAR -->
-        <div class="topbar">
-            <h4 class="m-0"><b>SDN MEKAR JAYA</b></h4>
+        .topbar h4 {
+            font-weight: 800;
+            
+            margin: 0;
+        }
 
-            <div style="position: relative; flex:1; max-width: 400px;" class="ms-4">
-                <input type="text" id="globalSearch" class="form-control" placeholder="Cari siswa / kelas...">
+        /* Mengatur area kanan topbar */
+        .topbar-right {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
 
-                <!-- Dropdown hasil -->
-                <div id="searchResults"
-                    class="bg-white border rounded shadow-sm mt-1"
-                    style="display:none; position:absolute; width:100%; z-index:1000;">
-                </div>
+        /* Search box lebih kecil */
+        .search-box {
+            position: relative;
+            width: 260px;
+        }
+
+        .search-box input {
+            padding-left: 12px;
+        }
+
+        /* Sidebar */
+        .main-area {
+            flex: 1;
+            display: flex;
+            height: calc(100vh - 70px);
+        }
+
+        .sidebar {
+            width: 260px;
+            background: #ffffff;
+            padding: 30px 18px;
+            border-right: 1px solid #e8e8e8;
+            overflow-y: auto;
+        }
+
+        .sidebar-title {
+            font-size: 14px;
+            color: #8088a2;
+            font-weight: 700;
+            margin-bottom: 14px;
+        }
+
+        .menu-item {
+            display: flex;
+            align-items: center;
+            padding: 12px 14px;
+            height: 48px;
+            border-radius: 12px;
+            font-size: 15px;
+            text-decoration: none;
+            color: #3b3f52;
+            margin-bottom: 6px;
+            transition: 0.25s;
+        }
+
+        .menu-item i {
+            margin-right: 12px;
+            font-size: 17px;
+        }
+
+        .menu-item:hover {
+            background: #f1f3fb;
+            color: #4d5bd8;
+        }
+
+        .menu-item.active {
+            background: #e9edff;
+            color: #4d5bd8 !important;
+            font-weight: 600;
+        }
+
+        .content {
+            flex: 1;
+            padding: 30px;
+            overflow-y: auto;
+        }
+        /* Indent submenu (item di dalam dropdown) */
+.submenu .menu-item {
+    padding-left: 34px !important; 
+    font-size: 14px;
+    opacity: 0.95;
+}
+
+        /* DARK MODE FULL */
+.dark-mode {
+    background: #1e1f26 !important;
+    color: #e6e6e6 !important;
+}
+
+.dark-mode .topbar {
+    background: #2c2e36 !important;
+    border-color: #3a3b44 !important;
+}
+
+.dark-mode .sidebar {
+    background: #2c2e36 !important;
+    border-color: #3a3b44 !important;
+}
+
+.dark-mode .menu-item {
+    color: #d0d0d0 !important;
+}
+
+.dark-mode .menu-item:hover {
+    background: #3c3f4a !important;
+    color: #ffffff !important;
+}
+
+.dark-mode .menu-item.active {
+    background: #4d53ff !important;
+    color: #fff !important;
+}
+
+.dark-mode .content {
+    color: #e6e6e6;
+}
+
+.dark-mode input, 
+.dark-mode .dropdown-menu, 
+.dark-mode .card, 
+.dark-mode #searchResults {
+    background: #2e3038 !important;
+    color: #e6e6e6 !important;
+    border-color: #444 !important;
+}
+.search-item {
+    cursor: pointer;
+    border-bottom: 1px solid #f0f0f0;
+}
+
+.search-item:hover {
+    background: #f5f6ff;
+}
+
+.dark-mode .search-item:hover {
+    background: #3a3c45 !important;
+
+
+}
+
+/* =============== FIX PAGINATION FINAL =============== */
+
+/* Reset seluruh wrapper pagination */
+.content .pagination,
+.content .pagination * {
+    all: initial !important;
+    font-family: inherit !important;
+    box-sizing: border-box !important;
+}
+
+/* Pagination container */
+.content .pagination {
+    display: flex !important;
+    gap: 6px !important;
+    align-items: center !important;
+}
+
+/* Pagination item */
+.content .pagination li {
+    list-style: none !important;
+    display: block !important;
+}
+
+/* Links */
+.content .pagination a,
+.content .pagination span {
+    display: inline-block !important;
+    padding: 6px 12px !important;
+    border: 1px solid #d0d0d0 !important;
+    border-radius: 6px !important;
+    background: #ffffff !important;
+    color: #4d5bd8 !important;
+    font-size: 14px !important;
+    text-decoration: none !important;
+    cursor: pointer !important;
+}
+
+/* SVG arrows */
+.content .pagination svg {
+    width: 14px !important;
+    height: 14px !important;
+    stroke: #4d5bd8 !important;
+    stroke-width: 2 !important;
+    display: inline-block !important;
+}
+
+/* Hover effect */
+.content .pagination a:hover {
+    background: #eef0ff !important;
+}
+
+/* Active page */
+.content .pagination .active span {
+    background: #4d5bd8 !important;
+    color: white !important;
+}
+
+
+    </style>
+</head>
+
+<body>
+
+<div class="layout-wrapper">
+
+    <!-- TOPBAR -->
+    <div class="topbar">
+
+        <!-- KIRI -->
+        <h4>SDN MEKAR JAYA</h4>
+
+        <!-- KANAN -->
+        <div class="topbar-right">
+
+            <!-- SEARCH -->
+            <div class="search-box">
+                <input type="text" id="globalSearch" class="form-control shadow-sm" placeholder="Cari siswa / kelas...">
+                <div id="searchResults" class="bg-white border rounded shadow-sm mt-1"
+                     style="display:none; position:absolute; width:100%; z-index:1000;"></div>
             </div>
 
+            <!-- DARK MODE -->
+            <button id="darkToggle" class="btn">🌙</button>
 
-
-            <!-- Dropdown Profil -->
+            <!-- PROFIL -->
             <div class="dropdown">
-                <a class="btn btn-light dropdown-toggle" href="#" data-bs-toggle="dropdown">
+                <a class="btn btn-light shadow-sm dropdown-toggle" href="#" data-bs-toggle="dropdown">
                     {{ Auth::user()->name }}
                 </a>
-
-                <ul class="dropdown-menu dropdown-menu-end">
+                <ul class="dropdown-menu dropdown-menu-end shadow-sm">
                     <li><a class="dropdown-item" href="{{ route('profile.edit') }}">Profil</a></li>
                     <li><hr class="dropdown-divider"></li>
                     <li>
@@ -152,6 +279,80 @@
                     </li>
                 </ul>
             </div>
+
+        </div>
+    </div>
+
+    <!-- MAIN -->
+    <div class="main-area">
+
+        <!-- SIDEBAR -->
+        <div class="sidebar">
+
+            <div class="sidebar-title">MAIN TATA USAHA</div>
+
+            <a class="menu-item {{ request()->is('tu/dashboard') ? 'active' : '' }}"
+               href="{{ route('tu.dashboard') }}">
+                <i class="bi bi-speedometer2"></i> Dashboard
+            </a>
+
+            <!-- Manajemen Sekolah -->
+            <a class="menu-item dropdown-toggle" data-bs-toggle="collapse" href="#menuSekolah">
+                <i class="bi bi-building"></i> Manajemen Sekolah
+            </a>
+
+            <div class="collapse show submenu" id="menuSekolah">
+                <a class="menu-item {{ request()->is('tu/kelas*') ? 'active' : '' }}" href="{{ route('tu.kelas.index') }}">
+                    <i class="bi bi-people"></i> Kelas
+                </a>
+
+                <a class="menu-item {{ request()->is('tu/tahun*') ? 'active' : '' }}" href="{{ route('tu.tahun.index') }}">
+                    <i class="bi bi-calendar3"></i> Tahun Ajaran
+                </a>
+
+                <a class="menu-item {{ request()->is('tu/siswa*') ? 'active' : '' }}" href="{{ route('tu.siswa.index') }}">
+                    <i class="bi bi-mortarboard"></i> Siswa
+                </a>
+
+                <a class="menu-item {{ request()->is('tu/guru*') ? 'active' : '' }}" href="{{ route('tu.guru.index') }}">
+                    <i class="bi bi-person-badge"></i> Guru
+                </a>
+
+                <a class="menu-item {{ request()->is('tu/jadwal*') ? 'active' : '' }}" href="{{ route('tu.jadwal.index') }}">
+                    <i class="bi bi-calendar-week"></i> Jadwal
+                </a>
+
+                <a class="menu-item {{ request()->is('tu/mapel*') ? 'active' : '' }}" href="{{ route('tu.mapel.index') }}">
+                    <i class="bi bi-journal-text"></i> Mata Pelajaran
+                </a>
+
+                <a class="menu-item {{ request()->is('tu/ruangan*') ? 'active' : '' }}" href="{{ route('tu.ruangan.index') }}">
+                    <i class="bi bi-door-closed"></i> Ruangan
+                </a>
+
+                <a class="menu-item {{ request()->is('tu/walikelas*') ? 'active' : '' }}" href="{{ route('tu.walikelas.index') }}">
+                    <i class="bi bi-person-workspace"></i> Wali Kelas
+                </a>
+
+            </div>
+
+            <!-- ARSIP -->
+            <a class="menu-item dropdown-toggle" data-bs-toggle="collapse" href="#menuArsip">
+                <i class="bi bi-folder2-open"></i> Arsip & Dokumen
+            </a>
+
+            <div class="collapse show submenu" id="menuArsip">
+                <a class="menu-item {{ request()->is('tu/arsip-dokumen*') ? 'active' : '' }}"
+                   href="{{ route('tu.arsip-dokumen.index') }}">
+                    <i class="bi bi-file-earmark-text"></i> Surat
+                </a>
+
+                <a class="menu-item {{ request()->is('tu/datakepegawaian*') ? 'active' : '' }}"
+                   href="{{ route('tu.datakepegawaian.index') }}">
+                    <i class="bi bi-people-fill"></i> Data Kepegawaian
+                </a>
+            </div>
+
         </div>
 
         <!-- CONTENT -->
@@ -160,53 +361,105 @@
         </div>
 
     </div>
-<script>
-document.getElementById('globalSearch').addEventListener('keyup', function() {
-    let q = this.value;
+</div>
 
-    if (q.length < 2) {
-        document.getElementById('searchResults').style.display = 'none';
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+<script>
+document.getElementById("darkToggle").onclick = function () {
+    document.body.classList.toggle("dark-mode");
+};
+</script>
+<script>
+/* ============================
+   🔥 DARK MODE + LOCALSTORAGE
+   ============================ */
+
+const darkToggle = document.getElementById("darkToggle");
+
+// Load dark mode dari localStorage
+if (localStorage.getItem("darkMode") === "enabled") {
+    document.body.classList.add("dark-mode");
+    darkToggle.innerText = "☀️";
+}
+
+darkToggle.onclick = function () {
+    document.body.classList.toggle("dark-mode");
+
+    if (document.body.classList.contains("dark-mode")) {
+        localStorage.setItem("darkMode", "enabled");
+        darkToggle.innerText = "☀️";
+    } else {
+        localStorage.setItem("darkMode", "disabled");
+        darkToggle.innerText = "🌙";
+    }
+};
+
+
+
+/* ============================
+   🔍 GLOBAL SEARCH AJAX
+   ============================ */
+
+let searchInput = document.getElementById("globalSearch");
+let searchResults = document.getElementById("searchResults");
+
+searchInput.addEventListener("keyup", function () {
+    let query = this.value.trim();
+
+    if (query.length < 2) {
+        searchResults.style.display = "none";
         return;
     }
 
-    fetch("{{ route('tu.search.ajax') }}?q=" + q)
-        .then(response => response.json())
+    fetch(`/tu/search?q=${query}`)
+        .then(res => res.json())
         .then(data => {
             let html = "";
 
             if (data.siswa.length === 0 && data.kelas.length === 0) {
-                html = "<div class='p-2 text-muted'>Tidak ada hasil</div>";
+                html = `<div class="p-2 text-muted">Tidak ada hasil...</div>`;
             }
 
+            // Siswa
             if (data.siswa.length > 0) {
-                html += "<div class='p-2 fw-bold border-bottom bg-light'>Siswa</div>";
+                html += `<div class="fw-bold px-2 pt-2">Siswa</div>`;
                 data.siswa.forEach(s => {
                     html += `
-                        <a href="/tu/siswa/${s.id}/edit" class="p-2 d-block text-dark" style="text-decoration:none;">
-                            ${s.nama} — NIS: ${s.nis}
-                        </a>
+                        <div class="p-2 search-item" onclick="window.location='/tu/siswa/${s.id}'">
+                            <i class="bi bi-person me-2"></i> ${s.nama}
+                            <div class="small text-muted">${s.nis}</div>
+                        </div>
                     `;
                 });
             }
 
+            // Kelas
             if (data.kelas.length > 0) {
-                html += "<div class='p-2 fw-bold border-bottom bg-light mt-2'>Kelas</div>";
+                html += `<div class="fw-bold px-2 pt-2">Kelas</div>`;
                 data.kelas.forEach(k => {
                     html += `
-                        <a href="/tu/kelas/${k.id}/edit" class="p-2 d-block text-dark" style="text-decoration:none;">
-                            ${k.nama_kelas} — Tingkat ${k.tingkat}
-                        </a>
+                        <div class="p-2 search-item" onclick="window.location='/tu/kelas/${k.id}'">
+                            <i class="bi bi-people me-2"></i> ${k.nama_kelas}
+                        </div>
                     `;
                 });
             }
 
-            let resultsBox = document.getElementById('searchResults');
-            resultsBox.innerHTML = html;
-            resultsBox.style.display = 'block';
+            searchResults.innerHTML = html;
+            searchResults.style.display = "block";
         });
+});
+
+// Klik luar → tutup dropdown
+document.addEventListener("click", function (e) {
+    if (!searchInput.contains(e.target)) {
+        searchResults.style.display = "none";
+    }
 });
 </script>
 
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+@yield('scripts')
+
 </body>
 </html>

@@ -1,3 +1,10 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+/* =========================================
+   MAIN CSS AGGREGATOR
+   Semua style ./tu diimport dari sini
+========================================= */
+
+/* Global & Base */
+/* GLOBAL */

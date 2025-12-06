@@ -32,15 +32,13 @@
             </div>
 
             <div class="mb-3">
-    <label>Mata Pelajaran</label>
-    <select name="mapel_id" class="form-control" required>
-        <option value="">-- Pilih Mata Pelajaran --</option>
-        @foreach($mapel as $m)
-            <option value="{{ $m->id }}">{{ $m->nama_mapel }}</option>
-        @endforeach
-    </select>
-</div>
-
+                <label>Mata Pelajaran</label>
+                <select name="mapel_id" class="form-control" required>
+                    <option value="">-- Pilih Mata Pelajaran --</option>
+                    @foreach($mapel as $m)
+                        <option value="{{ $m->id }}">{{ $m->nama_mapel }}</option>
+                    @endforeach
+                </select>
             </div>
 
             <div class="mb-3">
@@ -59,14 +57,13 @@
             </div>
 
             <div class="mb-3">
-            <label>Upload Foto</label>
-            <input type="file" name="foto" class="form-control">
-        </div>
+                <label>Upload Foto</label>
+                <input type="file" name="foto" class="form-control">
+            </div>
 
             <button class="btn btn-primary">Simpan</button>
 
         </form>
-
 
     </div>
 </div>

@@ -4,186 +4,208 @@ namespace App\Http\Controllers\Tu;
 
 use App\Http\Controllers\Controller;
 use App\Models\Jadwal;
-use App\Models\Kelas;
 use App\Models\Guru;
-use App\Models\MataPelajaran;
+use App\Models\Kelas;
+use App\Models\Ruangan;
 use Illuminate\Http\Request;
-use Barryvdh\DomPDF\Facade\Pdf;
 
 class JadwalController extends Controller
 {
-    // LIST
+    /**
+     * INDEX — Sorting + Search + Filter Deleted + Pagination
+     */
     public function index(Request $request)
     {
-        $kelas_id = $request->kelas_id ?? null;
+        $deleted = $request->deleted ?? 'active';
 
-        $jadwal = Jadwal::with(['kelas', 'guru', 'mapel'])
-            ->when($kelas_id, function($q) use ($kelas_id) {
-                $q->where('kelas_id', $kelas_id);
-            })
-            ->orderBy('id', 'desc')
-            ->paginate(20);
+        if ($deleted === 'only') {
+            $query = Jadwal::onlyTrashed()->with(['kelas', 'guru', 'ruangan']);
+        } elseif ($deleted === 'all') {
+            $query = Jadwal::withTrashed()->with(['kelas', 'guru', 'ruangan']);
+        } else {
+            $query = Jadwal::with(['kelas', 'guru', 'ruangan']);
+        }
 
-        $kelas = Kelas::orderBy('nama_kelas')->get();
+        // SEARCH
+        if ($request->q) {
+            $query->where(function ($q) use ($request) {
+                $q->whereHas('kelas', function ($x) use ($request) {
+                        $x->where('nama_kelas', 'like', "%{$request->q}%");
+                    })
+                  ->orWhereHas('guru', function ($x) use ($request) {
+                        $x->where('nama', 'like', "%{$request->q}%")
+                          ->orWhere('nip', 'like', "%{$request->q}%");
+                  })
+                  ->orWhere('hari', 'like', "%{$request->q}%")
+                  ->orWhere('jam_mulai', 'like', "%{$request->q}%")
+                  ->orWhere('jam_selesai', 'like', "%{$request->q}%");
+            });
+        }
 
-        return view('tu.jadwal.index', compact('jadwal', 'kelas', 'kelas_id'));
+        // SORTING
+        $sort = $request->sort ?? 'id';
+        $order = $request->order ?? 'asc';
+
+        $allowed = ['id', 'hari', 'jam_mulai', 'jam_selesai'];
+        if (!in_array($sort, $allowed)) $sort = 'id';
+
+        $query->orderBy($sort, $order);
+
+        // PAGINATION
+        $perPage = $request->per_page ?? 15;
+
+        $jadwal = $query->paginate($perPage)->withQueryString();
+
+        return view('tu.jadwal.index', compact('jadwal'));
     }
 
-    // CREATE
+    /**
+     * CREATE PAGE
+     */
     public function create()
     {
-        $kelas = Kelas::orderBy('nama_kelas')->get();
-        $guru  = Guru::orderBy('nama')->get();
-        $mapel = MataPelajaran::orderBy('nama_mapel')->get();
-
-        return view('tu.jadwal.create', compact('kelas','guru','mapel'));
+        return view('tu.jadwal.create', [
+            'kelas'   => Kelas::all(),
+            'guru'    => Guru::all(),
+            'ruangan' => Ruangan::all(),
+        ]);
     }
 
-    // EDIT
-    public function edit($id)
-    {
-        $jadwal = Jadwal::findOrFail($id);
-        $kelas  = Kelas::orderBy('nama_kelas')->get();
-        $guru   = Guru::orderBy('nama')->get();
-        $mapel  = MataPelajaran::orderBy('nama_mapel')->get();
-
-        return view('tu.jadwal.edit', compact('jadwal', 'kelas', 'guru', 'mapel'));
-    }
-
-    // DETAIL
-    public function detail($id)
-    {
-        $jadwal = Jadwal::with(['kelas', 'guru', 'mapel'])
-            ->findOrFail($id);
-
-        return view('tu.jadwal.detail', compact('jadwal'));
-    }
-
-    // STORE
+    /**
+     * STORE
+     */
     public function store(Request $request)
     {
         $request->validate([
-            'kelas_id' => 'required|exists:kelas,id',
-            'guru_id' => 'required|exists:guru,id',
-            'mapel_id' => 'required|exists:mata_pelajaran,id',
-            'hari' => 'required',
-            'jam_mulai' => 'required',
-            'jam_selesai' => 'required|after:jam_mulai',
+            'kelas_id'    => 'required|exists:kelas,id',
+            'guru_id'     => 'required|exists:guru,id',
+            'hari'        => 'required',
+            'jam_mulai'   => 'required',
+            'jam_selesai' => 'required',
+            'ruangan_id'  => 'nullable|exists:ruangan,id',
         ]);
 
-        // VALIDASI BENTROK KELAS
-        $bentrok = Jadwal::where('kelas_id', $request->kelas_id)
-            ->where('hari', $request->hari)
-            ->where(function($q) use ($request) {
-                $q->where('jam_mulai', '<', $request->jam_selesai)
-                  ->where('jam_selesai', '>', $request->jam_mulai);
-            })
-            ->exists();
+        Jadwal::create($request->all());
 
-        if ($bentrok) {
-            return back()->withErrors(['msg'=>'Jadwal bentrok dengan kelas lain'])->withInput();
-        }
-
-        // VALIDASI BENTROK GURU
-        $guruBentrok = Jadwal::where('guru_id', $request->guru_id)
-            ->where('hari', $request->hari)
-            ->where(function($q) use ($request) {
-                $q->where('jam_mulai', '<', $request->jam_selesai)
-                  ->where('jam_selesai', '>', $request->jam_mulai);
-            })
-            ->exists();
-
-        if ($guruBentrok) {
-            return back()->withErrors(['msg'=>'Guru sudah mengajar pada jam tersebut'])->withInput();
-        }
-
-        Jadwal::create($request->only([
-            'kelas_id','guru_id','mapel_id','hari','jam_mulai','jam_selesai'
-        ]));
-
-        return redirect()->route('tu.jadwal.index')->with('success','Jadwal berhasil ditambahkan');
+        return redirect()->route('tu.jadwal.index')
+            ->with('success', 'Jadwal berhasil ditambahkan!');
     }
 
-    // UPDATE
+    /**
+     * DETAIL PAGE
+     */
+    public function detail($id)
+    {
+        $jadwal = Jadwal::with(['kelas', 'guru', 'ruangan', 'mapel'])->findOrFail($id);
+        return view('tu.jadwal.detail', compact('jadwal'));
+    }
+
+    /**
+     * EDIT PAGE
+     */
+    public function edit($id)
+    {
+        return view('tu.jadwal.edit', [
+            'jadwal'  => Jadwal::withTrashed()->findOrFail($id),
+            'kelas'   => Kelas::all(),
+            'guru'    => Guru::all(),
+            'ruangan' => Ruangan::all(),
+        ]);
+    }
+
+    /**
+     * UPDATE
+     */
     public function update(Request $request, $id)
     {
-        $jadwal = Jadwal::findOrFail($id);
+        $jadwal = Jadwal::withTrashed()->findOrFail($id);
 
         $request->validate([
-            'kelas_id' => 'required|exists:kelas,id',
-            'guru_id' => 'required|exists:guru,id',
-            'mapel_id' => 'required|exists:mata_pelajaran,id',
-            'hari' => 'required',
-            'jam_mulai' => 'required',
-            'jam_selesai' => 'required|after:jam_mulai',
+            'kelas_id'    => 'required|exists:kelas,id',
+            'guru_id'     => 'required|exists:guru,id',
+            'hari'        => 'required',
+            'jam_mulai'   => 'required',
+            'jam_selesai' => 'required',
+            'ruangan_id'  => 'nullable|exists:ruangan,id',
         ]);
 
-        // VALIDASI BENTROK KELAS
-        $bentrok = Jadwal::where('kelas_id', $request->kelas_id)
-            ->where('hari', $request->hari)
-            ->where('id', '!=', $id)
-            ->where(function($q) use ($request) {
-                $q->where('jam_mulai', '<', $request->jam_selesai)
-                  ->where('jam_selesai', '>', $request->jam_mulai);
-            })
-            ->exists();
+        $jadwal->update($request->all());
 
-        if ($bentrok) {
-            return back()->withErrors(['msg'=>'Jadwal bentrok di kelas ini'])->withInput();
-        }
-
-        // VALIDASI BENTROK GURU
-        $guruBentrok = Jadwal::where('guru_id', $request->guru_id)
-            ->where('hari', $request->hari)
-            ->where('id', '!=', $id)
-            ->where(function($q) use ($request) {
-                $q->where('jam_mulai', '<', $request->jam_selesai)
-                  ->where('jam_selesai', '>', $request->jam_mulai);
-            })
-            ->exists();
-
-        if ($guruBentrok) {
-            return back()->withErrors(['msg'=>'Guru bentrok pada jam tersebut'])->withInput();
-        }
-
-        $jadwal->update($request->only([
-            'kelas_id','guru_id','mapel_id','hari','jam_mulai','jam_selesai'
-        ]));
-
-        return redirect()->route('tu.jadwal.index')->with('success', 'Jadwal berhasil diperbarui');
+        return redirect()->route('tu.jadwal.index')
+            ->with('success', 'Jadwal berhasil diperbarui!');
     }
 
-    // EXPORT PDF PER KELAS
-    public function exportPDF($kelas_id)
+    /**
+     * DELETE — Soft Delete
+     */
+    public function destroy($id)
     {
-        $kelas = Kelas::findOrFail($kelas_id);
+        Jadwal::findOrFail($id)->delete();
 
-        $jadwal = Jadwal::with(['guru','mapel'])
-            ->where('kelas_id', $kelas_id)
-            ->orderByRaw("FIELD(hari, 'Senin','Selasa','Rabu','Kamis','Jumat','Sabtu')")
-            ->orderBy('jam_mulai')
-            ->get();
-
-        $pdf = Pdf::loadView('tu.jadwal.export-pdf', compact('kelas', 'jadwal'))
-                ->setPaper('a4', 'portrait');
-
-        return $pdf->download('jadwal_kelas_' . $kelas->nama_kelas . '.pdf');
+        return redirect()->route('tu.jadwal.index')
+            ->with('success', 'Jadwal dipindahkan ke trash.');
     }
 
-    // EXPORT PDF PER GURU
-    public function exportGuruPDF($guru_id)
+    /**
+     * RESTORE
+     */
+    public function restore($id)
     {
-        $guru = Guru::findOrFail($guru_id);
+        Jadwal::withTrashed()->findOrFail($id)->restore();
 
-        $jadwal = Jadwal::with(['kelas','mapel'])
-            ->where('guru_id', $guru_id)
-            ->orderByRaw("FIELD(hari, 'Senin','Selasa','Rabu','Kamis','Jumat','Sabtu')")
-            ->orderBy('jam_mulai')
+        return back()->with('success', 'Jadwal berhasil direstore.');
+    }
+
+    /**
+     * FORCE DELETE
+     */
+    public function forceDelete($id)
+    {
+        Jadwal::withTrashed()->findOrFail($id)->forceDelete();
+
+        return back()->with('success', 'Jadwal berhasil dihapus permanen.');
+    }
+
+    /**
+     * BULK ACTION
+     */
+    public function bulkAction(Request $request)
+    {
+        $request->validate([
+            'action' => 'required|in:delete,restore,forceDelete',
+            'ids'    => 'required|array',
+        ]);
+
+        $ids = $request->ids;
+
+        switch ($request->action) {
+            case 'delete':
+                Jadwal::whereIn('id', $ids)->delete();
+                return response()->json(['message' => 'Berhasil menghapus jadwal.']);
+
+            case 'restore':
+                Jadwal::onlyTrashed()->whereIn('id', $ids)->restore();
+                return response()->json(['message' => 'Berhasil merestore jadwal.']);
+
+            case 'forceDelete':
+                Jadwal::onlyTrashed()->whereIn('id', $ids)->forceDelete();
+                return response()->json(['message' => 'Berhasil menghapus permanen.']);
+        }
+    }
+
+    /**
+     * AJAX LIVE SEARCH (tanpa reload halaman)
+     */
+    public function ajaxSearch(Request $request)
+    {
+        $keyword = $request->q;
+
+        $data = Jadwal::with(['kelas', 'guru', 'ruangan'])
+            ->whereHas('kelas', fn ($q) => $q->where('nama_kelas', 'like', "%$keyword%"))
+            ->orWhereHas('guru', fn ($q) => $q->where('nama', 'like', "%$keyword%"))
+            ->orWhere('hari', 'like', "%$keyword%")
             ->get();
 
-        $pdf = Pdf::loadView('tu.jadwal.export-guru-pdf', compact('guru', 'jadwal'))
-                ->setPaper('a4', 'portrait');
-
-        return $pdf->download('jadwal_guru_' . $guru->nama . '.pdf');
+        return response()->json($data);
     }
 }

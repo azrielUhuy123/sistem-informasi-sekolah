@@ -8,17 +8,15 @@ return new class extends Migration
 {
     public function up(): void
     {
-        Schema::table('jadwal', function (Blueprint $table) {
-            if (Schema::hasColumn('jadwal', 'mapel')) {
-                $table->dropColumn('mapel');
-            }
+        Schema::table('kelas', function (Blueprint $table) {
+            $table->softDeletes(); // menambahkan kolom deleted_at
         });
     }
 
     public function down(): void
     {
-        Schema::table('jadwal', function (Blueprint $table) {
-            $table->string('mapel')->nullable();
+        Schema::table('kelas', function (Blueprint $table) {
+            $table->dropSoftDeletes(); // hapus kolom deleted_at
         });
     }
 };

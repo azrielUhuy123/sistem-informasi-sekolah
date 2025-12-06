@@ -5,129 +5,189 @@ namespace App\Http\Controllers\Tu;
 use App\Http\Controllers\Controller;
 use App\Models\Guru;
 use Illuminate\Http\Request;
-use App\Models\MataPelajaran;
 
 class GuruController extends Controller
 {
-    // LIST DATA GURU
+    /**
+     * INDEX — Sorting + Search + Filter Deleted + Pagination
+     */
     public function index(Request $request)
     {
-        $sort = $request->get('sort', 'id');
-        $order = $request->get('order', 'asc');
+        $deleted = $request->deleted ?? 'active'; // active | only | all
 
-        // Kolom yang diizinkan untuk sorting
-        $allowed = ['id', 'nip', 'nama', 'mapel_id', 'jenis_kelamin'];
-        if (!in_array($sort, $allowed)) {
-            $sort = 'id';
+        if ($deleted === 'only') {
+            $query = Guru::onlyTrashed();
+        } elseif ($deleted === 'all') {
+            $query = Guru::withTrashed();
+        } else {
+            $query = Guru::query();
         }
 
-        $guru = Guru::with('mapel')   // penting!
-                    ->orderBy($sort, $order)
-                    ->paginate(20)
-                    ->withQueryString();
+        // SEARCH
+        if ($request->q) {
+            $query->where(function ($q) use ($request) {
+                $q->where('nama', 'like', "%{$request->q}%")
+                  ->orWhere('nip', 'like', "%{$request->q}%")
+                  ->orWhere('jenis_kelamin', 'like', "%{$request->q}%")
+                  ->orWhere('mapel', 'like', "%{$request->q}%")
+                  ->orWhere('alamat', 'like', "%{$request->q}%");
+            });
+        }
+
+        // SORTING
+        $sort = $request->sort ?? 'id';
+        $order = $request->order ?? 'asc';
+
+        $allowed = ['id', 'nama', 'nip', 'mapel'];
+        if (!in_array($sort, $allowed)) $sort = 'id';
+
+        $query->orderBy($sort, $order);
+
+        // PAGINATION
+        $perPage = $request->per_page ?? 15;
+        $guru = $query->paginate($perPage)->withQueryString();
 
         return view('tu.guru.index', compact('guru'));
     }
 
-    // FORM TAMBAH
+    /**
+     * CREATE PAGE
+     */
     public function create()
     {
-        $mapel = MataPelajaran::orderBy('nama_mapel')->get();
-        return view('tu.guru.create', compact('mapel'));
+        return view('tu.guru.create');
     }
 
-    // SIMPAN
+    /**
+     * STORE
+     */
     public function store(Request $request)
     {
         $request->validate([
-            'nama' => 'required',
-            'nip' => 'required|unique:guru,nip',
+            'nama'          => 'required',
+            'nip'           => 'nullable|unique:guru',
             'jenis_kelamin' => 'required',
-            'mapel_id' => 'required|exists:mata_pelajaran,id',
-            'email' => 'nullable|email|unique:guru,email',
-            'telepon' => 'nullable',
-            'alamat' => 'nullable',
-            'foto' => 'nullable|image|mimes:jpg,jpeg,png|max:2048'
+            'mapel'         => 'nullable',
+            'alamat'        => 'nullable',
         ]);
 
-        $data = $request->only([
-            'nama','nip','jenis_kelamin','email','telepon','alamat','mapel_id'
-        ]);
-
-        // Upload foto
-        if ($request->hasFile('foto')) {
-            $file = $request->file('foto');
-            $filename = time() . '-' . $file->getClientOriginalName();
-            $file->move(public_path('foto-guru'), $filename);
-            $data['foto'] = $filename;
-        }
-
-        Guru::create($data);
+        Guru::create($request->all());
 
         return redirect()->route('tu.guru.index')
-                         ->with('success', 'Guru berhasil ditambahkan');
+            ->with('success', 'Guru berhasil ditambahkan!');
     }
 
-    // FORM EDIT
+    /**
+     * DETAIL PAGE
+     */
+    public function detail($id)
+    {
+        $guru = Guru::withTrashed()->findOrFail($id);
+        return view('tu.guru.detail', compact('guru'));
+    }
+
+    /**
+     * EDIT PAGE
+     */
     public function edit($id)
     {
-        $guru = Guru::findOrFail($id);
-        $mapel = MataPelajaran::orderBy('nama_mapel')->get();
-        return view('tu.guru.edit', compact('guru','mapel'));
+        $guru = Guru::withTrashed()->findOrFail($id);
+        return view('tu.guru.edit', compact('guru'));
     }
 
-    // UPDATE
+    /**
+     * UPDATE
+     */
     public function update(Request $request, $id)
     {
-        $guru = Guru::findOrFail($id);
+        $guru = Guru::withTrashed()->findOrFail($id);
 
         $request->validate([
-            'nama' => 'required',
-            'nip' => 'required|unique:guru,nip,' . $guru->id,
+            'nama'          => 'required',
+            'nip'           => 'nullable|unique:guru,nip,' . $guru->id,
             'jenis_kelamin' => 'required',
-            'mapel_id' => 'required|exists:mata_pelajaran,id',
-            'email' => 'nullable|email|unique:guru,email,' . $guru->id,
-            'telepon' => 'nullable',
-            'alamat' => 'nullable',
-            'foto' => 'nullable|image|mimes:jpg,jpeg,png|max:2048'
+            'mapel'         => 'nullable',
+            'alamat'        => 'nullable',
         ]);
 
-        $data = $request->only([
-            'nama','nip','jenis_kelamin','email','telepon','alamat','mapel_id'
-        ]);
-
-        // Update foto
-        if ($request->hasFile('foto')) {
-
-            // hapus foto lama jika ada
-            if ($guru->foto && file_exists(public_path('foto-guru/'.$guru->foto))) {
-                unlink(public_path('foto-guru/'.$guru->foto));
-            }
-
-            // upload baru
-            $file = $request->file('foto');
-            $filename = time() . '-' . $file->getClientOriginalName();
-            $file->move(public_path('foto-guru'), $filename);
-            $data['foto'] = $filename;
-        }
-
-        $guru->update($data);
+        $guru->update($request->all());
 
         return redirect()->route('tu.guru.index')
-                         ->with('success', 'Guru berhasil diupdate');
+            ->with('success', 'Data guru berhasil diperbarui!');
     }
 
-    // HAPUS
+    /**
+     * DELETE (Soft Delete)
+     */
     public function destroy($id)
     {
-        $guru = Guru::findOrFail($id);
+        Guru::findOrFail($id)->delete();
 
-        if ($guru->foto && file_exists(public_path('foto-guru/'.$guru->foto))) {
-            unlink(public_path('foto-guru/'.$guru->foto));
+        return redirect()->route('tu.guru.index')
+            ->with('success', 'Guru dipindahkan ke trash.');
+    }
+
+    /**
+     * RESTORE
+     */
+    public function restore($id)
+    {
+        Guru::withTrashed()->findOrFail($id)->restore();
+
+        return back()->with('success', 'Guru berhasil direstore.');
+    }
+
+    /**
+     * FORCE DELETE
+     */
+    public function forceDelete($id)
+    {
+        Guru::withTrashed()->findOrFail($id)->forceDelete();
+
+        return back()->with('success', 'Guru berhasil dihapus permanen.');
+    }
+
+    /**
+     * BULK ACTION (delete | restore | forceDelete)
+     */
+    public function bulkAction(Request $request)
+    {
+        $request->validate([
+            'action' => 'required|in:delete,restore,forceDelete',
+            'ids'    => 'required|array',
+        ]);
+
+        $ids = $request->ids;
+
+        switch ($request->action) {
+            case 'delete':
+                Guru::whereIn('id', $ids)->delete();
+                return response()->json(['message' => 'Berhasil menghapus.']);
+
+            case 'restore':
+                Guru::onlyTrashed()->whereIn('id', $ids)->restore();
+                return response()->json(['message' => 'Berhasil restore.']);
+
+            case 'forceDelete':
+                Guru::onlyTrashed()->whereIn('id', $ids)->forceDelete();
+                return response()->json(['message' => 'Berhasil hapus permanen.']);
         }
+    }
 
-        $guru->delete();
+    /**
+     * AJAX LIVE SEARCH
+     */
+    public function ajaxSearch(Request $request)
+    {
+        $keyword = $request->q;
 
-        return back()->with('success', 'Guru berhasil dihapus');
+        $data = Guru::where('nama', 'like', "%$keyword%")
+            ->orWhere('nip', 'like', "%$keyword%")
+            ->orWhere('mapel', 'like', "%$keyword%")
+            ->orWhere('jenis_kelamin', 'like', "%$keyword%")
+            ->orderBy('nama')
+            ->get();
+
+        return response()->json($data);
     }
 }

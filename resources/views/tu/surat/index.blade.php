@@ -1,13 +1,13 @@
 @extends('layouts.tu')
 
-@section('title', 'Arsip Dokumen')
+@section('title', 'Surat')
 
 @section('content')
 
 <div class="d-flex justify-content-between align-items-center mb-4">
-    <h1>Arsip Dokumen</h1>
+    <h1>Dokumen Surat</h1>
     <a href="{{ route('tu.arsip-dokumen.create') }}" class="btn btn-primary">
-        + Tambah Dokumen
+        + Tambah Surat
     </a>
 </div>
 
@@ -26,9 +26,9 @@
             <thead class="table-dark">
                 <tr>
                     <th>No</th>
-                    <th>Nama Dokumen</th>
+                    <th>Nama Surat</th>
                     <th>Nomor Surat</th>
-                    <th>Kategori</th>
+                    <th>Kategori Surat</th>
                     <th>Tanggal Dibuat</th>
                     <th>Aksi</th>
                 </tr>
@@ -84,7 +84,7 @@
                 @empty
                     <tr>
                         <td colspan="6" class="text-center text-muted">
-                            Tidak ada dokumen tersimpan.
+                            Tidak ada surat tersimpan.
                         </td>
                     </tr>
                 @endforelse

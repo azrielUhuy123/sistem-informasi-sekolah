@@ -1,10 +1,10 @@
 @extends('layouts.tu')
 
-@section('title', 'Tambah Dokumen')
+@section('title', 'Tambah Surat Baru')
 
 @section('content')
 
-<h1 class="mb-4">Tambah Dokumen</h1>
+<h1 class="mb-4">Tambah Surat Baru</h1>
 
 @if ($errors->any())
     <div class="alert alert-danger">

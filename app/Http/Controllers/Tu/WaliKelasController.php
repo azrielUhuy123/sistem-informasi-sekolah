@@ -24,12 +24,15 @@ class WaliKelasController extends Controller
     {
         $guru = Guru::orderBy('nama')->get();
         $kelas = Kelas::orderBy('nama_kelas')->get();
-        $tahun = TahunAjaran::orderBy('tahun_mulai', 'desc')->get();
+        $tahun = TahunAjaran::orderBy('tahun', 'desc')
+                    ->orderBy('semester', 'desc')
+                    ->get();
+
 
         return view('tu.walikelas.create', compact('guru','kelas','tahun'));
     }
 
-    public function store(Request $request)
+        public function store(Request $request)
     {
         $request->validate([
             'guru_id' => 'required|exists:guru,id',
@@ -37,21 +40,27 @@ class WaliKelasController extends Controller
             'tahunajaran_id' => 'required|exists:tahun_ajaran,id',
         ]);
 
-        // Validasi: kelas sudah punya wali kelas di tahun ajaran yang sama?
+        // Validasi kelas agar tidak duplikat dalam satu tahun ajaran
         $cek = WaliKelas::where('kelas_id', $request->kelas_id)
                 ->where('tahunajaran_id', $request->tahunajaran_id)
                 ->first();
 
         if ($cek) {
             return back()->withErrors(['kelas_id' => 'Kelas ini sudah memiliki wali kelas pada tahun ajaran tersebut!'])
-                         ->withInput();
+                        ->withInput();
         }
 
-        WaliKelas::create($request->all());
+        // SIMPAN DATA SECARA MANUAL (WAJIB AGAR BISA MASUK)
+        WaliKelas::create([
+            'guru_id' => $request->guru_id,
+            'kelas_id' => $request->kelas_id,
+            'tahunajaran_id' => $request->tahunajaran_id,
+        ]);
 
         return redirect()->route('tu.walikelas.index')
-                         ->with('success', 'Wali kelas berhasil ditambahkan');
+                        ->with('success', 'Wali kelas berhasil ditambahkan');
     }
+
 
     public function destroy($id)
     {
