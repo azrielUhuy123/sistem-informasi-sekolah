@@ -211,7 +211,7 @@
                 </span>
 
                 <!-- INPUT -->
-                <input 
+                <input
                     id="tableSearch"
                     class="form-control ps-5 pe-5"
                     placeholder="Cari..."
@@ -235,35 +235,7 @@
                     @endforeach
                 </select>
 
-                {{-- Column Filter --}}
-                <div class="dropdown">
-                    <button class="btn btn-outline-secondary dropdown-toggle" data-bs-toggle="dropdown">
-                        Kolom
-                    </button>
-                    <ul class="dropdown-menu p-3" style="min-width:220px;">
-                        <li>
-                            <label><input checked type="checkbox" class="col-toggle" data-col="select"> Select</label>
-                        </li>
 
-                        @foreach($columns as $col)
-                        <li>
-                            <label>
-                                <input checked type="checkbox" class="col-toggle" data-col="{{ $col['key'] }}"> 
-                                {{ $col['label'] }}
-                            </label>
-                        </li>
-                        @endforeach
-
-                        <li>
-                            <label><input checked type="checkbox" class="col-toggle" data-col="aksi"> Aksi</label>
-                        </li>
-
-                        <li class="pt-2 mt-2 border-top">
-                            <button id="applyColumnFilter" class="btn btn-primary btn-sm w-100 mb-1">Terapkan</button>
-                            <button id="resetColumnFilter" class="btn btn-secondary btn-sm w-100">Reset</button>
-                        </li>
-                    </ul>
-                </div>
 
                 {{-- Deleted Filter --}}
                 <select id="deletedFilter" class="form-select">
@@ -286,17 +258,18 @@
     <div class="d-flex gap-2">
         @if(!request()->has('deleted') || request('deleted') === 'active')
         <button id="bulkDelete" class="btn btn-danger">Hapus</button>
+        <button id="bulkForce" class="btn btn-dark">Hapus Permanen</button>
         @endif
 
 
         @if(request('deleted') === 'only')
-        <button id="bulkRestore" class="btn btn-success">Restore</button>
+        <button id="bulkRestore" class="btn btn-success">Pulihkan</button>
         <button id="bulkForce" class="btn btn-dark">Hapus Permanen</button>
         @endif
 
         @if(request('deleted') === 'all')
         <button id="bulkDelete" class="btn btn-danger">Hapus</button>
-        <button id="bulkRestore" class="btn btn-success">Restore</button>
+        <button id="bulkRestore" class="btn btn-success">Pulihkan</button>
         <button id="bulkForce" class="btn btn-dark">Hapus Permanen</button>
         @endif
 

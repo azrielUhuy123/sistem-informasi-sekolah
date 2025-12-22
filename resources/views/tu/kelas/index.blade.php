@@ -3,7 +3,7 @@
     'rows' => $kelas,
     'columns' => [
         ['key' => 'nama_kelas', 'label' => 'Nama Kelas', 'sortable' => true],
-        ['key' => 'tingkat', 'label' => 'Tingkat', 'sortable' => true],
+        ['key' => 'tingkatan', 'label' => 'Tingkat', 'sortable' => true],
         ['key' => 'tahun_ajaran', 'label' => 'Tahun Ajaran', 'sortable' => true],
     ],
     'actions' => [

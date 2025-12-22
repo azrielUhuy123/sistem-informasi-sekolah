@@ -1,6 +1,6 @@
 @include('components.crud.index', [
     'title' => 'Manajemen Tahun Ajaran',
-    'rows' => $tahun_ajaran,
+    'rows' => $tahun,
     'columns' => [
         ['key' => 'tahun_ajaran', 'label' => 'Tahun Ajaran', 'sortable' => true],
         ['key' => 'status', 'label' => 'Status', 'sortable' => true],

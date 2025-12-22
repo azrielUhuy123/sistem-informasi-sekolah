@@ -20,7 +20,7 @@ function updateFloatingBar() {
 /* ===========================
     SORTING
 =========================== */
-function applySort(column) {
+window.applySort = function (column) {
     const url = new URL(window.location.href);
     const currentSort = url.searchParams.get("sort");
     const currentOrder = url.searchParams.get("order") || "asc";
@@ -235,7 +235,7 @@ function renderTable(rows) {
                     <input type="checkbox" class="row-checkbox" value="${row.id}">
                 </td>
                 <td data-col="nama_kelas">${row.nama_kelas}</td>
-                <td data-col="tingkat">${row.tingkat}</td>
+                <td data-col="tingkatan">${row.tingkatan}</td>
                 <td data-col="tahun_ajaran">${row.tahun_ajaran}</td>
                 <td data-col="aksi">
                     <a href="/tu/kelas/${row.id}/edit" class="btn btn-sm btn-warning">Edit</a>

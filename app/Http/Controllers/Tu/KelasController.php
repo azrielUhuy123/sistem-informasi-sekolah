@@ -28,7 +28,7 @@ class KelasController extends Controller
         if ($request->q) {
             $query->where(function($q) use ($request) {
                 $q->where('nama_kelas', 'like', "%{$request->q}%")
-                  ->orWhere('tingkat', 'like', "%{$request->q}%")
+                  ->orWhere('tingkatan', 'like', "%{$request->q}%")
                   ->orWhere('tahun_ajaran', 'like', "%{$request->q}%");
             });
         }
@@ -37,7 +37,7 @@ class KelasController extends Controller
         $sort = $request->sort ?? 'id';
         $order = $request->order ?? 'asc';
 
-        $allowed = ['id', 'nama_kelas', 'tingkat', 'tahun_ajaran'];
+        $allowed = ['id', 'nama_kelas', 'tingkatan', 'tahun_ajaran'];
         if (!in_array($sort, $allowed)) $sort = 'id';
 
         $query->orderBy($sort, $order);
@@ -64,11 +64,11 @@ class KelasController extends Controller
     {
         $request->validate([
             'nama_kelas' => 'required',
-            'tingkat' => 'required|integer',
+            'tingkatan' => 'required|integer',
             'tahun_ajaran' => 'required'
         ]);
 
-        Kelas::create($request->only(['nama_kelas','tingkat','tahun_ajaran']));
+        Kelas::create($request->only(['nama_kelas','tingkatan','tahun_ajaran']));
 
         return redirect()->route('tu.kelas.index')
             ->with('success','Kelas berhasil ditambahkan');
@@ -92,7 +92,7 @@ class KelasController extends Controller
 
         $kelas->update($request->validate([
             'nama_kelas' => 'required',
-            'tingkat' => 'required|integer',
+            'tingkatan' => 'required|integer',
             'tahun_ajaran' => 'required'
         ]));
 
@@ -150,7 +150,7 @@ class KelasController extends Controller
             case 'delete':
                 Kelas::whereIn('id', $ids)->delete();
                 return response()->json(['message' => 'Berhasil menghapus (soft delete).']);
-            
+
             case 'restore':
                 Kelas::onlyTrashed()->whereIn('id', $ids)->restore();
                 return response()->json(['message' => 'Berhasil merestore data.']);
@@ -174,14 +174,14 @@ class KelasController extends Controller
     $validated = $request->validate([
         'kelas' => 'required|array|min:1',
         'kelas.*.nama_kelas' => 'required',
-        'kelas.*.tingkat' => 'required|integer',
+        'kelas.*.tingkatan' => 'required|integer',
         'kelas.*.tahun_ajaran' => 'required'
     ]);
 
     foreach ($validated['kelas'] as $k) {
         Kelas::create([
             'nama_kelas' => $k['nama_kelas'],
-            'tingkat' => $k['tingkat'],
+            'tingkatan' => $k['tingkatan'],
             'tahun_ajaran' => $k['tahun_ajaran'],
         ]);
     }
@@ -196,7 +196,7 @@ public function ajaxSearch(Request $request)
     $keyword = $request->q;
 
     $data = Kelas::where('nama_kelas', 'like', "%$keyword%")
-                ->orWhere('tingkat', 'like', "%$keyword%")
+                ->orWhere('tingkatan', 'like', "%$keyword%")
                 ->orWhere('tahun_ajaran', 'like', "%$keyword%")
                 ->orderBy('nama_kelas')
                 ->get();

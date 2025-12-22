@@ -104,7 +104,11 @@
 }
 
 .template-select {
+    appearance: none;
+    -moz-appearance: none;
+    -webkit-appearance: none;
     max-width: 220px;
+    margin-left: 10px;
     border-radius: 10px;
     padding: 8px 12px;
     border: 1px solid #d4d7e5;
@@ -123,6 +127,8 @@
     border-color: #4d5bd8;
     box-shadow: 0 0 0 3px rgba(77,91,216,0.2);
 }
+
+
 
 </style>
 
@@ -152,7 +158,7 @@
             <input type="text" name="kelas[0][nama_kelas]" class="form-control mb-2 kelas-nama">
 
             <label>Tingkat</label>
-            <select name="kelas[0][tingkat]" class="form-select mb-2 tingkat-select" onchange="autoGenerateName(0)">
+            <select name="kelas[0][tingkatan]" class="form-select mb-2 tingkat-select" onchange="autoGenerateName(0)">
                 <option value="">Pilih tingkat</option>
                 @for($i=1; $i<=6; $i++)
                     <option value="{{ $i }}">{{ $i }} (SD)</option>
@@ -202,7 +208,7 @@ document.querySelectorAll('.tahun').forEach(t => autoSetYear(t));
    AUTO GENERATE KELAS NAMA
 —————————————————— */
 function autoGenerateName(i) {
-    let tingkat = document.querySelector(`[name="kelas[${i}][tingkat]"]`).value;
+    let tingkat = document.querySelector(`[name="kelas[${i}][tingkatan]"]`).value;
     let nameInput = document.querySelector(`[name="kelas[${i}][nama_kelas]"]`);
 
     if (!tingkat) return;
@@ -230,7 +236,7 @@ function renumberForms() {
 
         // Update name attributes (nama_kelas / tingkat / tahun_ajaran)
         f.querySelector(".kelas-nama").name = `kelas[${newIndex}][nama_kelas]`;
-        f.querySelector(".tingkat-select").name = `kelas[${newIndex}][tingkat]`;
+        f.querySelector(".tingkat-select").name = `kelas[${newIndex}][tingkatan]`;
         f.querySelector(".tahun").name = `kelas[${newIndex}][tahun_ajaran]`;
 
         newIndex++;
@@ -256,7 +262,7 @@ function addForm() {
         <input type="text" name="kelas[${index}][nama_kelas]" class="form-control mb-2 kelas-nama">
 
         <label>Tingkat</label>
-        <select name="kelas[${index}][tingkat]" class="form-select mb-2 tingkat-select"
+        <select name="kelas[${index}][tingkatan]" class="form-select mb-2 tingkat-select"
             onchange="autoGenerateName(${index})">
             <option value="">Pilih tingkat</option>
             @for($i=1; $i<=6; $i++)
@@ -312,8 +318,8 @@ function duplicateForm(i) {
 
     if (!prev || !curr) return;
 
-    curr.querySelector(`[name="kelas[${i}][tingkat]"]`).value =
-        prev.querySelector(`[name="kelas[${i-1}][tingkat]"]`).value;
+    curr.querySelector(`[name="kelas[${i}][tingkatan]"]`).value =
+        prev.querySelector(`[name="kelas[${i-1}][tingkatan]"]`).value;
 
     curr.querySelector(`[name="kelas[${i}][tahun_ajaran]"]`).value =
         prev.querySelector(`[name="kelas[${i-1}][tahun_ajaran]"]`).value;

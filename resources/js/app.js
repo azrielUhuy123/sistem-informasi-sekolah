@@ -1,5 +1,5 @@
 import './bootstrap';
-import './tu/kelas';
+
 
 
 import Alpine from 'alpinejs';
