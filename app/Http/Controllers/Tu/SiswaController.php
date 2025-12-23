@@ -66,19 +66,30 @@ class SiswaController extends Controller
     public function store(Request $request)
     {
         $request->validate([
-            'nama'           => 'required',
-            'nis'            => 'required|unique:siswas',
-            'nisn'           => 'nullable',
-            'jenis_kelamin'  => 'required',
+            'nama'           => 'required|string|max:255',
+            'nis'            => 'required|numeric|unique:siswa,nis',
+            'nisn'           => 'nullable|numeric|unique:siswa,nisn',
+            'jenis_kelamin'  => 'required|in:L,P',
             'kelas_id'       => 'required|exists:kelas,id',
-            'alamat'         => 'nullable',
+            'alamat'         => 'nullable|string',
         ]);
 
-        Siswa::create($request->all());
+        Siswa::create($request->only([
+            'nama',
+            'nis',
+            'nisn',
+            'kelas_id',
+            'jenis_kelamin',
+            'tanggal_lahir',
+            'alamat',
+            'nama_wali',
+            'telepon_wali',
+        ]));
 
         return redirect()->route('tu.siswa.index')
             ->with('success', 'Siswa berhasil ditambahkan!');
     }
+
 
     /**
      * DETAIL PAGE
@@ -103,23 +114,34 @@ class SiswaController extends Controller
      * UPDATE
      */
     public function update(Request $request, $id)
-    {
-        $siswa = Siswa::withTrashed()->findOrFail($id);
+{
+    $siswa = Siswa::withTrashed()->findOrFail($id);
 
-        $request->validate([
-            'nama'           => 'required',
-            'nis'            => 'required|unique:siswas,nis,' . $siswa->id,
-            'nisn'           => 'nullable',
-            'jenis_kelamin'  => 'required',
-            'kelas_id'       => 'required|exists:kelas,id',
-            'alamat'         => 'nullable',
-        ]);
+    $request->validate([
+        'nama'           => 'required|string|max:255',
+        'nis'            => 'required|numeric|unique:siswa,nis,' . $siswa->id,
+        'nisn'           => 'nullable|numeric|unique:siswa,nisn,' . $siswa->id,
+        'jenis_kelamin'  => 'required|in:L,P',
+        'kelas_id'       => 'required|exists:kelas,id',
+        'alamat'         => 'nullable|string',
+    ]);
 
-        $siswa->update($request->all());
+    $siswa->update($request->only([
+        'nama',
+        'nis',
+        'nisn',
+        'kelas_id',
+        'jenis_kelamin',
+        'tanggal_lahir',
+        'alamat',
+        'nama_wali',
+        'telepon_wali',
+    ]));
 
-        return redirect()->route('tu.siswa.index')
-            ->with('success', 'Data siswa berhasil diperbarui!');
-    }
+
+    return redirect()->route('tu.siswa.index')
+        ->with('success', 'Data siswa berhasil diperbarui!');
+}
 
     /**
      * DELETE (Soft Delete)

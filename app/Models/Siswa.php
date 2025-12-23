@@ -4,10 +4,11 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Siswa extends Model
 {
-    use HasFactory;
+    use HasFactory, SoftDeletes;
 
     protected $table = 'siswa'; // nama tabel
 
@@ -22,6 +23,8 @@ class Siswa extends Model
         'nama_wali',
         'telepon_wali',
     ];
+
+
 
     // Relasi: Siswa milik satu Kelas
     public function kelas()

@@ -313,11 +313,16 @@
             <input type="checkbox" class="row-checkbox" value="{{ $row->id }}">
         </td>
 
-        @foreach($columns as $col)
+       @foreach($columns as $col)
         <td data-col="{{ $col['key'] }}">
-            {{ $row->{$col['key']} }}
+            @if(isset($col['format']))
+                {!! $col['format']($row) !!}
+            @else
+                {{ data_get($row, $col['key']) }}
+            @endif
         </td>
         @endforeach
+
 
         <td data-col="aksi">
             @include('components.crud.actions', ['row'=>$row, 'actions'=>$actions])

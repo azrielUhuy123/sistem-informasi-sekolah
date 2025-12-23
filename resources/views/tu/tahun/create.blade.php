@@ -4,33 +4,60 @@
 
 @section('content')
 
-<h1 class="mb-4">Tambah Tahun Ajaran</h1>
+<h2 class="mb-4 fw-bold">Tambah Tahun Ajaran</h2>
 
-<div class="card">
+<div class="card shadow-sm">
     <div class="card-body">
 
         <form action="{{ route('tu.tahun.store') }}" method="POST">
             @csrf
 
+            {{-- Tahun Ajaran --}}
             <div class="mb-3">
-                <label>Tahun Ajaran</label>
-                <input type="text" name="tahun" class="form-control" placeholder="2024/2025" required>
+                <label class="form-label fw-semibold">Tahun Ajaran</label>
+                <input
+                    type="text"
+                    name="tahun"
+                    class="form-control"
+                    placeholder="2024/2025"
+                    required
+                >
             </div>
 
+            {{-- Semester --}}
             <div class="mb-3">
-                <label>Semester</label>
-                <select name="semester" class="form-control" required>
+                <label class="form-label fw-semibold">Semester</label>
+                <select name="semester" class="form-select" required>
+                    <option value="">— Pilih Semester —</option>
                     <option value="Ganjil">Ganjil</option>
                     <option value="Genap">Genap</option>
                 </select>
             </div>
 
-            <div class="mb-3 form-check">
-                <input type="checkbox" name="aktif" class="form-check-input" id="aktifCheck">
-                <label for="aktifCheck" class="form-check-label">Set sebagai tahun ajaran aktif</label>
+            {{-- Aktif --}}
+            <div class="form-check mb-4">
+                <input
+                    type="checkbox"
+                    name="aktif"
+                    class="form-check-input"
+                    id="aktifCheck"
+                >
+                <label class="form-check-label" for="aktifCheck">
+                    Set sebagai tahun ajaran aktif
+                </label>
             </div>
 
-            <button class="btn btn-primary">Simpan</button>
+            {{-- Button --}}
+            <div class="d-flex justify-content-between">
+                <a href="{{ route('tu.tahun.index') }}" class="btn btn-secondary">
+                    ← Kembali
+                </a>
+
+                <button type="submit" class="btn btn-primary">
+                    Simpan
+                </button>
+            </div>
+
         </form>
 
     </div>

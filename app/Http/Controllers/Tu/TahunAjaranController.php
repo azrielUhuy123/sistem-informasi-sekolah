@@ -26,17 +26,19 @@ class TahunAjaranController extends Controller
         // SEARCH
         if ($request->q) {
             $query->where(function ($q) use ($request) {
-                $q->where('tahun_ajaran', 'like', "%{$request->q}%")
-                  ->orWhere('status', 'like', "%{$request->q}%");
+                $q->where('tahun', 'like', "%{$request->q}%")
+                  ->orWhere('aktif', 'like', "%{$request->q}%");
             });
         }
 
         // SORTING
-        $sort = $request->sort ?? 'id';
+        $sort  = $request->sort ?? 'id';
         $order = $request->order ?? 'asc';
 
-        $allowed = ['id', 'tahun_ajaran', 'status'];
-        if (!in_array($sort, $allowed)) $sort = 'id';
+        $allowed = ['id', 'tahun', 'aktif'];
+        if (!in_array($sort, $allowed)) {
+            $sort = 'id';
+        }
 
         $query->orderBy($sort, $order);
 
@@ -59,17 +61,26 @@ class TahunAjaranController extends Controller
      * STORE
      */
     public function store(Request $request)
-    {
-        $request->validate([
-            'tahun_ajaran' => 'required',
-            'status'       => 'nullable'
-        ]);
+{
+    $data = $request->validate([
+        'tahun'    => 'required',
+        'semester' => 'required|in:Ganjil,Genap',
+        'aktif'    => 'nullable',
+    ]);
 
-        TahunAjaran::create($request->only(['tahun_ajaran', 'status']));
-
-        return redirect()->route('tu.tahun.index')
-            ->with('success', 'Tahun ajaran berhasil ditambahkan!');
+    if ($request->has('aktif')) {
+        TahunAjaran::query()->update(['aktif' => 0]);
     }
+
+    TahunAjaran::create([
+        'tahun'    => $data['tahun'],
+        'semester' => $data['semester'],
+        'aktif'    => $request->has('aktif') ? 1 : 0,
+    ]);
+
+    return redirect()->route('tu.tahun.index')
+        ->with('success', 'Tahun ajaran berhasil ditambahkan!');
+}
 
     /**
      * EDIT PAGE
@@ -84,17 +95,29 @@ class TahunAjaranController extends Controller
      * UPDATE
      */
     public function update(Request $request, $id)
-    {
-        $tahun = TahunAjaran::withTrashed()->findOrFail($id);
+{
+    $tahun = TahunAjaran::findOrFail($id);
 
-        $tahun->update($request->validate([
-            'tahun_ajaran' => 'required',
-            'status'       => 'nullable'
-        ]));
+    $data = $request->validate([
+        'tahun'    => 'required',
+        'semester' => 'required|in:Ganjil,Genap',
+        'aktif'    => 'nullable',
+    ]);
 
-        return redirect()->route('tu.tahun.index')
-            ->with('success', 'Tahun ajaran berhasil diperbarui!');
+    if ($request->has('aktif')) {
+        TahunAjaran::query()->update(['aktif' => 0]);
     }
+
+    $tahun->update([
+        'tahun'    => $data['tahun'],
+        'semester' => $data['semester'],
+        'aktif'    => $request->has('aktif') ? 1 : 0,
+    ]);
+
+    return redirect()->route('tu.tahun.index')
+        ->with('success', 'Tahun ajaran berhasil diperbarui!');
+}
+
 
     /**
      * DELETE (Soft Delete)
@@ -131,44 +154,50 @@ class TahunAjaranController extends Controller
     }
 
     /**
-     * BULK ACTION: delete | restore | forceDelete
+     * BULK ACTION
      */
     public function bulkAction(Request $request)
     {
         $request->validate([
             'action' => 'required|in:delete,restore,forceDelete',
-            'ids' => 'required|array',
+            'ids'    => 'required|array',
         ]);
-
-        $ids = $request->ids;
 
         switch ($request->action) {
             case 'delete':
-                TahunAjaran::whereIn('id', $ids)->delete();
-                return response()->json(['message' => 'Berhasil menghapus.']);
+                TahunAjaran::whereIn('id', $request->ids)->delete();
+                break;
 
             case 'restore':
-                TahunAjaran::onlyTrashed()->whereIn('id', $ids)->restore();
-                return response()->json(['message' => 'Berhasil restore.']);
+                TahunAjaran::onlyTrashed()->whereIn('id', $request->ids)->restore();
+                break;
 
             case 'forceDelete':
-                TahunAjaran::onlyTrashed()->whereIn('id', $ids)->forceDelete();
-                return response()->json(['message' => 'Berhasil hapus permanen.']);
+                TahunAjaran::onlyTrashed()->whereIn('id', $request->ids)->forceDelete();
+                break;
         }
+
+        return response()->json(['message' => 'Aksi berhasil dilakukan.']);
     }
 
     /**
-     * AJAX LIVE SEARCH
+     * AJAX SEARCH
      */
     public function ajaxSearch(Request $request)
     {
         $keyword = $request->q;
 
-        $data = TahunAjaran::where('tahun_ajaran', 'like', "%$keyword%")
-            ->orWhere('status', 'like', "%$keyword%")
-            ->orderBy('tahun_ajaran')
+        $data = TahunAjaran::where('tahun', 'like', "%$keyword%")
+            ->orderBy('tahun')
             ->get();
 
         return response()->json($data);
     }
+
+    public function detail($id)
+{
+    $tahun = TahunAjaran::withTrashed()->findOrFail($id);
+    return view('tu.tahun.detail', compact('tahun'));
+}
+
 }

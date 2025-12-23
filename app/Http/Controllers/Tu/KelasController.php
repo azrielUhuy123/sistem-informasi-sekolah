@@ -28,7 +28,7 @@ class KelasController extends Controller
         if ($request->q) {
             $query->where(function($q) use ($request) {
                 $q->where('nama_kelas', 'like', "%{$request->q}%")
-                  ->orWhere('tingkatan', 'like', "%{$request->q}%")
+                  ->orWhere('tingkat', 'like', "%{$request->q}%")
                   ->orWhere('tahun_ajaran', 'like', "%{$request->q}%");
             });
         }
@@ -37,7 +37,7 @@ class KelasController extends Controller
         $sort = $request->sort ?? 'id';
         $order = $request->order ?? 'asc';
 
-        $allowed = ['id', 'nama_kelas', 'tingkatan', 'tahun_ajaran'];
+        $allowed = ['id', 'nama_kelas', 'tingkat', 'tahun_ajaran'];
         if (!in_array($sort, $allowed)) $sort = 'id';
 
         $query->orderBy($sort, $order);
@@ -64,11 +64,11 @@ class KelasController extends Controller
     {
         $request->validate([
             'nama_kelas' => 'required',
-            'tingkatan' => 'required|integer',
+            'tingkat' => 'required|integer',
             'tahun_ajaran' => 'required'
         ]);
 
-        Kelas::create($request->only(['nama_kelas','tingkatan','tahun_ajaran']));
+        Kelas::create($request->only(['nama_kelas','tingkat','tahun_ajaran']));
 
         return redirect()->route('tu.kelas.index')
             ->with('success','Kelas berhasil ditambahkan');
@@ -92,7 +92,7 @@ class KelasController extends Controller
 
         $kelas->update($request->validate([
             'nama_kelas' => 'required',
-            'tingkatan' => 'required|integer',
+            'tingkat' => 'required|integer',
             'tahun_ajaran' => 'required'
         ]));
 
@@ -169,26 +169,37 @@ class KelasController extends Controller
         $kelas = Kelas::withTrashed()->with('siswa')->findOrFail($id);
         return view('tu.kelas.detail', compact('kelas'));
     }
+    
+    
     public function storeMultiple(Request $request)
-{
+    {
     $validated = $request->validate([
         'kelas' => 'required|array|min:1',
         'kelas.*.nama_kelas' => 'required',
-        'kelas.*.tingkatan' => 'required|integer',
+        'kelas.*.tingkat' => 'required|integer',
         'kelas.*.tahun_ajaran' => 'required'
     ]);
 
     foreach ($validated['kelas'] as $k) {
-        Kelas::create([
-            'nama_kelas' => $k['nama_kelas'],
-            'tingkatan' => $k['tingkatan'],
-            'tahun_ajaran' => $k['tahun_ajaran'],
-        ]);
+
+    $nama = trim($k['nama_kelas']);
+
+    // pastikan selalu diawali "Kelas "
+    if (!str_starts_with($nama, 'Kelas ')) {
+        $nama = 'Kelas ' . $nama;
     }
+
+    Kelas::create([
+        'nama_kelas'   => $nama,
+        'tingkat'      => $k['tingkat'],
+        'tahun_ajaran' => $k['tahun_ajaran'],
+    ]);
+}
+
 
     return redirect()->route('tu.kelas.index')
         ->with('success', 'Kelas berhasil ditambahkan!');
-}
+    }
 
 
 public function ajaxSearch(Request $request)
@@ -196,7 +207,7 @@ public function ajaxSearch(Request $request)
     $keyword = $request->q;
 
     $data = Kelas::where('nama_kelas', 'like', "%$keyword%")
-                ->orWhere('tingkatan', 'like', "%$keyword%")
+                ->orWhere('tingkat', 'like', "%$keyword%")
                 ->orWhere('tahun_ajaran', 'like', "%$keyword%")
                 ->orderBy('nama_kelas')
                 ->get();
