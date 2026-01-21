@@ -24,11 +24,11 @@ class MataPelajaranController extends Controller
         }
 
         // SEARCH
-        if ($request->q) {
+        if ($request->filled('q')) {
             $query->where(function ($q) use ($request) {
-                $q->where('nama_mapel', 'like', "%{$request->q}%")
-                  ->orWhere('kode_mapel', 'like', "%{$request->q}%")
-                  ->orWhere('kelompok', 'like', "%{$request->q}%");
+                $q->where('nama_mapel', 'like', '%' . $request->q . '%')
+                  ->orWhere('kode_mapel', 'like', '%' . $request->q . '%')
+                  ->orWhere('kelompok', 'like', '%' . $request->q . '%');
             });
         }
 
@@ -37,16 +37,20 @@ class MataPelajaranController extends Controller
         $order = $request->order ?? 'asc';
 
         $allowedSort = ['id', 'nama_mapel', 'kode_mapel', 'kelompok'];
-        if (!in_array($sort, $allowedSort)) $sort = 'id';
+        if (!in_array($sort, $allowedSort)) {
+            $sort = 'id';
+        }
 
         $query->orderBy($sort, $order);
 
         // PAGINATION
         $perPage = $request->per_page ?? 15;
 
-        $mapel = $query->paginate($perPage)->withQueryString();
+        $mata_pelajaran = $query
+            ->paginate($perPage)
+            ->withQueryString();
 
-        return view('tu.mapel.index', compact('mapel'));
+        return view('tu.mapel.index', compact('mata_pelajaran'));
     }
 
     /**
@@ -63,15 +67,16 @@ class MataPelajaranController extends Controller
     public function store(Request $request)
     {
         $data = $request->validate([
-            'nama_mapel' => 'required',
-            'kode_mapel' => 'nullable',
-            'kelompok'   => 'nullable'
+            'nama_mapel' => 'required|string|max:255',
+            'kode_mapel' => 'nullable|string|max:100',
+            'kelompok'   => 'nullable|string|max:100',
         ]);
 
         MataPelajaran::create($data);
 
-        return redirect()->route('tu.mapel.index')
-            ->with('success', 'Mata pelajaran berhasil ditambahkan!');
+        return redirect()
+            ->route('tu.mapel.index')
+            ->with('success', 'Mata pelajaran berhasil ditambahkan.');
     }
 
     /**
@@ -80,6 +85,7 @@ class MataPelajaranController extends Controller
     public function show($id)
     {
         $mapel = MataPelajaran::withTrashed()->findOrFail($id);
+
         return view('tu.mapel.detail', compact('mapel'));
     }
 
@@ -89,6 +95,7 @@ class MataPelajaranController extends Controller
     public function edit($id)
     {
         $mapel = MataPelajaran::withTrashed()->findOrFail($id);
+
         return view('tu.mapel.edit', compact('mapel'));
     }
 
@@ -100,15 +107,16 @@ class MataPelajaranController extends Controller
         $mapel = MataPelajaran::withTrashed()->findOrFail($id);
 
         $data = $request->validate([
-            'nama_mapel' => 'required',
-            'kode_mapel' => 'nullable',
-            'kelompok'   => 'nullable'
+            'nama_mapel' => 'required|string|max:255',
+            'kode_mapel' => 'nullable|string|max:100',
+            'kelompok'   => 'nullable|string|max:100',
         ]);
 
         $mapel->update($data);
 
-        return redirect()->route('tu.mapel.index')
-            ->with('success', 'Data mapel berhasil diperbarui!');
+        return redirect()
+            ->route('tu.mapel.index')
+            ->with('success', 'Data mata pelajaran berhasil diperbarui.');
     }
 
     /**
@@ -118,8 +126,9 @@ class MataPelajaranController extends Controller
     {
         MataPelajaran::findOrFail($id)->delete();
 
-        return redirect()->route('tu.mapel.index')
-            ->with('success', 'Mapel dipindahkan ke trash.');
+        return redirect()
+            ->route('tu.mapel.index')
+            ->with('success', 'Mata pelajaran dipindahkan ke trash.');
     }
 
     /**
@@ -129,7 +138,7 @@ class MataPelajaranController extends Controller
     {
         MataPelajaran::withTrashed()->findOrFail($id)->restore();
 
-        return back()->with('success', 'Mapel berhasil direstore.');
+        return back()->with('success', 'Mata pelajaran berhasil direstore.');
     }
 
     /**
@@ -139,7 +148,7 @@ class MataPelajaranController extends Controller
     {
         MataPelajaran::withTrashed()->findOrFail($id)->forceDelete();
 
-        return back()->with('success', 'Mapel berhasil dihapus permanen.');
+        return back()->with('success', 'Mata pelajaran berhasil dihapus permanen.');
     }
 
     /**
@@ -149,23 +158,25 @@ class MataPelajaranController extends Controller
     {
         $request->validate([
             'action' => 'required|in:delete,restore,forceDelete',
-            'ids'    => 'required|array'
+            'ids'    => 'required|array',
+            'ids.*'  => 'integer',
         ]);
 
         $ids = $request->ids;
 
-        switch ($request->action) {
-            case 'delete':
-                MataPelajaran::whereIn('id', $ids)->delete();
-                return response()->json(['message' => 'Mapel berhasil dihapus (soft delete).']);
+        if ($request->action === 'delete') {
+            MataPelajaran::whereIn('id', $ids)->delete();
+            return response()->json(['message' => 'Mapel berhasil dihapus (soft delete).']);
+        }
 
-            case 'restore':
-                MataPelajaran::onlyTrashed()->whereIn('id', $ids)->restore();
-                return response()->json(['message' => 'Mapel berhasil direstore.']);
+        if ($request->action === 'restore') {
+            MataPelajaran::onlyTrashed()->whereIn('id', $ids)->restore();
+            return response()->json(['message' => 'Mapel berhasil direstore.']);
+        }
 
-            case 'forceDelete':
-                MataPelajaran::onlyTrashed()->whereIn('id', $ids)->forceDelete();
-                return response()->json(['message' => 'Mapel berhasil dihapus permanen.']);
+        if ($request->action === 'forceDelete') {
+            MataPelajaran::onlyTrashed()->whereIn('id', $ids)->forceDelete();
+            return response()->json(['message' => 'Mapel berhasil dihapus permanen.']);
         }
     }
 
@@ -176,9 +187,10 @@ class MataPelajaranController extends Controller
     {
         $keyword = $request->q;
 
-        $data = MataPelajaran::where('nama_mapel', 'like', "%$keyword%")
-            ->orWhere('kode_mapel', 'like', "%$keyword%")
-            ->orWhere('kelompok', 'like', "%$keyword%")
+        $data = MataPelajaran::query()
+            ->where('nama_mapel', 'like', '%' . $keyword . '%')
+            ->orWhere('kode_mapel', 'like', '%' . $keyword . '%')
+            ->orWhere('kelompok', 'like', '%' . $keyword . '%')
             ->orderBy('nama_mapel')
             ->get();
 

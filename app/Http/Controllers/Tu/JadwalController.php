@@ -7,6 +7,7 @@ use App\Models\Jadwal;
 use App\Models\Guru;
 use App\Models\Kelas;
 use App\Models\Ruangan;
+use App\Models\MataPelajaran;
 use Illuminate\Http\Request;
 
 class JadwalController extends Controller
@@ -19,11 +20,13 @@ class JadwalController extends Controller
         $deleted = $request->deleted ?? 'active';
 
         if ($deleted === 'only') {
-            $query = Jadwal::onlyTrashed()->with(['kelas', 'guru', 'ruangan']);
+            $query = Jadwal::onlyTrashed()
+                ->with(['kelas', 'guru.mapel', 'ruangan']);
         } elseif ($deleted === 'all') {
-            $query = Jadwal::withTrashed()->with(['kelas', 'guru', 'ruangan']);
+            $query = Jadwal::withTrashed()
+                ->with(['kelas', 'guru.mapel', 'ruangan']);
         } else {
-            $query = Jadwal::with(['kelas', 'guru', 'ruangan']);
+            $query = Jadwal::with(['kelas', 'guru.mapel', 'ruangan']);
         }
 
         // SEARCH
@@ -43,18 +46,19 @@ class JadwalController extends Controller
         }
 
         // SORTING
-        $sort = $request->sort ?? 'id';
+        $sort  = $request->sort ?? 'id';
         $order = $request->order ?? 'asc';
 
         $allowed = ['id', 'hari', 'jam_mulai', 'jam_selesai'];
-        if (!in_array($sort, $allowed)) $sort = 'id';
+        if (!in_array($sort, $allowed)) {
+            $sort = 'id';
+        }
 
         $query->orderBy($sort, $order);
 
         // PAGINATION
         $perPage = $request->per_page ?? 15;
-
-        $jadwal = $query->paginate($perPage)->withQueryString();
+        $jadwal  = $query->paginate($perPage)->withQueryString();
 
         return view('tu.jadwal.index', compact('jadwal'));
     }
@@ -64,11 +68,17 @@ class JadwalController extends Controller
      */
     public function create()
     {
-        return view('tu.jadwal.create', [
-            'kelas'   => Kelas::all(),
-            'guru'    => Guru::all(),
-            'ruangan' => Ruangan::all(),
-        ]);
+        $kelas   = Kelas::whereNull('deleted_at')->get();
+        $guru    = Guru::with('mapel')->whereNull('deleted_at')->get();
+        $ruangan = Ruangan::all();
+        $mapel   = MataPelajaran::orderBy('nama_mapel')->get();
+
+        return view('tu.jadwal.create', compact(
+            'kelas',
+            'guru',
+            'ruangan',
+            'mapel'
+        ));
     }
 
     /**
@@ -76,18 +86,20 @@ class JadwalController extends Controller
      */
     public function store(Request $request)
     {
-        $request->validate([
+        $data = $request->validate([
             'kelas_id'    => 'required|exists:kelas,id',
             'guru_id'     => 'required|exists:guru,id',
-            'hari'        => 'required',
+            'mapel_id'    => 'required|exists:mata_pelajaran,id',
+            'hari'        => 'required|string|max:20',
             'jam_mulai'   => 'required',
             'jam_selesai' => 'required',
             'ruangan_id'  => 'nullable|exists:ruangan,id',
         ]);
 
-        Jadwal::create($request->all());
+        Jadwal::create($data);
 
-        return redirect()->route('tu.jadwal.index')
+        return redirect()
+            ->route('tu.jadwal.index')
             ->with('success', 'Jadwal berhasil ditambahkan!');
     }
 
@@ -96,7 +108,12 @@ class JadwalController extends Controller
      */
     public function detail($id)
     {
-        $jadwal = Jadwal::with(['kelas', 'guru', 'ruangan', 'mapel'])->findOrFail($id);
+        $jadwal = Jadwal::with([
+            'kelas',
+            'guru.mapel',
+            'ruangan'
+        ])->findOrFail($id);
+
         return view('tu.jadwal.detail', compact('jadwal'));
     }
 
@@ -105,12 +122,19 @@ class JadwalController extends Controller
      */
     public function edit($id)
     {
-        return view('tu.jadwal.edit', [
-            'jadwal'  => Jadwal::withTrashed()->findOrFail($id),
-            'kelas'   => Kelas::all(),
-            'guru'    => Guru::all(),
-            'ruangan' => Ruangan::all(),
-        ]);
+        $jadwal  = Jadwal::withTrashed()->findOrFail($id);
+        $kelas   = Kelas::whereNull('deleted_at')->get();
+        $guru    = Guru::with('mapel')->whereNull('deleted_at')->get();
+        $ruangan = Ruangan::all();
+        $mapel   = MataPelajaran::orderBy('nama_mapel')->get();
+
+        return view('tu.jadwal.edit', compact(
+            'jadwal',
+            'kelas',
+            'guru',
+            'ruangan',
+            'mapel'
+        ));
     }
 
     /**
@@ -120,18 +144,20 @@ class JadwalController extends Controller
     {
         $jadwal = Jadwal::withTrashed()->findOrFail($id);
 
-        $request->validate([
+        $data = $request->validate([
             'kelas_id'    => 'required|exists:kelas,id',
             'guru_id'     => 'required|exists:guru,id',
-            'hari'        => 'required',
+            'mapel_id'    => 'required|exists:mata_pelajaran,id',
+            'hari'        => 'required|string|max:20',
             'jam_mulai'   => 'required',
             'jam_selesai' => 'required',
             'ruangan_id'  => 'nullable|exists:ruangan,id',
         ]);
 
-        $jadwal->update($request->all());
+        $jadwal->update($data);
 
-        return redirect()->route('tu.jadwal.index')
+        return redirect()
+            ->route('tu.jadwal.index')
             ->with('success', 'Jadwal berhasil diperbarui!');
     }
 
@@ -142,7 +168,8 @@ class JadwalController extends Controller
     {
         Jadwal::findOrFail($id)->delete();
 
-        return redirect()->route('tu.jadwal.index')
+        return redirect()
+            ->route('tu.jadwal.index')
             ->with('success', 'Jadwal dipindahkan ke trash.');
     }
 
@@ -176,31 +203,31 @@ class JadwalController extends Controller
             'ids'    => 'required|array',
         ]);
 
-        $ids = $request->ids;
-
         switch ($request->action) {
             case 'delete':
-                Jadwal::whereIn('id', $ids)->delete();
-                return response()->json(['message' => 'Berhasil menghapus jadwal.']);
+                Jadwal::whereIn('id', $request->ids)->delete();
+                break;
 
             case 'restore':
-                Jadwal::onlyTrashed()->whereIn('id', $ids)->restore();
-                return response()->json(['message' => 'Berhasil merestore jadwal.']);
+                Jadwal::onlyTrashed()->whereIn('id', $request->ids)->restore();
+                break;
 
             case 'forceDelete':
-                Jadwal::onlyTrashed()->whereIn('id', $ids)->forceDelete();
-                return response()->json(['message' => 'Berhasil menghapus permanen.']);
+                Jadwal::onlyTrashed()->whereIn('id', $request->ids)->forceDelete();
+                break;
         }
+
+        return response()->json(['message' => 'Aksi massal berhasil.']);
     }
 
     /**
-     * AJAX LIVE SEARCH (tanpa reload halaman)
+     * AJAX LIVE SEARCH
      */
     public function ajaxSearch(Request $request)
     {
         $keyword = $request->q;
 
-        $data = Jadwal::with(['kelas', 'guru', 'ruangan'])
+        $data = Jadwal::with(['kelas', 'guru.mapel', 'ruangan'])
             ->whereHas('kelas', fn ($q) => $q->where('nama_kelas', 'like', "%$keyword%"))
             ->orWhereHas('guru', fn ($q) => $q->where('nama', 'like', "%$keyword%"))
             ->orWhere('hari', 'like', "%$keyword%")

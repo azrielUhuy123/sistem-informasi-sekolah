@@ -62,6 +62,9 @@ Route::middleware('auth')->group(function () {
 | ROUTE FILE TERPISAH
 |--------------------------------------------------------------------------
 */
-require __DIR__.'/kepsek.php';
+require __DIR__.'/admin.php';
+require __DIR__.'/superadmin.php';
 require __DIR__.'/tu.php';
 require __DIR__.'/auth.php';
+
+

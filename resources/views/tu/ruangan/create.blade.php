@@ -29,7 +29,7 @@
 
             <div class="mb-3">
                 <label>Jenis Ruangan</label>
-                <select name="jenis" class="form-control">
+                <select name="jenis_ruangan" class="form-control">
                     <option value="">-- Pilih Jenis --</option>
                     <option value="Kelas">Kelas</option>
                     <option value="Lab">Lab</option>

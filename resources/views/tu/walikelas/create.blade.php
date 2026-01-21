@@ -44,7 +44,7 @@
 
             <div class="mb-3">
                 <label>Tahun Ajaran</label>
-                <select name="tahunajaran_id" class="form-control" required>
+                <select name="tahun_ajaran_id" class="form-control" required>
                     <option value="">-- Pilih --</option>
                     @foreach($tahun as $t)
                     <option value="{{ $t->id }}">

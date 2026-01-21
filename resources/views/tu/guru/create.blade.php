@@ -19,7 +19,7 @@
 
             <div class="mb-3">
                 <label>NIP</label>
-                <input type="text" name="nip" class="form-control" required>
+                <input type="text" name="nip" class="form-control">
             </div>
 
             <div class="mb-3">
@@ -35,19 +35,19 @@
                 <label>Mata Pelajaran</label>
                 <select name="mapel_id" class="form-control" required>
                     <option value="">-- Pilih Mata Pelajaran --</option>
-                    @foreach($mapel as $m)
+                    @foreach ($mapel as $m)
                         <option value="{{ $m->id }}">{{ $m->nama_mapel }}</option>
                     @endforeach
                 </select>
             </div>
 
             <div class="mb-3">
-                <label>Email (opsional)</label>
+                <label>Email</label>
                 <input type="email" name="email" class="form-control">
             </div>
 
             <div class="mb-3">
-                <label>Telepon (opsional)</label>
+                <label>Telepon</label>
                 <input type="text" name="telepon" class="form-control">
             </div>
 
@@ -57,7 +57,7 @@
             </div>
 
             <div class="mb-3">
-                <label>Upload Foto</label>
+                <label>Foto</label>
                 <input type="file" name="foto" class="form-control">
             </div>
 

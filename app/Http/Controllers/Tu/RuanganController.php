@@ -8,60 +8,89 @@ use Illuminate\Http\Request;
 
 class RuanganController extends Controller
 {
+    /**
+     * INDEX
+     */
     public function index()
     {
-        $ruangan = Ruangan::orderBy('nama_ruangan')->paginate(20);
+        $ruangan = Ruangan::orderBy('nama_ruangan')->paginate(10);
         return view('tu.ruangan.index', compact('ruangan'));
     }
 
+    /**
+     * CREATE PAGE
+     */
     public function create()
     {
         return view('tu.ruangan.create');
     }
 
+    /**
+     * STORE
+     */
     public function store(Request $request)
     {
         $request->validate([
-            'kode' => 'required|unique:ruangan,kode',
-            'nama_ruangan' => 'required',
-            'kapasitas' => 'nullable|integer',
-            'jenis' => 'nullable'
+            'kode'          => 'required|string|max:50|unique:ruangan,kode',
+            'nama_ruangan'  => 'required|string|max:255',
+            'kapasitas'     => 'nullable|integer',
+            'jenis_ruangan' => 'nullable|string|max:100',
         ]);
 
-        Ruangan::create($request->all());
+        Ruangan::create([
+            'kode'          => $request->kode,
+            'nama_ruangan'  => $request->nama_ruangan,
+            'kapasitas'     => $request->kapasitas,
+            'jenis_ruangan' => $request->jenis_ruangan,
+        ]);
 
-        return redirect()->route('tu.ruangan.index')
-                         ->with('success', 'Ruangan berhasil ditambahkan');
+        return redirect()
+            ->route('tu.ruangan.index')
+            ->with('success', 'Ruangan berhasil ditambahkan.');
     }
 
+    /**
+     * EDIT PAGE
+     */
     public function edit($id)
     {
         $ruangan = Ruangan::findOrFail($id);
         return view('tu.ruangan.edit', compact('ruangan'));
     }
 
+    /**
+     * UPDATE
+     */
     public function update(Request $request, $id)
     {
         $ruangan = Ruangan::findOrFail($id);
 
         $request->validate([
-            'kode' => 'required|unique:ruangan,kode,' . $ruangan->id,
-            'nama_ruangan' => 'required',
-            'kapasitas' => 'nullable|integer',
-            'jenis' => 'nullable'
+            'kode'          => 'required|string|max:50|unique:ruangan,kode,' . $ruangan->id,
+            'nama_ruangan'  => 'required|string|max:255',
+            'kapasitas'     => 'nullable|integer',
+            'jenis_ruangan' => 'nullable|string|max:100',
         ]);
 
-        $ruangan->update($request->all());
+        $ruangan->update($request->only([
+            'kode',
+            'nama_ruangan',
+            'kapasitas',
+            'jenis_ruangan',
+        ]));
 
-        return redirect()->route('tu.ruangan.index')
-                         ->with('success', 'Ruangan berhasil diupdate');
+        return redirect()
+            ->route('tu.ruangan.index')
+            ->with('success', 'Ruangan berhasil diperbarui.');
     }
 
+    /**
+     * DELETE
+     */
     public function destroy($id)
     {
-        $ruangan = Ruangan::findOrFail($id);
-        $ruangan->delete();
+        Ruangan::findOrFail($id)->delete();
 
-        return back()->with('success', 'Ruangan berhasil dihapus');
+        return back()->with('success', 'Ruangan berhasil dihapus.');
     }
 }

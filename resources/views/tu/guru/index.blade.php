@@ -4,7 +4,7 @@
     'columns' => [
         ['key' => 'nama', 'label' => 'Nama Guru', 'sortable' => true],
         ['key' => 'nip', 'label' => 'NIP', 'sortable' => true],
-        ['key' => 'mapel', 'label' => 'Mata Pelajaran', 'sortable' => true],
+        ['key' => 'mapel.nama_mapel', 'label' => 'Mata Pelajaran'],
     ],
     'actions' => [
         'detail' => 'tu.guru.detail',

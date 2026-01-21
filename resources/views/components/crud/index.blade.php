@@ -1,4 +1,4 @@
-@extends('layouts.tu')
+@extends($layout ?? 'layouts.tu')
 
 @section('title', $title)
 

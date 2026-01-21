@@ -1,3 +1,4 @@
+@isset($routeBulk)
 <script>
 /* GLOBAL VARIABLES */
 document.addEventListener("DOMContentLoaded", function() {
@@ -70,54 +71,55 @@ document.querySelectorAll(".row-checkbox").forEach(cb => {
     });
 });
 
-
 /* ===========================
     BULK ACTION
 =========================== */
-async function doBulk(action) {
-    if (selectedIds.size === 0) {
-        alert("Pilih data terlebih dahulu.");
-        return;
+
+    const BULK_ROUTE = "{{ route($routeBulk) }}";
+
+    async function doBulk(action) {
+        if (selectedIds.size === 0) {
+            alert("Pilih data terlebih dahulu.");
+            return;
+        }
+
+        let confirmMsg = {
+            delete: `Yakin ingin menghapus ${selectedIds.size} data?`,
+            restore: `Pulihkan ${selectedIds.size} data terhapus?`,
+            forceDelete: `Hapus permanen ${selectedIds.size} data? Tidak bisa dikembalikan!`
+        }[action];
+
+        if (!confirm(confirmMsg)) return;
+
+        try {
+            const res = await fetch(BULK_ROUTE, {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                    "Accept": "application/json",
+                    "X-CSRF-TOKEN": csrf
+                },
+                body: JSON.stringify({
+                    action,
+                    ids: [...selectedIds]
+                })
+            });
+
+            const data = await res.json();
+            alert(data.message || "Sukses!");
+            location.reload();
+
+        } catch (err) {
+            console.error(err);
+            alert("Terjadi error: " + err.message);
+        }
     }
 
-    let confirmMsg = {
-        delete: `Yakin ingin menghapus ${selectedIds.size} data?`,
-        restore: `Pulihkan ${selectedIds.size} data terhapus?`,
-        forceDelete: `Hapus permanen ${selectedIds.size} data? Tidak bisa dikembalikan!`
-    }[action];
-
-    if (!confirm(confirmMsg)) return;
-
-    try {
-        const res = await fetch("{{ route($routeBulk ?? 'tu.kelas.bulk') }}", {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json",
-                "Accept": "application/json",
-                "X-CSRF-TOKEN": csrf
-            },
-            body: JSON.stringify({
-                action,
-                ids: [...selectedIds]
-            })
-        });
-
-        const raw = await res.text();
-        let data = JSON.parse(raw);
-
-        alert(data.message || "Sukses!");
-        location.reload();
-
-    } catch (err) {
-        console.error(err);
-        alert("Terjadi error: " + err.message);
-    }
-}
-
-/* Bulk Buttons */
-document.getElementById("bulkDelete")?.addEventListener("click", () => doBulk("delete"));
-document.getElementById("bulkRestore")?.addEventListener("click", () => doBulk("restore"));
-document.getElementById("bulkForce")?.addEventListener("click", () => doBulk("forceDelete"));
+    /* Bulk Buttons */
+    document.getElementById("bulkDelete")?.addEventListener("click", () => doBulk("delete"));
+    document.getElementById("bulkRestore")?.addEventListener("click", () => doBulk("restore"));
+    document.getElementById("bulkForce")?.addEventListener("click", () => doBulk("forceDelete"));
+   
 
 
 
@@ -203,7 +205,7 @@ clearBtn.addEventListener("click", () => {
 /* AJAX SEARCH */
 async function doSearch(keyword) {
     try {
-        const url = "{{ route('tu.kelas.search') }}?q=" + encodeURIComponent(keyword);
+        const url = "{{ route($routeSearch ?? 'tu.kelas.search') }}?q=" + encodeURIComponent(keyword);
         const res = await fetch(url);
         const data = await res.json();
 
@@ -258,3 +260,4 @@ function highlight(text, keyword) {
 }); // END DOMContentLoaded
 
 </script>
+ @endisset

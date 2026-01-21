@@ -6,21 +6,15 @@ use Illuminate\Database\Eloquent\Model;
 
 class MataPelajaran extends Model
 {
+    // WAJIB sesuai database
     protected $table = 'mata_pelajaran';
 
     protected $fillable = [
-        'kode',
         'nama_mapel',
-        'kkm',
     ];
 
-    public function gurus()
+    public function guru()
     {
-        return $this->hasMany(\App\Models\Guru::class, 'mapel_id');
-    }
-
-    public function jadwals()
-    {
-        return $this->hasMany(\App\Models\Jadwal::class, 'mapel_id');
+        return $this->hasMany(Guru::class, 'mapel_id');
     }
 }

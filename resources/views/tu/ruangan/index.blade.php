@@ -33,7 +33,7 @@
                     <td>{{ $r->kode }}</td>
                     <td>{{ $r->nama_ruangan }}</td>
                     <td>{{ $r->kapasitas ?? '-' }}</td>
-                    <td>{{ $r->jenis ?? '-' }}</td>
+                    <td>{{ $r->jenis_ruangan ?? '-' }}</td>
 
                     <td>
                         <a href="{{ route('tu.ruangan.edit', $r->id) }}"
@@ -41,7 +41,8 @@
 
                         <form action="{{ route('tu.ruangan.destroy', $r->id) }}"
                               method="POST" class="d-inline">
-                            @csrf @method('DELETE')
+                            @csrf
+                            @method('DELETE')
                             <button class="btn btn-danger btn-sm"
                                     onclick="return confirm('Hapus ruangan ini?')">
                                 Hapus

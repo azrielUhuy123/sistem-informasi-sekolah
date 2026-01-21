@@ -4,57 +4,126 @@ namespace App\Http\Controllers\Tu;
 
 use App\Http\Controllers\Controller;
 use App\Models\Kelas;
+use App\Models\KelasMaster;
+use App\Models\TahunAjaran;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
+use App\Models\KelasGrup;
 
 class KelasController extends Controller
 {
     /**
-     * INDEX — Sorting + Search + Filter Deleted + Pagination
+     * INDEX — Grup Kelas berdasarkan Kelas Master
      */
-    public function index(Request $request)
-    {
-        // query dasar
-        $deleted = $request->deleted ?? 'active';  // active | only | all
+   public function index()
+{
+    $grupKelas = KelasGrup::with(['kelasMaster', 'tahunAjaran'])
+        ->orderBy('kelas_master_id')
+        ->get();
 
-        if ($deleted === 'only') {
-            $query = Kelas::onlyTrashed();
-        } elseif ($deleted === 'all') {
-            $query = Kelas::withTrashed();
-        } else {
-            $query = Kelas::query();
-        }
+    return view('tu.kelas.index', compact('grupKelas'));
+}
 
-        // FILTER SEARCH
-        if ($request->q) {
-            $query->where(function($q) use ($request) {
-                $q->where('nama_kelas', 'like', "%{$request->q}%")
-                  ->orWhere('tingkat', 'like', "%{$request->q}%")
-                  ->orWhere('tahun_ajaran', 'like', "%{$request->q}%");
-            });
-        }
+    public function rombelIndex($kelasMasterId, $tahunAjaranId)
+{
+    $kelas = Kelas::with(['kelasMaster', 'tahunAjaran'])
+        ->where('kelas_master_id', $kelasMasterId)
+        ->where('tahun_ajaran_id', $tahunAjaranId)
+        ->orderBy('nama_kelas')
+        ->get();
 
-        // SORTING
-        $sort = $request->sort ?? 'id';
-        $order = $request->order ?? 'asc';
+    return view('tu.kelas.rombel-index', compact('kelas'));
+}
 
-        $allowed = ['id', 'nama_kelas', 'tingkat', 'tahun_ajaran'];
-        if (!in_array($sort, $allowed)) $sort = 'id';
+public function createRombel($kelasMasterId, $tahunAjaranId)
+{
+    $kelasMaster = KelasMaster::findOrFail($kelasMasterId);
+    $tahunAjaran = TahunAjaran::findOrFail($tahunAjaranId);
 
-        $query->orderBy($sort, $order);
+    return view('tu.kelas.rombel-create', compact(
+        'kelasMaster',
+        'tahunAjaran'
+    ));
+}
 
-        // PAGINATION
-        $perPage = $request->per_page ?? 15;
-        $kelas = $query->paginate($perPage)->withQueryString();
+public function storeRombel(Request $request, $kelasMasterId, $tahunAjaranId)
+{
+    $request->validate([
+        'kode' => 'required|alpha|max:1'
+    ]);
 
-        return view('tu.kelas.index', compact('kelas'));
+    $namaKelas = $kelasMasterId . strtoupper($request->kode);
+
+    // cegah duplikat
+    $exists = Kelas::where('kelas_master_id', $kelasMasterId)
+        ->where('tahun_ajaran_id', $tahunAjaranId)
+        ->where('nama_kelas', $namaKelas)
+        ->exists();
+
+    if ($exists) {
+        return back()->with('error', 'Rombel sudah ada');
     }
 
+    Kelas::create([
+        'kelas_master_id' => $kelasMasterId,
+        'tahun_ajaran_id' => $tahunAjaranId,
+        'nama_kelas' => $namaKelas,
+    ]);
+
+    return redirect()->route('tu.kelas.rombel.index', [
+        'kelas_master' => $kelasMasterId,
+        'tahun_ajaran' => $tahunAjaranId
+    ])->with('success', 'Rombel berhasil ditambahkan');
+}
+
+
     /**
-     * CREATE PAGE
+ * FORM CREATE GRUP KELAS
+ */
+public function createGrup()
+{
+    $kelasMaster = KelasMaster::orderBy('tingkat')->get();
+    $tahunAjaran = TahunAjaran::orderBy('tahun', 'desc')->get();
+
+    return view('tu.kelas.grup-create', compact('kelasMaster', 'tahunAjaran'));
+}
+/**
+ * SIMPAN GRUP KELAS
+ */
+public function storeGrup(Request $request)
+{
+    $request->validate([
+        'kelas_master_id' => 'required|exists:kelas_master,id',
+        'tahun_ajaran_id' => 'required|exists:tahun_ajaran,id',
+    ]);
+
+    $exists = KelasGrup::where('kelas_master_id', $request->kelas_master_id)
+        ->where('tahun_ajaran_id', $request->tahun_ajaran_id)
+        ->exists();
+
+    if ($exists) {
+        return back()->with('error', 'Grup kelas sudah ada');
+    }
+
+    KelasGrup::create([
+        'kelas_master_id' => $request->kelas_master_id,
+        'tahun_ajaran_id' => $request->tahun_ajaran_id,
+    ]);
+
+    return redirect()->route('tu.kelas.index')
+        ->with('success', 'Grup kelas berhasil dibuat');
+}
+
+
+    /**
+     * CREATE
      */
     public function create()
     {
-        return view('tu.kelas.create');
+        return view('tu.kelas.create', [
+            'kelasMaster' => KelasMaster::orderBy('tingkat')->orderBy('kode')->get(),
+            'tahunAjaran' => TahunAjaran::orderByDesc('tahun')->get(),
+        ]);
     }
 
     /**
@@ -62,25 +131,27 @@ class KelasController extends Controller
      */
     public function store(Request $request)
     {
-        $request->validate([
-            'nama_kelas' => 'required',
-            'tingkat' => 'required|integer',
-            'tahun_ajaran' => 'required'
+        $validated = $request->validate([
+            'kelas_master_id' => 'required|exists:kelas_master,id',
+            'tahun_ajaran_id' => 'required|exists:tahun_ajaran,id',
         ]);
 
-        Kelas::create($request->only(['nama_kelas','tingkat','tahun_ajaran']));
+        Kelas::create($validated);
 
         return redirect()->route('tu.kelas.index')
-            ->with('success','Kelas berhasil ditambahkan');
+            ->with('success', 'Kelas berhasil ditambahkan');
     }
 
     /**
-     * EDIT PAGE
+     * EDIT
      */
     public function edit($id)
     {
-        $kelas = Kelas::withTrashed()->findOrFail($id);
-        return view('tu.kelas.edit', compact('kelas'));
+        return view('tu.kelas.edit', [
+            'kelas'        => Kelas::withTrashed()->findOrFail($id),
+            'kelasMaster'  => KelasMaster::orderBy('tingkat')->get(),
+            'tahunAjaran'  => TahunAjaran::orderByDesc('tahun')->get(),
+        ]);
     }
 
     /**
@@ -90,26 +161,24 @@ class KelasController extends Controller
     {
         $kelas = Kelas::withTrashed()->findOrFail($id);
 
-        $kelas->update($request->validate([
-            'nama_kelas' => 'required',
-            'tingkat' => 'required|integer',
-            'tahun_ajaran' => 'required'
-        ]));
+        $validated = $request->validate([
+            'kelas_master_id' => 'required|exists:kelas_master,id',
+            'tahun_ajaran_id' => 'required|exists:tahun_ajaran,id',
+        ]);
+
+        $kelas->update($validated);
 
         return redirect()->route('tu.kelas.index')
-            ->with('success','Kelas berhasil diperbarui');
+            ->with('success', 'Kelas berhasil diperbarui');
     }
 
     /**
-     * DELETE (Soft Delete)
+     * SOFT DELETE
      */
     public function destroy($id)
     {
-        $kelas = Kelas::findOrFail($id);
-        $kelas->delete();
-
-        return redirect()->route('tu.kelas.index')
-            ->with('success','Data dipindahkan ke trash');
+        Kelas::findOrFail($id)->delete();
+        return back()->with('success', 'Data dipindahkan ke trash');
     }
 
     /**
@@ -117,104 +186,28 @@ class KelasController extends Controller
      */
     public function restore($id)
     {
-        $kelas = Kelas::withTrashed()->findOrFail($id);
-        $kelas->restore();
-
-        return back()->with('success','Data berhasil direstore');
+        Kelas::onlyTrashed()->findOrFail($id)->restore();
+        return back()->with('success', 'Data berhasil direstore');
     }
 
     /**
-     * FORCE DELETE (Permanent)
+     * FORCE DELETE
      */
     public function forceDelete($id)
     {
-        $kelas = Kelas::withTrashed()->findOrFail($id);
-        $kelas->forceDelete();
-
-        return back()->with('success','Data berhasil dihapus permanen');
+        Kelas::onlyTrashed()->findOrFail($id)->forceDelete();
+        return back()->with('success', 'Data dihapus permanen');
     }
 
     /**
-     * BULK ACTION (delete | restore | forceDelete)
-     */
-    public function bulkAction(Request $request)
-    {
-        $request->validate([
-            'action' => 'required|in:delete,restore,forceDelete',
-            'ids' => 'required|array',
-        ]);
-
-        $ids = $request->ids;
-
-        switch ($request->action) {
-            case 'delete':
-                Kelas::whereIn('id', $ids)->delete();
-                return response()->json(['message' => 'Berhasil menghapus (soft delete).']);
-
-            case 'restore':
-                Kelas::onlyTrashed()->whereIn('id', $ids)->restore();
-                return response()->json(['message' => 'Berhasil merestore data.']);
-
-            case 'forceDelete':
-                Kelas::onlyTrashed()->whereIn('id', $ids)->forceDelete();
-                return response()->json(['message' => 'Berhasil menghapus permanen.']);
-        }
-    }
-
-    /**
-     * DETAIL
+     * DETAIL (ROMBEL)
      */
     public function detail($id)
     {
-        $kelas = Kelas::withTrashed()->with('siswa')->findOrFail($id);
+        $kelas = Kelas::with(['kelasMaster', 'tahunAjaran', 'siswa'])
+            ->withTrashed()
+            ->findOrFail($id);
+
         return view('tu.kelas.detail', compact('kelas'));
     }
-    
-    
-    public function storeMultiple(Request $request)
-    {
-    $validated = $request->validate([
-        'kelas' => 'required|array|min:1',
-        'kelas.*.nama_kelas' => 'required',
-        'kelas.*.tingkat' => 'required|integer',
-        'kelas.*.tahun_ajaran' => 'required'
-    ]);
-
-    foreach ($validated['kelas'] as $k) {
-
-    $nama = trim($k['nama_kelas']);
-
-    // pastikan selalu diawali "Kelas "
-    if (!str_starts_with($nama, 'Kelas ')) {
-        $nama = 'Kelas ' . $nama;
-    }
-
-    Kelas::create([
-        'nama_kelas'   => $nama,
-        'tingkat'      => $k['tingkat'],
-        'tahun_ajaran' => $k['tahun_ajaran'],
-    ]);
-}
-
-
-    return redirect()->route('tu.kelas.index')
-        ->with('success', 'Kelas berhasil ditambahkan!');
-    }
-
-
-public function ajaxSearch(Request $request)
-{
-    $keyword = $request->q;
-
-    $data = Kelas::where('nama_kelas', 'like', "%$keyword%")
-                ->orWhere('tingkat', 'like', "%$keyword%")
-                ->orWhere('tahun_ajaran', 'like', "%$keyword%")
-                ->orderBy('nama_kelas')
-                ->get();
-
-    return response()->json($data);
-}
-
-
-
 }

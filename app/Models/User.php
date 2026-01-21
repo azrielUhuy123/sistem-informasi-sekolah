@@ -69,7 +69,9 @@ class User extends Authenticatable
     public function getDashboardUrl()
     {
         return match ($this->role) {
-            'kepsek' => '/kepsek/dashboard',
+            'superadmin' => '/superadmin/dashboard',
+            'admin'  => '/admin/dashboard',
+            'kepsek' => '/superadmin/dashboard',
             'tu'     => '/tu/dashboard',
             'guru'   => '/guru/dashboard',
             'murid'  => '/murid/dashboard',

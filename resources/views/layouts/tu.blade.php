@@ -302,8 +302,9 @@
             </a>
 
             <div class="collapse show submenu" id="menuSekolah">
-                <a class="menu-item {{ request()->is('tu/kelas*') ? 'active' : '' }}" href="{{ route('tu.kelas.index') }}">
-                    <i class="bi bi-people"></i> Kelas
+                <a class="menu-item {{ request()->is('tu/kelas*') ? 'active' : '' }}"
+                    href="{{ route('tu.kelas.index') }}">
+                        <i class="bi bi-people"></i> Kelas
                 </a>
 
                 <a class="menu-item {{ request()->is('tu/tahun*') ? 'active' : '' }}" href="{{ route('tu.tahun.index') }}">
@@ -352,6 +353,29 @@
                     <i class="bi bi-people-fill"></i> Data Kepegawaian
                 </a>
             </div>
+
+            <!-- KEUANGAN -->
+<a class="menu-item dropdown-toggle" data-bs-toggle="collapse" href="#menuKeuangan">
+    <i class="bi bi-cash-coin"></i> Keuangan
+</a>
+
+<div class="collapse submenu" id="menuKeuangan">
+
+    <a class="menu-item {{ request()->is('tu/keuangan/pemasukan*') ? 'active' : '' }}"
+       href="{{ route('tu.keuangan.pemasukan.index') }}">
+        <i class="bi bi-arrow-down-circle"></i> Pemasukan
+    </a>
+
+    <a class="menu-item" href="#">
+        <i class="bi bi-arrow-up-circle"></i> Pengeluaran
+    </a>
+
+    <a class="menu-item" href="#">
+        <i class="bi bi-file-earmark-bar-graph"></i> Laporan
+    </a>
+
+</div>
+
 
         </div>
 

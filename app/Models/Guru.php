@@ -2,13 +2,13 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\SoftDeletes;
+use App\Models\MataPelajaran;
 
 class Guru extends Model
 {
-    use HasFactory;
+    use SoftDeletes;
 
     protected $table = 'guru';
 
@@ -16,20 +16,17 @@ class Guru extends Model
         'nama',
         'nip',
         'jenis_kelamin',
+        'mapel_id',
         'email',
         'telepon',
         'alamat',
         'foto',
-        'mapel_id', // gunakan mapel_id sebagai FK ke tabel mata_pelajaran
-        // jika masih ada kolom 'mapel' (string) biarkan sampai migrasi & data selesai
     ];
 
     /**
-     * Relasi ke mata pelajaran.
-     *
-     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
+     * Relasi ke Mata Pelajaran
      */
-    public function mapel(): BelongsTo
+    public function mapel()
     {
         return $this->belongsTo(MataPelajaran::class, 'mapel_id');
     }

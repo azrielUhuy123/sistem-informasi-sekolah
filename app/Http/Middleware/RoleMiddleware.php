@@ -32,5 +32,9 @@ class RoleMiddleware
         }
 
         return $next($request);
+
+        if (auth()->user()->role === 'superadmin') {
+            return $next($request);
+        }
     }
 }
