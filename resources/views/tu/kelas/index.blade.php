@@ -21,15 +21,16 @@
                 <tr>
                     <th>Tingkat</th>
                     <th>Tahun Ajaran</th>
+                    <th>Jumlah Kelas</th>
                     <th class="text-center">Aksi</th>
                 </tr>
             </thead>
             <tbody>
                 @forelse ($grupKelas as $grup)
                     <tr>
-                        <td>Kelas {{ $grup->kelasMaster->tingkat }}</td>
-<td>{{ $grup->tahunAjaran->tahun }}</td>
-
+                         <td>Kelas {{ $grup->tingkat }}</td>
+                        <td>{{ $grup->tahun }}</td>
+                         <td>{{ $grup->jumlah_kelas }}</td>
                         <td class="text-center">
                             <a href="{{ route('tu.kelas.rombel.index', [
                                 'kelas_master' => $grup->kelas_master_id,

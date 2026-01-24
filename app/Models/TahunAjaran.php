@@ -13,4 +13,10 @@ class TahunAjaran extends Model
         'semester',
         'aktif'
     ];
+
+    public function penempatanSiswa()
+{
+    return $this->hasMany(PenempatanSiswa::class);
+}
+
 }

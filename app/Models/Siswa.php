@@ -26,9 +26,16 @@ class Siswa extends Model
 
 
 
-    // Relasi: Siswa milik satu Kelas
-    public function kelas()
-    {
-        return $this->belongsTo(Kelas::class, 'kelas_id');
-    }
+    public function penempatan()
+{
+    return $this->hasMany(PenempatanSiswa::class);
+}
+
+// Ambil penempatan AKTIF (helper, opsional tapi berguna)
+public function penempatanAktif()
+{
+    return $this->hasOne(PenempatanSiswa::class)
+        ->where('status', 'aktif');
+}
+
 }

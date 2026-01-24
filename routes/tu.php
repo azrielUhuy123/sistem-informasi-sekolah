@@ -20,6 +20,7 @@ use App\Http\Controllers\Tu\ArsipDokumenController;
 use App\Http\Controllers\Tu\DataKepegawaianController;
 use App\Http\Controllers\Tu\MataPelajaranController;
 use App\Http\Controllers\Tu\KeuanganPemasukanController;
+use App\Http\Controllers\Tu\PenempatanSiswaController;
 
 /*
 |--------------------------------------------------------------------------
@@ -113,7 +114,17 @@ Route::middleware(['auth', 'role:tu'])
         Route::get('/siswa/{id}/detail', [SiswaController::class, 'detail'])
             ->name('siswa.detail');
 
+        Route::post('/siswa/import', [SiswaController::class, 'importExcel'])
+            ->name('siswa.import');
+
+        Route::post('/siswa/{id}/restore', [SiswaController::class, 'restore'])
+            ->name('siswa.restore');
+
+        Route::delete('/siswa/{id}/force-delete', [SiswaController::class, 'forceDelete'])
+            ->name('siswa.forceDelete');
+
         Route::resource('siswa', SiswaController::class);
+
 
         /*
         |--------------------------------------------------------------------------
@@ -258,5 +269,36 @@ Route::middleware(['auth', 'role:tu'])
                     [KeuanganPemasukanController::class, 'store'])
                     ->name('pemasukan.store');
             });
+
+        
+            
+// 🔥 PENEMPATAN (TANPA INDEX)
+    Route::prefix('penempatan-siswa')
+        ->name('penempatan-siswa.')
+        ->group(function () {
+
+        Route::get('/create', [PenempatanSiswaController::class, 'create'])
+            ->name('create');
+
+        Route::post('/', [PenempatanSiswaController::class, 'store'])
+            ->name('store');
+
+        Route::post('/naik-kelas', [PenempatanSiswaController::class, 'naikKelas'])
+            ->name('naik-kelas');
+
+        Route::get('/preview-naik-kelas', [PenempatanSiswaController::class, 'previewNaikKelas'])
+            ->name('preview-naik-kelas');
+    });
+
+    Route::resource('siswa', SiswaController::class);
+
+
+    Route::post('siswa/{id}/restore', [SiswaController::class, 'restore'])
+        ->name('siswa.restore');
+
+    Route::delete('siswa/{id}/force-delete', [SiswaController::class, 'forceDelete'])
+        ->name('siswa.forceDelete');
+
+
 
     });

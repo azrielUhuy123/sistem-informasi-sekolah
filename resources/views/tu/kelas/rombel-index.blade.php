@@ -22,13 +22,19 @@
                 </tr>
             </thead>
             <tbody>
-                @foreach ($kelas as $k)
-                    <tr>
-                        <td>{{ $k->nama_kelas }}</td>
-                        <td>Kelas {{ $k->kelasMaster->tingkat }}</td>
-                        <td>{{ $k->tahunAjaran->nama }}</td>
-                    </tr>
-                @endforeach
+                @foreach ($kelas as $item)
+    <tr>
+        <td>{{ $item->nama_kelas }}</td>
+
+        <td>
+            Kelas {{ $item->kelasMaster->tingkat }}
+        </td>
+
+        <td>
+            {{ $item->tahunAjaran->tahun ?? '-' }}
+        </td>
+    </tr>
+@endforeach
             </tbody>
         </table>
     </div>

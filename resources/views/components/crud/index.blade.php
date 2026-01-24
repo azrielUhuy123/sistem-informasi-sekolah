@@ -1,7 +1,5 @@
-@extends($layout ?? 'layouts.tu')
-
-@section('title', $title)
-
+@extends($layout ?? 'layouts.tu') 
+@section('title', $title) 
 @section('content')
 
 {{-- =============================
@@ -250,6 +248,20 @@
 </div>
 
 {{-- ============================
+        EXTRA ACTIONS
+============================ --}}
+@if (!empty($extraActions))
+<div class="card mb-3">
+    <div class="card-body">
+        <div class="d-flex gap-2 flex-wrap">
+            {!! $extraActions !!}
+        </div>
+    </div>
+</div>
+@endif
+
+
+{{-- ============================
         BULK ACTION BAR
 ============================ --}}
 <div id="bulkActionBar">
@@ -370,5 +382,6 @@
 @endsection
 
 @section('scripts')
-@include('components.crud.scripts')
+@include('components.crud.scripts') 
 @endsection
+

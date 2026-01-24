@@ -17,23 +17,49 @@ class KelasController extends Controller
      */
    public function index()
 {
-    $grupKelas = KelasGrup::with(['kelasMaster', 'tahunAjaran'])
-        ->orderBy('kelas_master_id')
+    $grupKelas = DB::table('kelas_grup')
+        ->join('kelas_master', 'kelas_master.id', '=', 'kelas_grup.kelas_master_id')
+        ->join('tahun_ajaran', 'tahun_ajaran.id', '=', 'kelas_grup.tahun_ajaran_id')
+        ->leftJoin('kelas', function ($join) {
+            $join->on('kelas.kelas_master_id', '=', 'kelas_grup.kelas_master_id')
+                 ->on('kelas.tahun_ajaran_id', '=', 'kelas_grup.tahun_ajaran_id')
+                 ->where('kelas.nama_kelas', '!=', '-')
+                 ->whereNull('kelas.deleted_at');
+        })
+        ->select(
+            'kelas_grup.id',
+            'kelas_master.tingkat',
+            'kelas_grup.kelas_master_id',
+            'kelas_grup.tahun_ajaran_id',
+            'tahun_ajaran.tahun',
+            DB::raw('COUNT(kelas.id) as jumlah_kelas')
+        )
+        ->groupBy(
+            'kelas_grup.id',
+            'kelas_master.tingkat',
+            'kelas_grup.kelas_master_id',
+            'kelas_grup.tahun_ajaran_id',
+            'tahun_ajaran.tahun'
+        )
+        ->orderBy('kelas_master.tingkat')
         ->get();
 
     return view('tu.kelas.index', compact('grupKelas'));
 }
+
 
     public function rombelIndex($kelasMasterId, $tahunAjaranId)
 {
     $kelas = Kelas::with(['kelasMaster', 'tahunAjaran'])
         ->where('kelas_master_id', $kelasMasterId)
         ->where('tahun_ajaran_id', $tahunAjaranId)
+        ->where('nama_kelas', '!=', '-') // ⬅️ ini penting
         ->orderBy('nama_kelas')
         ->get();
 
     return view('tu.kelas.rombel-index', compact('kelas'));
 }
+
 
 public function createRombel($kelasMasterId, $tahunAjaranId)
 {
