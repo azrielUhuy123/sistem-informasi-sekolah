@@ -47,7 +47,6 @@ class KelasController extends Controller
     return view('tu.kelas.index', compact('grupKelas'));
 }
 
-
     public function rombelIndex($kelasMasterId, $tahunAjaranId)
 {
     $kelas = Kelas::with(['kelasMaster', 'tahunAjaran'])

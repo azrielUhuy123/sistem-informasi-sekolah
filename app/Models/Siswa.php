@@ -16,7 +16,7 @@ class Siswa extends Model
         'nama',
         'nis',
         'nisn',
-        'kelas_id',
+        'angkatan',
         'jenis_kelamin',
         'tanggal_lahir',
         'alamat',
@@ -29,6 +29,11 @@ class Siswa extends Model
     public function penempatan()
 {
     return $this->hasMany(PenempatanSiswa::class);
+}
+
+public function angkatan()
+{
+    return $this->belongsTo(Angkatan::class, 'angkatan', 'tahun');
 }
 
 // Ambil penempatan AKTIF (helper, opsional tapi berguna)

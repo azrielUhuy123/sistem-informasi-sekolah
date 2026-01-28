@@ -24,12 +24,36 @@ class AuthenticatedSessionController extends Controller
      */
     public function store(LoginRequest $request): RedirectResponse
     {
+        // 1️⃣ PROSES LOGIN (WAJIB DULU)
         $request->authenticate();
 
+        // 2️⃣ BARU AMBIL USER
+        $user = Auth::user();
+
+        // 3️⃣ APPROVAL (KECUALI SUPERADMIN / KEPSEK)
+        if ($user->role !== 'superadmin' && $user->approval_status !== 'approved') {
+            Auth::logout();
+
+            return back()->withErrors([
+                'email' => 'Akun belum disetujui oleh Kepala Sekolah.',
+            ]);
+        }
+
+        // 4️⃣ STATUS AKTIF (JIKA ADA)
+        if (property_exists($user, 'is_active') && ! $user->is_active) {
+            Auth::logout();
+
+            return back()->withErrors([
+                'email' => 'Akun dinonaktifkan.',
+            ]);
+        }
+
+        // 5️⃣ SESSION & REDIRECT
         $request->session()->regenerate();
 
-        $user = $request->user();
-        return redirect($user->getDashboardUrl());
+        return redirect()->intended($user->getDashboardUrl());
+
+
 
     }
 
@@ -46,4 +70,5 @@ class AuthenticatedSessionController extends Controller
 
         return redirect('/');
     }
+    
 }

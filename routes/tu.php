@@ -21,6 +21,7 @@ use App\Http\Controllers\Tu\DataKepegawaianController;
 use App\Http\Controllers\Tu\MataPelajaranController;
 use App\Http\Controllers\Tu\KeuanganPemasukanController;
 use App\Http\Controllers\Tu\PenempatanSiswaController;
+use App\Http\Controllers\Tu\AngkatanController;
 
 /*
 |--------------------------------------------------------------------------
@@ -299,6 +300,13 @@ Route::middleware(['auth', 'role:tu'])
     Route::delete('siswa/{id}/force-delete', [SiswaController::class, 'forceDelete'])
         ->name('siswa.forceDelete');
 
+    Route::resource('angkatan', AngkatanController::class)
+    ->except(['show']);
+
+    Route::post(
+    'angkatan/{angkatan}/toggle',
+    [AngkatanController::class, 'toggle']
+)->name('angkatan.toggle');
 
 
     });

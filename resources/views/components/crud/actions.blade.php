@@ -49,7 +49,7 @@
     @endif
 @endif
 
-@if ($row->role !== 'superadmin')
+@if(($crudMode ?? null) !== 'internal_user')
     {{-- RESTORE --}}
     @if(isset($actions['restore']) && $isDeleted)
         <form class="d-inline" method="POST" action="{{ route($actions['restore'], $row->id) }}">
@@ -78,5 +78,22 @@
             </button>
         </form>
     @endif
+
+    @if(isset($actions['toggle']))
+    <form method="POST" action="{{ route($actions['toggle'], $row->id) }}" class="d-inline">
+        @csrf
+        @method('PATCH')
+        <button class="icon-btn" 
+            title="{{ $row->is_active ? 'Nonaktifkan' : 'Aktifkan' }}"
+            onclick="return confirm('Yakin?')">
+            @if($row->is_active)
+                ❌
+            @else
+                ✅
+            @endif
+        </button>
+    </form>
+    @endif
+
  @endif   
 

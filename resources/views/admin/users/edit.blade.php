@@ -9,7 +9,7 @@
 <div class="card">
     <div class="card-body">
 
-        <form action="{{ route('admin.users.update', $user->id) }}" method="POST">
+        <form method="POST" action="{{ route('admin.users.update', $user->id) }}">
             @csrf
             @method('PUT')
 
@@ -32,25 +32,25 @@
             </div>
 
             <div class="mb-3">
-                <label>Password (opsional)</label>
+                <label>Role</label>
+                <select name="role" class="form-control" required>
+                    <option value="admin" {{ $user->role=='admin'?'selected':'' }}>Admin</option>
+                    <option value="tu" {{ $user->role=='tu'?'selected':'' }}>Tata Usaha</option>
+                </select>
+            </div>
+
+            <div class="mb-3">
+                <label>Password Baru <small class="text-muted">(opsional)</small></label>
                 <input type="password"
                        name="password"
                        class="form-control"
                        placeholder="Kosongkan jika tidak diubah">
             </div>
 
-            <div class="mb-3">
-                <label>Role</label>
-                <select name="role" class="form-control" required>
-                    <option value="admin" {{ $user->role === 'admin' ? 'selected' : '' }}>Admin</option>
-                    <option value="tu" {{ $user->role === 'tu' ? 'selected' : '' }}>Tata Usaha</option>
-                    <option value="guru" {{ $user->role === 'guru' ? 'selected' : '' }}>Guru</option>
-                    <option value="murid" {{ $user->role === 'murid' ? 'selected' : '' }}>Murid</option>
-                </select>
+            <div class="d-flex gap-2">
+                <button class="btn btn-primary">Simpan Perubahan</button>
+                <a href="{{ route('admin.users.index') }}" class="btn btn-secondary">Batal</a>
             </div>
-
-            <button class="btn btn-primary">Update</button>
-            <a href="{{ route('admin.users.index') }}" class="btn btn-secondary ms-2">Kembali</a>
 
         </form>
 

@@ -22,6 +22,7 @@ class User extends Authenticatable
         'email',
         'password',
         'role',
+        'is_active'
     ];
 
     /**
@@ -78,6 +79,20 @@ class User extends Authenticatable
             'spmb'   => '/spmb/dashboard',
             default  => '/dashboard'
         };
+    }
+    public function isActive(): bool
+    {
+        return (bool) $this->is_active;
+    }
+    
+    public function isApproved(): bool
+    {
+        return $this->approval_status === 'approved';
+    }
+
+    public function approver()
+    {
+        return $this->belongsTo(User::class, 'approved_by');
     }
 
 }

@@ -9,58 +9,71 @@ use Illuminate\Support\Facades\Hash;
 
 class UserController extends Controller
 {
-    public function index()
+    private function forbidIfSuperadmin(User $user)
     {
-        $users = \App\Models\User::query();
+        if ($user->role === 'superadmin') {
+            abort(403, 'Tidak boleh memodifikasi Kepala Sekolah');
+        }
+    }
+
+    public function index(Request $request)
+    {
+        $query = User::query()
+            ->whereIn('role', ['superadmin', 'admin', 'tu']);
+
+        // 🔃 Sorting
+        if ($request->filled('sort')) {
+            $column = $request->get('sort');
+            $order  = $request->get('order', 'asc');
+
+            if (in_array($column, ['name', 'email', 'role'])) {
+                $query->orderBy($column, $order);
+            }
+        } else {
+            $query->orderByRaw("role = 'superadmin' DESC")
+                ->orderBy('name');
+        }
 
         return view('admin.users.index', [
             'title'   => 'Manajemen User',
             'layout'  => 'layouts.admin',
-            'rows'    => $users->paginate(10),
+            'rows'    => $query->paginate(10)->withQueryString(),
+
+            // ✅ WAJIB ADA
             'columns' => [
                 ['key' => 'name', 'label' => 'Nama', 'sortable' => true],
                 ['key' => 'email', 'label' => 'Email', 'sortable' => true],
                 ['key' => 'role', 'label' => 'Role', 'sortable' => true],
             ],
+
             'actions' => [
                 'edit'   => 'admin.users.edit',
-                'delete' => 'admin.users.destroy',
+                'toggle' => 'admin.users.toggle',
             ],
             'routeCreate' => route('admin.users.create'),
+            'crudMode' => 'internal_user',
         ]);
     }
+
+
 
     public function create()
     {
         return view('admin.users.create');
     }
 
-    public function edit(User $user)
-    {
-        // Admin tidak boleh edit superadmin
-        if ($user->role === 'superadmin') {
-            abort(403, 'Tidak boleh mengedit Super Admin');
-        }
-
-        return view('admin.users.edit', compact('user'));
-    }
 
 
     public function destroy(User $user)
     {
-        // Admin tidak boleh hapus diri sendiri
+        $this->forbidIfSuperadmin($user);
+        
         if ($user->id === auth()->id()) {
-            abort(403, 'Tidak boleh menghapus akun sendiri');
-        }
-
-        // Admin tidak boleh hapus superadmin
-        if ($user->role === 'superadmin') {
-            abort(403, 'Tidak boleh menghapus Super Admin');
+            return back()->withErrors('Tidak boleh menghapus akun sendiri');
         }
 
         $user->delete();
-
-        return back()->with('success', 'User berhasil dihapus');
+        return back()->with('success', 'User dihapus');
     }
 
 
@@ -84,31 +97,57 @@ class UserController extends Controller
             ->with('success','User berhasil ditambahkan');
     }
 
+    
+    public function edit(User $user)
+    {
+        $this->forbidIfSuperadmin($user);
+        
+        return view('admin.users.edit', compact('user'));
+    }
+
     public function update(Request $request, User $user)
     {
-        // Proteksi superadmin (opsional tapi disarankan)
-        if ($user->role === 'superadmin') {
-            abort(403, 'Tidak boleh mengubah Super Admin');
+        $this->forbidIfSuperadmin($user);
+
+        if ($user->id === auth()->id()) {
+            abort(403, 'Tidak boleh mengubah akun sendiri');
         }
 
-        $request->validate([
-            'name' => 'required',
+        $validated = $request->validate([
+            'name'  => 'required|string|max:100',
             'email' => 'required|email|unique:users,email,' . $user->id,
-            'role' => 'required',
+            'role'  => 'required|in:admin,tu',
             'password' => 'nullable|min:6',
         ]);
 
-        $data = $request->only('name', 'email', 'role');
-
-        if ($request->filled('password')) {
-            $data['password'] = Hash::make($request->password);
+        if (!empty($validated['password'])) {
+            $validated['password'] = bcrypt($validated['password']);
+        } else {
+            unset($validated['password']);
         }
 
-        $user->update($data);
+        $user->update($validated);
 
         return redirect()
             ->route('admin.users.index')
             ->with('success', 'User berhasil diperbarui');
+    }
+
+    public function toggleStatus(User $user)
+    {
+        if ($user->role === 'superadmin') {
+            abort(403, 'Tidak boleh menonaktifkan Kepala Sekolah');
+        }
+
+        if ($user->id === auth()->id()) {
+            return back()->withErrors('Tidak boleh menonaktifkan akun sendiri');
+        }
+
+        $user->update([
+            'is_active' => ! $user->is_active
+        ]);
+
+        return back()->with('success', 'Status user diperbarui');
     }
 
 

@@ -3,22 +3,26 @@
 namespace App\Providers;
 
 use Illuminate\Support\ServiceProvider;
+use Illuminate\Support\Facades\Gate;
+use App\Models\User;
 
 class AppServiceProvider extends ServiceProvider
 {
-    /**
-     * Register any application services.
-     */
-    public function register(): void
-    {
-        //
-    }
-
-    /**
-     * Bootstrap any application services.
-     */
     public function boot(): void
     {
-        //
+        Gate::define('manage-user', function (User $authUser, User $targetUser) {
+            // superadmin boleh semua
+            if ($authUser->role === 'superadmin') {
+                return true;
+            }
+
+            // admin TIDAK BOLEH sentuh superadmin
+            if ($targetUser->role === 'superadmin') {
+                return false;
+            }
+
+            // admin boleh kelola user lain
+            return true;
+        });
     }
 }

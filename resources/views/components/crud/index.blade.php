@@ -264,6 +264,7 @@
 {{-- ============================
         BULK ACTION BAR
 ============================ --}}
+@if(($crudMode ?? null) !== 'internal_user')
 <div id="bulkActionBar">
     <div><span id="selectedCount">0</span> item dipilih</div>
 
@@ -287,6 +288,7 @@
 
     </div>
 </div>
+@endif
 
 {{-- ============================
         TABLE
@@ -295,20 +297,21 @@
 <table class="table table-hover">
     <thead>
     <tr>
+        @if(($crudMode ?? null) !== 'internal_user')
         <th data-col="select">
             <input id="selectAll" type="checkbox">
         </th>
+        @endif
 
         @foreach($columns as $col)
         <th data-col="{{ $col['key'] }}">
             <div class="th-sort">
                 {{ $col['label'] }}
 
-                @if(isset($col['sortable']) && $col['sortable'])
                 <span class="sort-icon-btn" onclick="applySort('{{ $col['key'] }}')">
                     @include('components.crud.sort-icon', ['column' => $col['key']])
                 </span>
-                @endif
+                
             </div>
         </th>
         @endforeach
@@ -320,10 +323,11 @@
     <tbody>
     @forelse($rows as $row)
     <tr data-id="{{ $row->id }}" data-deleted="{{ $row->deleted_at ? 'yes' : 'no' }}">
-
+        @if(($crudMode ?? null) !== 'internal_user')
         <td data-col="select">
             <input type="checkbox" class="row-checkbox" value="{{ $row->id }}">
         </td>
+        @endif
 
        @foreach($columns as $col)
         <td data-col="{{ $col['key'] }}">
@@ -382,6 +386,8 @@
 @endsection
 
 @section('scripts')
+
 @include('components.crud.scripts') 
+
 @endsection
 
