@@ -11,16 +11,12 @@ return new class extends Migration
      */
     public function up(): void
 {
-    Schema::table('angkatan', function (Blueprint $table) {
-        $table->string('keterangan')->nullable()->after('tahun');
-    });
+    // kolom keterangan sudah dibuat di create_angkatan_table
 }
 
 public function down(): void
 {
-    Schema::table('angkatan', function (Blueprint $table) {
-        $table->dropColumn('keterangan');
-    });
+
 }
 
 };

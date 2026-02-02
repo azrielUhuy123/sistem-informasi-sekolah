@@ -64,7 +64,7 @@
 
     {{-- FORCE DELETE --}}
     @if(isset($actions['forceDelete']) && $isDeleted)
-        <form class="d-inline" 
+        <form class="d-inline"
             method="POST"
             action="{{ route($actions['forceDelete'], $row->id) }}"
             onsubmit="return confirm('Hapus permanen? Tidak bisa dikembalikan!')">
@@ -83,7 +83,7 @@
     <form method="POST" action="{{ route($actions['toggle'], $row->id) }}" class="d-inline">
         @csrf
         @method('PATCH')
-        <button class="icon-btn" 
+        <button class="icon-btn"
             title="{{ $row->is_active ? 'Nonaktifkan' : 'Aktifkan' }}"
             onclick="return confirm('Yakin?')">
             @if($row->is_active)
@@ -95,5 +95,23 @@
     </form>
     @endif
 
- @endif   
+ @endif
+ @if(isset($actions['approve']))
+<form method="POST" action="{{ route($actions['approve'], $row->id) }}" class="d-inline">
+    @csrf
+    @method('PATCH')
+    <button class="icon-btn" title="Approve">✅</button>
+</form>
+@endif
+
+@if(isset($actions['reject']))
+<form method="POST" action="{{ route($actions['reject'], $row->id) }}"
+      class="d-inline"
+      onsubmit="return confirm('Tolak user ini?')">
+    @csrf
+    @method('PATCH')
+    <button class="icon-btn" title="Reject">❌</button>
+</form>
+@endif
+
 

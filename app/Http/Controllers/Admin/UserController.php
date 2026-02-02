@@ -19,7 +19,8 @@ class UserController extends Controller
     public function index(Request $request)
     {
         $query = User::query()
-            ->whereIn('role', ['superadmin', 'admin', 'tu']);
+        ->where('approval_status', 'approved')
+        ->where('role', '!=', 'superadmin');
 
         // 🔃 Sorting
         if ($request->filled('sort')) {
@@ -67,7 +68,7 @@ class UserController extends Controller
     public function destroy(User $user)
     {
         $this->forbidIfSuperadmin($user);
-        
+
         if ($user->id === auth()->id()) {
             return back()->withErrors('Tidak boleh menghapus akun sendiri');
         }
@@ -97,11 +98,11 @@ class UserController extends Controller
             ->with('success','User berhasil ditambahkan');
     }
 
-    
+
     public function edit(User $user)
     {
         $this->forbidIfSuperadmin($user);
-        
+
         return view('admin.users.edit', compact('user'));
     }
 

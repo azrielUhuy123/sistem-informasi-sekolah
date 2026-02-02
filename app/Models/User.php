@@ -22,7 +22,10 @@ class User extends Authenticatable
         'email',
         'password',
         'role',
-        'is_active'
+        'is_active',
+        'approval_status',
+        'approved_at',
+        'approved_by',
     ];
 
     /**
@@ -84,7 +87,7 @@ class User extends Authenticatable
     {
         return (bool) $this->is_active;
     }
-    
+
     public function isApproved(): bool
     {
         return $this->approval_status === 'approved';

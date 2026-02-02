@@ -4,7 +4,7 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Admin\DashboardController;
 use App\Http\Controllers\Admin\UserController;
 
-Route::middleware(['auth','role:admin'])
+Route::middleware(['auth','approved','role:admin'])
     ->prefix('admin')
     ->name('admin.')
     ->group(function () {

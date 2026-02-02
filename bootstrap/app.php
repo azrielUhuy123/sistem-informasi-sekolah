@@ -14,9 +14,10 @@ return Application::configure(basePath: dirname(__DIR__))
         $middleware->alias([
             'role' => \App\Http\Middleware\RoleMiddleware::class,
             'forbid.superadmin' => \App\Http\Middleware\ForbidSuperadminTarget::class,
+            'approved' => \App\Http\Middleware\EnsureUserApproved::class,
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions): void {
         //
-    
+
     })->create();

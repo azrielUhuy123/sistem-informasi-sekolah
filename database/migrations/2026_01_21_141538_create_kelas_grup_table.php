@@ -12,12 +12,13 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('kelas_grup', function (Blueprint $table) {
-    $table->id();
-    $table->foreignId('kelas_master_id')->constrained('kelas_master')->cascadeOnDelete();
-    $table->foreignId('tahun_ajaran_id')->constrained('tahun_ajaran')->cascadeOnDelete();
-    $table->timestamps();
+        $table->id();
+        $table->unsignedBigInteger('kelas_master_id');
+        $table->unsignedBigInteger('tahun_ajaran_id');
+        $table->timestamps();
+        $table->unique(['kelas_master_id', 'tahun_ajaran_id']);
 
-    $table->unique(['kelas_master_id', 'tahun_ajaran_id']);
+
 });
 
     }

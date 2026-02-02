@@ -8,11 +8,9 @@ return new class extends Migration {
     public function up(): void
     {
         Schema::table('siswa', function (Blueprint $table) {
-            $table->foreignId('angkatan_id')
-                  ->nullable()
-                  ->after('id')
-                  ->constrained('angkatan')
-                  ->nullOnDelete();
+            $table->unsignedBigInteger('angkatan_id')
+                ->nullable()
+                ->after('id');
         });
     }
 

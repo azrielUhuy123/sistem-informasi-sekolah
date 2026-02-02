@@ -1,5 +1,5 @@
-@extends($layout ?? 'layouts.tu') 
-@section('title', $title) 
+@extends($layout ?? 'layouts.tu')
+@section('title', $title)
 @section('content')
 
 {{-- =============================
@@ -311,12 +311,15 @@
                 <span class="sort-icon-btn" onclick="applySort('{{ $col['key'] }}')">
                     @include('components.crud.sort-icon', ['column' => $col['key']])
                 </span>
-                
+
             </div>
         </th>
         @endforeach
 
-        <th data-col="aksi">Aksi</th>
+        @if(!empty($actions))
+            <th data-col="aksi">Aksi</th>
+        @endif
+
     </tr>
     </thead>
 
@@ -340,9 +343,12 @@
         @endforeach
 
 
+        @if(!empty($actions))
         <td data-col="aksi">
             @include('components.crud.actions', ['row'=>$row, 'actions'=>$actions])
         </td>
+        @endif
+
     </tr>
     @empty
         <tr><td colspan="99" class="text-center py-4">Tidak ada data</td></tr>
@@ -387,7 +393,7 @@
 
 @section('scripts')
 
-@include('components.crud.scripts') 
+@include('components.crud.scripts')
 
 @endsection
 
