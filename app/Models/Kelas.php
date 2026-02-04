@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use App\Models\TahunAjaran;
 
 class Kelas extends Model
 {
@@ -37,6 +38,16 @@ class Kelas extends Model
     public function penempatanSiswa()
     {
         return $this->hasMany(PenempatanSiswa::class);
+    }
+    public function scopeTahunAktif($query)
+    {
+        $tahunAktif = TahunAjaran::aktif();
+
+        if (!$tahunAktif) {
+            return $query->whereRaw('1 = 0'); // aman: tampilkan kosong
+        }
+
+        return $query->where('tahun_ajaran_id', $tahunAktif->id);
     }
 
 }

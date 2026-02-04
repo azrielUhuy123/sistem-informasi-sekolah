@@ -3,6 +3,7 @@
 namespace App\Models;
 
 // use Illuminate\Contracts\Auth\MustVerifyEmail;
+use App\Enums\UserRole;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
@@ -73,14 +74,12 @@ class User extends Authenticatable
     public function getDashboardUrl()
     {
         return match ($this->role) {
-            'superadmin' => '/superadmin/dashboard',
-            'admin'  => '/admin/dashboard',
-            'kepsek' => '/superadmin/dashboard',
-            'tu'     => '/tu/dashboard',
-            'guru'   => '/guru/dashboard',
-            'murid'  => '/murid/dashboard',
-            'spmb'   => '/spmb/dashboard',
-            default  => '/dashboard'
+            UserRole::SUPERADMIN => '/superadmin/dashboard',
+            UserRole::ADMIN      => '/admin/dashboard',
+            UserRole::TU         => '/tu/dashboard',
+            UserRole::GURU       => '/guru/dashboard',
+            UserRole::MURID      => '/murid/dashboard',
+            default              => '/dashboard',
         };
     }
     public function isActive(): bool

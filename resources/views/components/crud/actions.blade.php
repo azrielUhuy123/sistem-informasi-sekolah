@@ -114,4 +114,15 @@
 </form>
 @endif
 
+@if(isset($actions['activate']) && !$row->aktif)
+<form method="POST" action="{{ route($actions['activate'], $row->id) }}" class="d-inline">
+    @csrf
+    @method('PATCH')
+    <button class="icon-btn" title="Set Aktif"
+            onclick="return confirm('Jadikan Tahun Ajaran ini aktif?')">
+        ✅
+    </button>
+</form>
+@endif
+
 

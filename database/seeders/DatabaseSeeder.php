@@ -33,6 +33,15 @@ class DatabaseSeeder extends Seeder
             'role' => 'superadmin',
             'approved_at' => now(),
         ]);
+
+        User::create([
+            'name' => 'Tata Usaha',
+            'email' => 'tu@example.com',
+            'password' => Hash::make('tu123'),
+            'approval_status' => 'approved',
+            'role' => 'tu',
+            'approved_at' => now(),
+        ]);
     }
 
 }

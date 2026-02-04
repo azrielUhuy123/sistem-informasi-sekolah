@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use App\Models\TahunAjaran;
 
 class PenempatanSiswa extends Model
 {
@@ -29,5 +30,15 @@ class PenempatanSiswa extends Model
     public function tahunAjaran()
     {
         return $this->belongsTo(TahunAjaran::class);
+    }
+    public function scopeTahunAktif($query)
+    {
+        $tahunAktif = TahunAjaran::aktif();
+
+        if (!$tahunAktif) {
+            return $query->whereRaw('1 = 0');
+        }
+
+        return $query->where('tahun_ajaran_id', $tahunAktif->id);
     }
 }

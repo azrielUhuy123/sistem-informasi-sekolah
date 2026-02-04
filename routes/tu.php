@@ -45,6 +45,9 @@ Route::middleware(['auth', 'role:tu'])
 
     Route::prefix('kelas')->name('kelas.')->group(function () {
 
+    Route::middleware(['auth', 'approved', 'role:tu', 'tahun.aktif'])
+        ->group(function () {
+
     //Grup Kelas
     Route::get('/', [KelasController::class, 'index'])
         ->name('index');
@@ -95,7 +98,7 @@ Route::middleware(['auth', 'role:tu'])
         '/rombel/{kelas_master}/{tahun_ajaran}',
         [KelasController::class, 'storeRombel']
     )->name('rombel.store');
-
+ });
 });
 
 

@@ -287,8 +287,10 @@
     <div class="main-area">
 
         <!-- SIDEBAR -->
+        @php
+            $menus = config('menu')[auth()->user()->role] ?? [];
+        @endphp
         <div class="sidebar">
-
             <div class="sidebar-title">ADMINISTRATOR</div>
 
             <a class="menu-item {{ request()->is('admin/dashboard') ? 'active' : '' }}"
@@ -296,21 +298,36 @@
                 <i class="bi bi-speedometer2"></i> Dashboard
             </a>
 
-            <!-- USER MANAGEMENT -->
-            <a class="menu-item dropdown-toggle" data-bs-toggle="collapse" href="#menuUser">
-                <i class="bi bi-people"></i> Manajemen User
-            </a>
+            @php
+                $tahunAktif = \App\Models\TahunAjaran::aktif();
+            @endphp
 
-            <div class="collapse show submenu" id="menuUser">
-                <a class="menu-item {{ request()->is('admin/users*') ? 'active' : '' }}"
-                href="{{ route('admin.users.index') }}">
-                    <i class="bi bi-person-gear"></i> Data User
-                </a>
+            @if($tahunAktif)
+                <div class="mb-3 p-2 rounded bg-light">
+                    <small class="text-muted">Tahun Ajaran Aktif</small><br>
+                    <strong>{{ $tahunAktif->tahun }} {{ $tahunAktif->semester }}</strong>
+                </div>
+            @endif
 
-                <a class="menu-item" href="#">
-                    <i class="bi bi-shield-lock"></i> Role & Akses
-                </a>
-            </div>
+
+            @if(count($menus))
+                <div class="sidebar-title">MENU</div>
+
+                @foreach ($menus as $menu)
+                    @php
+                        $routeExists = Route::has($menu['route']);
+                    @endphp
+
+                    <a class="menu-item {{ $routeExists && request()->routeIs($menu['route']) ? 'active' : '' }}"
+                    href="{{ $routeExists ? route($menu['route']) : '#' }}"
+                    {{ $routeExists ? '' : 'onclick=return false; style=opacity:0.5;cursor:not-allowed;' }}>
+                        <i class="bi bi-chevron-right"></i>
+                        {{ $menu['label'] }}
+                    </a>
+                @endforeach
+
+            @endif
+
 
             <!-- MASTER DATA -->
             <a class="menu-item dropdown-toggle" data-bs-toggle="collapse" href="#menuMaster">

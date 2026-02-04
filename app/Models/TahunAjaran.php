@@ -18,5 +18,10 @@ class TahunAjaran extends Model
 {
     return $this->hasMany(PenempatanSiswa::class);
 }
+public static function aktif()
+{
+    return static::where('aktif', true)->first();
+}
+
 
 }

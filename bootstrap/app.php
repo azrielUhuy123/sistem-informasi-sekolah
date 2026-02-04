@@ -15,6 +15,7 @@ return Application::configure(basePath: dirname(__DIR__))
             'role' => \App\Http\Middleware\RoleMiddleware::class,
             'forbid.superadmin' => \App\Http\Middleware\ForbidSuperadminTarget::class,
             'approved' => \App\Http\Middleware\EnsureUserApproved::class,
+            'tahun.aktif' => \App\Http\Middleware\EnsureTahunAjaranAktif::class,
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions): void {

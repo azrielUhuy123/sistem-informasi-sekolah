@@ -28,11 +28,6 @@ Route::get('/dashboard', function () {
 |--------------------------------------------------------------------------
 */
 
-// GURU
-use App\Http\Controllers\Guru\DashboardController as GuruDashboard;
-Route::middleware(['auth', 'role:guru'])->group(function () {
-    Route::get('/guru/dashboard', [GuruDashboard::class, 'index'])->name('guru.dashboard');
-});
 
 // MURID
 use App\Http\Controllers\Murid\DashboardController as MuridDashboard;
@@ -65,6 +60,7 @@ Route::middleware('auth')->group(function () {
 require __DIR__.'/admin.php';
 require __DIR__.'/superadmin.php';
 require __DIR__.'/tu.php';
+require __DIR__.'/guru.php';
 require __DIR__.'/auth.php';
 
 
