@@ -8,39 +8,38 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Siswa extends Model
 {
-    use HasFactory, SoftDeletes;
+    use SoftDeletes;
 
-    protected $table = 'siswa'; // nama tabel
+    protected $table = 'siswa';
 
     protected $fillable = [
-        'nama',
-        'nis',
-        'nisn',
-        'angkatan',
-        'jenis_kelamin',
-        'tanggal_lahir',
-        'alamat',
-        'nama_wali',
-        'telepon_wali',
-    ];
+    'nama',
+    'nis',
+    'nisn',
+    'kelas_id',
+    'jenis_kelamin',
+    'tanggal_lahir',
+    'alamat',
+    'nama_wali',
+    'telepon_wali',
+];
 
 
+    public function kelas()
+    {
+        return $this->belongsTo(Kelas::class);
+    }
 
-    public function penempatan()
+    public function getAngkatanIdAttribute()
 {
-    return $this->hasMany(PenempatanSiswa::class);
+    return $this->kelas?->kelasGrup?->angkatan_id;
 }
 
-public function angkatan()
+public function kelasGrup()
 {
-    return $this->belongsTo(Angkatan::class, 'angkatan', 'tahun');
-}
-
-// Ambil penempatan AKTIF (helper, opsional tapi berguna)
-public function penempatanAktif()
-{
-    return $this->hasOne(PenempatanSiswa::class)
-        ->where('status', 'aktif');
+    return $this->kelas?->kelasGrup();
 }
 
 }
+
+

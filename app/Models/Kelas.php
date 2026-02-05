@@ -4,7 +4,6 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
-use App\Models\TahunAjaran;
 
 class Kelas extends Model
 {
@@ -13,41 +12,28 @@ class Kelas extends Model
     protected $table = 'kelas';
 
     protected $fillable = [
-        'kelas_master_id',
-        'tahun_ajaran_id',
+        'kelas_grup_id',
         'nama_kelas',
     ];
 
-    /* ================= RELASI ================= */
-
-    public function kelasMaster()
-    {
-        return $this->belongsTo(KelasMaster::class);
-    }
-
-    public function tahunAjaran()
-    {
-        return $this->belongsTo(TahunAjaran::class);
-    }
+    public function kelasGrup()
+{
+    return $this->belongsTo(KelasGrup::class, 'kelas_grup_id');
+}
 
     public function siswa()
     {
-        return $this->hasMany(Siswa::class);
+        return $this->hasMany(Siswa::class, 'kelas_id');
     }
 
-    public function penempatanSiswa()
-    {
-        return $this->hasMany(PenempatanSiswa::class);
-    }
-    public function scopeTahunAktif($query)
-    {
-        $tahunAktif = TahunAjaran::aktif();
+    public function getAngkatanIdAttribute()
+{
+    return $this->kelasGrup?->angkatan_id;
+}
 
-        if (!$tahunAktif) {
-            return $query->whereRaw('1 = 0'); // aman: tampilkan kosong
-        }
-
-        return $query->where('tahun_ajaran_id', $tahunAktif->id);
-    }
+public function getTingkatAttribute()
+{
+    return $this->kelasGrup?->kelasMaster?->tingkat;
+}
 
 }

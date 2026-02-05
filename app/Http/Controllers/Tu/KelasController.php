@@ -4,235 +4,181 @@ namespace App\Http\Controllers\Tu;
 
 use App\Http\Controllers\Controller;
 use App\Models\Kelas;
+use App\Models\KelasGrup;
 use App\Models\KelasMaster;
-use App\Models\TahunAjaran;
+use App\Models\Angkatan;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
-use App\Models\KelasGrup;
 
 class KelasController extends Controller
 {
     /**
-     * INDEX — Grup Kelas berdasarkan Kelas Master
+     * =====================================================
+     * INDEX — LIST GRUP KELAS (PER TINGKAT & ANGKATAN)
+     * =====================================================
      */
-   public function index()
-{
-    $grupKelas = DB::table('kelas_grup')
-        ->join('kelas_master', 'kelas_master.id', '=', 'kelas_grup.kelas_master_id')
-        ->join('tahun_ajaran', 'tahun_ajaran.id', '=', 'kelas_grup.tahun_ajaran_id')
-        ->leftJoin('kelas', function ($join) {
-            $join->on('kelas.kelas_master_id', '=', 'kelas_grup.kelas_master_id')
-                 ->on('kelas.tahun_ajaran_id', '=', 'kelas_grup.tahun_ajaran_id')
-                 ->where('kelas.nama_kelas', '!=', '-')
-                 ->whereNull('kelas.deleted_at');
-        })
-        ->select(
-            'kelas_grup.id',
-            'kelas_master.tingkat',
-            'kelas_grup.kelas_master_id',
-            'kelas_grup.tahun_ajaran_id',
-            'tahun_ajaran.tahun',
-            DB::raw('COUNT(kelas.id) as jumlah_kelas')
-        )
-        ->groupBy(
-            'kelas_grup.id',
-            'kelas_master.tingkat',
-            'kelas_grup.kelas_master_id',
-            'kelas_grup.tahun_ajaran_id',
-            'tahun_ajaran.tahun'
-        )
-        ->orderBy('kelas_master.tingkat')
-        ->get();
-
-    return view('tu.kelas.index', compact('grupKelas'));
-}
-
-    public function rombelIndex($kelasMasterId, $tahunAjaranId)
-{
-    $kelas = Kelas::with(['kelasMaster', 'tahunAjaran'])
-        ->where('kelas_master_id', $kelasMasterId)
-        ->where('tahun_ajaran_id', $tahunAjaranId)
-        ->where('nama_kelas', '!=', '-') // ⬅️ ini penting
-        ->orderBy('nama_kelas')
-        ->get();
-
-    return view('tu.kelas.rombel-index', compact('kelas'));
-}
-
-
-public function createRombel($kelasMasterId, $tahunAjaranId)
-{
-    $kelasMaster = KelasMaster::findOrFail($kelasMasterId);
-    $tahunAjaran = TahunAjaran::findOrFail($tahunAjaranId);
-
-    return view('tu.kelas.rombel-create', compact(
-        'kelasMaster',
-        'tahunAjaran'
-    ));
-}
-
-public function storeRombel(Request $request, $kelasMasterId, $tahunAjaranId)
-{
-    $request->validate([
-        'kode' => 'required|alpha|max:1'
-    ]);
-
-    $namaKelas = $kelasMasterId . strtoupper($request->kode);
-
-    // cegah duplikat
-    $exists = Kelas::where('kelas_master_id', $kelasMasterId)
-        ->where('tahun_ajaran_id', $tahunAjaranId)
-        ->where('nama_kelas', $namaKelas)
-        ->exists();
-
-    if ($exists) {
-        return back()->with('error', 'Rombel sudah ada');
-    }
-
-    Kelas::create([
-        'kelas_master_id' => $kelasMasterId,
-        'tahun_ajaran_id' => $tahunAjaranId,
-        'nama_kelas' => $namaKelas,
-    ]);
-
-    return redirect()->route('tu.kelas.rombel.index', [
-        'kelas_master' => $kelasMasterId,
-        'tahun_ajaran' => $tahunAjaranId
-    ])->with('success', 'Rombel berhasil ditambahkan');
-}
-
-
-    /**
- * FORM CREATE GRUP KELAS
- */
-public function createGrup()
-{
-    $kelasMaster = KelasMaster::orderBy('tingkat')->get();
-    $tahunAjaran = TahunAjaran::orderBy('tahun', 'desc')->get();
-
-    return view('tu.kelas.grup-create', compact('kelasMaster', 'tahunAjaran'));
-}
-/**
- * SIMPAN GRUP KELAS
- */
-public function storeGrup(Request $request)
-{
-    $request->validate([
-        'kelas_master_id' => 'required|exists:kelas_master,id',
-        'tahun_ajaran_id' => 'required|exists:tahun_ajaran,id',
-    ]);
-
-    $exists = KelasGrup::where('kelas_master_id', $request->kelas_master_id)
-        ->where('tahun_ajaran_id', $request->tahun_ajaran_id)
-        ->exists();
-
-    if ($exists) {
-        return back()->with('error', 'Grup kelas sudah ada');
-    }
-
-    KelasGrup::create([
-        'kelas_master_id' => $request->kelas_master_id,
-        'tahun_ajaran_id' => $request->tahun_ajaran_id,
-    ]);
-
-    return redirect()->route('tu.kelas.index')
-        ->with('success', 'Grup kelas berhasil dibuat');
-}
-
-
-    /**
-     * CREATE
-     */
-    public function create()
+    public function index()
     {
-        return view('tu.kelas.create', [
-            'kelasMaster' => KelasMaster::orderBy('tingkat')->orderBy('kode')->get(),
-            'tahunAjaran' => TahunAjaran::orderByDesc('tahun')->get(),
+        $grupKelas = KelasGrup::query()
+            ->join('angkatan', 'angkatan.id', '=', 'kelas_grup.angkatan_id')
+            ->join('kelas_master', 'kelas_master.id', '=', 'kelas_grup.kelas_master_id')
+            ->leftJoin('kelas', function ($join) {
+                $join->on('kelas.kelas_grup_id', '=', 'kelas_grup.id')
+                     ->whereNull('kelas.deleted_at');
+            })
+            ->select(
+                'kelas_grup.id',
+                'kelas_master.tingkat as tingkat',
+                'angkatan.tahun',
+                'angkatan.keterangan',
+                DB::raw('COUNT(kelas.id) as jumlah_kelas')
+            )
+            ->groupBy(
+                'kelas_grup.id',
+                'kelas_master.tingkat',
+                'angkatan.tahun',
+                'angkatan.keterangan'
+            )
+            ->orderBy('kelas_master.tingkat')
+            ->orderBy('angkatan.tahun', 'desc')
+            ->get();
+
+        return view('tu.kelas.index', compact('grupKelas'));
+    }
+
+    /**
+     * =====================================================
+     * ROMBEL INDEX — LIST ROMBEL DALAM 1 GRUP KELAS
+     * =====================================================
+     */
+    public function rombelIndex($kelasGrupId)
+    {
+        $kelasGrup = KelasGrup::with(['angkatan', 'kelasMaster'])
+            ->findOrFail($kelasGrupId);
+
+        $rombels = Kelas::withCount('siswa')
+            ->where('kelas_grup_id', $kelasGrupId)
+            ->orderBy('nama_kelas')
+            ->get();
+
+        return view('tu.kelas.rombel-index', compact(
+            'kelasGrup',
+            'rombels'
+        ));
+    }
+
+    /**
+     * =====================================================
+     * CREATE ROMBEL
+     * =====================================================
+     */
+    public function createRombel($kelasGrupId)
+    {
+        $kelasGrup = KelasGrup::with(['angkatan', 'kelasMaster'])
+            ->findOrFail($kelasGrupId);
+
+        return view('tu.kelas.rombel-create', compact('kelasGrup'));
+    }
+
+    /**
+     * =====================================================
+     * STORE ROMBEL
+     * =====================================================
+     */
+    public function storeRombel(Request $request, $kelasGrupId)
+    {
+        $request->validate([
+            'kode' => 'required|string|max:1|alpha'
+        ]);
+
+        $kelasGrup = KelasGrup::with('kelasMaster')->findOrFail($kelasGrupId);
+
+        // contoh: tingkat 1 + A = 1A
+        $namaKelas = $kelasGrup->kelasMaster->tingkat . strtoupper($request->kode);
+
+        // cegah duplikat rombel
+        if (
+            Kelas::where('kelas_grup_id', $kelasGrupId)
+                ->where('nama_kelas', $namaKelas)
+                ->exists()
+        ) {
+            return back()->with('error', 'Rombel sudah ada');
+        }
+
+        Kelas::create([
+            'kelas_grup_id' => $kelasGrupId,
+            'nama_kelas'    => $namaKelas,
+        ]);
+
+        return redirect()
+            ->route('tu.kelas.rombel.index', $kelasGrupId)
+            ->with('success', 'Rombel berhasil ditambahkan');
+    }
+
+    /**
+     * =====================================================
+     * CREATE GRUP KELAS
+     * =====================================================
+     */
+    public function createGrup()
+    {
+        return view('tu.kelas.grup-create', [
+            'angkatan'     => Angkatan::orderByDesc('tahun')->get(),
+            'kelasMaster' => KelasMaster::orderBy('tingkat')->get(),
         ]);
     }
 
     /**
-     * STORE
+     * =====================================================
+     * STORE GRUP KELAS
+     * =====================================================
      */
-    public function store(Request $request)
+    public function storeGrup(Request $request)
     {
-        $validated = $request->validate([
+        $request->validate([
             'kelas_master_id' => 'required|exists:kelas_master,id',
-            'tahun_ajaran_id' => 'required|exists:tahun_ajaran,id',
+            'angkatan_id'     => 'required|exists:angkatan,id',
         ]);
 
-        Kelas::create($validated);
+        // cegah duplikat grup
+        $exists = KelasGrup::where('kelas_master_id', $request->kelas_master_id)
+            ->where('angkatan_id', $request->angkatan_id)
+            ->exists();
 
-        return redirect()->route('tu.kelas.index')
-            ->with('success', 'Kelas berhasil ditambahkan');
+        if ($exists) {
+            return back()->with('error', 'Grup kelas sudah ada');
+        }
+
+        KelasGrup::create([
+            'kelas_master_id' => $request->kelas_master_id,
+            'angkatan_id'     => $request->angkatan_id,
+        ]);
+
+        return redirect()
+            ->route('tu.kelas.index')
+            ->with('success', 'Grup kelas berhasil dibuat');
     }
 
     /**
-     * EDIT
-     */
-    public function edit($id)
-    {
-        return view('tu.kelas.edit', [
-            'kelas'        => Kelas::withTrashed()->findOrFail($id),
-            'kelasMaster'  => KelasMaster::orderBy('tingkat')->get(),
-            'tahunAjaran'  => TahunAjaran::orderByDesc('tahun')->get(),
-        ]);
-    }
-
-    /**
-     * UPDATE
-     */
-    public function update(Request $request, $id)
-    {
-        $kelas = Kelas::withTrashed()->findOrFail($id);
-
-        $validated = $request->validate([
-            'kelas_master_id' => 'required|exists:kelas_master,id',
-            'tahun_ajaran_id' => 'required|exists:tahun_ajaran,id',
-        ]);
-
-        $kelas->update($validated);
-
-        return redirect()->route('tu.kelas.index')
-            ->with('success', 'Kelas berhasil diperbarui');
-    }
-
-    /**
-     * SOFT DELETE
+     * =====================================================
+     * DELETE / RESTORE / FORCE DELETE ROMBEL
+     * =====================================================
      */
     public function destroy($id)
     {
         Kelas::findOrFail($id)->delete();
-        return back()->with('success', 'Data dipindahkan ke trash');
+        return back()->with('success', 'Rombel dipindahkan ke trash');
     }
 
-    /**
-     * RESTORE
-     */
     public function restore($id)
     {
         Kelas::onlyTrashed()->findOrFail($id)->restore();
-        return back()->with('success', 'Data berhasil direstore');
+        return back()->with('success', 'Rombel berhasil direstore');
     }
 
-    /**
-     * FORCE DELETE
-     */
     public function forceDelete($id)
     {
         Kelas::onlyTrashed()->findOrFail($id)->forceDelete();
-        return back()->with('success', 'Data dihapus permanen');
-    }
-
-    /**
-     * DETAIL (ROMBEL)
-     */
-    public function detail($id)
-    {
-        $kelas = Kelas::with(['kelasMaster', 'tahunAjaran', 'siswa'])
-            ->withTrashed()
-            ->findOrFail($id);
-
-        return view('tu.kelas.detail', compact('kelas'));
+        return back()->with('success', 'Rombel dihapus permanen');
     }
 }

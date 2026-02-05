@@ -60,9 +60,9 @@ Route::middleware(['auth', 'role:tu'])
         
 
     //Rombel dalam grup
-    Route::get('/rombel/{kelas_master}/{tahun_ajaran}',
-        [KelasController::class, 'rombelIndex'])
+    Route::get('/rombel/{kelas_grup}',[KelasController::class, 'rombelIndex'])
         ->name('rombel.index');
+
 
     /**
      * ===============================
@@ -88,16 +88,17 @@ Route::middleware(['auth', 'role:tu'])
     Route::get('/search/ajax', [KelasController::class, 'ajaxSearch'])->name('search');
 
     // form tambah rombel
-    Route::get(
-        '/rombel/{kelas_master}/{tahun_ajaran}/create',
-        [KelasController::class, 'createRombel']
-    )->name('rombel.create');
+    // ✅ form tambah rombel
+Route::get(
+    '/rombel/{kelas_grup}/create',
+    [KelasController::class, 'createRombel']
+)->name('rombel.create');
 
-    // simpan rombel
-    Route::post(
-        '/rombel/{kelas_master}/{tahun_ajaran}',
-        [KelasController::class, 'storeRombel']
-    )->name('rombel.store');
+// ✅ simpan rombel
+Route::post(
+    '/rombel/{kelas_grup}',
+    [KelasController::class, 'storeRombel']
+)->name('rombel.store');
  });
 });
 
@@ -110,24 +111,38 @@ Route::middleware(['auth', 'role:tu'])
         |--------------------------------------------------------------------------
         */
         Route::get('/siswa/search/ajax', [SiswaController::class, 'ajaxSearch'])
-            ->name('siswa.search');
+    ->name('siswa.search');
 
-        Route::post('/siswa/bulk', [SiswaController::class, 'bulkAction'])
-            ->name('siswa.bulk');
+Route::post('/siswa/bulk', [SiswaController::class, 'bulkAction'])
+    ->name('siswa.bulk');
 
-        Route::get('/siswa/{id}/detail', [SiswaController::class, 'detail'])
-            ->name('siswa.detail');
+Route::post('/siswa/import', [SiswaController::class, 'importExcel'])
+    ->name('siswa.import');
 
-        Route::post('/siswa/import', [SiswaController::class, 'importExcel'])
-            ->name('siswa.import');
+Route::get('/siswa/{id}/detail', [SiswaController::class, 'detail'])
+    ->name('siswa.detail');
 
-        Route::post('/siswa/{id}/restore', [SiswaController::class, 'restore'])
-            ->name('siswa.restore');
+Route::post('/siswa/{id}/restore', [SiswaController::class, 'restore'])
+    ->name('siswa.restore');
 
-        Route::delete('/siswa/{id}/force-delete', [SiswaController::class, 'forceDelete'])
-            ->name('siswa.forceDelete');
+Route::delete('/siswa/{id}/force-delete', [SiswaController::class, 'forceDelete'])
+    ->name('siswa.forceDelete');
 
-        Route::resource('siswa', SiswaController::class);
+// TERAKHIR BARU RESOURCE
+Route::resource('siswa', SiswaController::class);
+
+        /*
+|--------------------------------------------------------------------------
+| AJAX SISWA (ANGKATAN → GRUP → ROMBEL)
+|--------------------------------------------------------------------------
+*/
+Route::prefix('ajax')->group(function () {
+    Route::get('/kelas-grup', [SiswaController::class, 'ajaxGrup'])
+        ->name('ajax.kelas-grup');
+
+    Route::get('/kelas', [SiswaController::class, 'ajaxKelas'])
+        ->name('ajax.kelas');
+});
 
 
         /*
@@ -311,5 +326,10 @@ Route::middleware(['auth', 'role:tu'])
     [AngkatanController::class, 'toggle']
 )->name('angkatan.toggle');
 
+// routes/web.php
+Route::get('/tu/siswa/rombel/{angkatan}', [SiswaController::class, 'getRombelByAngkatan'])
+    ->name('tu.siswa.rombel');
 
-    });
+
+
+});

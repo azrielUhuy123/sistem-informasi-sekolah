@@ -4,147 +4,104 @@ namespace App\Http\Controllers\Tu;
 
 use App\Http\Controllers\Controller;
 use App\Models\Siswa;
+use App\Models\Angkatan;
+use App\Models\Kelas;
 use Illuminate\Http\Request;
 use App\Imports\SiswaImport;
 use Maatwebsite\Excel\Facades\Excel;
-use App\Models\Angkatan;
+use App\Models\KelasGrup;
 
 class SiswaController extends Controller
 {
     /**
      * INDEX
      * - WAJIB pilih angkatan
-     * - Support soft delete filter
-     * - Aman walau belum pilih angkatan
+     * - Kelas = ROMBEL
      */
-    public function index(Request $request)
+   public function index(Request $request)
 {
-    $angkatan = $request->get('angkatan');
-    $kelasId  = $request->get('kelas_id');
-    $deleted  = $request->deleted ?? 'active';
+    $angkatanId = $request->get('angkatan');
+    $grupId     = $request->get('kelas_grup_id');
+    $kelasId    = $request->get('kelas_id');
+    $submit     = $request->has('submit');
 
     // ===============================
-    // LIST ANGKATAN (DROPDOWN)
+    // DATA MASTER
     // ===============================
-    $listAngkatan = Angkatan::query()
-    ->where('aktif', true)
-    ->orderBy('tahun', 'desc')
-    ->get(); 
-
-    // ===============================
-    // LIST KELAS (KOSONG DEFAULT)
-    // ===============================
-    $listKelas = collect();
+    $listAngkatan = Angkatan::orderByDesc('tahun')->get();
+    $listGrup     = collect();
+    $listKelas    = collect();
 
     // ===============================
-    // BASE QUERY (DEFAULT KOSONG)
+    // JIKA ANGKATAN DIPILIH → LOAD GRUP
     // ===============================
-    $query = Siswa::query()->whereRaw('1 = 0');
-
-    // ===============================
-    // JIKA ANGKATAN DIPILIH
-    // ===============================
-    if ($angkatan) {
-
-        $query = match ($deleted) {
-            'only' => Siswa::onlyTrashed(),
-            'all'  => Siswa::withTrashed(),
-            default => Siswa::query(),
-        };
-
-        // filter angkatan
-        $query->where('angkatan', $angkatan);
-
-        // load relasi
-        $query->with([
-            'penempatanAktif.kelas',
-            'penempatanAktif.tahunAjaran'
-        ]);
-
-        // ===============================
-        // LIST KELAS DARI PENEMPATAN
-        // ===============================
-        $listKelas = \App\Models\Kelas::whereHas('penempatanSiswa', function ($q) use ($angkatan) {
-            $q->whereHas('siswa', function ($s) use ($angkatan) {
-                $s->where('angkatan', $angkatan);
-            })->where('status', 'aktif');
-        })->orderBy('nama_kelas')->get();
-
-        // ===============================
-        // FILTER KELAS (JIKA DIPILIH)
-        // ===============================
-        if ($kelasId) {
-            $query->whereHas('penempatanAktif', function ($q) use ($kelasId) {
-                $q->where('kelas_id', $kelasId);
-            });
-        }
-
-        // ===============================
-        // SEARCH
-        // ===============================
-        if ($request->filled('q')) {
-            $query->where(function ($q) use ($request) {
-                $q->where('nama', 'like', "%{$request->q}%")
-                  ->orWhere('nis', 'like', "%{$request->q}%")
-                  ->orWhere('nisn', 'like', "%{$request->q}%");
-            });
-        }
-
-        // ===============================
-        // SORTING
-        // ===============================
-        $sort  = $request->sort ?? 'nama';
-        $order = $request->order ?? 'asc';
-
-        $allowedSort = ['id', 'nama', 'nis', 'nisn'];
-        if (!in_array($sort, $allowedSort)) {
-            $sort = 'nama';
-        }
-
-        $query->orderBy($sort, $order);
+    if ($angkatanId) {
+        $listGrup = KelasGrup::where('angkatan_id', $angkatanId)
+            ->orderBy('tingkat')
+            ->get();
     }
 
     // ===============================
-    // PAGINATION
+    // JIKA GRUP DIPILIH → LOAD ROMBEL
     // ===============================
-    $siswa = $query->paginate(15)->withQueryString();
+    if ($grupId) {
+        $listKelas = Kelas::where('kelas_grup_id', $grupId)
+            ->orderBy('nama_kelas')
+            ->get();
+    }
 
-    return view('tu.siswa.index', [
-        'siswa'        => $siswa,
-        'listAngkatan' => $listAngkatan,
-        'listKelas'    => $listKelas,
-        'angkatan'     => $angkatan,
-        'kelasId'      => $kelasId,
-        'title'        => 'Manajemen Data Siswa',
-    ]);
+    // ===============================
+    // QUERY SISWA (HANYA JIKA SUBMIT)
+    // ===============================
+    $siswa = collect();
+
+    if ($submit && $kelasId) {
+        $siswa = Siswa::with('kelas.kelasGrup.angkatan')
+            ->where('kelas_id', $kelasId)
+            ->paginate(15)
+            ->withQueryString();
+    }
+
+    return view('tu.siswa.index', compact(
+        'listAngkatan',
+        'listGrup',
+        'listKelas',
+        'angkatanId',
+        'grupId',
+        'kelasId',
+        'submit',
+        'siswa'
+    ));
 }
 
 
     /**
      * CREATE
-     * - WAJIB membawa parameter angkatan
+     * - WAJIB kelas_id (rombel)
      */
     public function create(Request $request)
     {
-        $angkatan = $request->get('angkatan');
+        $kelasId = $request->get('kelas_id');
 
-        if (!$angkatan) {
+        if (!$kelasId) {
             return redirect()
                 ->route('tu.siswa.index')
-                ->with('warning', 'Silakan pilih angkatan terlebih dahulu');
+                ->with('warning', 'Silakan pilih kelas (rombel) terlebih dahulu');
         }
 
-        return view('tu.siswa.create', compact('angkatan'));
+        $kelas = Kelas::with('kelasGrup.angkatan')->findOrFail($kelasId);
+
+        return view('tu.siswa.create', compact('kelas'));
     }
 
     /**
      * STORE
-     * - ANGKATAN WAJIB
+     * - SIMPAN KE ROMBEL
      */
     public function store(Request $request)
     {
         $request->validate([
-            'angkatan'       => 'required|digits:4',
+            'kelas_id'       => 'required|exists:kelas,id',
             'nama'           => 'required|string|max:255',
             'nis'            => 'required|numeric|unique:siswa,nis',
             'nisn'           => 'nullable|numeric|unique:siswa,nisn',
@@ -156,7 +113,7 @@ class SiswaController extends Controller
         ]);
 
         Siswa::create($request->only([
-            'angkatan',
+            'kelas_id',
             'nama',
             'nis',
             'nisn',
@@ -168,9 +125,36 @@ class SiswaController extends Controller
         ]));
 
         return redirect()
-            ->route('tu.siswa.index', ['angkatan' => $request->angkatan])
+            ->route('tu.siswa.index', [
+                'angkatan' => Kelas::find($request->kelas_id)->kelasGrup->angkatan_id,
+                'kelas_id' => $request->kelas_id
+            ])
             ->with('success', 'Siswa berhasil ditambahkan');
     }
+
+    /**
+ * AJAX: Ambil Grup Kelas berdasarkan Angkatan
+ */
+public function ajaxGrup(Request $request)
+{
+    return KelasGrup::with('kelasMaster')
+        ->where('angkatan_id', $request->angkatan_id)
+        ->get()
+        ->map(function ($g) {
+            return [
+                'id' => $g->id,
+                'label' => 'Kelas ' . $g->kelasMaster->tingkat
+            ];
+        });
+}
+
+public function ajaxKelas(Request $request)
+{
+    return Kelas::where('kelas_grup_id', $request->kelas_grup_id)
+        ->orderBy('nama_kelas')
+        ->get(['id', 'nama_kelas']);
+}
+
 
     /**
      * DETAIL
@@ -178,10 +162,7 @@ class SiswaController extends Controller
     public function detail($id)
     {
         $siswa = Siswa::withTrashed()
-            ->with([
-                'penempatanAktif.kelas',
-                'penempatanAktif.tahunAjaran',
-            ])
+            ->with(['kelas.kelasGrup.angkatan'])
             ->findOrFail($id);
 
         return view('tu.siswa.detail', compact('siswa'));
@@ -192,7 +173,10 @@ class SiswaController extends Controller
      */
     public function edit($id)
     {
-        $siswa = Siswa::withTrashed()->findOrFail($id);
+        $siswa = Siswa::withTrashed()
+            ->with('kelas.kelasGrup.angkatan')
+            ->findOrFail($id);
+
         return view('tu.siswa.edit', compact('siswa'));
     }
 
@@ -204,7 +188,7 @@ class SiswaController extends Controller
         $siswa = Siswa::withTrashed()->findOrFail($id);
 
         $request->validate([
-            'angkatan'       => 'required|digits:4',
+            'kelas_id'       => 'required|exists:kelas,id',
             'nama'           => 'required|string|max:255',
             'nis'            => 'required|numeric|unique:siswa,nis,' . $siswa->id,
             'nisn'           => 'nullable|numeric|unique:siswa,nisn,' . $siswa->id,
@@ -216,7 +200,7 @@ class SiswaController extends Controller
         ]);
 
         $siswa->update($request->only([
-            'angkatan',
+            'kelas_id',
             'nama',
             'nis',
             'nisn',
@@ -227,13 +211,12 @@ class SiswaController extends Controller
             'telepon_wali',
         ]));
 
-        return redirect()
-            ->route('tu.siswa.index', ['angkatan' => $request->angkatan])
-            ->with('success', 'Data siswa berhasil diperbarui');
+        return back()->with('success', 'Data siswa berhasil diperbarui');
     }
 
     /**
-     * SOFT DELETE
+     * SOFT DELETE / RESTORE / FORCE DELETE
+     * (TIDAK DIUBAH)
      */
     public function destroy($id)
     {
@@ -241,18 +224,12 @@ class SiswaController extends Controller
         return back()->with('success', 'Siswa dipindahkan ke trash');
     }
 
-    /**
-     * RESTORE
-     */
     public function restore($id)
     {
         Siswa::withTrashed()->findOrFail($id)->restore();
         return back()->with('success', 'Data siswa berhasil direstore');
     }
 
-    /**
-     * FORCE DELETE
-     */
     public function forceDelete($id)
     {
         Siswa::withTrashed()->findOrFail($id)->forceDelete();
@@ -260,59 +237,20 @@ class SiswaController extends Controller
     }
 
     /**
-     * BULK ACTION
-     */
-    public function bulkAction(Request $request)
-    {
-        $request->validate([
-            'action' => 'required|in:delete,restore,forceDelete',
-            'ids'    => 'required|array',
-        ]);
-
-        match ($request->action) {
-            'delete'      => Siswa::whereIn('id', $request->ids)->delete(),
-            'restore'     => Siswa::onlyTrashed()->whereIn('id', $request->ids)->restore(),
-            'forceDelete' => Siswa::onlyTrashed()->whereIn('id', $request->ids)->forceDelete(),
-        };
-
-        return response()->json(['message' => 'Aksi berhasil dijalankan']);
-    }
-
-    /**
-     * AJAX SEARCH
-     */
-    public function ajaxSearch(Request $request)
-    {
-        return Siswa::query()
-            ->where('nama', 'like', "%{$request->q}%")
-            ->orWhere('nis', 'like', "%{$request->q}%")
-            ->orWhere('nisn', 'like', "%{$request->q}%")
-            ->orderBy('nama')
-            ->limit(10)
-            ->get();
-    }
-
-    /**
-     * IMPORT EXCEL
-     * - ANGKATAN WAJIB ADA DI FILE
+     * IMPORT EXCEL (SUDAH BENAR)
      */
     public function importExcel(Request $request)
-{
-    $request->validate([
-        'file'      => 'required|mimes:xlsx,xls,csv|max:2048',
-        'angkatan'  => 'required|digits:4',
-        'kelas_id'  => 'required|exists:kelas,id',
-    ]);
+    {
+        $request->validate([
+            'file'     => 'required|mimes:xlsx,xls,csv|max:2048',
+            'kelas_id' => 'required|exists:kelas,id',
+        ]);
 
-    Excel::import(
-        new SiswaImport(
-            angkatan: $request->angkatan,
-            kelasId: $request->kelas_id
-        ),
-        $request->file('file')
-    );
+        Excel::import(
+            new SiswaImport(kelasId: $request->kelas_id),
+            $request->file('file')
+        );
 
-    return back()->with('success', 'Data siswa berhasil di-import dan ditempatkan ke kelas');
-}
-
+        return back()->with('success', 'Data siswa berhasil di-import');
+    }
 }

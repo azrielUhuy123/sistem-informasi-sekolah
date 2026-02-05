@@ -3,38 +3,39 @@
 @section('title', 'Tambah Rombel')
 
 @section('content')
-<div class="card">
+<div class="card shadow-sm">
     <div class="card-body">
-        <h5 class="fw-bold mb-3">
-            Tambah Rombel Kelas {{ $kelasMaster->tingkat }}
-            ({{ $tahunAjaran->tahun }})
-        </h5>
 
-        <form method="POST"
-            action="{{ route('tu.kelas.rombel.store', [
-                'kelas_master' => $kelasMaster->id,
-                'tahun_ajaran' => $tahunAjaran->id
-            ]) }}">
-            @csrf
+        <h5 class="fw-bold">
+    Tambah Rombel Kelas {{ $kelasGrup->tingkat }}
+</h5>
+<p class="text-muted">
+    Angkatan {{ $kelasGrup->angkatan->tahun }}
+</p>
 
-            <div class="mb-3">
-                <label class="form-label">Kode Rombel</label>
-                <input type="text"
-                    name="kode"
-                    class="form-control"
-                    placeholder="A / B / C"
-                    maxlength="1"
-                    required>
-            </div>
+<form method="POST"
+      action="{{ route('tu.kelas.rombel.store', $kelasGrup->id) }}">
+    @csrf
 
-            <button class="btn btn-primary">Simpan</button>
-            <a href="{{ route('tu.kelas.rombel.index', [
-                'kelas_master' => $kelasMaster->id,
-                'tahun_ajaran' => $tahunAjaran->id
-            ]) }}" class="btn btn-secondary">
+    <div class="mb-3">
+        <label class="form-label">Kode Kelas</label>
+        <input type="text"
+               name="kode"
+               class="form-control"
+               placeholder="A / B / C"
+               maxlength="1"
+               required>
+    </div>
+            <button class="btn btn-primary">
+                Simpan
+            </button>
+
+            <a href="{{ route('tu.kelas.rombel.index', $kelasGrup->id) }}"
+               class="btn btn-secondary">
                 Batal
             </a>
         </form>
+
     </div>
 </div>
 @endsection

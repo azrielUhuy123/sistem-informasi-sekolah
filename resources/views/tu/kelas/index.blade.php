@@ -16,34 +16,43 @@
             </a>
         </div>
 
-        <table class="table table-hover">
+        <table class="table table-hover align-middle">
             <thead class="table-light">
                 <tr>
-                    <th>Tingkat</th>
-                    <th>Tahun Ajaran</th>
-                    <th>Jumlah Kelas</th>
-                    <th class="text-center">Aksi</th>
+                    <th style="width: 20%">Tingkat</th>
+                    <th>Angkatan</th>
+                    <th style="width: 20%">Jumlah Kelas</th>
+                    <th style="width: 15%" class="text-center">Aksi</th>
                 </tr>
             </thead>
             <tbody>
                 @forelse ($grupKelas as $grup)
                     <tr>
-                         <td>Kelas {{ $grup->tingkat }}</td>
-                        <td>{{ $grup->tahun }}</td>
-                         <td>{{ $grup->jumlah_kelas }}</td>
+                        <td>Kelas {{ $grup->tingkat }}</td>
+
+                        <td>
+                            {{ $grup->tahun }}
+                            <span class="text-muted">
+                                ({{ $grup->keterangan }})
+                            </span>
+                        </td>
+
+                        <td>
+                            <span class="badge bg-secondary">
+                                {{ $grup->jumlah_kelas }} Kelas
+                            </span>
+                        </td>
+
                         <td class="text-center">
-                            <a href="{{ route('tu.kelas.rombel.index', [
-                                'kelas_master' => $grup->kelas_master_id,
-                                'tahun_ajaran' => $grup->tahun_ajaran_id
-                            ]) }}"
-                            class="btn btn-sm btn-primary">
+                            <a href="{{ route('tu.kelas.rombel.index', $grup->id) }}"
+                               class="btn btn-sm btn-outline-primary">
                                 Masuk
                             </a>
                         </td>
                     </tr>
                 @empty
                     <tr>
-                        <td colspan="3" class="text-center text-muted">
+                        <td colspan="4" class="text-center text-muted">
                             Belum ada data kelas
                         </td>
                     </tr>
