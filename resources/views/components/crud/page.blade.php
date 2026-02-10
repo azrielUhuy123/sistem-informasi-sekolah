@@ -263,131 +263,13 @@
 
 {{-- ============================
         BULK ACTION BAR
-============================ --}}
-@if(($crudMode ?? null) !== 'internal_user')
-<div id="bulkActionBar">
-    <div><span id="selectedCount">0</span> item dipilih</div>
 
-    <div class="d-flex gap-2">
-        @if(!request()->has('deleted') || request('deleted') === 'active')
-        <button id="bulkDelete" class="btn btn-danger">Hapus</button>
-        <button id="bulkForce" class="btn btn-dark">Hapus Permanen</button>
-        @endif
-
-
-        @if(request('deleted') === 'only')
-        <button id="bulkRestore" class="btn btn-success">Pulihkan</button>
-        <button id="bulkForce" class="btn btn-dark">Hapus Permanen</button>
-        @endif
-
-        @if(request('deleted') === 'all')
-        <button id="bulkDelete" class="btn btn-danger">Hapus</button>
-        <button id="bulkRestore" class="btn btn-success">Pulihkan</button>
-        <button id="bulkForce" class="btn btn-dark">Hapus Permanen</button>
-        @endif
-
-    </div>
-</div>
-@endif
-
-{{-- ============================
         TABLE
-============================ --}}
-<div class="table-responsive">
-<table class="table table-hover">
-    <thead>
-    <tr>
-        @if(($crudMode ?? null) !== 'internal_user')
-        <th data-col="select">
-            <input id="selectAll" type="checkbox">
-        </th>
-        @endif
 
-        @foreach($columns as $col)
-        <th data-col="{{ $col['key'] }}">
-            <div class="th-sort">
-                {{ $col['label'] }}
-
-                <span class="sort-icon-btn" onclick="applySort('{{ $col['key'] }}')">
-                    @include('components.crud.sort-icon', ['column' => $col['key']])
-                </span>
-
-            </div>
-        </th>
-        @endforeach
-
-        @if(!empty($actions))
-            <th data-col="aksi">Aksi</th>
-        @endif
-
-    </tr>
-    </thead>
-
-    <tbody>
-    @forelse($rows as $row)
-    <tr data-id="{{ $row->id }}" data-deleted="{{ $row->deleted_at ? 'yes' : 'no' }}">
-        @if(($crudMode ?? null) !== 'internal_user')
-        <td data-col="select">
-            <input type="checkbox" class="row-checkbox" value="{{ $row->id }}">
-        </td>
-        @endif
-
-       @foreach($columns as $col)
-        <td data-col="{{ $col['key'] }}">
-            @if(isset($col['format']))
-                {!! $col['format']($row) !!}
-            @else
-                {{ data_get($row, $col['key']) }}
-            @endif
-        </td>
-        @endforeach
-
-
-        @if(!empty($actions))
-        <td data-col="aksi">
-            @include('components.crud.actions', ['row'=>$row, 'actions'=>$actions])
-        </td>
-        @endif
-
-    </tr>
-    @empty
-        <tr><td colspan="99" class="text-center py-4">Tidak ada data</td></tr>
-    @endforelse
-    </tbody>
-
-</table>
-</div>
-
-{{-- ============================
         PAGINATION
 ============================ --}}
-<div class="d-flex justify-content-between mt-3">
-    <div>
-        Menampilkan {{ $rows->firstItem() }} - {{ $rows->lastItem() }} dari {{ $rows->total() }} data
-    </div>
+@include('components.crud.table-wrapper')
 
-    <div class="simple-pagination">
-        @if($rows->onFirstPage())
-        <span class="disabled-page">«</span>
-        @else
-        <a class="page-link" href="{{ $rows->previousPageUrl() }}">«</a>
-        @endif
-
-        @foreach($rows->getUrlRange(1, $rows->lastPage()) as $page => $url)
-            @if($page == $rows->currentPage())
-                <span class="active-page">{{ $page }}</span>
-            @else
-                <a href="{{ $url }}" class="page-link">{{ $page }}</a>
-            @endif
-        @endforeach
-
-        @if($rows->hasMorePages())
-        <a class="page-link" href="{{ $rows->nextPageUrl() }}">»</a>
-        @else
-        <span class="disabled-page">»</span>
-        @endif
-    </div>
-</div>
 
 @endsection
 

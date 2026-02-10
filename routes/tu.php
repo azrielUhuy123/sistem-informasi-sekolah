@@ -136,12 +136,17 @@ Route::resource('siswa', SiswaController::class);
 | AJAX SISWA (ANGKATAN → GRUP → ROMBEL)
 |--------------------------------------------------------------------------
 */
-Route::prefix('ajax')->group(function () {
+Route::prefix('ajax')->name('ajax.')->group(function () {
+
     Route::get('/kelas-grup', [SiswaController::class, 'ajaxGrup'])
-        ->name('ajax.kelas-grup');
+        ->name('kelas-grup');
 
     Route::get('/kelas', [SiswaController::class, 'ajaxKelas'])
-        ->name('ajax.kelas');
+        ->name('kelas');
+
+    // 🔥 INI YANG KURANG & WAJIB
+    Route::get('/siswa-table', [SiswaController::class, 'ajaxTable'])
+        ->name('siswa-table');
 });
 
 
@@ -325,11 +330,6 @@ Route::prefix('ajax')->group(function () {
     'angkatan/{angkatan}/toggle',
     [AngkatanController::class, 'toggle']
 )->name('angkatan.toggle');
-
-// routes/web.php
-Route::get('/tu/siswa/rombel/{angkatan}', [SiswaController::class, 'getRombelByAngkatan'])
-    ->name('tu.siswa.rombel');
-
 
 
 });

@@ -19,60 +19,60 @@ class SiswaController extends Controller
      * - Kelas = ROMBEL
      */
    public function index(Request $request)
-{
-    $angkatanId = $request->get('angkatan');
-    $grupId     = $request->get('kelas_grup_id');
-    $kelasId    = $request->get('kelas_id');
-    $submit     = $request->has('submit');
+    {
+        $angkatanId = $request->get('angkatan');
+        $grupId     = $request->get('kelas_grup_id');
+        $kelasId    = $request->get('kelas_id');
+        $submit     = $request->has('submit');
 
-    // ===============================
-    // DATA MASTER
-    // ===============================
-    $listAngkatan = Angkatan::orderByDesc('tahun')->get();
-    $listGrup     = collect();
-    $listKelas    = collect();
+        // ===============================
+        // DATA MASTER
+        // ===============================
+        $listAngkatan = Angkatan::orderByDesc('tahun')->get();
+        $listGrup  = collect();
+        $listKelas = collect();
+        $siswa     = collect();
 
-    // ===============================
-    // JIKA ANGKATAN DIPILIH → LOAD GRUP
-    // ===============================
-    if ($angkatanId) {
-        $listGrup = KelasGrup::where('angkatan_id', $angkatanId)
-            ->orderBy('tingkat')
-            ->get();
+        // ===============================
+        // LOAD GRUP KELAS (via relasi kelas_master)
+        // ===============================
+        if ($angkatanId) {
+            $listGrup = KelasGrup::with('kelasMaster')
+                ->where('angkatan_id', $angkatanId)
+                ->get()
+                ->sortBy(fn ($g) => $g->kelasMaster->tingkat);
+        }
+
+        // ===============================
+        // LOAD ROMBEL
+        // ===============================
+        if ($grupId) {
+            $listKelas = Kelas::where('kelas_grup_id', $grupId)
+                ->orderBy('nama_kelas')
+                ->get();
+        }
+
+        // ===============================
+        // LOAD SISWA (HANYA SETELAH SUBMIT)
+        // ===============================
+        if ($submit && $kelasId) {
+            $siswa = Siswa::with('kelas.kelasGrup.angkatan')
+                ->where('kelas_id', $kelasId)
+                ->paginate(15)
+                ->withQueryString();
+        }
+
+        return view('tu.siswa.index', compact(
+            'listAngkatan',
+            'listGrup',
+            'listKelas',
+            'angkatanId',
+            'grupId',
+            'kelasId',
+            'submit',
+            'siswa'
+        ));
     }
-
-    // ===============================
-    // JIKA GRUP DIPILIH → LOAD ROMBEL
-    // ===============================
-    if ($grupId) {
-        $listKelas = Kelas::where('kelas_grup_id', $grupId)
-            ->orderBy('nama_kelas')
-            ->get();
-    }
-
-    // ===============================
-    // QUERY SISWA (HANYA JIKA SUBMIT)
-    // ===============================
-    $siswa = collect();
-
-    if ($submit && $kelasId) {
-        $siswa = Siswa::with('kelas.kelasGrup.angkatan')
-            ->where('kelas_id', $kelasId)
-            ->paginate(15)
-            ->withQueryString();
-    }
-
-    return view('tu.siswa.index', compact(
-        'listAngkatan',
-        'listGrup',
-        'listKelas',
-        'angkatanId',
-        'grupId',
-        'kelasId',
-        'submit',
-        'siswa'
-    ));
-}
 
 
     /**
@@ -154,6 +154,37 @@ public function ajaxKelas(Request $request)
         ->orderBy('nama_kelas')
         ->get(['id', 'nama_kelas']);
 }
+
+public function ajaxTable(Request $request)
+{
+    $rows = Siswa::with('kelas.kelasGrup.angkatan')
+        ->where('kelas_id', $request->kelas_id)
+        ->paginate(10);
+
+    $columns = [
+        ['key' => 'nama', 'label' => 'Nama'],
+        ['key' => 'nis', 'label' => 'NIS'],
+        ['key' => 'nisn', 'label' => 'NISN'],
+        [
+            'key' => 'kelas.nama_kelas',
+            'label' => 'Kelas',
+        ],
+    ];
+
+    $actions = [
+        'detail' => 'tu.siswa.detail',
+        'edit'   => 'tu.siswa.edit',
+        'delete' => 'tu.siswa.destroy',
+    ];
+
+    return view('components.crud.table-wrapper', [
+        'rows'     => $rows,
+        'columns'  => $columns,
+        'actions'  => $actions,
+        'crudMode' => 'normal',
+    ]);
+}
+
 
 
     /**

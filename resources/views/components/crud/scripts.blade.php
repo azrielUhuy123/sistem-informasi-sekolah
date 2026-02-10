@@ -1,5 +1,53 @@
 @isset($routeBulk)
 <script>
+window.initCrudTable = function () {
+    // 🔒 reset state & hindari double binding
+    document.querySelectorAll('.row-checkbox').forEach(cb => {
+        cb.replaceWith(cb.cloneNode(true));
+    });
+    const selectedIds = new Set();
+
+    const bulkBar = document.getElementById("bulkActionBar");
+    const selectedCount = document.getElementById("selectedCount");
+    const selectAll = document.getElementById("selectAll");
+
+    function updateFloatingBar() {
+        if (!bulkBar || !selectedCount) return;
+        selectedCount.innerText = selectedIds.size;
+        bulkBar.style.display = selectedIds.size > 0 ? "flex" : "none";
+    }
+
+    // SELECT ALL
+    selectAll?.addEventListener("change", function () {
+        document.querySelectorAll(".row-checkbox").forEach(cb => {
+            cb.checked = this.checked;
+            const id = parseInt(cb.value);
+            if (this.checked) selectedIds.add(id);
+            else selectedIds.delete(id);
+        });
+        updateFloatingBar();
+    });
+
+    // SINGLE CHECKBOX
+    document.querySelectorAll(".row-checkbox").forEach(cb => {
+        cb.addEventListener("change", function () {
+            const id = parseInt(this.value);
+            if (this.checked) selectedIds.add(id);
+            else selectedIds.delete(id);
+
+            if (selectAll) {
+                const all = document.querySelectorAll(".row-checkbox").length;
+                const checked = document.querySelectorAll(".row-checkbox:checked").length;
+                selectAll.checked = all === checked;
+            }
+
+            updateFloatingBar();
+        });
+    });
+};
+</script>
+
+<script>
 /* GLOBAL VARIABLES */
 document.addEventListener("DOMContentLoaded", function() {
     console.log("SCRIPT READY");
