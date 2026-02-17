@@ -61,7 +61,7 @@ class KelasController extends Controller
             ->orderBy('nama_kelas')
             ->get();
 
-        return view('tu.kelas.rombel-index', compact(
+        return view('tu.kelas.rombel.index', compact(
             'kelasGrup',
             'rombels'
         ));
@@ -77,7 +77,7 @@ class KelasController extends Controller
         $kelasGrup = KelasGrup::with(['angkatan', 'kelasMaster'])
             ->findOrFail($kelasGrupId);
 
-        return view('tu.kelas.rombel-create', compact('kelasGrup'));
+        return view('tu.kelas.rombel.create', compact('kelasGrup'));
     }
 
     /**
@@ -181,4 +181,35 @@ class KelasController extends Controller
         Kelas::onlyTrashed()->findOrFail($id)->forceDelete();
         return back()->with('success', 'Rombel dihapus permanen');
     }
+    public function showRombel($id)
+    {
+        $rombel = \App\Models\Kelas::with('kelasGrup.angkatan')
+            ->withCount('siswa')
+            ->findOrFail($id);
+
+        $siswa = \App\Models\Siswa::where('kelas_id', $id)
+            ->latest()
+            ->paginate(15);
+
+        $totalSiswa = \App\Models\Siswa::where('kelas_id', $id)->count();
+        $totalLaki  = \App\Models\Siswa::where('kelas_id', $id)
+                        ->where('jenis_kelamin', 'L')->count();
+        $totalPerempuan = \App\Models\Siswa::where('kelas_id', $id)
+                        ->where('jenis_kelamin', 'P')->count();
+
+        $persenLaki = $totalSiswa > 0 ? round(($totalLaki / $totalSiswa) * 100) : 0;
+        $persenPerempuan = $totalSiswa > 0 ? round(($totalPerempuan / $totalSiswa) * 100) : 0;
+
+        return view('tu.kelas.rombel.show', compact(
+            'rombel',
+            'siswa',
+            'totalSiswa',
+            'totalLaki',
+            'totalPerempuan',
+            'persenLaki',
+            'persenPerempuan'
+        ));
+    }
+
+
 }

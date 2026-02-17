@@ -1,0 +1,100 @@
+/* =========================
+   ROMBEL PAGE STYLE
+========================= */
+
+.rombel-page {
+    font-size: 14px;
+}
+
+/* Header */
+.rombel-page h4 {
+    font-size: 20px;
+}
+
+.rombel-page small {
+    font-size: 13px;
+}
+
+/* Statistik Cards */
+.rombel-page .card {
+    border-radius: 10px;
+}
+
+.rombel-page .card-body {
+    padding: 16px;
+}
+
+.rombel-page .card h3 {
+    font-size: 22px;
+}
+
+/* Progress bar lebih tipis */
+.rombel-page .progress {
+    height: 6px;
+    border-radius: 6px;
+}
+
+/* =========================
+   TABLE SISWA
+========================= */
+
+.rombel-page table {
+    font-size: 13px;
+}
+
+.rombel-page table th {
+    font-size: 12px;
+    font-weight: 600;
+    background: #f8f9fa;
+}
+
+.rombel-page table td {
+    vertical-align: middle;
+    padding: 8px 10px;
+}
+
+/* Badge gender */
+.rombel-page .badge {
+    font-size: 11px;
+    padding: 4px 8px;
+    border-radius: 20px;
+}
+
+/* Action buttons */
+.rombel-page .btn-sm {
+    font-size: 12px;
+    padding: 4px 8px;
+}
+
+/* =========================
+   MODAL FORM
+========================= */
+
+.rombel-page .modal-content {
+    border-radius: 14px;
+}
+
+.rombel-page .modal-header {
+    padding: 14px 20px;
+}
+
+.rombel-page .modal-body {
+    padding: 18px 20px;
+}
+
+.rombel-page .form-label {
+    font-size: 12px;
+    font-weight: 600;
+    margin-bottom: 4px;
+}
+
+.rombel-page .form-control,
+.rombel-page .form-select {
+    font-size: 13px;
+    padding: 6px 10px;
+}
+
+/* Success popup */
+#successOverlay .card {
+    border-radius: 18px;
+}

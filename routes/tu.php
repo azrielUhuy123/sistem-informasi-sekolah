@@ -87,19 +87,25 @@ Route::middleware(['auth', 'role:tu'])
 
     Route::get('/search/ajax', [KelasController::class, 'ajaxSearch'])->name('search');
 
-    // form tambah rombel
-    // ✅ form tambah rombel
-Route::get(
-    '/rombel/{kelas_grup}/create',
-    [KelasController::class, 'createRombel']
-)->name('rombel.create');
+    // Detail rombel
+    Route::get('/rombel/{id}/show',
+        [KelasController::class, 'showRombel']
+    )->name('rombel.show');
 
-// ✅ simpan rombel
-Route::post(
-    '/rombel/{kelas_grup}',
-    [KelasController::class, 'storeRombel']
-)->name('rombel.store');
- });
+    // Index rombel dalam grup
+    Route::get('/rombel/{kelas_grup}',
+        [KelasController::class, 'rombelIndex']
+    )->name('rombel.index');
+
+    // Form tambah rombel
+    Route::get('/rombel/{kelas_grup}/create',
+        [KelasController::class, 'createRombel']
+    )->name('rombel.create');
+
+    Route::post('/rombel/{kelas_grup}',
+        [KelasController::class, 'storeRombel']
+    )->name('rombel.store');
+    });
 });
 
 
@@ -148,6 +154,9 @@ Route::prefix('ajax')->name('ajax.')->group(function () {
     Route::get('/siswa-table', [SiswaController::class, 'ajaxTable'])
         ->name('siswa-table');
 });
+
+
+
 
 
         /*
@@ -314,14 +323,6 @@ Route::prefix('ajax')->name('ajax.')->group(function () {
             ->name('preview-naik-kelas');
     });
 
-    Route::resource('siswa', SiswaController::class);
-
-
-    Route::post('siswa/{id}/restore', [SiswaController::class, 'restore'])
-        ->name('siswa.restore');
-
-    Route::delete('siswa/{id}/force-delete', [SiswaController::class, 'forceDelete'])
-        ->name('siswa.forceDelete');
 
     Route::resource('angkatan', AngkatanController::class)
     ->except(['show']);

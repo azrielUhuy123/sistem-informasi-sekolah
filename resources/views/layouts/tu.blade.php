@@ -4,6 +4,7 @@
     <title>@yield('title')</title>
 
     <!-- Bootstrap + Icons -->
+    @vite(['resources/css/app.css', 'resources/js/app.js'])
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css" rel="stylesheet">
     <meta name="csrf-token" content="{{ csrf_token() }}">
@@ -297,11 +298,17 @@
             </a>
 
             <!-- Manajemen Sekolah -->
-            <a class="menu-item dropdown-toggle" data-bs-toggle="collapse" href="#menuSekolah">
-                <i class="bi bi-building"></i> Manajemen Sekolah
-            </a>
+            <button class="menu-item dropdown-toggle border-0 bg-transparent w-100 text-start"
+                type="button"
+                data-bs-toggle="collapse"
+                data-bs-target="#menuSekolah"
+                aria-expanded="false"
+                aria-controls="menuSekolah">
+            <i class="bi bi-building"></i> Manajemen Sekolah
+        </button>
 
-            <div class="collapse show submenu" id="menuSekolah">
+
+            <div class="collapse submenu" id="menuSekolah">
                 <a class="menu-item {{ request()->is('tu/kelas*') ? 'active' : '' }}"
                     href="{{ route('tu.kelas.index') }}">
                         <i class="bi bi-people"></i> Kelas
@@ -338,9 +345,13 @@
             </div>
 
             <!-- ARSIP -->
-            <a class="menu-item dropdown-toggle" data-bs-toggle="collapse" href="#menuArsip">
+            <a class="menu-item dropdown-toggle"
+            data-bs-toggle="collapse"
+            data-bs-target="#menuArsip"
+            role="button">
                 <i class="bi bi-folder2-open"></i> Arsip & Dokumen
             </a>
+
 
             <div class="collapse show submenu" id="menuArsip">
                 <a class="menu-item {{ request()->is('tu/arsip-dokumen*') ? 'active' : '' }}"
@@ -354,28 +365,6 @@
                 </a>
             </div>
 
-            <!-- KEUANGAN -->
-<a class="menu-item dropdown-toggle" data-bs-toggle="collapse" href="#menuKeuangan">
-    <i class="bi bi-cash-coin"></i> Keuangan
-</a>
-
-<div class="collapse submenu" id="menuKeuangan">
-
-    <a class="menu-item {{ request()->is('tu/keuangan/pemasukan*') ? 'active' : '' }}"
-       href="{{ route('tu.keuangan.pemasukan.index') }}">
-        <i class="bi bi-arrow-down-circle"></i> Pemasukan
-    </a>
-
-    <a class="menu-item" href="#">
-        <i class="bi bi-arrow-up-circle"></i> Pengeluaran
-    </a>
-
-    <a class="menu-item" href="#">
-        <i class="bi bi-file-earmark-bar-graph"></i> Laporan
-    </a>
-
-</div>
-
 
         </div>
 
@@ -386,102 +375,136 @@
 
     </div>
 </div>
-
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<div class="toast-container position-fixed top-0 end-0 p-3" style="z-index: 9999">
+    <div id="appToast" class="toast align-items-center border-0" role="alert">
+        <div class="d-flex">
+            <div class="toast-body fw-semibold"></div>
+            <button type="button" class="btn-close me-2 m-auto"
+                data-bs-dismiss="toast"></button>
+        </div>
+    </div>
+</div>
 
 <script>
-document.getElementById("darkToggle").onclick = function () {
-    document.body.classList.toggle("dark-mode");
-};
-</script>
-<script>
-/* ============================
-   🔥 DARK MODE + LOCALSTORAGE
-   ============================ */
+document.addEventListener("DOMContentLoaded", function () {
 
-const darkToggle = document.getElementById("darkToggle");
+    /* DARK MODE */
+    const darkToggle = document.getElementById("darkToggle");
 
-// Load dark mode dari localStorage
-if (localStorage.getItem("darkMode") === "enabled") {
-    document.body.classList.add("dark-mode");
-    darkToggle.innerText = "☀️";
-}
+    if (darkToggle) {
+        if (localStorage.getItem("darkMode") === "enabled") {
+            document.body.classList.add("dark-mode");
+            darkToggle.innerText = "☀️";
+        }
 
-darkToggle.onclick = function () {
-    document.body.classList.toggle("dark-mode");
+        darkToggle.addEventListener("click", function () {
+            document.body.classList.toggle("dark-mode");
 
-    if (document.body.classList.contains("dark-mode")) {
-        localStorage.setItem("darkMode", "enabled");
-        darkToggle.innerText = "☀️";
-    } else {
-        localStorage.setItem("darkMode", "disabled");
-        darkToggle.innerText = "🌙";
-    }
-};
-
-
-
-/* ============================
-   🔍 GLOBAL SEARCH AJAX
-   ============================ */
-
-let searchInput = document.getElementById("globalSearch");
-let searchResults = document.getElementById("searchResults");
-
-searchInput.addEventListener("keyup", function () {
-    let query = this.value.trim();
-
-    if (query.length < 2) {
-        searchResults.style.display = "none";
-        return;
-    }
-
-    fetch(`/tu/search?q=${query}`)
-        .then(res => res.json())
-        .then(data => {
-            let html = "";
-
-            if (data.siswa.length === 0 && data.kelas.length === 0) {
-                html = `<div class="p-2 text-muted">Tidak ada hasil...</div>`;
+            if (document.body.classList.contains("dark-mode")) {
+                localStorage.setItem("darkMode", "enabled");
+                darkToggle.innerText = "☀️";
+            } else {
+                localStorage.setItem("darkMode", "disabled");
+                darkToggle.innerText = "🌙";
             }
-
-            // Siswa
-            if (data.siswa.length > 0) {
-                html += `<div class="fw-bold px-2 pt-2">Siswa</div>`;
-                data.siswa.forEach(s => {
-                    html += `
-                        <div class="p-2 search-item" onclick="window.location='/tu/siswa/${s.id}'">
-                            <i class="bi bi-person me-2"></i> ${s.nama}
-                            <div class="small text-muted">${s.nis}</div>
-                        </div>
-                    `;
-                });
-            }
-
-            // Kelas
-            if (data.kelas.length > 0) {
-                html += `<div class="fw-bold px-2 pt-2">Kelas</div>`;
-                data.kelas.forEach(k => {
-                    html += `
-                        <div class="p-2 search-item" onclick="window.location='/tu/kelas/${k.id}'">
-                            <i class="bi bi-people me-2"></i> ${k.nama_kelas}
-                        </div>
-                    `;
-                });
-            }
-
-            searchResults.innerHTML = html;
-            searchResults.style.display = "block";
         });
-});
-
-// Klik luar → tutup dropdown
-document.addEventListener("click", function (e) {
-    if (!searchInput.contains(e.target)) {
-        searchResults.style.display = "none";
     }
+
+    /* GLOBAL SEARCH */
+    const searchInput = document.getElementById("globalSearch");
+    const searchResults = document.getElementById("searchResults");
+
+    if (searchInput) {
+        searchInput.addEventListener("keyup", function () {
+            let query = this.value.trim();
+
+            if (query.length < 2) {
+                searchResults.style.display = "none";
+                return;
+            }
+
+            fetch(`/tu/search-ajax?q=${query}`)
+                .then(res => res.json())
+                .then(data => {
+                    let html = "";
+
+                    if (data.siswa.length === 0 && data.kelas.length === 0) {
+                        html = `<div class="p-2 text-muted">Tidak ada hasil...</div>`;
+                    }
+
+                    if (data.siswa.length > 0) {
+                        html += `<div class="fw-bold px-2 pt-2">Siswa</div>`;
+                        data.siswa.forEach(s => {
+                            html += `
+                                <div class="p-2 search-item" onclick="window.location='/tu/siswa/${s.id}'">
+                                    <i class="bi bi-person me-2"></i> ${s.nama}
+                                    <div class="small text-muted">${s.nis}</div>
+                                </div>
+                            `;
+                        });
+                    }
+
+                    if (data.kelas.length > 0) {
+                        html += `<div class="fw-bold px-2 pt-2">Kelas</div>`;
+                        data.kelas.forEach(k => {
+                            html += `
+                                <div class="p-2 search-item" onclick="window.location='/tu/kelas/${k.id}'">
+                                    <i class="bi bi-people me-2"></i> ${k.nama_kelas}
+                                </div>
+                            `;
+                        });
+                    }
+
+                    searchResults.innerHTML = html;
+                    searchResults.style.display = "block";
+                });
+        });
+
+        document.addEventListener("click", function (e) {
+
+            if (!searchInput || !searchResults) return;
+
+            if (
+                !searchInput.contains(e.target) &&
+                !searchResults.contains(e.target)
+            ) {
+                searchResults.style.display = "none";
+            }
+        });
+
+
+    }
+
 });
 </script>
+
+<script>
+function showToast(message, type = 'success') {
+
+    const toastEl = document.getElementById('appToast');
+    const toastBody = toastEl.querySelector('.toast-body');
+
+    // Reset class
+    toastEl.classList.remove('bg-success', 'bg-danger', 'text-white');
+
+    if (type === 'success') {
+        toastEl.classList.add('bg-success', 'text-white');
+    }
+
+    if (type === 'error') {
+        toastEl.classList.add('bg-danger', 'text-white');
+    }
+
+    toastBody.innerText = message;
+
+    const toast = new bootstrap.Toast(toastEl, {
+        delay: 3000
+    });
+
+    toast.show();
+}
+</script>
+
 
 @yield('scripts')
 

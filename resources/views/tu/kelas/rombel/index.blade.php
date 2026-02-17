@@ -30,7 +30,12 @@
                 <td>{{ $rombel->nama_kelas }}</td>
                 <td>{{ $kelasGrup->angkatan->tahun }}</td>
                 <td>{{ $rombel->siswa_count }}</td>
-                <td>-</td>
+                <td>
+                    <a href="{{ route('tu.kelas.rombel.show', $rombel->id) }}"
+                    class="btn btn-sm btn-outline-primary">
+                        Detail
+                    </a>
+                </td>
             </tr>
         @empty
             <tr>

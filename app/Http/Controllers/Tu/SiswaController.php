@@ -100,7 +100,7 @@ class SiswaController extends Controller
      */
     public function store(Request $request)
     {
-        $request->validate([
+        $validated = $request->validate([
             'kelas_id'       => 'required|exists:kelas,id',
             'nama'           => 'required|string|max:255',
             'nis'            => 'required|numeric|unique:siswa,nis',
@@ -112,18 +112,17 @@ class SiswaController extends Controller
             'telepon_wali'   => 'nullable|string|max:20',
         ]);
 
-        Siswa::create($request->only([
-            'kelas_id',
-            'nama',
-            'nis',
-            'nisn',
-            'jenis_kelamin',
-            'tanggal_lahir',
-            'alamat',
-            'nama_wali',
-            'telepon_wali',
-        ]));
+        Siswa::create($validated);
 
+        // 🔥 Kalau request AJAX → return JSON
+        if ($request->expectsJson()) {
+            return response()->json([
+                'success' => true,
+                'message' => 'Siswa berhasil ditambahkan'
+            ]);
+        }
+
+        // 🔥 Kalau form biasa → redirect
         return redirect()
             ->route('tu.siswa.index', [
                 'angkatan' => Kelas::find($request->kelas_id)->kelasGrup->angkatan_id,
@@ -131,6 +130,7 @@ class SiswaController extends Controller
             ])
             ->with('success', 'Siswa berhasil ditambahkan');
     }
+
 
     /**
  * AJAX: Ambil Grup Kelas berdasarkan Angkatan
