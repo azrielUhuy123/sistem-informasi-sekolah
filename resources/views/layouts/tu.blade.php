@@ -5,7 +5,7 @@
 
     <!-- Bootstrap + Icons -->
     @vite(['resources/css/app.css', 'resources/js/app.js'])
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css" rel="stylesheet">
     <meta name="csrf-token" content="{{ csrf_token() }}">
 
@@ -83,33 +83,52 @@
         }
 
         .menu-item {
-            display: flex;
-            align-items: center;
-            padding: 12px 14px;
-            height: 48px;
-            border-radius: 12px;
-            font-size: 15px;
-            text-decoration: none;
-            color: #3b3f52;
-            margin-bottom: 6px;
-            transition: 0.25s;
-        }
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 12px 14px;
+    height: 48px;
+    border-radius: 12px;
+    font-size: 15px;
+    text-decoration: none;
+    color: #3b3f52;
+    margin-bottom: 6px;
+    transition: 0.25s ease;
+    width: 100%;
+    white-space: nowrap; /* 🔥 supaya tidak turun baris */
+}
 
-        .menu-item i {
-            margin-right: 12px;
-            font-size: 17px;
-        }
+.menu-left {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
 
-        .menu-item:hover {
-            background: #f1f3fb;
-            color: #4d5bd8;
-        }
+.menu-item i {
+    font-size: 17px;
+}
 
-        .menu-item.active {
-            background: #e9edff;
-            color: #4d5bd8 !important;
-            font-weight: 600;
-        }
+.menu-item:hover {
+    background: #f1f3fb;
+    color: #4d5bd8;
+}
+
+.menu-item.active {
+    background: #e9edff;
+    color: #4d5bd8 !important;
+    font-weight: 600;
+}
+
+/* Arrow icon */
+.dropdown-arrow {
+    transition: transform 0.3s ease;
+    font-size: 14px;
+}
+
+.rotate {
+    transform: rotate(90deg);
+}
+
 
         .content {
             flex: 1;
@@ -121,6 +140,18 @@
     padding-left: 34px !important; 
     font-size: 14px;
     opacity: 0.95;
+}
+
+/* Submenu */
+.submenu {
+    display: none;
+    margin-left: 8px;
+    padding-left: 8px;
+    border-left: 2px solid #e6e9ff;
+}
+
+.submenu.show {
+    display: block;
 }
 
         /* DARK MODE FULL */
@@ -288,85 +319,132 @@
     <div class="main-area">
 
         <!-- SIDEBAR -->
-        <div class="sidebar">
+<div class="sidebar">
 
-            <div class="sidebar-title">MAIN TATA USAHA</div>
+    <div class="sidebar-title">MAIN TATA USAHA</div>
 
-            <a class="menu-item {{ request()->is('tu/dashboard') ? 'active' : '' }}"
-               href="{{ route('tu.dashboard') }}">
-                <i class="bi bi-speedometer2"></i> Dashboard
-            </a>
-
-            <!-- Manajemen Sekolah -->
-            <button class="menu-item dropdown-toggle border-0 bg-transparent w-100 text-start"
-                type="button"
-                data-bs-toggle="collapse"
-                data-bs-target="#menuSekolah"
-                aria-expanded="false"
-                aria-controls="menuSekolah">
-            <i class="bi bi-building"></i> Manajemen Sekolah
-        </button>
-
-
-            <div class="collapse submenu" id="menuSekolah">
-                <a class="menu-item {{ request()->is('tu/kelas*') ? 'active' : '' }}"
-                    href="{{ route('tu.kelas.index') }}">
-                        <i class="bi bi-people"></i> Kelas
-                </a>
-
-                <a class="menu-item {{ request()->is('tu/tahun*') ? 'active' : '' }}" href="{{ route('tu.tahun.index') }}">
-                    <i class="bi bi-calendar3"></i> Tahun Ajaran
-                </a>
-
-                <a class="menu-item {{ request()->is('tu/siswa*') ? 'active' : '' }}" href="{{ route('tu.siswa.index') }}">
-                    <i class="bi bi-mortarboard"></i> Siswa
-                </a>
-
-                <a class="menu-item {{ request()->is('tu/guru*') ? 'active' : '' }}" href="{{ route('tu.guru.index') }}">
-                    <i class="bi bi-person-badge"></i> Guru
-                </a>
-
-                <a class="menu-item {{ request()->is('tu/jadwal*') ? 'active' : '' }}" href="{{ route('tu.jadwal.index') }}">
-                    <i class="bi bi-calendar-week"></i> Jadwal
-                </a>
-
-                <a class="menu-item {{ request()->is('tu/mapel*') ? 'active' : '' }}" href="{{ route('tu.mapel.index') }}">
-                    <i class="bi bi-journal-text"></i> Mata Pelajaran
-                </a>
-
-                <a class="menu-item {{ request()->is('tu/ruangan*') ? 'active' : '' }}" href="{{ route('tu.ruangan.index') }}">
-                    <i class="bi bi-door-closed"></i> Ruangan
-                </a>
-
-                <a class="menu-item {{ request()->is('tu/walikelas*') ? 'active' : '' }}" href="{{ route('tu.walikelas.index') }}">
-                    <i class="bi bi-person-workspace"></i> Wali Kelas
-                </a>
-
-            </div>
-
-            <!-- ARSIP -->
-            <a class="menu-item dropdown-toggle"
-            data-bs-toggle="collapse"
-            data-bs-target="#menuArsip"
-            role="button">
-                <i class="bi bi-folder2-open"></i> Arsip & Dokumen
-            </a>
-
-
-            <div class="collapse show submenu" id="menuArsip">
-                <a class="menu-item {{ request()->is('tu/arsip-dokumen*') ? 'active' : '' }}"
-                   href="{{ route('tu.arsip-dokumen.index') }}">
-                    <i class="bi bi-file-earmark-text"></i> Surat
-                </a>
-
-                <a class="menu-item {{ request()->is('tu/datakepegawaian*') ? 'active' : '' }}"
-                   href="{{ route('tu.datakepegawaian.index') }}">
-                    <i class="bi bi-people-fill"></i> Data Kepegawaian
-                </a>
-            </div>
-
-
+    <a class="menu-item {{ request()->is('tu/dashboard') ? 'active' : '' }}"
+       href="{{ route('tu.dashboard') }}">
+        <div class="menu-left">
+            <i class="bi bi-speedometer2"></i>
+            <span>Dashboard</span>
         </div>
+    </a>
+
+    <!-- Manajemen Sekolah -->
+    <button class="menu-item border-0 bg-transparent text-start"
+        onclick="toggleMenu('menuSekolah','arrowSekolah')">
+
+        <div class="menu-left">
+            <i class="bi bi-building"></i>
+            <span>Manajemen Sekolah</span>
+        </div>
+
+        <i class="bi bi-chevron-right dropdown-arrow" id="arrowSekolah"></i>
+    </button>
+
+    <div class="submenu" id="menuSekolah">
+
+        <a class="menu-item {{ request()->is('tu/kelas*') ? 'active' : '' }}"
+            href="{{ route('tu.kelas.index') }}">
+            <div class="menu-left">
+                <i class="bi bi-people"></i>
+                <span>Kelas</span>
+            </div>
+        </a>
+
+        <a class="menu-item {{ request()->is('tu/tahun*') ? 'active' : '' }}"
+            href="{{ route('tu.tahun.index') }}">
+            <div class="menu-left">
+                <i class="bi bi-calendar3"></i>
+                <span>Tahun Ajaran</span>
+            </div>
+        </a>
+
+        <a class="menu-item {{ request()->is('tu/siswa*') ? 'active' : '' }}"
+            href="{{ route('tu.siswa.index') }}">
+            <div class="menu-left">
+                <i class="bi bi-mortarboard"></i>
+                <span>Siswa</span>
+            </div>
+        </a>
+
+        <a class="menu-item {{ request()->is('tu/guru*') ? 'active' : '' }}"
+            href="{{ route('tu.guru.index') }}">
+            <div class="menu-left">
+                <i class="bi bi-person-badge"></i>
+                <span>Guru</span>
+            </div>
+        </a>
+
+        <a class="menu-item {{ request()->is('tu/jadwal*') ? 'active' : '' }}"
+            href="{{ route('tu.jadwal.index') }}">
+            <div class="menu-left">
+                <i class="bi bi-calendar-week"></i>
+                <span>Jadwal</span>
+            </div>
+        </a>
+
+        <a class="menu-item {{ request()->is('tu/mapel*') ? 'active' : '' }}"
+            href="{{ route('tu.mapel.index') }}">
+            <div class="menu-left">
+                <i class="bi bi-journal-text"></i>
+                <span>Mata Pelajaran</span>
+            </div>
+        </a>
+
+        <a class="menu-item {{ request()->is('tu/ruangan*') ? 'active' : '' }}"
+            href="{{ route('tu.ruangan.index') }}">
+            <div class="menu-left">
+                <i class="bi bi-door-closed"></i>
+                <span>Ruangan</span>
+            </div>
+        </a>
+
+        <a class="menu-item {{ request()->is('tu/walikelas*') ? 'active' : '' }}"
+            href="{{ route('tu.walikelas.index') }}">
+            <div class="menu-left">
+                <i class="bi bi-person-workspace"></i>
+                <span>Wali Kelas</span>
+            </div>
+        </a>
+
+    </div>
+
+    <!-- Arsip -->
+    <button class="menu-item border-0 bg-transparent text-start"
+        onclick="toggleMenu('menuArsip','arrowArsip')">
+
+        <div class="menu-left">
+            <i class="bi bi-folder2-open"></i>
+            <span>Arsip & Dokumen</span>
+        </div>
+
+        <i class="bi bi-chevron-right dropdown-arrow" id="arrowArsip"></i>
+    </button>
+
+    <div class="submenu" id="menuArsip">
+
+        <a class="menu-item {{ request()->is('tu/arsip-dokumen*') ? 'active' : '' }}"
+           href="{{ route('tu.arsip-dokumen.index') }}">
+            <div class="menu-left">
+                <i class="bi bi-file-earmark-text"></i>
+                <span>Surat</span>
+            </div>
+        </a>
+
+        <a class="menu-item {{ request()->is('tu/datakepegawaian*') ? 'active' : '' }}"
+           href="{{ route('tu.datakepegawaian.index') }}">
+            <div class="menu-left">
+                <i class="bi bi-people-fill"></i>
+                <span>Data Kepegawaian</span>
+            </div>
+        </a>
+
+    </div>
+
+</div>
+
 
         <!-- CONTENT -->
         <div class="content">
@@ -464,6 +542,9 @@ document.addEventListener("DOMContentLoaded", function () {
 
             if (!searchInput || !searchResults) return;
 
+            // 🔥 JANGAN ganggu klik di sidebar
+            if (e.target.closest('.sidebar')) return;
+
             if (
                 !searchInput.contains(e.target) &&
                 !searchResults.contains(e.target)
@@ -471,6 +552,7 @@ document.addEventListener("DOMContentLoaded", function () {
                 searchResults.style.display = "none";
             }
         });
+
 
 
     }
@@ -502,6 +584,33 @@ function showToast(message, type = 'success') {
     });
 
     toast.show();
+}
+</script>
+
+<script>
+function toggleSekolah() {
+    const menu = document.getElementById("menuSekolah");
+    if (menu.style.display === "none") {
+        menu.style.display = "block";
+    } else {
+        menu.style.display = "none";
+    }
+}
+</script>
+
+<script>
+function toggleMenu(menuId, arrowId) {
+
+    const menu = document.getElementById(menuId);
+    const arrow = document.getElementById(arrowId);
+
+    if (menu.style.display === "block") {
+        menu.style.display = "none";
+        arrow.classList.remove("rotate");
+    } else {
+        menu.style.display = "block";
+        arrow.classList.add("rotate");
+    }
 }
 </script>
 

@@ -1,5 +1,6 @@
 /* IMPORT MODULE DULU */
 @import './modules/rombel.css';
+@import "bootstrap/dist/css/bootstrap.min.css";
 
 
 /* BARU TAILWIND */
