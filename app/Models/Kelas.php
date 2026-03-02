@@ -14,6 +14,8 @@ class Kelas extends Model
     protected $fillable = [
         'kelas_grup_id',
         'nama_kelas',
+        'tingkatan',
+        'tahun_ajaran_id',
     ];
 
     public function kelasGrup()
@@ -34,6 +36,16 @@ class Kelas extends Model
 public function getTingkatAttribute()
 {
     return $this->kelasGrup?->kelasMaster?->tingkat;
+}
+public function penempatan()
+{
+    return $this->hasMany(PenempatanSiswa::class);
+}
+
+public function siswaAktif()
+{
+    return $this->hasMany(PenempatanSiswa::class)
+        ->whereNull('tanggal_keluar');
 }
 
 }

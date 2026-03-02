@@ -9,7 +9,16 @@
 
         <div class="d-flex justify-content-between align-items-center mb-3">
             <h5 class="fw-bold mb-0">Grup Kelas</h5>
-
+            @if(session('error'))
+                <div class="alert alert-danger">
+                    {{ session('error') }}
+                </div>
+            @endif
+            <form action="{{ route('tu.siswa.import') }}" method="POST" enctype="multipart/form-data">
+                        @csrf
+                        <input type="file" name="file" required>
+                        <button type="submit">Import Excel</button>
+                    </form>
             <a href="{{ route('tu.kelas.grup.create') }}"
                class="btn btn-primary btn-sm">
                 <i class="bi bi-plus-circle"></i> Tambah Grup
@@ -28,12 +37,12 @@
             <tbody>
                 @forelse ($grupKelas as $grup)
                     <tr>
-                        <td>Kelas {{ $grup->tingkat }}</td>
+                        <td>Kelas {{ $grup->kelasMaster->tingkat }}</td>
 
                         <td>
-                            {{ $grup->tahun }}
+                            {{ $grup->angkatan->tahun }}
                             <span class="text-muted">
-                                ({{ $grup->keterangan }})
+                                ({{ $grup->angkatan->keterangan }})
                             </span>
                         </td>
 

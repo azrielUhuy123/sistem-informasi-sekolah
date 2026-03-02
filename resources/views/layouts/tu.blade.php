@@ -9,7 +9,7 @@
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css" rel="stylesheet">
     <meta name="csrf-token" content="{{ csrf_token() }}">
 
-    
+
     <style>
         body {
             margin: 0;
@@ -39,7 +39,7 @@
 
         .topbar h4 {
             font-weight: 800;
-            
+
             margin: 0;
         }
 
@@ -70,65 +70,73 @@
         .sidebar {
             width: 260px;
             background: #ffffff;
-            padding: 30px 18px;
-            border-right: 1px solid #e8e8e8;
+            padding: 28px 20px;
+            border-right: 1px solid #eef0f5;
             overflow-y: auto;
         }
 
         .sidebar-title {
-            font-size: 14px;
-            color: #8088a2;
+            font-size: 12px;
             font-weight: 700;
-            margin-bottom: 14px;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+            color: #9aa3b2;
+            margin-bottom: 18px;
         }
 
         .menu-item {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    padding: 12px 14px;
-    height: 48px;
-    border-radius: 12px;
-    font-size: 15px;
-    text-decoration: none;
-    color: #3b3f52;
-    margin-bottom: 6px;
-    transition: 0.25s ease;
-    width: 100%;
-    white-space: nowrap; /* 🔥 supaya tidak turun baris */
-}
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 12px 16px;
+            height: 46px;
+            border-radius: 10px;
+            font-size: 14.5px;
+            font-weight: 500;
+            text-decoration: none;
+            color: #4a4f63;
+            margin-bottom: 6px;
+            transition: all 0.2s ease;
+            width: 100%;
+            white-space: nowrap;
+            position: relative;
+        }
 
-.menu-left {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-}
+        .menu-left {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+        }
 
-.menu-item i {
-    font-size: 17px;
-}
+        .menu-item i {
+            font-size: 16px;
+            opacity: 0.85;
+        }
 
-.menu-item:hover {
-    background: #f1f3fb;
-    color: #4d5bd8;
-}
+        .menu-item:hover {
+            background: #f2f4ff;
+            color: #3f51f5;
+        }
 
-.menu-item.active {
-    background: #e9edff;
-    color: #4d5bd8 !important;
-    font-weight: 600;
-}
+        .menu-item.active {
+            background: #e8edff;
+            color: #3f51f5;
+            font-weight: 600;
+        }
+        .menu-item.active i {
+            opacity: 1;
+        }
 
-/* Arrow icon */
-.dropdown-arrow {
-    transition: transform 0.3s ease;
-    font-size: 14px;
-}
+        /* Arrow icon */
+        .dropdown-arrow {
+            font-size: 13px;
+            transition: transform 0.25s ease;
+            opacity: 0.6;
+        }
 
-.rotate {
-    transform: rotate(90deg);
-}
-
+        .rotate {
+            transform: rotate(90deg);
+        }
 
         .content {
             flex: 1;
@@ -136,23 +144,32 @@
             overflow-y: auto;
         }
         /* Indent submenu (item di dalam dropdown) */
-.submenu .menu-item {
-    padding-left: 34px !important; 
-    font-size: 14px;
-    opacity: 0.95;
-}
+        .submenu .menu-item {
+            height: 42px;
+            font-size: 13.5px;
+            font-weight: 500;
+            padding-left: 18px;
+            color: #5c627a;
+            background: transparent;
+            margin-bottom: 4px;
+        }
 
-/* Submenu */
-.submenu {
-    display: none;
-    margin-left: 8px;
-    padding-left: 8px;
-    border-left: 2px solid #e6e9ff;
-}
+        /* Submenu */
+        .submenu {
+            display: none;
+            margin-top: 4px;
+            padding-left: 16px;
+            border-left: 2px solid #edf0ff;
+        }
 
-.submenu.show {
-    display: block;
-}
+        .submenu.show {
+            display: block;
+        }
+
+        .submenu .menu-item:hover {
+            background: #f4f6ff;
+            color: #3f51f5;
+        }
 
         /* DARK MODE FULL */
 .dark-mode {
@@ -188,9 +205,9 @@
     color: #e6e6e6;
 }
 
-.dark-mode input, 
-.dark-mode .dropdown-menu, 
-.dark-mode .card, 
+.dark-mode input,
+.dark-mode .dropdown-menu,
+.dark-mode .card,
 .dark-mode #searchResults {
     background: #2e3038 !important;
     color: #e6e6e6 !important;
@@ -411,6 +428,37 @@
 
     </div>
 
+    <!-- Proses Akademik -->
+    <button class="menu-item border-0 bg-transparent text-start"
+        onclick="toggleMenu('menuProses','arrowProses')">
+
+        <div class="menu-left">
+            <i class="bi bi-arrow-repeat"></i>
+            <span>Proses Akademik</span>
+        </div>
+
+        <i class="bi bi-chevron-right dropdown-arrow" id="arrowProses"></i>
+    </button>
+
+    <div class="submenu" id="menuProses">
+
+        <a class="menu-item {{ request()->is('tu/penempatan-siswa/create') ? 'active' : '' }}"
+            href="{{ route('tu.penempatan-siswa.create') }}">
+            <div class="menu-left">
+                <i class="bi bi-person-plus"></i>
+                <span>Penempatan Siswa</span>
+            </div>
+        </a>
+
+        <a class="menu-item {{ request()->is('tu/penempatan-siswa/preview-naik-kelas') ? 'active' : '' }}"
+            href="{{ route('tu.penempatan-siswa.naik-kelas.index') }}"></a>
+            <div class="menu-left">
+                <i class="bi bi-arrow-up-circle"></i>
+                <span>Naik Kelas</span>
+            </div>
+        </a>
+
+    </div>
     <!-- Arsip -->
     <button class="menu-item border-0 bg-transparent text-start"
         onclick="toggleMenu('menuArsip','arrowArsip')">

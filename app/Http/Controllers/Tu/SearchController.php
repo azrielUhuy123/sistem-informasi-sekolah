@@ -37,7 +37,7 @@ class SearchController extends Controller
         // Cari kelas
         $kelas = Kelas::where('nama_kelas', 'like', "%$q%")
                   ->limit(5)
-                  ->get(['id', 'nama_kelas'f]);
+                  ->get(['id', 'nama_kelas']);
 
         return response()->json([
             'siswa' => $siswa,

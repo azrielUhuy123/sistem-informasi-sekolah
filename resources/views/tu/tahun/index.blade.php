@@ -4,7 +4,7 @@
 
 @section('content')
 
-@include('components.crud.index', [
+@include('components.crud.page', [
     'title' => 'Manajemen Tahun Ajaran',
     'rows'  => $tahun,
 

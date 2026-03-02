@@ -13,7 +13,8 @@ class PenempatanSiswa extends Model
         'siswa_id',
         'kelas_id',
         'tahun_ajaran_id',
-        'status',
+        'tanggal_masuk',
+        'tanggal_keluar',
     ];
 
     // Relasi

@@ -52,19 +52,17 @@
                     <select name="kelas_id" class="form-select" required>
                         <option value="">-- Pilih Kelas --</option>
                         @foreach ($kelas as $k)
-                            <option value="{{ $k->id }}">
+                            <option value="{{ $k->id }}"
+                                {{ request('kelas_id') == $k->id ? 'selected' : '' }}>
                                 {{ $k->nama_kelas }}
                             </option>
                         @endforeach
                     </select>
                 </div>
 
-                {{-- Tahun ajaran (hidden) --}}
-                <input type="hidden" name="tahun_ajaran_id" value="{{ $tahunAktif->id }}">
-
                 {{-- Action --}}
                 <div class="d-flex justify-content-end">
-                    <a href="{{ route('tu.penempatan-siswa.index') }}" class="btn btn-secondary me-2">
+                    <a href="{{ route('tu.siswa.index') }}" class="btn btn-secondary me-2">
                         Batal
                     </a>
                     <button class="btn btn-success">

@@ -3,72 +3,173 @@
 namespace App\Imports;
 
 use App\Models\Siswa;
+use App\Models\Kelas;
+use App\Models\KelasGrup;
+use App\Models\TahunAjaran;
 use App\Models\PenempatanSiswa;
 use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\DB;
+use Carbon\Carbon;
 use Maatwebsite\Excel\Concerns\ToCollection;
 use Maatwebsite\Excel\Concerns\WithHeadingRow;
-use Illuminate\Support\Facades\DB;
+use PhpOffice\PhpSpreadsheet\Shared\Date;
 
 class SiswaImport implements ToCollection, WithHeadingRow
 {
-    protected int $angkatan;
-    protected int $kelasId;
+    protected $tahunAjaran;
 
-    public function __construct(int $angkatan, int $kelasId)
+    public function __construct()
     {
-        $this->angkatan = $angkatan;
-        $this->kelasId  = $kelasId;
+        $this->tahunAjaran = TahunAjaran::where('aktif', 1)->first();
+
+        if (!$this->tahunAjaran) {
+            throw new \Exception("Tidak ada tahun ajaran aktif.");
+        }
     }
 
     public function collection(Collection $rows)
     {
-        DB::transaction(function () use ($rows) {
+        
+        if (!$rows->count()) {
+            throw new \Exception("File kosong atau header tidak sesuai.");
+        }
+
+        $angkatan = \App\Models\Angkatan::where('aktif', 1)->first();
+
+        if (!$angkatan) {
+            throw new \Exception("Angkatan untuk tahun ajaran aktif tidak ditemukan.");
+        }
+        DB::transaction(function () use ($rows, $angkatan) {
+            $total = 0;
+            $created = 0;
+            $updated = 0;
 
             foreach ($rows as $row) {
-
-                // SKIP BARIS KOSONG
-                if (empty($row['nama']) || empty($row['nis'])) {
+            
+                if (empty($row['nis'])) {
                     continue;
                 }
+                $total++;
 
-                // ===============================
-                // INSERT SISWA
-                // ===============================
-                $siswa = Siswa::firstOrCreate(
-                    ['nis' => $row['nis']],
+                $nis     = trim((string) $row['nis']);
+                $nisn    = trim((string) $row['nisn']);
+                $tingkat = trim($row['tingkat']);
+                $rombel  = trim($row['rombel']);
+
+                $namaKelas = $tingkat . $rombel;
+
+                // Cari kelas_master berdasarkan tingkat
+                $kelasMaster = \App\Models\KelasMaster::where('tingkat', $tingkat)->first();
+
+                if (!$kelasMaster) {
+                    throw new \Exception("Tingkat {$tingkat} tidak ditemukan di kelas_master.");
+                }
+                // Cari kelas_grup berdasarkan kelas_master + angkatan
+                $kelasGrup = \App\Models\KelasGrup::where('kelas_master_id', $kelasMaster->id)
+                    ->where('angkatan_id', $angkatan->id)
+                    ->first();
+
+                if (!$kelasGrup) {
+                    throw new \Exception("KelasGrup untuk tingkat {$tingkat} tidak ditemukan.");
+                }
+
+                // Auto create rombel jika belum ada
+                $kelas = Kelas::firstOrCreate([
+                    'nama_kelas'   => $namaKelas,
+                    'kelas_grup_id'=> $kelasGrup->id
+                ]);
+
+                // validasi isi baris
+                $jk = strtoupper(trim($row['jenis_kelamin']));
+
+                if (!in_array($jk, ['L','P'])) {
+                    throw new \Exception("Jenis kelamin hanya boleh L atau P pada NIS {$nis}");
+                }
+
+                if (strlen($nisn) != 10) {
+                    throw new \Exception("NISN harus 10 digit pada NIS {$nis}");
+                }
+                
+                //handle tanggal lahir yang bisa berupa string atau excel date
+                $tanggalLahir = null;
+
+                if (!empty($row['tanggal_lahir'])) {
+
+                    $raw = $row['tanggal_lahir'];
+
+                    // Jika Excel numeric date (serial)
+                    if (is_numeric($raw)) {
+                        $tanggalLahir = Date::excelToDateTimeObject($raw)
+                                            ->format('Y-m-d');
+                    } 
+                    else {
+                        // Coba format US: m/d/Y (karena Excel Anda US style)
+                        try {
+                            $tanggalLahir = Carbon::createFromFormat('m/d/Y', $raw)
+                                                ->format('Y-m-d');
+                        } catch (\Exception $e) {
+
+                            // Fallback jika memang sudah Y-m-d
+                            try {
+                                $tanggalLahir = Carbon::createFromFormat('Y-m-d', $raw)
+                                                    ->format('Y-m-d');
+                            } catch (\Exception $e) {
+                                throw new \Exception("Format tanggal_lahir tidak valid: {$raw}");
+                            }
+                        }
+                    }
+                }
+                
+                // Buat atau ambil siswa
+                $siswa = Siswa::updateOrCreate(
+                    ['nis' => $nis],
                     [
-                        'angkatan'      => $this->angkatan,
+                        'nisn'          => $nisn,
                         'nama'          => $row['nama'],
-                        'nisn'          => $row['nisn'] ?? null,
-                        'jenis_kelamin' => strtoupper(substr($row['jenis_kelamin'] ?? 'L', 0, 1)),
-                        'tanggal_lahir' => $row['tanggal_lahir'] ?? null,
-                        'alamat'        => $row['alamat'] ?? null,
-                        'nama_wali'     => $row['nama_wali'] ?? null,
-                        'telepon_wali'  => $row['telepon_wali'] ?? null,
+                        'jenis_kelamin' => $jk,
+                        'tanggal_lahir' => $tanggalLahir,
                     ]
                 );
 
-                // ===============================
-                // CEK SUDAH ADA PENEMPATAN AKTIF?
-                // ===============================
-                $sudahAda = PenempatanSiswa::where('siswa_id', $siswa->id)
-                    ->where('status', 'aktif')
-                    ->exists();
+                $penempatanAktif = PenempatanSiswa::where('siswa_id', $siswa->id)
+                    ->where('tahun_ajaran_id', $this->tahunAjaran->id)
+                    ->whereNull('tanggal_keluar')
+                    ->first();
 
-                if ($sudahAda) {
-                    continue;
+                if (!$penempatanAktif) {
+
+                    PenempatanSiswa::create([
+                        'siswa_id'        => $siswa->id,
+                        'kelas_id'        => $kelas->id,
+                        'tahun_ajaran_id' => $this->tahunAjaran->id,
+                        'tanggal_masuk'   => now(),
+                        'tanggal_keluar'  => null
+                    ]);
+                    $created++;
+                } else {
+
+                    if ($penempatanAktif->kelas_id != $kelas->id) {
+
+                        $penempatanAktif->update([
+                            'tanggal_keluar' => now()
+                        ]);
+
+                        PenempatanSiswa::create([
+                            'siswa_id'        => $siswa->id,
+                            'kelas_id'        => $kelas->id,
+                            'tahun_ajaran_id' => $this->tahunAjaran->id,
+                            'tanggal_masuk'   => now(),
+                            'tanggal_keluar'  => null
+                        ]);
+                        $updated++;
+                    }
                 }
-
-                // ===============================
-                // BUAT PENEMPATAN BARU
-                // ===============================  
-                PenempatanSiswa::create([
-                    'siswa_id'      => $siswa->id,
-                    'kelas_id'      => $this->kelasId,
-                    'tahun_ajaran_id' => session('tahun_ajaran_aktif_id'), // atau helper kamu
-                    'status'        => 'aktif',
-                ]);
             }
+            session()->flash('import_report', [
+            'total'   => $total,
+            'created' => $created,
+            'updated' => $updated
+            ]);
         });
     }
 }

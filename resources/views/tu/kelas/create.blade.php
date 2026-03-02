@@ -145,7 +145,7 @@
 </div>
 @endif
 
-<form action="{{ route('tu.kelas.storeMultiple') }}" method="POST">
+<form action="{{ route('tu.kelas.store') }}" method="POST">
     @csrf
 
     <div id="formContainer">

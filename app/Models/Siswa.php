@@ -31,14 +31,27 @@ class Siswa extends Model
     }
 
     public function getAngkatanIdAttribute()
-{
-    return $this->kelas?->kelasGrup?->angkatan_id;
-}
+    {
+        return $this->kelas?->kelasGrup?->angkatan_id;
+    }
 
-public function kelasGrup()
-{
-    return $this->kelas?->kelasGrup();
-}
+    public function kelasGrup()
+    {
+        return $this->kelas?->kelasGrup();
+    }
+    public function penempatan()
+    {
+        return $this->hasMany(PenempatanSiswa::class);
+    }
+
+    public function penempatanAktif()
+    {
+        return $this->hasOne(PenempatanSiswa::class)
+            ->whereNull('tanggal_keluar')
+            ->whereHas('tahunAjaran', function ($q) {
+                $q->where('aktif', 1);
+            });
+    }
 
 }
 

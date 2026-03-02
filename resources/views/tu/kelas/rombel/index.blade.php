@@ -9,12 +9,19 @@
         Kelas {{ $kelasGrup->tingkat }} – Angkatan {{ $kelasGrup->angkatan->tahun }}
     </h5>
 
+    
     <a href="{{ route('tu.kelas.rombel.create', $kelasGrup->id) }}"
        class="btn btn-primary btn-sm">
         + Tambah Rombel
     </a>
 </div>
-
+@if(session('import_report'))
+    <div class="alert alert-info">
+        Total diproses: {{ session('import_report.total') }} <br>
+        Penempatan baru: {{ session('import_report.created') }} <br>
+        Pindah kelas: {{ session('import_report.updated') }}
+    </div>
+@endif
 <table class="table table-bordered">
     <thead>
         <tr>

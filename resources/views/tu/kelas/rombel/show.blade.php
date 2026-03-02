@@ -20,11 +20,8 @@
                 Kembali
             </a>
 
-            <a href="#"
-            class="btn btn-success btn-sm">
-                Import Siswa
-            </a>
             
+
             <a href="#"
             class="btn  btn-warning btn-sm">
                 Export Siswa
@@ -34,6 +31,10 @@
                     data-bs-target="#modalTambahSiswa">
                 Tambah Siswa
             </button>
+            <a href="{{ route('tu.penempatan-siswa.create', ['kelas_id' => $rombel->id]) }}"
+            class="btn btn-primary btn-sm mb-3">
+                + Tambah Siswa ke Rombel
+            </a>
         </div>
     </div>
 
@@ -134,20 +135,25 @@
                         <tbody>
                             @foreach($siswa as $item)
                                 <tr>
-                                    <td>{{ $item->nama }}</td>
-                                    <td>{{ $item->nis }}</td>
-                                    <td>{{ $item->nisn ?? '-' }}</td>
-                                    <td>@if($item->jenis_kelamin == 'L')
+                                    <td>{{ $item->siswa->nama }}</td>
+                                    <td>{{ $item->siswa->nis }}</td>
+                                    <td>{{ $item->siswa->nisn ?? '-' }}</td>
+
+                                    <td>
+                                        @if($item->siswa->jenis_kelamin == 'L')
                                             <span class="badge bg-primary">Laki-laki</span>
                                         @else
                                             <span class="badge bg-danger">Perempuan</span>
                                         @endif
                                     </td>
-                                    <td>{{ $item->tanggal_lahir 
-                                        ? \Carbon\Carbon::parse($item->tanggal_lahir)->format('d/m/Y') 
-                                        : '-' }}
+
+                                    <td>
+                                        {{ $item->siswa->tanggal_lahir
+                                            ? \Carbon\Carbon::parse($item->siswa->tanggal_lahir)->format('d/m/Y')
+                                            : '-' }}
                                     </td>
-                                    <td>{{ $item->nama_wali ?? '-' }}</td>
+
+                                    <td>{{ $item->siswa->nama_wali ?? '-' }}</td>
                                     <td>
                                         <div class="d-flex gap-1">
                                             <a href="{{ route('tu.siswa.detail', $item->id) }}"
@@ -159,6 +165,15 @@
                                             class="btn btn-sm btn-outline-warning">
                                                 Edit
                                             </a>
+                                            <form action="{{ route('tu.penempatan-siswa.keluarkan', $item->id) }}"
+                                                method="POST"
+                                                class="d-inline">
+                                                @csrf
+                                                <button class="btn btn-sm btn-outline-danger"
+                                                    onclick="return confirm('Keluarkan siswa dari rombel?')">
+                                                    Keluarkan
+                                                </button>
+                                            </form>
                                         </div>
                                     </td>
                                 </tr>
@@ -368,7 +383,7 @@
         });
     });
 
-        
+
     // RELOAD TABLE FUNCTION
     function reloadRombelTable() {
         fetch(window.location.href)

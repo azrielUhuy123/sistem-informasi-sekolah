@@ -9,15 +9,26 @@
 
         <form method="POST" action="{{ route('tu.kelas.grup.store') }}">
     @csrf
-
+    @if ($errors->any())
+        <div class="alert alert-danger">
+            <strong>Terjadi kesalahan:</strong>
+            <ul class="mb-0">
+                @foreach ($errors->all() as $error)
+                    <li>{{ $error }}</li>
+                @endforeach
+            </ul>
+        </div>
+    @endif
     {{-- TINGKAT --}}
     <div class="mb-3">
         <label class="form-label">Tingkat</label>
-        <select name="tingkat" class="form-select" required>
+        <select name="kelas_master_id" class="form-select" required>
             <option value="">-- Pilih Tingkat --</option>
-            @for ($i = 1; $i <= 6; $i++)
-                <option value="{{ $i }}">{{ $i }}</option>
-            @endfor
+            @foreach ($kelasMaster as $km)
+                <option value="{{ $km->id }}">
+                    Kelas {{ $km->tingkat }}
+                </option>
+            @endforeach
         </select>
     </div>
 
@@ -34,7 +45,9 @@
         </select>
     </div>
 
-    <button class="btn btn-primary">Simpan</button>
+    <button type="submit" class="btn btn-primary">
+        Simpan
+    </button>
     <a href="{{ route('tu.kelas.index') }}" class="btn btn-secondary">Batal</a>
 </form>
 

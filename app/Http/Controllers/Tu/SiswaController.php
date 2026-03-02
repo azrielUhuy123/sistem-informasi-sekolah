@@ -3,6 +3,8 @@
 namespace App\Http\Controllers\Tu;
 
 use App\Http\Controllers\Controller;
+use App\Models\PenempatanSiswa;
+use App\Models\TahunAjaran;
 use App\Models\Siswa;
 use App\Models\Angkatan;
 use App\Models\Kelas;
@@ -10,6 +12,7 @@ use Illuminate\Http\Request;
 use App\Imports\SiswaImport;
 use Maatwebsite\Excel\Facades\Excel;
 use App\Models\KelasGrup;
+use Illuminate\Support\Facades\DB;
 
 class SiswaController extends Controller
 {
@@ -56,8 +59,14 @@ class SiswaController extends Controller
         // LOAD SISWA (HANYA SETELAH SUBMIT)
         // ===============================
         if ($submit && $kelasId) {
-            $siswa = Siswa::with('kelas.kelasGrup.angkatan')
-                ->where('kelas_id', $kelasId)
+
+            $siswa = Siswa::whereHas('penempatanAktif', function ($q) use ($kelasId) {
+                    $q->where('kelas_id', $kelasId);
+                })
+                ->with([
+                    'penempatanAktif.kelas.kelasGrup.kelasMaster',
+                    'penempatanAktif.kelas.kelasGrup.angkatan'
+                ])
                 ->paginate(15)
                 ->withQueryString();
         }
@@ -111,8 +120,27 @@ class SiswaController extends Controller
             'nama_wali'      => 'nullable|string|max:255',
             'telepon_wali'   => 'nullable|string|max:20',
         ]);
-
-        Siswa::create($validated);
+        DB::transaction(function () use ($validated, $request) {
+            $siswa = Siswa::create([
+                'nama'           => $validated['nama'],
+                'nis'            => $validated['nis'],
+                'nisn'           => $validated['nisn'] ?? null,
+                'jenis_kelamin'  => $validated['jenis_kelamin'],
+                'tanggal_lahir'  => $validated['tanggal_lahir'] ?? null,
+                'alamat'         => $validated['alamat'] ?? null,
+                'nama_wali'      => $validated['nama_wali'] ?? null,
+                'telepon_wali'   => $validated['telepon_wali'] ?? null,
+            ]);
+            $tahunAjaranAktif = \App\Models\TahunAjaran::where('aktif', 1)->firstOrFail();
+            // buat penempatan aktif
+            PenempatanSiswa::create([
+                'siswa_id'        => $siswa->id,
+                'kelas_id'        => $validated['kelas_id'],
+                'tahun_ajaran_id' => TahunAjaran::where('aktif', 1)->first()->id,
+                'tanggal_masuk'   => now(),
+                'tanggal_keluar'  => null,
+            ]);
+        });
 
         // 🔥 Kalau request AJAX → return JSON
         if ($request->expectsJson()) {
@@ -129,6 +157,7 @@ class SiswaController extends Controller
                 'kelas_id' => $request->kelas_id
             ])
             ->with('success', 'Siswa berhasil ditambahkan');
+        
     }
 
 
@@ -157,16 +186,20 @@ public function ajaxKelas(Request $request)
 
 public function ajaxTable(Request $request)
 {
-    $rows = Siswa::with('kelas.kelasGrup.angkatan')
-        ->where('kelas_id', $request->kelas_id)
-        ->paginate(10);
+    $rows = Siswa::whereHas('penempatanAktif', function ($q) use ($request) {
+        $q->where('kelas_id', $request->kelas_id);
+    })
+    ->with([
+        'penempatanAktif.kelas.kelasGrup.angkatan'
+    ])
+    ->paginate(10);
 
     $columns = [
         ['key' => 'nama', 'label' => 'Nama'],
         ['key' => 'nis', 'label' => 'NIS'],
         ['key' => 'nisn', 'label' => 'NISN'],
         [
-            'key' => 'kelas.nama_kelas',
+            'key' => 'penempatanAktif.kelas.nama_kelas',
             'label' => 'Kelas',
         ],
     ];
@@ -193,7 +226,7 @@ public function ajaxTable(Request $request)
     public function detail($id)
     {
         $siswa = Siswa::withTrashed()
-            ->with(['kelas.kelasGrup.angkatan'])
+            ->with(['penempatanAktif.kelas.kelasGrup.angkatan'])
             ->findOrFail($id);
 
         return view('tu.siswa.detail', compact('siswa'));
@@ -205,7 +238,7 @@ public function ajaxTable(Request $request)
     public function edit($id)
     {
         $siswa = Siswa::withTrashed()
-            ->with('kelas.kelasGrup.angkatan')
+            ->with('penempatanAktif.kelas.kelasGrup.angkatan')
             ->findOrFail($id);
 
         return view('tu.siswa.edit', compact('siswa'));
@@ -231,7 +264,6 @@ public function ajaxTable(Request $request)
         ]);
 
         $siswa->update($request->only([
-            'kelas_id',
             'nama',
             'nis',
             'nisn',
@@ -241,6 +273,22 @@ public function ajaxTable(Request $request)
             'nama_wali',
             'telepon_wali',
         ]));
+        $penempatanAktif = $siswa->penempatanAktif;
+
+        if ($penempatanAktif && $penempatanAktif->kelas_id != $request->kelas_id) {
+
+            $penempatanAktif->update([
+                'tanggal_keluar' => now()
+            ]);
+
+            PenempatanSiswa::create([
+                'siswa_id'        => $siswa->id,
+                'kelas_id'        => $request->kelas_id,
+                'tahun_ajaran_id' => $penempatanAktif->tahun_ajaran_id,
+                'tanggal_masuk'   => now(),
+                'tanggal_keluar'  => null,
+            ]);
+        }
 
         return back()->with('success', 'Data siswa berhasil diperbarui');
     }
@@ -273,15 +321,18 @@ public function ajaxTable(Request $request)
     public function importExcel(Request $request)
     {
         $request->validate([
-            'file'     => 'required|mimes:xlsx,xls,csv|max:2048',
-            'kelas_id' => 'required|exists:kelas,id',
+            'file' => 'required|mimes:xlsx,xls'
         ]);
 
-        Excel::import(
-            new SiswaImport(kelasId: $request->kelas_id),
-            $request->file('file')
-        );
+        try {
 
-        return back()->with('success', 'Data siswa berhasil di-import');
+            Excel::import(new SiswaImport, $request->file('file'));
+
+            return back()->with('success', 'Import berhasil.');
+
+        } catch (\Exception $e) {
+
+            return back()->with('error', $e->getMessage());
+        }
     }
 }

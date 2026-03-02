@@ -7,6 +7,8 @@ use App\Models\Kelas;
 use App\Models\KelasGrup;
 use App\Models\KelasMaster;
 use App\Models\Angkatan;
+use App\Models\PenempatanSiswa;
+use App\Models\TahunAjaran;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 
@@ -20,27 +22,13 @@ class KelasController extends Controller
     public function index()
     {
         $grupKelas = KelasGrup::query()
-            ->join('angkatan', 'angkatan.id', '=', 'kelas_grup.angkatan_id')
-            ->join('kelas_master', 'kelas_master.id', '=', 'kelas_grup.kelas_master_id')
-            ->leftJoin('kelas', function ($join) {
-                $join->on('kelas.kelas_grup_id', '=', 'kelas_grup.id')
-                     ->whereNull('kelas.deleted_at');
-            })
-            ->select(
-                'kelas_grup.id',
-                'kelas_master.tingkat as tingkat',
-                'angkatan.tahun',
-                'angkatan.keterangan',
-                DB::raw('COUNT(kelas.id) as jumlah_kelas')
-            )
-            ->groupBy(
-                'kelas_grup.id',
-                'kelas_master.tingkat',
-                'angkatan.tahun',
-                'angkatan.keterangan'
-            )
-            ->orderBy('kelas_master.tingkat')
-            ->orderBy('angkatan.tahun', 'desc')
+            ->with(['angkatan', 'kelasMaster'])
+            ->withCount([
+                'kelas as jumlah_kelas' => function ($q) {
+                    $q->whereNull('deleted_at');
+                }
+            ])
+            ->orderBy('kelas_master_id')
             ->get();
 
         return view('tu.kelas.index', compact('grupKelas'));
@@ -56,8 +44,15 @@ class KelasController extends Controller
         $kelasGrup = KelasGrup::with(['angkatan', 'kelasMaster'])
             ->findOrFail($kelasGrupId);
 
-        $rombels = Kelas::withCount('siswa')
-            ->where('kelas_grup_id', $kelasGrupId)
+        $tahunAktif = TahunAjaran::where('aktif', 1)->firstOrFail();
+
+        $rombels = Kelas::where('kelas_grup_id', $kelasGrupId)
+            ->withCount([
+                'penempatan as siswa_count' => function ($q) use ($tahunAktif) {
+                    $q->where('tahun_ajaran_id', $tahunAktif->id)
+                    ->whereNull('tanggal_keluar');
+                }
+            ])
             ->orderBy('nama_kelas')
             ->get();
 
@@ -183,32 +178,43 @@ class KelasController extends Controller
     }
     public function showRombel($id)
     {
-        $rombel = \App\Models\Kelas::with('kelasGrup.angkatan')
-            ->withCount('siswa')
-            ->findOrFail($id);
+        $tahunAktif = TahunAjaran::where('aktif', 1)->firstOrFail();
 
-        $siswa = \App\Models\Siswa::where('kelas_id', $id)
+        $rombel = Kelas::with('kelasGrup.angkatan')
+            ->findOrFail($id);
+        $baseQuery = PenempatanSiswa::where('kelas_id', $id)
+            ->where('tahun_ajaran_id', $tahunAktif->id)
+            ->whereNull('tanggal_keluar');
+        $penempatan = $baseQuery->with('siswa')
             ->latest()
             ->paginate(15);
 
-        $totalSiswa = \App\Models\Siswa::where('kelas_id', $id)->count();
-        $totalLaki  = \App\Models\Siswa::where('kelas_id', $id)
-                        ->where('jenis_kelamin', 'L')->count();
-        $totalPerempuan = \App\Models\Siswa::where('kelas_id', $id)
-                        ->where('jenis_kelamin', 'P')->count();
+        $totalSiswa = (clone $baseQuery)->count();
 
-        $persenLaki = $totalSiswa > 0 ? round(($totalLaki / $totalSiswa) * 100) : 0;
-        $persenPerempuan = $totalSiswa > 0 ? round(($totalPerempuan / $totalSiswa) * 100) : 0;
+        $totalLaki = (clone $baseQuery)
+            ->whereHas('siswa', fn($q) => $q->where('jenis_kelamin', 'L'))
+            ->count();
 
-        return view('tu.kelas.rombel.show', compact(
-            'rombel',
-            'siswa',
-            'totalSiswa',
-            'totalLaki',
-            'totalPerempuan',
-            'persenLaki',
-            'persenPerempuan'
-        ));
+        $totalPerempuan = (clone $baseQuery)
+            ->whereHas('siswa', fn($q) => $q->where('jenis_kelamin', 'P'))
+            ->count();
+        $persenLaki = $totalSiswa > 0
+            ? round(($totalLaki / $totalSiswa) * 100)
+            : 0;
+
+        $persenPerempuan = $totalSiswa > 0
+            ? round(($totalPerempuan / $totalSiswa) * 100)
+            : 0;
+
+        return view('tu.kelas.rombel.show', [
+            'rombel' => $rombel,
+            'siswa' => $penempatan,
+            'totalSiswa' => $totalSiswa,
+            'totalLaki' => $totalLaki,
+            'totalPerempuan' => $totalPerempuan,
+            'persenLaki' => $persenLaki,
+            'persenPerempuan' => $persenPerempuan,
+        ]);
     }
 
 
