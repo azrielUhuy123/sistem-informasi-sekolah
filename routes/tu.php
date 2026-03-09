@@ -98,7 +98,6 @@ Route::middleware(['auth', 'role:tu'])
         Route::get('/siswa/search/ajax', [SiswaController::class, 'ajaxSearch'])->name('siswa.search');
         Route::post('/siswa/bulk', [SiswaController::class, 'bulkAction'])->name('siswa.bulk');
         Route::post('/siswa/import', [SiswaController::class, 'importExcel'])->name('siswa.import');
-        Route::get('/siswa/{id}/detail', [SiswaController::class, 'detail'])->name('siswa.detail');
         Route::post('/siswa/{id}/restore', [SiswaController::class, 'restore'])->name('siswa.restore');
         Route::delete('/siswa/{id}/force-delete', [SiswaController::class, 'forceDelete'])->name('siswa.forceDelete');
         Route::resource('siswa', SiswaController::class);

@@ -20,7 +20,7 @@
                 Kembali
             </a>
 
-            
+
 
             <a href="#"
             class="btn  btn-warning btn-sm">
@@ -156,12 +156,12 @@
                                     <td>{{ $item->siswa->nama_wali ?? '-' }}</td>
                                     <td>
                                         <div class="d-flex gap-1">
-                                            <a href="{{ route('tu.siswa.detail', $item->id) }}"
+                                            <a href="{{ route('tu.siswa.show', $item->siswa->id) }}"
                                             class="btn btn-sm btn-outline-info">
                                                 Detail
                                             </a>
 
-                                            <a href="{{ route('tu.siswa.edit', $item->id) }}"
+                                            <a href="{{ route('tu.siswa.edit', $item->siswa->id) }}"
                                             class="btn btn-sm btn-outline-warning">
                                                 Edit
                                             </a>

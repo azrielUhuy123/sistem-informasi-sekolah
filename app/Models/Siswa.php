@@ -41,7 +41,9 @@ class Siswa extends Model
     }
     public function penempatan()
     {
-        return $this->hasMany(PenempatanSiswa::class);
+        return $this->hasMany(PenempatanSiswa::class)
+        ->with(['kelas.kelasGrup.angkatan'])
+        ->orderByDesc('tanggal_masuk');
     }
 
     public function penempatanAktif()

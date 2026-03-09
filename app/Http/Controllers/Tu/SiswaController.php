@@ -157,7 +157,7 @@ class SiswaController extends Controller
                 'kelas_id' => $request->kelas_id
             ])
             ->with('success', 'Siswa berhasil ditambahkan');
-        
+
     }
 
 
@@ -205,7 +205,7 @@ public function ajaxTable(Request $request)
     ];
 
     $actions = [
-        'detail' => 'tu.siswa.detail',
+        'detail' => 'tu.siswa.show',
         'edit'   => 'tu.siswa.edit',
         'delete' => 'tu.siswa.destroy',
     ];
@@ -221,12 +221,17 @@ public function ajaxTable(Request $request)
 
 
     /**
-     * DETAIL
+     * show
      */
-    public function detail($id)
+    public function show($id)
     {
         $siswa = Siswa::withTrashed()
-            ->with(['penempatanAktif.kelas.kelasGrup.angkatan'])
+            ->with([
+                'penempatanAktif.kelas.kelasGrup.angkatan',
+                'penempatan' => fn($q) => $q
+                ->orderByDesc('tanggal_masuk')
+                ->orderByDesc('id')
+            ])
             ->findOrFail($id);
 
         return view('tu.siswa.detail', compact('siswa'));
@@ -241,7 +246,9 @@ public function ajaxTable(Request $request)
             ->with('penempatanAktif.kelas.kelasGrup.angkatan')
             ->findOrFail($id);
 
-        return view('tu.siswa.edit', compact('siswa'));
+        $kelas = Kelas::orderBy('nama_kelas')->get();
+
+        return view('tu.siswa.edit', compact('siswa','kelas'));
     }
 
     /**
