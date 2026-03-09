@@ -22,67 +22,59 @@ class SiswaController extends Controller
      * - Kelas = ROMBEL
      */
    public function index(Request $request)
-    {
-        $angkatanId = $request->get('angkatan');
-        $grupId     = $request->get('kelas_grup_id');
-        $kelasId    = $request->get('kelas_id');
-        $submit     = $request->has('submit');
+{
+    $query = Siswa::query()
+        ->with([
+            'penempatanAktif.kelas.kelasGrup.kelasMaster',
+            'penempatanAktif.kelas.kelasGrup.angkatan'
+        ]);
 
-        // ===============================
-        // DATA MASTER
-        // ===============================
-        $listAngkatan = Angkatan::orderByDesc('tahun')->get();
-        $listGrup  = collect();
-        $listKelas = collect();
-        $siswa     = collect();
-
-        // ===============================
-        // LOAD GRUP KELAS (via relasi kelas_master)
-        // ===============================
-        if ($angkatanId) {
-            $listGrup = KelasGrup::with('kelasMaster')
-                ->where('angkatan_id', $angkatanId)
-                ->get()
-                ->sortBy(fn ($g) => $g->kelasMaster->tingkat);
-        }
-
-        // ===============================
-        // LOAD ROMBEL
-        // ===============================
-        if ($grupId) {
-            $listKelas = Kelas::where('kelas_grup_id', $grupId)
-                ->orderBy('nama_kelas')
-                ->get();
-        }
-
-        // ===============================
-        // LOAD SISWA (HANYA SETELAH SUBMIT)
-        // ===============================
-        if ($submit && $kelasId) {
-
-            $siswa = Siswa::whereHas('penempatanAktif', function ($q) use ($kelasId) {
-                    $q->where('kelas_id', $kelasId);
-                })
-                ->with([
-                    'penempatanAktif.kelas.kelasGrup.kelasMaster',
-                    'penempatanAktif.kelas.kelasGrup.angkatan'
-                ])
-                ->paginate(15)
-                ->withQueryString();
-        }
-
-        return view('tu.siswa.index', compact(
-            'listAngkatan',
-            'listGrup',
-            'listKelas',
-            'angkatanId',
-            'grupId',
-            'kelasId',
-            'submit',
-            'siswa'
-        ));
+    // =====================
+    // FILTER ANGKATAN
+    // =====================
+    if ($request->angkatan) {
+        $query->whereHas('penempatanAktif.kelas.kelasGrup', function ($q) use ($request) {
+            $q->where('angkatan_id', $request->angkatan);
+        });
     }
 
+    // =====================
+    // FILTER TINGKAT
+    // =====================
+    if ($request->tingkat) {
+        $query->whereHas('penempatanAktif.kelas.kelasGrup.kelasMaster', function ($q) use ($request) {
+            $q->where('tingkat', $request->tingkat);
+        });
+    }
+
+    // =====================
+    // FILTER ROMBEL
+    // =====================
+    if ($request->kelas) {
+        $query->whereHas('penempatanAktif', function ($q) use ($request) {
+            $q->where('kelas_id', $request->kelas);
+        });
+    }
+
+    // =====================
+    // SEARCH
+    // =====================
+    if ($request->search) {
+        $query->where(function ($q) use ($request) {
+            $q->where('nama', 'like', "%{$request->search}%")
+              ->orWhere('nis', 'like', "%{$request->search}%");
+        });
+    }
+
+    $siswa = $query->paginate(20)->withQueryString();
+
+    $angkatan = Angkatan::orderByDesc('tahun')->get();
+
+    return view('tu.siswa.index', compact(
+        'siswa',
+        'angkatan'
+    ));
+}
 
     /**
      * CREATE
@@ -341,5 +333,34 @@ public function ajaxTable(Request $request)
 
             return back()->with('error', $e->getMessage());
         }
+    }
+    public function bulkAction(Request $request)
+    {
+        $ids = $request->ids;
+        $action = $request->action;
+
+        if (!$ids || count($ids) == 0) {
+            return back()->with('error','Tidak ada siswa dipilih');
+        }
+
+        switch ($action) {
+
+            case 'nonaktifkan':
+
+                Siswa::whereIn('id',$ids)->update([
+                    'deleted_at' => now()
+                ]);
+
+            break;
+
+            case 'pindah_rombel':
+
+                return back()->with('info','Fitur pindah rombel belum diimplementasikan');
+
+            break;
+
+        }
+
+        return back()->with('success','Bulk action berhasil');
     }
 }
