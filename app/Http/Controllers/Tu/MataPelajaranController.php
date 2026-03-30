@@ -25,18 +25,16 @@ class MataPelajaranController extends Controller
 
         // SEARCH
         if ($request->filled('q')) {
-            $query->where(function ($q) use ($request) {
-                $q->where('nama_mapel', 'like', '%' . $request->q . '%')
-                  ->orWhere('kode_mapel', 'like', '%' . $request->q . '%')
-                  ->orWhere('kelompok', 'like', '%' . $request->q . '%');
-            });
-        }
-
+    $query->where(function ($q) use ($request) {
+        $q->where('nama_mapel', 'like', '%' . $request->q . '%')
+          ->orWhere('kode_mapel', 'like', '%' . $request->q . '%');
+    });
+}
         // SORT
         $sort  = $request->sort ?? 'id';
         $order = $request->order ?? 'asc';
 
-        $allowedSort = ['id', 'nama_mapel', 'kode_mapel', 'kelompok'];
+        $allowedSort = ['id', 'nama_mapel', 'kode_mapel', 'kkm'];
         if (!in_array($sort, $allowedSort)) {
             $sort = 'id';
         }
@@ -69,7 +67,7 @@ class MataPelajaranController extends Controller
         $data = $request->validate([
             'nama_mapel' => 'required|string|max:255',
             'kode_mapel' => 'nullable|string|max:100',
-            'kelompok'   => 'nullable|string|max:100',
+            'kkm'        => 'nullable|integer|min:0|max:100',
         ]);
 
         MataPelajaran::create($data);
@@ -102,6 +100,7 @@ class MataPelajaranController extends Controller
     /**
      * UPDATE
      */
+    
     public function update(Request $request, $id)
     {
         $mapel = MataPelajaran::withTrashed()->findOrFail($id);
@@ -109,7 +108,7 @@ class MataPelajaranController extends Controller
         $data = $request->validate([
             'nama_mapel' => 'required|string|max:255',
             'kode_mapel' => 'nullable|string|max:100',
-            'kelompok'   => 'nullable|string|max:100',
+            'kkm'        => 'nullable|integer|min:0|max:100',
         ]);
 
         $mapel->update($data);

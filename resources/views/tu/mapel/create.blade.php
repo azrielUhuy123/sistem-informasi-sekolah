@@ -14,7 +14,7 @@
 
             <div class="mb-3">
                 <label>Kode Mapel</label>
-                <input type="text" name="kode" class="form-control" required>
+                <input type="text" name="kode_mapel" class="form-control" required>
             </div>
 
             <div class="mb-3">

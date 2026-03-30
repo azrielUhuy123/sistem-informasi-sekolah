@@ -135,12 +135,12 @@
                         <tbody>
                             @foreach($siswa as $item)
                                 <tr>
-                                    <td>{{ $item->siswa->nama }}</td>
-                                    <td>{{ $item->siswa->nis }}</td>
+                                    <td>{{ $item->siswa->nama ?? '-' }}</td>
+                                    <td>{{ $item->siswa->nis ?? '-' }}</td>
                                     <td>{{ $item->siswa->nisn ?? '-' }}</td>
 
                                     <td>
-                                        @if($item->siswa->jenis_kelamin == 'L')
+                                        @if(optional($item->siswa)->jenis_kelamin == 'L')
                                             <span class="badge bg-primary">Laki-laki</span>
                                         @else
                                             <span class="badge bg-danger">Perempuan</span>
@@ -148,7 +148,7 @@
                                     </td>
 
                                     <td>
-                                        {{ $item->siswa->tanggal_lahir
+                                        {{ optional($item->siswa)->tanggal_lahir
                                             ? \Carbon\Carbon::parse($item->siswa->tanggal_lahir)->format('d/m/Y')
                                             : '-' }}
                                     </td>
@@ -156,15 +156,21 @@
                                     <td>{{ $item->siswa->nama_wali ?? '-' }}</td>
                                     <td>
                                         <div class="d-flex gap-1">
-                                            <a href="{{ route('tu.siswa.show', $item->siswa->id) }}"
-                                            class="btn btn-sm btn-outline-info">
-                                                Detail
-                                            </a>
 
-                                            <a href="{{ route('tu.siswa.edit', $item->siswa->id) }}"
-                                            class="btn btn-sm btn-outline-warning">
-                                                Edit
-                                            </a>
+                                            @if($item->siswa)
+                                                <a href="{{ route('tu.siswa.show', $item->siswa->id) }}"
+                                                class="btn btn-sm btn-outline-info">
+                                                    Detail
+                                                </a>
+
+                                                <a href="{{ route('tu.siswa.edit', $item->siswa->id) }}"
+                                                class="btn btn-sm btn-outline-warning">
+                                                    Edit
+                                                </a>
+                                            @else
+                                                <span class="text-danger small">Siswa tidak ditemukan</span>
+                                            @endif
+
                                             <form action="{{ route('tu.penempatan-siswa.keluarkan', $item->id) }}"
                                                 method="POST"
                                                 class="d-inline">
