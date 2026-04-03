@@ -1,5 +1,5 @@
 @php $isDeleted = !empty($row->deleted_at); @endphp
-
+<div class="d-flex gap-1 justify-content-center">
 {{-- DETAIL --}}
 @if(isset($actions['detail']) && Route::has($actions['detail']))
     <a class="icon-btn {{ $isDeleted ? 'disabled' : '' }}"
@@ -124,5 +124,5 @@
     </button>
 </form>
 @endif
-
+</div>
 

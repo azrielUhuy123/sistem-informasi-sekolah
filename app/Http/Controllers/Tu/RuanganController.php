@@ -26,21 +26,21 @@ class RuanganController extends Controller
     }
 
     /**
-     * STORE
+     * STORE (TAMBAH DATA)
      */
     public function store(Request $request)
     {
         $request->validate([
-            'kode'          => 'required|string|max:50|unique:ruangan,kode',
-            'nama_ruangan'  => 'required|string|max:255',
-            'kapasitas'     => 'nullable|integer',
+            'kode_ruangan' => 'required|string|max:50|unique:ruangan,kode_ruangan',
+            'nama_ruangan' => 'required|string|max:255',
+            'kapasitas' => 'nullable|integer',
             'jenis_ruangan' => 'nullable|string|max:100',
         ]);
 
         Ruangan::create([
-            'kode'          => $request->kode,
-            'nama_ruangan'  => $request->nama_ruangan,
-            'kapasitas'     => $request->kapasitas,
+            'kode_ruangan' => $request->kode_ruangan,
+            'nama_ruangan' => $request->nama_ruangan,
+            'kapasitas' => $request->kapasitas,
             'jenis_ruangan' => $request->jenis_ruangan,
         ]);
 
@@ -59,25 +59,25 @@ class RuanganController extends Controller
     }
 
     /**
-     * UPDATE
+     * UPDATE (EDIT DATA)
      */
     public function update(Request $request, $id)
     {
         $ruangan = Ruangan::findOrFail($id);
 
         $request->validate([
-            'kode'          => 'required|string|max:50|unique:ruangan,kode,' . $ruangan->id,
-            'nama_ruangan'  => 'required|string|max:255',
-            'kapasitas'     => 'nullable|integer',
+            'kode_ruangan' => 'required|string|max:50|unique:ruangan,kode_ruangan,' . $ruangan->id,
+            'nama_ruangan' => 'required|string|max:255',
+            'kapasitas' => 'nullable|integer',
             'jenis_ruangan' => 'nullable|string|max:100',
         ]);
 
-        $ruangan->update($request->only([
-            'kode',
-            'nama_ruangan',
-            'kapasitas',
-            'jenis_ruangan',
-        ]));
+        $ruangan->update([
+            'kode_ruangan' => $request->kode_ruangan,
+            'nama_ruangan' => $request->nama_ruangan,
+            'kapasitas' => $request->kapasitas,
+            'jenis_ruangan' => $request->jenis_ruangan,
+        ]);
 
         return redirect()
             ->route('tu.ruangan.index')

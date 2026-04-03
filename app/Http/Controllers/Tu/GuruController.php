@@ -24,30 +24,32 @@ class GuruController extends Controller
     }
 
     public function store(Request $request)
-    {
-        $request->validate([
-            'nama'          => 'required|string|max:255',
-            'nip'           => 'nullable|string|max:50|unique:guru,nip',
-            'jenis_kelamin' => 'required|in:L,P',
-            'mapel_id'      => 'required|exists:mata_pelajaran,id',
-            'email'         => 'nullable|email|max:255',
-            'telepon'       => 'nullable|string|max:50',
-            'alamat'        => 'nullable|string',
-            'foto'          => 'nullable|image|max:2048',
-        ]);
+{
+    $data = $request->only([
+        'nama',
+        'nip',
+        'jenis_kelamin',
+        'email',
+        'telepon',
+        'alamat'
+    ]);
 
-        $data = $request->except('foto');
+    // HANDLE FOTO
+    if ($request->hasFile('foto')) {
+        $file = $request->file('foto');
+        $namaFile = time().'.'.$file->getClientOriginalExtension();
 
-        if ($request->hasFile('foto')) {
-            $data['foto'] = $request->file('foto')->store('guru', 'public');
-        }
+        // pindahkan ke folder public/foto-guru
+        $file->move(public_path('foto-guru'), $namaFile);
 
-        Guru::create($data);
-
-        return redirect()
-            ->route('tu.guru.index')
-            ->with('success', 'Guru berhasil ditambahkan.');
+        $data['foto'] = $namaFile;
     }
+
+    \App\Models\Guru::create($data);
+
+    return redirect()->route('tu.guru.index')
+        ->with('success', 'Data guru berhasil ditambahkan');
+}
 
     public function edit($id)
     {
@@ -58,31 +60,30 @@ class GuruController extends Controller
     }
 
     public function update(Request $request, $id)
+{
+    $guru = Guru::findOrFail($id);
+
+    $data = $request->all();
+
+if ($request->hasFile('foto')) {
+    $file = $request->file('foto');
+    $namaFile = time().'.'.$file->getClientOriginalExtension();
+    $file->move(public_path('foto-guru'), $namaFile);
+
+    $data['foto'] = $namaFile;
+}
+
+$guru->update($data);
+
+    return redirect()->route('tu.guru.index')
+        ->with('success', 'Data guru berhasil diupdate');
+    }
+
+    public function show($id)
     {
-        $guru = Guru::findOrFail($id);
+        $guru = \App\Models\Guru::findOrFail($id);
 
-        $request->validate([
-            'nama'          => 'required|string|max:255',
-            'nip'           => 'nullable|string|max:50|unique:guru,nip,' . $guru->id,
-            'jenis_kelamin' => 'required|in:L,P',
-            'mapel_id'      => 'required|exists:mata_pelajaran,id',
-            'email'         => 'nullable|email|max:255',
-            'telepon'       => 'nullable|string|max:50',
-            'alamat'        => 'nullable|string',
-            'foto'          => 'nullable|image|max:2048',
-        ]);
-
-        $data = $request->except('foto');
-
-        if ($request->hasFile('foto')) {
-            $data['foto'] = $request->file('foto')->store('guru', 'public');
-        }
-
-        $guru->update($data);
-
-        return redirect()
-            ->route('tu.guru.index')
-            ->with('success', 'Guru berhasil diperbarui.');
+        return view('tu.guru.show', compact('guru'));
     }
 
     public function destroy($id)

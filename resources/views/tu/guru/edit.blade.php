@@ -38,20 +38,6 @@
                 </select>
             </div>
 
-            {{-- Dropdown Mata Pelajaran --}}
-            <div class="col-md-4 mb-3">
-    <label>Mata Pelajaran</label>
-    <select name="mapel_id" class="form-control" required>
-        <option value="">-- Pilih Mata Pelajaran --</option>
-        @foreach($mapel as $m)
-            <option value="{{ $m->id }}" {{ $guru->mapel_id == $m->id ? 'selected' : '' }}>
-                {{ $m->nama_mapel }}
-            </option>
-        @endforeach
-    </select>
-</div>
-
-
             {{-- Telepon --}}
             <div class="mb-3">
                 <label>Telepon</label>
@@ -88,7 +74,10 @@
                 @endif
             </div>
 
-            <button class="btn btn-primary">Update</button>
+            <div class="d-flex gap-2 mt-4">
+                <button class="btn btn-primary">Update</button>
+                <a href="{{ route('tu.guru.index') }}" class="btn btn-secondary">Kembali</a>
+            </div>
         </form>
 
     </div>

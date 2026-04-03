@@ -9,9 +9,9 @@ class Ruangan extends Model
     protected $table = 'ruangan';
 
     protected $fillable = [
-        'kode',
-        'nama_ruangan',
-        'kapasitas',
-        'jenis_ruangan',
-    ];
+    'kode_ruangan',
+    'nama_ruangan',
+    'kapasitas',
+    'jenis_ruangan',
+];
 }

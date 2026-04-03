@@ -32,16 +32,6 @@
             </div>
 
             <div class="mb-3">
-                <label>Mata Pelajaran</label>
-                <select name="mapel_id" class="form-control" required>
-                    <option value="">-- Pilih Mata Pelajaran --</option>
-                    @foreach ($mapel as $m)
-                        <option value="{{ $m->id }}">{{ $m->nama_mapel }}</option>
-                    @endforeach
-                </select>
-            </div>
-
-            <div class="mb-3">
                 <label>Email</label>
                 <input type="email" name="email" class="form-control">
             </div>
@@ -61,7 +51,12 @@
                 <input type="file" name="foto" class="form-control">
             </div>
 
-            <button class="btn btn-primary">Simpan</button>
+            <div class="d-flex gap-2 mt-4">
+                
+                <button class="btn btn-primary">Simpan</button>
+                <a href="{{ route('tu.guru.index') }}" class="btn btn-secondary">Kembali</a>
+
+            </div>
 
         </form>
 
