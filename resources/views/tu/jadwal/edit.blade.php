@@ -3,105 +3,88 @@
 @section('title', 'Edit Jadwal')
 
 @section('content')
+<form method="GET">
+    <label>Mapel</label>
+    <select name="mapel_id" onchange="this.form.submit()">
+        <option value="">-- Pilih Mapel --</option>
 
-<div class="d-flex justify-content-between align-items-center mb-4">
-    <h1>Edit Jadwal</h1>
-    <a href="{{ route('tu.jadwal.index') }}" class="btn btn-secondary">Kembali</a>
+        @foreach($mapels as $mapel)
+            <option value="{{ $mapel->kode_mapel }}"
+                {{ $mapelId == $mapel->kode_mapel ? 'selected' : '' }}
+                @if(isset($jpStatus[$mapel->kode_mapel]) && $jpStatus[$mapel->kode_mapel]['status'] === 'ok')
+                    disabled
+                @endif
+            >
+                {{ $mapel->nama_mapel }}
+                @if(isset($jpStatus[$mapel->kode_mapel]))
+                    ({{ $jpStatus[$mapel->kode_mapel]['current'] }}/{{ $jpStatus[$mapel->kode_mapel]['target'] }})
+                @endif
+            </option>
+        @endforeach
+    </select>
+</form>
+<div class="mt-2">
+    @if($mapelId && isset($jpStatus[$mapelId]))
+        @php $jp = $jpStatus[$mapelId]; @endphp
+
+        <small>
+            {{ $jp['nama'] }} 
+            ({{ $jp['current'] }}/{{ $jp['target'] }})
+
+            @if($jp['status'] === 'kurang')
+                <span style="color: orange;">Kurang</span>
+            @elseif($jp['status'] === 'lebih')
+                <span style="color: red;">Lebih</span>
+            @else
+                <span style="color: green;">OK</span>
+            @endif
+        </small>
+    @endif
 </div>
+<form method="POST" action="{{ url("/tu/jadwal/$kelasId/$hariId/$jamId") }}">
+    @csrf
 
-@if ($errors->any())
-    <div class="alert alert-danger">
-        <ul class="mb-0">
-            @foreach ($errors->all() as $e)
-                <li>{{ $e }}</li>
-            @endforeach
-        </ul>
-    </div>
-@endif
+    <input type="hidden" name="mapel_id" value="{{ request('mapel_id') }}">
 
-<div class="card">
-    <div class="card-body">
-@if ($errors->any())
-    <div class="alert alert-danger">
-        <strong>{{ $errors->first() }}</strong>
-    </div>
-@endif
+    <label>Guru</label>
+    <select name="guru_id" required>
+        <option value="">-- Pilih Guru --</option>
 
-        <form action="{{ route('tu.jadwal.update', $jadwal->id) }}" method="POST">
-            @csrf
-            @method('PUT')
+        @foreach ($gurus as $g)
+            @php
+                $isBentrok = in_array($g->id, $occupiedGuruMap ?? []);
+                $total = $guruJam[$g->id] ?? 0;
+                $isWali = $waliKelasId == $g->id;
 
-            <div class="row">
+                $label = $g->nama;
 
-                <div class="col-md-4 mb-3">
-                    <label>Kelas</label>
-                    <select name="kelas_id" class="form-control" required>
-                        @foreach($kelas as $k)
-                            <option value="{{ $k->id }}"
-                                {{ $jadwal->kelas_id == $k->id ? 'selected' : '' }}>
-                                {{ $k->nama_kelas }}
-                            </option>
-                        @endforeach
-                    </select>
-                </div>
+                if ($isWali) {
+                    $label .= " (Wali Kelas)";
+                }
 
-                <div class="col-md-4 mb-3">
-                    <label>Mata Pelajaran</label>
-                    <select name="mapel_id" class="form-control" required>
-                        <option value="">-- Pilih Mapel --</option>
-                        @foreach($mapel as $m)
-                            <option value="{{ $m->id }}"
-                                {{ $jadwal->mapel_id == $m->id ? 'selected' : '' }}>
-                                {{ $m->nama_mapel }}
-                            </option>
-                        @endforeach
-                    </select>
-                </div>
+                $label .= " ({$total} jam)";
 
+                if ($isBentrok) {
+                    $label .= " - Bentrok";
+                } elseif ($total > 24) {
+                    $label .= " - Overload";
+                }
+            @endphp
 
-                <div class="col-md-4 mb-3">
-                    <label>Guru Pengajar</label>
-                    <select name="guru_id" class="form-control" required>
-                        @foreach($guru as $g)
-                            <option value="{{ $g->id }}"
-                                {{ $jadwal->guru_id == $g->id ? 'selected' : '' }}>
-                                {{ $g->nama }}
-                            </option>
-                        @endforeach
-                    </select>
-                </div>
+            <option value="{{ $g->id }}"
+                {{ old('guru_id', $currentGuruId ?? null) == $g->id ? 'selected' : '' }}
+                @if($isBentrok) disabled @endif
+                style="{{ $isWali ? 'font-weight:bold; color:green;' : '' }}"
+            >
+                {{ $label }}
+            </option>
+        @endforeach
+    </select>
 
-                <div class="col-md-4 mb-3">
-                    <label>Hari</label>
-                    <select name="hari" class="form-control" required>
-                        @foreach(['Senin', 'Selasa', 'Rabu', 'Kamis', 'Jumat'] as $hari)
-                            <option value="{{ $hari }}"
-                                {{ $jadwal->hari == $hari ? 'selected' : '' }}>
-                                {{ $hari }}
-                            </option>
-                        @endforeach
-                    </select>
-                </div>
+    @if(!request('mapel_id'))
+        <small>Pilih mapel terlebih dahulu</small>
+    @endif
 
-                <div class="col-md-4 mb-3">
-                    <label>Jam Mulai</label>
-                    <input type="time" name="jam_mulai" class="form-control"
-                           value="{{ $jadwal->jam_mulai }}" required>
-                </div>
-
-                <div class="col-md-4 mb-3">
-                    <label>Jam Selesai</label>
-                    <input type="time" name="jam_selesai" class="form-control"
-                           value="{{ $jadwal->jam_selesai }}" required>
-                </div>
-
-            </div>
-
-            <button class="btn btn-primary w-100 mt-3">Update Jadwal</button>
-
-        </form>
-
-    </div>
-</div>
-
+    <button type="submit">Simpan</button>
+</form>
 @endsection

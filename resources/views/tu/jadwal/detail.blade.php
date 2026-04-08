@@ -1,45 +1,72 @@
 @extends('layouts.tu')
 
-@section('title', 'Detail Jadwal')
+@section('title', 'Rombel Jadwal')
 
 @section('content')
 
-<div class="d-flex justify-content-between align-items-center mb-4">
-    <h1>Detail Jadwal</h1>
-    <a href="{{ route('tu.jadwal.index') }}" class="btn btn-secondary">Kembali</a>
-</div>
+<div class="container-fluid">
 
-<div class="card">
-    <div class="card-body">
+    {{-- HEADER --}}
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h4 class="fw-bold mb-0">
+                Kelas {{ $grup->kelasMaster->tingkat }}
+            </h4>
+            <small class="text-muted">
+                {{ $grup->tahunAjaran->tahun }} ({{ $grup->tahunAjaran->semester }})
+            </small>
+        </div>
 
-        <table class="table">
-            <tr>
-                <th>Kelas</th>
-                <td>{{ $jadwal->kelas->nama_kelas }}</td>
-            </tr>
-
-            <tr>
-                <th>Mata Pelajaran</th>
-                <td>{{ $jadwal->mapel }}</td>
-            </tr>
-
-            <tr>
-                <th>Guru</th>
-                <td>{{ $jadwal->guru->nama }}</td>
-            </tr>
-
-            <tr>
-                <th>Hari</th>
-                <td>{{ $jadwal->hari }}</td>
-            </tr>
-
-            <tr>
-                <th>Jam</th>
-                <td>{{ $jadwal->jam_mulai }} - {{ $jadwal->jam_selesai }}</td>
-            </tr>
-        </table>
-
+        <a href="{{ route('tu.jadwal.index') }}" class="btn btn-secondary btn-sm">
+            Kembali
+        </a>
     </div>
+
+    {{-- BUTTON TAMBAH --}}
+    <div class="d-flex justify-content-end mb-3">
+        <a href="{{ route('tu.jadwal.rombel.create', $grup->id) }}"
+   class="btn btn-primary btn-sm">
+    + Tambah Rombel
+</a>
+    </div>
+
+    {{-- TABLE --}}
+    <div class="card">
+        <div class="card-body">
+
+            <table class="table table-hover align-middle">
+
+                <thead class="table-light">
+                    <tr>
+                        <th>No</th>
+                        <th>Rombel</th>
+                        <th width="120">Aksi</th>
+                    </tr>
+                </thead>
+
+                <tbody>
+                @forelse($grup->rombel as $r)
+                    <tr>
+                        <td>{{ $loop->iteration }}</td>
+                        <td>{{ $r->nama_rombel }}</td>
+                        <td>
+                            <span class="text-muted">-</span>
+                        </td>
+                    </tr>
+                @empty
+                    <tr>
+                        <td colspan="3" class="text-center text-muted">
+                            Belum ada rombel
+                        </td>
+                    </tr>
+                @endforelse
+                </tbody>
+
+            </table>
+
+        </div>
+    </div>
+
 </div>
 
 @endsection

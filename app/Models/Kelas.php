@@ -47,5 +47,9 @@ public function siswaAktif()
     return $this->hasMany(PenempatanSiswa::class)
         ->whereNull('tanggal_keluar');
 }
+public function waliKelas()
+{
+    return $this->hasOne(WaliKelas::class);
+}
 
 }

@@ -11,7 +11,7 @@ class GuruController extends Controller
 {
     public function index(Request $request)
     {
-        $guru = Guru::with('mapel')->paginate(10);
+        $guru = Guru::with('mapels')->paginate(10);
 
         return view('tu.guru.index', compact('guru'));
     }
@@ -92,4 +92,5 @@ $guru->update($data);
 
         return back()->with('success', 'Guru berhasil dihapus.');
     }
+    
 }

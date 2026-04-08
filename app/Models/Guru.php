@@ -26,8 +26,19 @@ class Guru extends Model
     /**
      * Relasi ke Mata Pelajaran
      */
-    public function mapel()
+
+    public function mapels()
     {
-        return $this->belongsTo(MataPelajaran::class, 'mapel_id');
+        return $this->belongsToMany(
+            MataPelajaran::class,
+            'guru_mapel',
+            'guru_id',
+            'mapel_id'
+        );
+    }
+
+    public function waliKelas()
+    {
+        return $this->hasOne(WaliKelas::class);
     }
 }

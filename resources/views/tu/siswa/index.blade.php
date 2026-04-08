@@ -42,6 +42,54 @@
                         </div>
                     </div>
 
+                    {{-- KELAS GRUP --}}
+                    <div class="col-md-2">
+
+                        <label class="form-label fw-semibold">Grup Kelas</label>
+
+                        <select name="kelas_grup" class="form-select">
+
+                            <option value="">Semua</option>
+
+                            @foreach($kelasGrup as $g)
+
+                            <option value="{{ $g->id }}"
+                            {{ request('kelas_grup') == $g->id ? 'selected' : '' }}>
+
+                            Kelas {{ $g->kelasMaster->tingkat }}
+
+                            </option>
+
+                            @endforeach
+
+                        </select>
+
+                    </div>
+
+                    {{-- ROMBEL --}}
+                    <div class="col-md-2">
+
+                        <label class="form-label fw-semibold">Rombel</label>
+
+                        <select name="kelas" class="form-select">
+
+                        <option value="">Semua</option>
+
+                        @foreach($kelas as $k)
+
+                        <option value="{{ $k->id }}"
+                        {{ request('kelas') == $k->id ? 'selected' : '' }}>
+
+                        {{ $k->nama_kelas }}
+
+                        </option>
+
+                        @endforeach
+
+                        </select>
+
+                    </div>
+
                     {{-- SEARCH --}}
                     <div class="col-md-3">
                         <label class="form-label fw-semibold">Cari Siswa</label>
@@ -51,6 +99,26 @@
                             class="form-control"
                             placeholder="Nama / NIS"
                             value="{{ request('search') }}">
+                    </div>
+
+                    {{-- STATUS --}}
+                    <div class="col-md-2">
+                        <label class="form-label fw-semibold">Status</label>
+
+                        <select name="status" class="form-select">
+                            <option value="">Semua</option>
+
+                            <option value="aktif"
+                            {{ request('status') == 'aktif' ? 'selected' : '' }}>
+                            Aktif
+                            </option>
+
+                            <option value="nonaktif"
+                            {{ request('status') == 'nonaktif' ? 'selected' : '' }}>
+                            Nonaktif
+                            </option>
+
+                        </select>
                     </div>
 
                     {{-- BUTTON --}}
@@ -85,14 +153,18 @@
 
     <select name="action" class="form-select w-auto" required>
     <option value="">Pilih Opsi</option>
-    <option value="pindah_rombel">Pindah Rombel</option>
     <option value="nonaktifkan">Nonaktifkan</option>
+    <option value="aktifkan">Aktifkan</option>
     </select>
 
     <button class="btn btn-primary btn-sm">
     Terapkan
     </button>
 
+    </div>
+
+    <div class="mb-2 text-muted small">
+        <span id="selectedCount">0</span> siswa dipilih
     </div>
 
     {{-- =========================
@@ -150,10 +222,14 @@
 
                             {{-- STATUS --}}
                             <td>
-                                @if($row->penempatanAktif)
-                                    <span class="badge bg-success">Aktif</span>
+                                @if($row->trashed())
+
+                                <span class="badge bg-secondary">Nonaktif</span>
+
                                 @else
-                                    <span class="badge bg-secondary">Tidak Aktif</span>
+
+                                <span class="badge bg-success">Aktif</span>
+
                                 @endif
                             </td>
 
@@ -221,8 +297,24 @@ document.getElementById('bulkForm').addEventListener('submit', function(e){
     if(checked.length === 0){
         e.preventDefault();
         alert('Pilih minimal satu siswa');
+        return;
     }
 
+
+});
+
+    const boxes = document.querySelectorAll('.row-checkbox');
+    const counter = document.getElementById('selectedCount');
+
+    boxes.forEach(box => {
+
+    box.addEventListener('change', function(){
+
+    const checked = document.querySelectorAll('.row-checkbox:checked').length;
+
+    counter.innerText = checked;
+
+    });
 });
 
 </script>

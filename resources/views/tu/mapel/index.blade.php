@@ -51,7 +51,10 @@
 
                             <td>{{ $row->kode_mapel ?? '-' }}</td>
 
-                            <td>{{ $row->nama_mapel }}</td>
+                            <td>{{ $row->nama_mapel }}
+                            <small style="color:gray;">
+                                ({{ $row->fase }})
+                            </small></td>
 
                             <td>{{ $row->kkm ?? '-' }}</td>
 

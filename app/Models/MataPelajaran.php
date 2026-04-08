@@ -15,8 +15,13 @@ class MataPelajaran extends Model
         'kkm'
     ];
 
-    public function guru()
+    public function gurus()
     {
-        return $this->hasMany(Guru::class, 'mapel_id');
+        return $this->belongsToMany(
+            Guru::class,
+            'guru_mapel',
+            'mapel_id',
+            'guru_id'
+        );
     }
 }

@@ -22,59 +22,65 @@ class SiswaController extends Controller
      * - Kelas = ROMBEL
      */
    public function index(Request $request)
-{
-    $query = Siswa::query()
-        ->with([
-            'penempatanAktif.kelas.kelasGrup.kelasMaster',
-            'penempatanAktif.kelas.kelasGrup.angkatan'
-        ]);
+    {
+        $query = Siswa::query()
+            ->with([
+                'penempatanAktif.kelas.kelasGrup.kelasMaster',
+                'penempatanAktif.kelas.kelasGrup.angkatan'
+            ]);
 
-    // =====================
-    // FILTER ANGKATAN
-    // =====================
-    if ($request->angkatan) {
-        $query->whereHas('penempatanAktif.kelas.kelasGrup', function ($q) use ($request) {
-            $q->where('angkatan_id', $request->angkatan);
-        });
+        // FILTER ANGKATAN
+        if ($request->angkatan) {
+            $query->whereHas('penempatanAktif.kelas.kelasGrup', function ($q) use ($request) {
+                $q->where('angkatan_id', $request->angkatan);
+            });
+        }
+
+        // FILTER GRUP
+        if ($request->kelas_grup) {
+            $query->whereHas('penempatanAktif.kelas', function ($q) use ($request) {
+                $q->where('kelas_grup_id', $request->kelas_grup);
+            });
+        }
+
+        // FILTER ROMBEL
+        if ($request->kelas) {
+            $query->whereHas('penempatanAktif', function ($q) use ($request) {
+                $q->where('kelas_id', $request->kelas);
+            });
+        }
+
+        // FILTER STATUS
+        if ($request->status == 'nonaktif') {
+            $query->onlyTrashed();
+        }
+
+        if ($request->status == 'aktif') {
+            $query->whereNull('deleted_at');
+        }
+
+        // SEARCH
+        if ($request->search) {
+            $query->where(function ($q) use ($request) {
+                $q->where('nama', 'like', "%{$request->search}%")
+                ->orWhere('nis', 'like', "%{$request->search}%");
+            });
+        }
+
+        // FINAL DATA
+        $siswa = $query->paginate(20)->withQueryString();
+
+        $angkatan   = Angkatan::orderByDesc('tahun')->get();
+        $kelasGrup  = KelasGrup::with('kelasMaster')->get();
+        $kelas      = Kelas::orderBy('nama_kelas')->get();
+
+        return view('tu.siswa.index', compact(
+            'siswa',
+            'angkatan',
+            'kelasGrup',
+            'kelas'
+        ));
     }
-
-    // =====================
-    // FILTER TINGKAT
-    // =====================
-    if ($request->tingkat) {
-        $query->whereHas('penempatanAktif.kelas.kelasGrup.kelasMaster', function ($q) use ($request) {
-            $q->where('tingkat', $request->tingkat);
-        });
-    }
-
-    // =====================
-    // FILTER ROMBEL
-    // =====================
-    if ($request->kelas) {
-        $query->whereHas('penempatanAktif', function ($q) use ($request) {
-            $q->where('kelas_id', $request->kelas);
-        });
-    }
-
-    // =====================
-    // SEARCH
-    // =====================
-    if ($request->search) {
-        $query->where(function ($q) use ($request) {
-            $q->where('nama', 'like', "%{$request->search}%")
-              ->orWhere('nis', 'like', "%{$request->search}%");
-        });
-    }
-
-    $siswa = $query->paginate(20)->withQueryString();
-
-    $angkatan = Angkatan::orderByDesc('tahun')->get();
-
-    return view('tu.siswa.index', compact(
-        'siswa',
-        'angkatan'
-    ));
-}
 
     /**
      * CREATE
@@ -347,15 +353,15 @@ public function ajaxTable(Request $request)
 
             case 'nonaktifkan':
 
-                Siswa::whereIn('id',$ids)->update([
-                    'deleted_at' => now()
-                ]);
+                Siswa::whereIn('id',$ids)->delete();
 
             break;
 
-            case 'pindah_rombel':
+            case 'aktifkan':
 
-                return back()->with('info','Fitur pindah rombel belum diimplementasikan');
+                Siswa::withTrashed()
+                    ->whereIn('id',$ids)
+                    ->restore();
 
             break;
 

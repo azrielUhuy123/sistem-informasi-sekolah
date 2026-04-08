@@ -25,32 +25,34 @@ class MataPelajaranController extends Controller
 
         // SEARCH
         if ($request->filled('q')) {
-    $query->where(function ($q) use ($request) {
-        $q->where('nama_mapel', 'like', '%' . $request->q . '%')
-          ->orWhere('kode_mapel', 'like', '%' . $request->q . '%');
-    });
-}
-        // SORT
-        $sort  = $request->sort ?? 'id';
-        $order = $request->order ?? 'asc';
-
-        $allowedSort = ['id', 'nama_mapel', 'kode_mapel', 'kkm'];
-        if (!in_array($sort, $allowedSort)) {
-            $sort = 'id';
+            $query->where(function ($q) use ($request) {
+                $q->where('nama_mapel', 'like', '%' . $request->q . '%')
+                ->orWhere('kode_mapel', 'like', '%' . $request->q . '%');
+            });
         }
 
-        $query->orderBy($sort, $order);
+        // 🔥 AMBIL SEMUA DATA DULU
+        $data = $query->get();
 
-        // PAGINATION
-        $perPage = $request->per_page ?? 15;
+        // 🔥 GROUP BY kode_mapel (INI INTI FIX)
+        $grouped = $data->groupBy('kode_mapel');
 
-        $mata_pelajaran = $query
-            ->paginate($perPage)
-            ->withQueryString();
+        // 🔥 FORMAT JADI 1 BARIS PER MAPEL
+        $mata_pelajaran = $grouped->map(function ($items) {
+            $first = $items->first();
+
+            return (object) [
+                'id' => $first->id,
+                'nama_mapel' => $first->nama_mapel,
+                'kode_mapel' => $first->kode_mapel,
+                'kkm' => $first->kkm,
+                'fase' => $items->pluck('fase')->join(', '),
+                'count_fase' => $items->count(),
+            ];
+        })->values();
 
         return view('tu.mapel.index', compact('mata_pelajaran'));
     }
-
     /**
      * CREATE PAGE
      */

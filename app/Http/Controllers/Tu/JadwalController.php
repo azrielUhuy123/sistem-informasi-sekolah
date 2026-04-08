@@ -4,235 +4,305 @@ namespace App\Http\Controllers\Tu;
 
 use App\Http\Controllers\Controller;
 use App\Models\Jadwal;
-use App\Models\Guru;
 use App\Models\Kelas;
-use App\Models\Ruangan;
+use App\Models\HariSekolah;
+use App\Models\JamPelajaran;
 use App\Models\MataPelajaran;
+use App\Models\Guru;
+use App\Actions\Jadwal\GetJPStatus;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 
 class JadwalController extends Controller
 {
-    /**
-     * INDEX — Sorting + Search + Filter Deleted + Pagination
-     */
     public function index(Request $request)
     {
-        $deleted = $request->deleted ?? 'active';
+        $kelasId = $request->kelas_id;
 
-        if ($deleted === 'only') {
-            $query = Jadwal::onlyTrashed()
-                ->with(['kelas', 'guru.mapel', 'ruangan']);
-        } elseif ($deleted === 'all') {
-            $query = Jadwal::withTrashed()
-                ->with(['kelas', 'guru.mapel', 'ruangan']);
-        } else {
-            $query = Jadwal::with(['kelas', 'guru.mapel', 'ruangan']);
+        $kelasList = Kelas::with('kelasGrup.kelasMaster')->get();
+        $haris = HariSekolah::orderBy('urutan')->get();
+        $jams = JamPelajaran::orderBy('jam_ke')->get();
+
+        $jadwals = [];
+
+        if ($kelasId) {
+            $data = Jadwal::with(['mapel', 'guru'])
+                ->where('kelas_id', $kelasId)
+                ->get();
+
+            foreach ($data as $j) {
+                $jadwals[$j->hari_id][$j->jam_pelajaran_id] = $j;
+            }
         }
 
-        // SEARCH
-        if ($request->q) {
-            $query->where(function ($q) use ($request) {
-                $q->whereHas('kelas', function ($x) use ($request) {
-                        $x->where('nama_kelas', 'like', "%{$request->q}%");
-                    })
-                  ->orWhereHas('guru', function ($x) use ($request) {
-                        $x->where('nama', 'like', "%{$request->q}%")
-                          ->orWhere('nip', 'like', "%{$request->q}%");
-                  })
-                  ->orWhere('hari', 'like', "%{$request->q}%")
-                  ->orWhere('jam_mulai', 'like', "%{$request->q}%")
-                  ->orWhere('jam_selesai', 'like', "%{$request->q}%");
+        // setelah ambil $data (jadwal kelas ini)
+        $occupiedGuru = [];
+
+        // ambil semua jadwal (SEMUA kelas) untuk cek bentrok global guru
+        $all = Jadwal::select('guru_id','hari_id','jam_pelajaran_id','kelas_id')->get();
+
+        foreach ($all as $row) {
+            $occupiedGuru[$row->hari_id][$row->jam_pelajaran_id][] = $row->guru_id;
+        }
+
+        $jpStatus = [];
+
+        if ($kelasId) {
+            $jpStatus = app(GetJPStatus::class)->execute($kelasId);
+        }
+
+        return view('tu.jadwal.index', compact(
+            'kelasList',
+            'kelasId',
+            'haris',
+            'jams',
+            'jadwals',
+            'occupiedGuru',
+            'jpStatus'
+        ));
+    }
+
+    public function edit(Request $request, $kelas, $hari, $jam)
+    {
+        $guruJam = collect();
+        $waliKelasId = null;
+        $kodeMapel = $request->get('mapel_id');
+
+        $current = Jadwal::where([
+            'kelas_id' => $kelas,
+            'hari_id' => $hari,
+            'jam_pelajaran_id' => $jam,
+        ])->first();
+
+        // fallback
+        if (!$kodeMapel && $current) {
+            $kodeMapel = optional($current->mapel)->kode_mapel;
+        }
+
+        $gurus = [];
+
+        if ($kodeMapel) {
+            $gurus = Guru::whereHas('mapels', function ($q) use ($kodeMapel) {
+                $q->where('mata_pelajaran.kode_mapel', $kodeMapel);
+            })->get();
+
+            $guruJam = Jadwal::select('guru_id', DB::raw('COUNT(*) as total'))
+                ->groupBy('guru_id')
+                ->pluck('total', 'guru_id');
+
+            $waliKelasId = optional(
+                \App\Models\WaliKelas::where('kelas_id', $kelas)->first()
+            )->guru_id;
+
+            $gurus = $gurus->sortBy(function ($g) use ($guruJam, $waliKelasId) {
+                if ($g->id == $waliKelasId) return 0;
+
+                return ($guruJam[$g->id] ?? 0) + 1;
             });
         }
 
-        // SORTING
-        $sort  = $request->sort ?? 'id';
-        $order = $request->order ?? 'asc';
+        $currentGuruId = $current?->guru_id;
 
-        $allowed = ['id', 'hari', 'jam_mulai', 'jam_selesai'];
-        if (!in_array($sort, $allowed)) {
-            $sort = 'id';
-        }
+        $occupiedGuru = Jadwal::where('hari_id', $hari)
+            ->where('jam_pelajaran_id', $jam)
+            ->where('guru_id', '!=', $currentGuruId)
+            ->pluck('guru_id')
+            ->toArray();
 
-        $query->orderBy($sort, $order);
+        $occupiedGuruMap = Jadwal::where('hari_id', $hari)
+            ->where('jam_pelajaran_id', $jam)
+            ->pluck('guru_id')
+            ->toArray();
 
-        // PAGINATION
-        $perPage = $request->per_page ?? 15;
-        $jadwal  = $query->paginate($perPage)->withQueryString();
+        $kelasData = Kelas::findOrFail($kelas);
+        $fase = $this->getFaseFromKelas($kelasData->nama_kelas);
 
-        return view('tu.jadwal.index', compact('jadwal'));
-    }
+        $faseList = match ($fase) {
+            'A' => ['A'],
+            'B' => ['A', 'B'],
+            'C' => ['A', 'B', 'C'],
+        };
 
-    /**
-     * CREATE PAGE
-     */
-    public function create()
-    {
-        $kelas   = Kelas::whereNull('deleted_at')->get();
-        $guru    = Guru::with('mapel')->whereNull('deleted_at')->get();
-        $ruangan = Ruangan::all();
-        $mapel   = MataPelajaran::orderBy('nama_mapel')->get();
+        $mapels = MataPelajaran::whereIn('fase', $faseList)
+            ->get()
+            ->unique('kode_mapel')
+            ->values();
 
-        return view('tu.jadwal.create', compact(
-            'kelas',
-            'guru',
-            'ruangan',
-            'mapel'
-        ));
-    }
+        $jpStatus = app(GetJPStatus::class)->execute($kelas);
 
-    /**
-     * STORE
-     */
-    public function store(Request $request)
-    {
-        $data = $request->validate([
-            'kelas_id'    => 'required|exists:kelas,id',
-            'guru_id'     => 'required|exists:guru,id',
-            'mapel_id'    => 'required|exists:mata_pelajaran,id',
-            'hari'        => 'required|string|max:20',
-            'jam_mulai'   => 'required',
-            'jam_selesai' => 'required',
-            'ruangan_id'  => 'nullable|exists:ruangan,id',
+
+        return view('tu.jadwal.edit', [
+            'kelasId' => $kelas,
+            'hariId' => $hari,
+            'jamId' => $jam,
+            'gurus' => $gurus,
+            'mapelId' => $kodeMapel,
+            'occupiedGuru' => $occupiedGuru,
+            'guruJam' => $guruJam,
+            'fase' => $fase,
+            'mapels' => $mapels,
+            'jpStatus' => $jpStatus,
+            'occupiedGuruMap' => $occupiedGuruMap,
+            'waliKelasId' => $waliKelasId,
         ]);
-
-        Jadwal::create($data);
-
-        return redirect()
-            ->route('tu.jadwal.index')
-            ->with('success', 'Jadwal berhasil ditambahkan!');
     }
 
-    /**
-     * DETAIL PAGE
-     */
-    public function detail($id)
-    {
-        $jadwal = Jadwal::with([
-            'kelas',
-            'guru.mapel',
-            'ruangan'
-        ])->findOrFail($id);
-
-        return view('tu.jadwal.detail', compact('jadwal'));
-    }
-
-    /**
-     * EDIT PAGE
-     */
-    public function edit($id)
-    {
-        $jadwal  = Jadwal::withTrashed()->findOrFail($id);
-        $kelas   = Kelas::whereNull('deleted_at')->get();
-        $guru    = Guru::with('mapel')->whereNull('deleted_at')->get();
-        $ruangan = Ruangan::all();
-        $mapel   = MataPelajaran::orderBy('nama_mapel')->get();
-
-        return view('tu.jadwal.edit', compact(
-            'jadwal',
-            'kelas',
-            'guru',
-            'ruangan',
-            'mapel'
-        ));
-    }
-
-    /**
-     * UPDATE
-     */
-    public function update(Request $request, $id)
-    {
-        $jadwal = Jadwal::withTrashed()->findOrFail($id);
-
-        $data = $request->validate([
-            'kelas_id'    => 'required|exists:kelas,id',
-            'guru_id'     => 'required|exists:guru,id',
-            'mapel_id'    => 'required|exists:mata_pelajaran,id',
-            'hari'        => 'required|string|max:20',
-            'jam_mulai'   => 'required',
-            'jam_selesai' => 'required',
-            'ruangan_id'  => 'nullable|exists:ruangan,id',
-        ]);
-
-        $jadwal->update($data);
-
-        return redirect()
-            ->route('tu.jadwal.index')
-            ->with('success', 'Jadwal berhasil diperbarui!');
-    }
-
-    /**
-     * DELETE — Soft Delete
-     */
-    public function destroy($id)
-    {
-        Jadwal::findOrFail($id)->delete();
-
-        return redirect()
-            ->route('tu.jadwal.index')
-            ->with('success', 'Jadwal dipindahkan ke trash.');
-    }
-
-    /**
-     * RESTORE
-     */
-    public function restore($id)
-    {
-        Jadwal::withTrashed()->findOrFail($id)->restore();
-
-        return back()->with('success', 'Jadwal berhasil direstore.');
-    }
-
-    /**
-     * FORCE DELETE
-     */
-    public function forceDelete($id)
-    {
-        Jadwal::withTrashed()->findOrFail($id)->forceDelete();
-
-        return back()->with('success', 'Jadwal berhasil dihapus permanen.');
-    }
-
-    /**
-     * BULK ACTION
-     */
-    public function bulkAction(Request $request)
+    public function update(Request $request, $kelas, $hari, $jam)
     {
         $request->validate([
-            'action' => 'required|in:delete,restore,forceDelete',
-            'ids'    => 'required|array',
+            'mapel_id' => 'required|exists:mata_pelajaran,kode_mapel',
+            'guru_id' => 'required|exists:guru,id',
         ]);
 
-        switch ($request->action) {
-            case 'delete':
-                Jadwal::whereIn('id', $request->ids)->delete();
-                break;
+        $kodeMapel = $request->mapel_id;
 
-            case 'restore':
-                Jadwal::onlyTrashed()->whereIn('id', $request->ids)->restore();
-                break;
+        $kelasData = Kelas::findOrFail($kelas);
+        $fase = $this->getFaseFromKelas($kelasData->nama_kelas);
 
-            case 'forceDelete':
-                Jadwal::onlyTrashed()->whereIn('id', $request->ids)->forceDelete();
-                break;
+        // ambil mapel sesuai fase
+        $mapel = MataPelajaran::where('kode_mapel', $kodeMapel)
+            ->where('fase', $fase)
+            ->firstOrFail();
+
+        $guru = Guru::findOrFail($request->guru_id);
+
+        // VALIDASI guru ↔ mapel
+        if (!$guru->mapels()->where('mata_pelajaran.id', $mapel->id)->exists()) {
+            return back()->withErrors([
+                'guru_id' => 'Guru tidak mengampu mata pelajaran ini'
+            ])->withInput();
         }
 
-        return response()->json(['message' => 'Aksi massal berhasil.']);
+        // CEK BENTROK
+        $bentrokData = Jadwal::with('kelas')
+            ->where('guru_id', $request->guru_id)
+            ->where('hari_id', $hari)
+            ->where('jam_pelajaran_id', $jam)
+            ->where('kelas_id', '!=', $kelas)
+            ->first();
+
+        if ($bentrokData) {
+            return back()->withErrors([
+                'guru_id' => 'Bentrok dengan kelas: ' . $bentrokData->kelas->nama_kelas
+            ]);
+        }
+
+        // VALIDASI JP (pakai ID hasil mapping)
+        
+        $count = Jadwal::where('kelas_id', $kelas)
+            ->whereHas('mapel', function ($q) use ($kodeMapel) {
+                $q->where('kode_mapel', $kodeMapel);
+            })
+            ->count();
+
+        $existing = Jadwal::where([
+            'kelas_id' => $kelas,
+            'hari_id' => $hari,
+            'jam_pelajaran_id' => $jam,
+        ])->first();
+
+        $jpTarget = MataPelajaran::where('kode_mapel', $kodeMapel)
+            ->orderBy('fase') // A dulu
+            ->value('jp_per_minggu');
+
+        if (
+            !$existing ||
+            optional($existing->mapel)->kode_mapel != $kodeMapel
+        ) 
+        {
+            if ($count >= $jpTarget) {
+                return back()->withErrors([
+                    'mapel_id' => 'JP sudah terpenuhi'
+                ]);
+            }
+        }
+        // VALIDASI WALI KELAS (PRIORITAS - HARDENED)
+        $waliKelasList = \App\Models\WaliKelas::where('guru_id', $request->guru_id)
+            ->pluck('kelas_id');
+
+        if ($waliKelasList->isNotEmpty() && !$waliKelasList->contains($kelas)) {
+
+            $jadwalWali = Jadwal::whereIn('kelas_id', $waliKelasList)
+                ->where('hari_id', $hari)
+                ->where('jam_pelajaran_id', $jam)
+                ->exists();
+
+            if ($jadwalWali) {
+                return back()->withErrors([
+                    'guru_id' => 'Wali kelas harus mengajar di kelasnya sendiri pada jam ini'
+                ]);
+            }
+        }
+
+        Jadwal::updateOrCreate(
+            [
+                'kelas_id' => $kelas,
+                'hari_id' => $hari,
+                'jam_pelajaran_id' => $jam,
+            ],
+            [
+                'mapel_id' => $mapel->id, // ✔ FIX
+                'guru_id' => $request->guru_id,
+            ]
+        );
+
+        return redirect()
+            ->route('tu.jadwal.index', ['kelas_id' => $kelas])
+            ->with('success', 'Jadwal berhasil disimpan');
+    }
+    public function jadwalGuru(Request $request)
+    {
+        $guruId = $request->guru_id;
+
+        $gurus = Guru::all();
+        $haris = HariSekolah::orderBy('urutan')->get();
+        $jams = JamPelajaran::orderBy('jam_ke')->get();
+
+        $jadwals = [];
+
+        if ($guruId) {
+            $data = Jadwal::with(['kelas', 'mapel'])
+                ->where('guru_id', $guruId)
+                ->get();
+
+            foreach ($data as $j) {
+                $jadwals[$j->hari_id][$j->jam_pelajaran_id] = $j;
+            }
+        }
+
+        $jpStatus = [];
+
+        if ($guruId) {
+            $jpStatus = app(GetJPStatus::class)->executeByGuru((int) $guruId);
+        }
+
+
+        $totalJam = 0;
+
+        if ($guruId) {
+            $totalJam = Jadwal::where('guru_id', $guruId)->count();
+        }
+
+        
+        return view('tu.jadwal.guru', compact(
+            'gurus',
+            'guruId',
+            'haris',
+            'jams',
+            'jadwals',
+            'totalJam',
+            'jpStatus'
+        ));
     }
 
-    /**
-     * AJAX LIVE SEARCH
-     */
-    public function ajaxSearch(Request $request)
+    private function getFaseFromKelas($namaKelas)
     {
-        $keyword = $request->q;
+        $tingkat = (int) substr($namaKelas, 0, 1);
 
-        $data = Jadwal::with(['kelas', 'guru.mapel', 'ruangan'])
-            ->whereHas('kelas', fn ($q) => $q->where('nama_kelas', 'like', "%$keyword%"))
-            ->orWhereHas('guru', fn ($q) => $q->where('nama', 'like', "%$keyword%"))
-            ->orWhere('hari', 'like', "%$keyword%")
-            ->get();
+        if (in_array($tingkat, [1, 2])) return 'A';
+        if (in_array($tingkat, [3, 4])) return 'B';
+        if (in_array($tingkat, [5, 6])) return 'C';
 
-        return response()->json($data);
+        return null;
     }
 }

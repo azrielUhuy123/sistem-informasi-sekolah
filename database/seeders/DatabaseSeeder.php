@@ -42,6 +42,12 @@ class DatabaseSeeder extends Seeder
             'role' => 'tu',
             'approved_at' => now(),
         ]);
+
+        $this->call(KelasMasterSeeder::class);
+
+        $this->call(HariJamSeeder::class);
+
+        $this->call(MataPelajaranSeeder::class);
     }
 
 }

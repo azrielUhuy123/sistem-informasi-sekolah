@@ -137,11 +137,20 @@ Route::middleware(['auth', 'role:tu'])
         | JADWAL
         |--------------------------------------------------------------------------
         */
-        Route::get('/jadwal/search/ajax', [JadwalController::class, 'ajaxSearch'])->name('jadwal.search');
-        Route::post('/jadwal/bulk', [JadwalController::class, 'bulkAction'])->name('jadwal.bulk');
-        Route::get('/jadwal/{id}/detail', [JadwalController::class, 'detail'])->name('jadwal.detail');
-        Route::resource('jadwal', JadwalController::class);
 
+        Route::prefix('jadwal')->name('jadwal.')->group(function () {
+
+            Route::get('/', [JadwalController::class, 'index'])->name('index');
+
+            Route::get('/{kelas}/{hari}/{jam}/edit', [JadwalController::class, 'edit'])
+                ->name('edit');
+
+            Route::post('/{kelas}/{hari}/{jam}', [JadwalController::class, 'update'])
+                ->name('update');
+        });
+
+            Route::get('/jadwal-guru', [JadwalController::class, 'jadwalGuru'])
+                ->name('jadwal.guru');
         /*
         |--------------------------------------------------------------------------
         | MATA PELAJARAN
