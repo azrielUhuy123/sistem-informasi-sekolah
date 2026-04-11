@@ -32,6 +32,28 @@
             </div>
 
             <div class="mb-3">
+                <label class="form-label">Mata Pelajaran</label>
+
+                @foreach ($mapel as $m)
+                    <div class="form-check">
+                        <input 
+                            class="form-check-input"
+                            type="checkbox"
+                            name="mapel_ids[]"
+                            value="{{ $m->id }}"
+
+                            {{-- untuk edit --}}
+                            @if(isset($guru) && $guru->mapels->contains($m->id)) checked @endif
+                        >
+
+                        <label class="form-check-label">
+                            {{ $m->nama_mapel }} ({{ $m->fase }})
+                        </label>
+                    </div>
+                @endforeach
+            </div>
+
+            <div class="mb-3">
                 <label>Email</label>
                 <input type="email" name="email" class="form-control">
             </div>

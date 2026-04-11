@@ -18,70 +18,92 @@ class GuruController extends Controller
 
     public function create()
     {
-        $mapel = MataPelajaran::orderBy('nama_mapel')->get();
+        // ambil mapel unik biar tidak double fase
+        $mapel = MataPelajaran::all()
+            ->unique('kode_mapel')
+            ->values();
 
         return view('tu.guru.create', compact('mapel'));
     }
 
     public function store(Request $request)
-{
-    $data = $request->only([
-        'nama',
-        'nip',
-        'jenis_kelamin',
-        'email',
-        'telepon',
-        'alamat'
-    ]);
+    {
+        $data = $request->only([
+            'nama',
+            'nip',
+            'jenis_kelamin',
+            'email',
+            'telepon',
+            'alamat'
+        ]);
 
-    // HANDLE FOTO
-    if ($request->hasFile('foto')) {
-        $file = $request->file('foto');
-        $namaFile = time().'.'.$file->getClientOriginalExtension();
+        // HANDLE FOTO
+        if ($request->hasFile('foto')) {
+            $file = $request->file('foto');
+            $namaFile = time() . '.' . $file->getClientOriginalExtension();
+            $file->move(public_path('foto-guru'), $namaFile);
 
-        // pindahkan ke folder public/foto-guru
-        $file->move(public_path('foto-guru'), $namaFile);
+            $data['foto'] = $namaFile;
+        }
 
-        $data['foto'] = $namaFile;
+        // SIMPAN GURU
+        $guru = Guru::create($data);
+
+        // SIMPAN RELASI MAPEL (PIVOT)
+        if ($request->has('mapel_ids')) {
+            $guru->mapels()->sync($request->mapel_ids);
+        }
+
+        return redirect()->route('tu.guru.index')
+            ->with('success', 'Data guru berhasil ditambahkan');
     }
-
-    \App\Models\Guru::create($data);
-
-    return redirect()->route('tu.guru.index')
-        ->with('success', 'Data guru berhasil ditambahkan');
-}
 
     public function edit($id)
     {
-        $guru  = Guru::findOrFail($id);
-        $mapel = MataPelajaran::orderBy('nama_mapel')->get();
+        $guru = Guru::with('mapels')->findOrFail($id);
+
+        $mapel = MataPelajaran::all()
+            ->unique('kode_mapel')
+            ->values();
 
         return view('tu.guru.edit', compact('guru', 'mapel'));
     }
 
     public function update(Request $request, $id)
-{
-    $guru = Guru::findOrFail($id);
+    {
+        $guru = Guru::findOrFail($id);
 
-    $data = $request->all();
+        $data = $request->only([
+            'nama',
+            'nip',
+            'jenis_kelamin',
+            'email',
+            'telepon',
+            'alamat'
+        ]);
 
-if ($request->hasFile('foto')) {
-    $file = $request->file('foto');
-    $namaFile = time().'.'.$file->getClientOriginalExtension();
-    $file->move(public_path('foto-guru'), $namaFile);
+        // HANDLE FOTO
+        if ($request->hasFile('foto')) {
+            $file = $request->file('foto');
+            $namaFile = time() . '.' . $file->getClientOriginalExtension();
+            $file->move(public_path('foto-guru'), $namaFile);
 
-    $data['foto'] = $namaFile;
-}
+            $data['foto'] = $namaFile;
+        }
 
-$guru->update($data);
+        // UPDATE DATA GURU
+        $guru->update($data);
 
-    return redirect()->route('tu.guru.index')
-        ->with('success', 'Data guru berhasil diupdate');
+        // UPDATE RELASI MAPEL
+        $guru->mapels()->sync($request->mapel_ids ?? []);
+
+        return redirect()->route('tu.guru.index')
+            ->with('success', 'Data guru berhasil diupdate');
     }
 
     public function show($id)
     {
-        $guru = \App\Models\Guru::findOrFail($id);
+        $guru = Guru::with('mapels')->findOrFail($id);
 
         return view('tu.guru.show', compact('guru'));
     }
@@ -92,5 +114,4 @@ $guru->update($data);
 
         return back()->with('success', 'Guru berhasil dihapus.');
     }
-    
 }

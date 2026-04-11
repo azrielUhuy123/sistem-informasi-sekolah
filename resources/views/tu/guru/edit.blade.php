@@ -74,6 +74,27 @@
                 @endif
             </div>
 
+            <div class="mb-3">
+                <label class="form-label">Mata Pelajaran</label>
+
+                @foreach ($mapel as $m)
+                    <div class="form-check">
+                        <input 
+                            class="form-check-input"
+                            type="checkbox"
+                            name="mapel_ids[]"
+                            value="{{ $m->id }}"
+
+                            {{ $guru->mapels->contains($m->id) ? 'checked' : '' }}
+                        >
+
+                        <label class="form-check-label">
+                            {{ $m->nama_mapel }} ({{ $m->fase }})
+                        </label>
+                    </div>
+                @endforeach
+            </div>
+
             <div class="d-flex gap-2 mt-4">
                 <button class="btn btn-primary">Update</button>
                 <a href="{{ route('tu.guru.index') }}" class="btn btn-secondary">Kembali</a>
