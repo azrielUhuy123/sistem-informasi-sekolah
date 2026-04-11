@@ -9,23 +9,19 @@ class WaliKelas extends Model
     protected $table = 'wali_kelas';
 
     protected $fillable = [
-        'guru_id',
         'kelas_id',
-        'tahun_ajaran_id',
+        'guru_id'
     ];
 
-    public function guru()
-    {
-        return $this->belongsTo(Guru::class);
-    }
+    // RELASI
 
     public function kelas()
     {
         return $this->belongsTo(Kelas::class);
     }
 
-    public function tahun()
+    public function guru()
     {
-        return $this->belongsTo(TahunAjaran::class, 'tahun_ajaran_id');
+        return $this->belongsTo(Guru::class);
     }
 }

@@ -28,6 +28,7 @@
             <th>Kelas</th>
             <th>Angkatan</th>
             <th>Jumlah Siswa</th>
+            <th>Wali Kelas</th>
             <th width="120">Aksi</th>
         </tr>
     </thead>
@@ -37,16 +38,22 @@
                 <td>{{ $rombel->nama_kelas }}</td>
                 <td>{{ $kelasGrup->angkatan->tahun }}</td>
                 <td>{{ $rombel->siswa_count }}</td>
+                <td>{{ optional(optional($rombel->waliKelas)->guru)->nama ?? '-' }}</td>
                 <td>
                     <a href="{{ route('tu.kelas.rombel.show', $rombel->id) }}"
                     class="btn btn-sm btn-outline-primary">
                         Detail
                     </a>
+
+                    <a href="{{ route('tu.kelas.wali', $rombel->id) }}" 
+                    class="btn btn-sm btn-secondary">
+                    Set Wali
+                    </a>
                 </td>
             </tr>
         @empty
             <tr>
-                <td colspan="4" class="text-center text-muted">
+                <td colspan="5" class="text-center text-muted">
                     Belum ada rombel
                 </td>
             </tr>

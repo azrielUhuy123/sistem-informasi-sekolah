@@ -4,129 +4,158 @@
 
 @section('content')
 
-<div style="padding:20px">
+<div class="container-fluid py-3">
 
-    <h2>Jadwal Pelajaran</h2>
+    {{-- HEADER --}}
+    <div class="mb-4">
+        <h4 class="fw-bold mb-0">Manajemen Jadwal</h4>
+        <small class="text-muted">Kelola jadwal pelajaran dan monitoring JP</small>
+    </div>
 
-    {{-- FILTER KELAS --}}
-    <form method="GET" style="margin-bottom:20px;">
-        <label>Pilih Kelas:</label>
-        <select name="kelas_id" onchange="this.form.submit()" style="padding:5px;">
-            <option value="">-- Pilih Kelas --</option>
-            @foreach ($kelasList as $k)
-                <option value="{{ $k->id }}" {{ $kelasId == $k->id ? 'selected' : '' }}>
-                    {{ $k->nama_kelas }}
-                </option>
-            @endforeach
-        </select>
-    </form>
-    <a href="{{ route('tu.jadwal.guru') }}">Jadwal Guru</a>
+    {{-- CARD FILTER --}}
+    <div class="card shadow-sm border-0 mb-4">
+        <div class="card-body">
+
+            <form method="GET" class="row align-items-end g-3">
+                
+                <div class="col-md-4">
+                    <label class="form-label">Pilih Kelas</label>
+                    <select name="kelas_id" onchange="this.form.submit()" class="form-control">
+                        <option value="">-- Pilih Kelas --</option>
+                        @foreach ($kelasList as $k)
+                            <option value="{{ $k->id }}" {{ $kelasId == $k->id ? 'selected' : '' }}>
+                                {{ $k->nama_kelas }}
+                            </option>
+                        @endforeach
+                    </select>
+                </div>
+
+                <div class="col-md-4">
+                    <a href="{{ route('tu.jadwal.guru') }}" class="btn btn-outline-primary">
+                        Lihat Jadwal Guru
+                    </a>
+                </div>
+
+            </form>
+
+        </div>
+    </div>
+
     @if ($kelasId)
 
-
-        <div style="margin-bottom:10px;">
+        {{-- INFO KELAS --}}
+        <div class="mb-3">
             <strong>Kelas:</strong>
             {{ $kelasList->firstWhere('id', $kelasId)->nama_kelas ?? '-' }}
         </div>
 
-        <table border="1" cellpadding="10" cellspacing="0" style="border-collapse: collapse; width:100%; text-align:center;">
-            
-            <thead style="background:#f2f2f2;">
-                <tr>
-                    <th style="width:80px;">Jam</th>
-                    @foreach ($haris as $hari)
-                        <th>{{ $hari->nama }}</th>
-                    @endforeach
-                </tr>
-            </thead>
+        {{-- TABLE CARD --}}
+        <div class="card shadow-sm border-0">
+            <div class="card-body p-0">
 
-            <tbody>
-                @foreach ($jams as $jam)
-                <tr>
-                    <td>
-                        <strong>{{ $jam->jam_ke }}</strong><br>
-                        <small>{{ $jam->mulai }} - {{ $jam->selesai }}</small>
-                    </td>
+                <div class="table-responsive">
 
-                    @foreach ($haris as $hari)
-                        @php
-                            $item = $jadwals[$hari->id][$jam->id] ?? null;
+                    <table class="table table-bordered mb-0 text-center align-middle">
 
-                            $isBentrok = false;
-                            $jp = null;
-                            $bg = '#f2f2f2'; // default kosong
+                        <thead class="table-light">
+                            <tr>
+                                <th style="width:100px;">Jam</th>
+                                @foreach ($haris as $hari)
+                                    <th>{{ $hari->nama }}</th>
+                                @endforeach
+                            </tr>
+                        </thead>
 
-                            if ($item) {
-                                $listGuru = $occupiedGuru[$hari->id][$jam->id] ?? [];
+                        <tbody>
+                            @foreach ($jams as $jam)
+                            <tr>
+                                <td class="bg-light">
+                                    <strong>{{ $jam->jam_ke }}</strong><br>
+                                    <small>{{ $jam->mulai }} - {{ $jam->selesai }}</small>
+                                </td>
 
-                                if (count(array_filter($listGuru, fn($g) => $g == $item->guru_id)) > 1) {
-                                    $isBentrok = true;
-                                }
+                                @foreach ($haris as $hari)
+                                    @php
+                                        $item = $jadwals[$hari->id][$jam->id] ?? null;
 
-                                // ambil kode_mapel
-                                $kode = $item->mapel->kode_mapel ?? null;
+                                        $isBentrok = false;
+                                        $jp = null;
+                                        $bg = '#f8f9fa';
 
-                                // ambil JP status
-                                $jp = $jpStatus[$kode] ?? null;
+                                        if ($item) {
+                                            $listGuru = $occupiedGuru[$hari->id][$jam->id] ?? [];
 
-                                // PRIORITAS WARNA
-                                if ($isBentrok) {
-                                    $bg = '#f8d7da'; // merah
-                                } elseif ($jp) {
-                                    if ($jp['status'] === 'lebih') {
-                                        $bg = '#f8d7da'; // merah
-                                    } elseif ($jp['current'] >= $jp['target']) {
-                                        $bg = '#f5c6cb'; // merah muda (full)
-                                    } elseif ($jp['current'] >= ($jp['target'] - 1)) {
-                                        $bg = '#fff3cd'; // kuning (hampir)
-                                    } else {
-                                        $bg = '#d4edda'; // hijau
-                                    }
-                                } else {
-                                    $bg = '#d4edda';
-                                }
-                            }
-                        @endphp
+                                            if (count(array_filter($listGuru, fn($g) => $g == $item->guru_id)) > 1) {
+                                                $isBentrok = true;
+                                            }
 
-                        <td style="background: {{ $bg }};">
-                            <a href="{{ url("/tu/jadwal/$kelasId/$hari->id/$jam->id/edit") }}"
-                               style="text-decoration:none; color:black; display:block; padding:10px;">
+                                            $kode = $item->mapel->kode_mapel ?? null;
+                                            $jp = $jpStatus[$kode] ?? null;
 
-                                @if ($item)
-                                    <div style="font-weight:bold;">
-                                        {{ $item->mapel?->nama_mapel ?? '-' }}
-                                    </div>
+                                            if ($isBentrok) {
+                                                $bg = '#f8d7da';
+                                            } elseif ($jp) {
+                                                if ($jp['status'] === 'lebih') {
+                                                    $bg = '#f8d7da';
+                                                } elseif ($jp['current'] >= $jp['target']) {
+                                                    $bg = '#f5c6cb';
+                                                } elseif ($jp['current'] >= ($jp['target'] - 1)) {
+                                                    $bg = '#fff3cd';
+                                                } else {
+                                                    $bg = '#d4edda';
+                                                }
+                                            } else {
+                                                $bg = '#d4edda';
+                                            }
+                                        }
+                                    @endphp
 
-                                    <small>
-                                        {{ $item->guru?->nama ?? '-' }}
-                                    </small>
+                                    <td style="background: {{ $bg }}; cursor:pointer;">
 
-                                    @if ($jp)
-                                        <div style="font-size:11px; color:#555;">
-                                            ({{ $jp['current'] }}/{{ $jp['target'] }})
-                                        </div>
-                                    @endif
+                                        <a href="{{ url("/tu/jadwal/$kelasId/$hari->id/$jam->id/edit") }}"
+                                           class="d-block text-decoration-none text-dark p-2">
 
-                                    @if ($isBentrok)
-                                        <div style="color:red; font-size:12px;">
-                                            ⚠ Bentrok
-                                        </div>
-                                    @endif
+                                            @if ($item)
+                                                <div class="fw-bold">
+                                                    {{ $item->mapel?->nama_mapel ?? '-' }}
+                                                </div>
 
-                                @else
-                                    <span style="color:#aaa;">(kosong)</span>
-                                @endif
+                                                <small class="text-muted d-block">
+                                                    {{ $item->guru?->nama ?? '-' }}
+                                                </small>
 
-                            </a>
-                        </td>
-                    @endforeach
-                </tr>
-                @endforeach
-            </tbody>
+                                                @if ($jp)
+                                                    <div style="font-size:11px;" class="text-secondary">
+                                                        ({{ $jp['current'] }}/{{ $jp['target'] }})
+                                                    </div>
+                                                @endif
 
-        </table>
+                                                @if ($isBentrok)
+                                                    <div class="text-danger small">
+                                                        ⚠ Bentrok
+                                                    </div>
+                                                @endif
+                                            @else
+                                                <span class="text-muted">(kosong)</span>
+                                            @endif
+
+                                        </a>
+
+                                    </td>
+                                @endforeach
+                            </tr>
+                            @endforeach
+                        </tbody>
+
+                    </table>
+
+                </div>
+
+            </div>
+        </div>
 
     @endif
 
 </div>
+
 @endsection

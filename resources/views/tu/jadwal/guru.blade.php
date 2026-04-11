@@ -3,122 +3,155 @@
 @section('title', 'Jadwal Guru')
 
 @section('content')
-<form method="GET">
-    <label>Pilih Guru</label>
-    <select name="guru_id" onchange="this.form.submit()">
-        <option value="">-- Pilih Guru --</option>
-        @foreach ($gurus as $g)
-            <option value="{{ $g->id }}"
-                {{ $guruId == $g->id ? 'selected' : '' }}>
-                {{ $g->nama }}
-            </option>
-        @endforeach
-    </select>
-</form>
 
-@if ($guruId)
-    @php
-        $guru = $gurus->firstWhere('id', $guruId);
-    @endphp
+<div class="container-fluid py-3">
 
-    <div style="margin:10px 0;">
-        <strong>Guru:</strong> {{ $guru?->nama ?? '-' }}
+    {{-- HEADER --}}
+    <div class="d-flex justify-content-between align-items-center mb-4">
+    
+    <div>
+        <h4 class="fw-bold mb-0">Jadwal Guru</h4>
+        <small class="text-muted">Monitoring beban mengajar guru</small>
     </div>
-@endif
 
-@if ($guruId)
-    <div style="margin:10px 0;">
-        <strong>Total Jam Mengajar:</strong> 
-        <span style="
-            color: 
-                {{ $totalJam > 30 ? 'red' : ($totalJam > 24 ? 'orange' : 'green') }};
-            font-weight: bold;
-        ">
-            {{ $totalJam }} jam
-        </span>
+    <a href="{{ route('tu.jadwal.index') }}" class="btn btn-secondary btn-sm">
+        ← Kembali
+    </a>
 
-        @if ($totalJam > 30)
-            <small style="color:red;">(Berat)</small>
-        @elseif ($totalJam > 24)
-            <small style="color:orange;">(Mulai Overload)</small>
-        @endif
+</div>
+
+    {{-- FILTER --}}
+    <div class="card shadow-sm border-0 mb-4">
+        <div class="card-body">
+
+            <form method="GET" class="row align-items-end g-3">
+                <div class="col-md-4">
+                    <label class="form-label">Pilih Guru</label>
+                    <select name="guru_id" onchange="this.form.submit()" class="form-control">
+                        <option value="">-- Pilih Guru --</option>
+                        @foreach ($gurus as $g)
+                            <option value="{{ $g->id }}"
+                                {{ $guruId == $g->id ? 'selected' : '' }}>
+                                {{ $g->nama }}
+                            </option>
+                        @endforeach
+                    </select>
+                    
+                </div>
+            </form>
+
+        </div>
     </div>
-@endif
 
-@if ($guruId)
+    @if ($guruId)
+        @php
+            $guru = $gurus->firstWhere('id', $guruId);
+        @endphp
 
-<table border="1" cellpadding="10" cellspacing="0" style="border-collapse: collapse; width:100%; text-align:center;">
+        {{-- INFO --}}
+        <div class="mb-3">
+            <strong>Guru:</strong> {{ $guru?->nama ?? '-' }}
+        </div>
 
-    <thead style="background:#f2f2f2;">
-        <tr>
-            <th>Jam</th>
-            @foreach ($haris as $hari)
-                <th>{{ $hari->nama }}</th>
-            @endforeach
-        </tr>
-    </thead>
+        <div class="mb-4">
+            <strong>Total Jam Mengajar:</strong> 
+            <span class="fw-bold
+                {{ $totalJam > 30 ? 'text-danger' : ($totalJam > 24 ? 'text-warning' : 'text-success') }}">
+                {{ $totalJam }} jam
+            </span>
 
-    <tbody>
-        @foreach ($jams as $jam)
-        <tr>
-            <td>
-                <strong>{{ $jam->jam_ke }}</strong><br>
-                <small>{{ $jam->mulai }} - {{ $jam->selesai }}</small>
-            </td>
+            @if ($totalJam > 30)
+                <small class="text-danger">(Berat)</small>
+            @elseif ($totalJam > 24)
+                <small class="text-warning">(Mulai Overload)</small>
+            @endif
+        </div>
 
-            @foreach ($haris as $hari)
-                @php
-                    $item = $jadwals[$hari->id][$jam->id] ?? null;
-                @endphp
+        {{-- TABLE --}}
+        <div class="card shadow-sm border-0">
+            <div class="card-body p-0">
 
-                @php
-                    $bg = '#f2f2f2';
+                <div class="table-responsive">
+                    <table class="table table-bordered mb-0 text-center align-middle">
 
-                    if ($item) {
-                        $kode = $item->mapel->kode_mapel ?? null;
-                        $jp = $jpStatus[$kode] ?? null;
+                        <thead class="table-light">
+                            <tr>
+                                <th style="width:100px;">Jam</th>
+                                @foreach ($haris as $hari)
+                                    <th>{{ $hari->nama }}</th>
+                                @endforeach
+                            </tr>
+                        </thead>
 
-                        if ($jp) {
-                            if ($jp['status'] === 'lebih') {
-                                $bg = '#f8d7da'; // merah
-                            } elseif ($jp['status'] === 'full') {
-                                $bg = '#fff3cd'; // kuning
-                            } else {
-                                $bg = '#d4edda'; // hijau
-                            }
-                        } else {
-                            $bg = '#d4edda';
-                        }
-                    }
-                @endphp
+                        <tbody>
+                            @foreach ($jams as $jam)
+                            <tr>
+                                <td class="bg-light">
+                                    <strong>{{ $jam->jam_ke }}</strong><br>
+                                    <small>{{ $jam->mulai }} - {{ $jam->selesai }}</small>
+                                </td>
 
-                <td style="background: {{ $bg }};">
-                    @if ($item)
-                        @if(isset($jpStatus[$item->mapel->kode_mapel]))
-                            @php $jp = $jpStatus[$item->mapel->kode_mapel]; @endphp
+                                @foreach ($haris as $hari)
+                                    @php
+                                        $item = $jadwals[$hari->id][$jam->id] ?? null;
 
-                            <div style="font-size:11px; color:#555;">
-                                ({{ $jp['current'] }}/{{ $jp['target'] }})
-                            </div>
-                        @endif
-                        <div style="font-weight:bold;">
-                            {{ $item->mapel?->nama_mapel }}
-                        </div>
+                                        $bg = '#f8f9fa';
 
-                        <small>
-                            {{ $item->kelas?->nama_kelas }}
-                        </small>
-                    @else
-                        <span style="color:#aaa;">(kosong)</span>
-                    @endif
-                </td>
+                                        if ($item) {
+                                            $kode = $item->mapel->kode_mapel ?? null;
+                                            $jp = $jpStatus[$kode] ?? null;
 
-            @endforeach
-        </tr>
-        @endforeach
-    </tbody>
+                                            if ($jp) {
+                                                if ($jp['status'] === 'lebih') {
+                                                    $bg = '#f8d7da';
+                                                } elseif ($jp['status'] === 'full') {
+                                                    $bg = '#fff3cd';
+                                                } else {
+                                                    $bg = '#d4edda';
+                                                }
+                                            } else {
+                                                $bg = '#d4edda';
+                                            }
+                                        }
+                                    @endphp
 
-</table>
+                                    <td style="background: {{ $bg }};">
 
-@endif
+                                        @if ($item)
+
+                                            @if(isset($jpStatus[$item->mapel->kode_mapel]))
+                                                @php $jp = $jpStatus[$item->mapel->kode_mapel]; @endphp
+                                                <div style="font-size:11px;" class="text-secondary">
+                                                    ({{ $jp['current'] }}/{{ $jp['target'] }})
+                                                </div>
+                                            @endif
+
+                                            <div class="fw-bold">
+                                                {{ $item->mapel?->nama_mapel }}
+                                            </div>
+
+                                            <small class="text-muted">
+                                                {{ $item->kelas?->nama_kelas }}
+                                            </small>
+
+                                        @else
+                                            <span class="text-muted">(kosong)</span>
+                                        @endif
+
+                                    </td>
+                                @endforeach
+                            </tr>
+                            @endforeach
+                        </tbody>
+
+                    </table>
+                </div>
+
+            </div>
+        </div>
+
+    @endif
+
+</div>
+
 @endsection

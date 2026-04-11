@@ -11,6 +11,8 @@ use App\Models\PenempatanSiswa;
 use App\Models\TahunAjaran;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use App\Models\WaliKelas;
+use App\Models\Guru;
 
 class KelasController extends Controller
 {
@@ -39,28 +41,31 @@ class KelasController extends Controller
      * ROMBEL INDEX — LIST ROMBEL DALAM 1 GRUP KELAS
      * =====================================================
      */
-    public function rombelIndex($kelasGrupId)
-    {
-        $kelasGrup = KelasGrup::with(['angkatan', 'kelasMaster'])
-            ->findOrFail($kelasGrupId);
+  public function rombelIndex($kelasGrupId)
+{
+    $kelasGrup = KelasGrup::with(['angkatan', 'kelasMaster'])
+        ->findOrFail($kelasGrupId);
 
-        $tahunAktif = TahunAjaran::where('aktif', 1)->firstOrFail();
+    $tahunAktif = TahunAjaran::where('aktif', 1)->firstOrFail();
 
-        $rombels = Kelas::where('kelas_grup_id', $kelasGrupId)
-            ->withCount([
-                'penempatan as siswa_count' => function ($q) use ($tahunAktif) {
-                    $q->where('tahun_ajaran_id', $tahunAktif->id)
-                    ->whereNull('tanggal_keluar');
-                }
-            ])
-            ->orderBy('nama_kelas')
-            ->get();
+    $rombels = Kelas::where('kelas_grup_id', $kelasGrupId)
+        ->with([
+            'waliKelas.guru' // 🔥 TAMBAHAN PENTING
+        ])
+        ->withCount([
+            'penempatan as siswa_count' => function ($q) use ($tahunAktif) {
+                $q->where('tahun_ajaran_id', $tahunAktif->id)
+                  ->whereNull('tanggal_keluar');
+            }
+        ])
+        ->orderBy('nama_kelas')
+        ->get();
 
-        return view('tu.kelas.rombel.index', compact(
-            'kelasGrup',
-            'rombels'
-        ));
-    }
+    return view('tu.kelas.rombel.index', compact(
+        'kelasGrup',
+        'rombels'
+    ));
+}
 
     /**
      * =====================================================
@@ -217,5 +222,51 @@ class KelasController extends Controller
         ]);
     }
 
+    public function wali($id)
+    {
+        $kelas = Kelas::with('waliKelas')->findOrFail($id);
+        $gurus = Guru::all();
+
+        $waliGuruIds = \App\Models\WaliKelas::pluck('guru_id')->toArray();
+
+        return view('tu.kelas.wali', compact(
+            'kelas',
+            'gurus',
+            'waliGuruIds'
+        ));
+    }
+
+
+public function storeWali(Request $request, $id)
+{
+    $request->validate([
+        'guru_id' => 'required|exists:guru,id'
+    ]);
+
+    
+    $exists = \App\Models\WaliKelas::where('guru_id', $request->guru_id)
+        ->where('kelas_id', '!=', $id)
+        ->exists();
+
+    if ($exists) {
+        return back()->withErrors([
+            'guru_id' => 'Guru sudah menjadi wali kelas lain'
+        ])->withInput();
+    }
+
+    // hapus lama
+    \App\Models\WaliKelas::where('kelas_id', $id)->delete();
+
+    // simpan baru
+    \App\Models\WaliKelas::create([
+        'kelas_id' => $id,
+        'guru_id' => $request->guru_id,
+    ]);
+
+    return redirect()
+        ->route('tu.kelas.rombel.index', $request->kelas_grup_id)
+        ->with('success', 'Wali kelas berhasil disimpan');
+    
+}
 
 }

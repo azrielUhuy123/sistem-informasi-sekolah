@@ -88,8 +88,13 @@ Route::middleware(['auth', 'role:tu'])
                 Route::delete('/{id}/force-delete', [KelasController::class, 'forceDelete'])->name('forceDelete');
                 Route::post('/bulk', [KelasController::class, 'bulkAction'])->name('bulk');
                 Route::get('/search/ajax', [KelasController::class, 'ajaxSearch'])->name('search');
+                Route::get('/{id}/wali', [KelasController::class, 'wali'])
+                    ->name('wali');
+            Route::post('/{id}/wali', [KelasController::class, 'storeWali'])
+                    ->name('wali.store');
             });
 
+            
         /*
         |--------------------------------------------------------------------------
         | SISWA

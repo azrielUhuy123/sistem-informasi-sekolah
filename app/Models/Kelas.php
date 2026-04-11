@@ -49,7 +49,7 @@ public function siswaAktif()
 }
 public function waliKelas()
 {
-    return $this->hasOne(WaliKelas::class);
+    return $this->hasOne(\App\Models\WaliKelas::class, 'kelas_id');
 }
 
 }
