@@ -251,49 +251,51 @@ class JadwalController extends Controller
             ->with('success', 'Jadwal berhasil disimpan');
     }
     public function jadwalGuru(Request $request)
-    {
-        $guruId = $request->guru_id;
+{
+    $guruId = $request->guru_id;
+    $kelasId = $request->kelas_id;
 
-        $gurus = Guru::all();
-        $haris = HariSekolah::orderBy('urutan')->get();
-        $jams = JamPelajaran::orderBy('jam_ke')->get();
+    $gurus = Guru::all();
+    $kelasList = Kelas::orderBy('nama_kelas')->get();
 
-        $jadwals = [];
+    $haris = HariSekolah::orderBy('urutan')->get();
+    $jams = JamPelajaran::orderBy('jam_ke')->get();
 
-        if ($guruId) {
-            $data = Jadwal::with(['kelas', 'mapel'])
-                ->where('guru_id', $guruId)
-                ->get();
+    $jadwals = [];
+    $totalJam = 0;
+    $jpStatus = [];
 
-            foreach ($data as $j) {
-                $jadwals[$j->hari_id][$j->jam_pelajaran_id] = $j;
-            }
+    if ($guruId && $kelasId) {
+
+        // ambil jadwal berdasarkan guru + kelas
+        $data = Jadwal::with(['kelas', 'mapel'])
+            ->where('guru_id', $guruId)
+            ->where('kelas_id', $kelasId)
+            ->get();
+
+        foreach ($data as $j) {
+            $jadwals[$j->hari_id][$j->jam_pelajaran_id] = $j;
         }
 
-        $jpStatus = [];
+        // total jam khusus guru + kelas
+        $totalJam = $data->count();
 
-        if ($guruId) {
-            $jpStatus = app(GetJPStatus::class)->executeByGuru((int) $guruId);
-        }
-
-
-        $totalJam = 0;
-
-        if ($guruId) {
-            $totalJam = Jadwal::where('guru_id', $guruId)->count();
-        }
-
-        
-        return view('tu.jadwal.guru', compact(
-            'gurus',
-            'guruId',
-            'haris',
-            'jams',
-            'jadwals',
-            'totalJam',
-            'jpStatus'
-        ));
+        // status JP (optional tapi bagus tetap ada)
+        $jpStatus = app(GetJPStatus::class)->execute($kelasId);
     }
+
+    return view('tu.jadwal.guru', compact(
+        'gurus',
+        'kelasList',
+        'guruId',
+        'kelasId',
+        'haris',
+        'jams',
+        'jadwals',
+        'totalJam',
+        'jpStatus'
+    ));
+}
 
     private function getFaseFromKelas($namaKelas)
     {

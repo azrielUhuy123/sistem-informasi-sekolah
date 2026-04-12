@@ -451,7 +451,7 @@
         </a>
 
         <a class="menu-item {{ request()->is('tu/penempatan-siswa/preview-naik-kelas') ? 'active' : '' }}"
-            href="{{ route('tu.penempatan-siswa.naik-kelas.index') }}"></a>
+            href="{{ route('tu.penempatan-siswa.naik-kelas.index') }}">
             <div class="menu-left">
                 <i class="bi bi-arrow-up-circle"></i>
                 <span>Naik Kelas</span>
@@ -601,6 +601,43 @@ document.addEventListener("DOMContentLoaded", function () {
             }
         });
 
+        // 🔥 Restore sidebar state
+document.addEventListener("DOMContentLoaded", function () {
+
+    const menus = [
+        { id: 'menuSekolah', arrow: 'arrowSekolah' },
+        { id: 'menuProses', arrow: 'arrowProses' },
+        { id: 'menuArsip', arrow: 'arrowArsip' }
+    ];
+
+    menus.forEach(m => {
+        if (localStorage.getItem(m.id) === "open") {
+            const menu = document.getElementById(m.id);
+            const arrow = document.getElementById(m.arrow);
+
+            if (menu) menu.classList.add("show");
+            if (arrow) arrow.classList.add("rotate");
+        }
+    });
+
+});
+
+// 🔥 Auto open kalau ada menu active
+document.addEventListener("DOMContentLoaded", function () {
+
+    const submenus = document.querySelectorAll(".submenu");
+
+    submenus.forEach(menu => {
+        if (menu.querySelector(".menu-item.active")) {
+            menu.classList.add("show");
+
+            const arrow = menu.previousElementSibling.querySelector(".dropdown-arrow");
+            if (arrow) arrow.classList.add("rotate");
+        }
+    });
+
+});
+
 
 
     }
@@ -652,12 +689,16 @@ function toggleMenu(menuId, arrowId) {
     const menu = document.getElementById(menuId);
     const arrow = document.getElementById(arrowId);
 
-    if (menu.style.display === "block") {
-        menu.style.display = "none";
+    if (menu.classList.contains("show")) {
+        menu.classList.remove("show");
         arrow.classList.remove("rotate");
+
+        localStorage.removeItem(menuId);
     } else {
-        menu.style.display = "block";
+        menu.classList.add("show");
         arrow.classList.add("rotate");
+
+        localStorage.setItem(menuId, "open");
     }
 }
 </script>

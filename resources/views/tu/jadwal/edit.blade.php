@@ -80,7 +80,7 @@
 
                 @csrf
 
-                <input type="hidden" name="mapel_id" value="{{ request('mapel_id') }}">
+                <input type="hidden" name="mapel_id" value="{{ $mapelId }}">
 
                 <div class="mb-3">
                     <label class="form-label">Pilih Guru</label>

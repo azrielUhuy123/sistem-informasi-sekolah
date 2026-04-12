@@ -9,11 +9,19 @@
         Kelas {{ $kelasGrup->tingkat }} – Angkatan {{ $kelasGrup->angkatan->tahun }}
     </h5>
 
-    
-    <a href="{{ route('tu.kelas.rombel.create', $kelasGrup->id) }}"
-       class="btn btn-primary btn-sm">
-        + Tambah Rombel
-    </a>
+    <div class="d-flex gap-2">
+        {{-- BUTTON KEMBALI --}}
+        <a href="{{ route('tu.kelas.index') }}"
+           class="btn btn-secondary btn-sm">
+            ← Kembali
+        </a>
+
+        {{-- BUTTON TAMBAH --}}
+        <a href="{{ route('tu.kelas.rombel.create', $kelasGrup->id) }}"
+           class="btn btn-primary btn-sm">
+            + Tambah Rombel
+        </a>
+    </div>
 </div>
 @if(session('import_report'))
     <div class="alert alert-info">

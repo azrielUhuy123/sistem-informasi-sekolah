@@ -8,26 +8,26 @@
 
     {{-- HEADER --}}
     <div class="d-flex justify-content-between align-items-center mb-4">
-    
-    <div>
-        <h4 class="fw-bold mb-0">Jadwal Guru</h4>
-        <small class="text-muted">Monitoring beban mengajar guru</small>
+        <div>
+            <h4 class="fw-bold mb-0">Jadwal Guru</h4>
+            <small class="text-muted">Monitoring beban mengajar guru per kelas</small>
+        </div>
+
+        <a href="{{ route('tu.jadwal.index') }}" class="btn btn-secondary btn-sm">
+            ← Kembali
+        </a>
     </div>
-
-    <a href="{{ route('tu.jadwal.index') }}" class="btn btn-secondary btn-sm">
-        ← Kembali
-    </a>
-
-</div>
 
     {{-- FILTER --}}
     <div class="card shadow-sm border-0 mb-4">
         <div class="card-body">
 
             <form method="GET" class="row align-items-end g-3">
+
+                {{-- GURU --}}
                 <div class="col-md-4">
                     <label class="form-label">Pilih Guru</label>
-                    <select name="guru_id" onchange="this.form.submit()" class="form-control">
+                    <select name="guru_id" class="form-control">
                         <option value="">-- Pilih Guru --</option>
                         @foreach ($gurus as $g)
                             <option value="{{ $g->id }}"
@@ -36,23 +36,49 @@
                             </option>
                         @endforeach
                     </select>
-                    
                 </div>
+
+                {{-- KELAS --}}
+                <div class="col-md-4">
+                    <label class="form-label">Pilih Kelas</label>
+                    <select name="kelas_id" class="form-control">
+                        <option value="">-- Pilih Kelas --</option>
+                        @foreach ($kelasList as $k)
+                            <option value="{{ $k->id }}"
+                                {{ $kelasId == $k->id ? 'selected' : '' }}>
+                                {{ $k->nama_kelas }}
+                            </option>
+                        @endforeach
+                    </select>
+                </div>
+
+                {{-- BUTTON --}}
+                <div class="col-md-2">
+                    <button class="btn btn-primary w-100">
+                        Tampilkan
+                    </button>
+                </div>
+
             </form>
 
         </div>
     </div>
 
-    @if ($guruId)
+    {{-- HASIL --}}
+    @if ($guruId && $kelasId)
+
         @php
             $guru = $gurus->firstWhere('id', $guruId);
+            $kelas = $kelasList->firstWhere('id', $kelasId);
         @endphp
 
         {{-- INFO --}}
         <div class="mb-3">
-            <strong>Guru:</strong> {{ $guru?->nama ?? '-' }}
+            <strong>Guru:</strong> {{ $guru?->nama ?? '-' }} <br>
+            <strong>Kelas:</strong> {{ $kelas?->nama_kelas ?? '-' }}
         </div>
 
+        {{-- TOTAL JAM --}}
         <div class="mb-4">
             <strong>Total Jam Mengajar:</strong> 
             <span class="fw-bold
@@ -76,7 +102,7 @@
 
                         <thead class="table-light">
                             <tr>
-                                <th style="width:100px;">Jam</th>
+                                <th style="width:120px;">Jam</th>
                                 @foreach ($haris as $hari)
                                     <th>{{ $hari->nama }}</th>
                                 @endforeach
@@ -103,11 +129,11 @@
 
                                             if ($jp) {
                                                 if ($jp['status'] === 'lebih') {
-                                                    $bg = '#f8d7da';
+                                                    $bg = '#f8d7da'; // merah
                                                 } elseif ($jp['status'] === 'full') {
-                                                    $bg = '#fff3cd';
+                                                    $bg = '#fff3cd'; // kuning
                                                 } else {
-                                                    $bg = '#d4edda';
+                                                    $bg = '#d4edda'; // hijau
                                                 }
                                             } else {
                                                 $bg = '#d4edda';
@@ -119,17 +145,20 @@
 
                                         @if ($item)
 
+                                            {{-- STATUS JP --}}
                                             @if(isset($jpStatus[$item->mapel->kode_mapel]))
                                                 @php $jp = $jpStatus[$item->mapel->kode_mapel]; @endphp
-                                                <div style="font-size:11px;" class="text-secondary">
+                                                <div class="text-secondary" style="font-size:11px;">
                                                     ({{ $jp['current'] }}/{{ $jp['target'] }})
                                                 </div>
                                             @endif
 
+                                            {{-- MAPEL --}}
                                             <div class="fw-bold">
                                                 {{ $item->mapel?->nama_mapel }}
                                             </div>
 
+                                            {{-- KELAS --}}
                                             <small class="text-muted">
                                                 {{ $item->kelas?->nama_kelas }}
                                             </small>
