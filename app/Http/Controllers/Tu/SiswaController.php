@@ -129,12 +129,12 @@ class SiswaController extends Controller
                 'nama_wali'      => $validated['nama_wali'] ?? null,
                 'telepon_wali'   => $validated['telepon_wali'] ?? null,
             ]);
-            $tahunAjaranAktif = \App\Models\TahunAjaran::where('aktif', 1)->firstOrFail();
+            $tahunAktif = TahunAjaran::aktif();
             // buat penempatan aktif
             PenempatanSiswa::create([
                 'siswa_id'        => $siswa->id,
                 'kelas_id'        => $validated['kelas_id'],
-                'tahun_ajaran_id' => TahunAjaran::where('aktif', 1)->first()->id,
+                'tahun_ajaran_id' => $tahunAktif->id,
                 'tanggal_masuk'   => now(),
                 'tanggal_keluar'  => null,
             ]);

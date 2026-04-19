@@ -46,7 +46,11 @@ class KelasController extends Controller
     $kelasGrup = KelasGrup::with(['angkatan', 'kelasMaster'])
         ->findOrFail($kelasGrupId);
 
-    $tahunAktif = TahunAjaran::where('aktif', 1)->firstOrFail();
+    $tahunAktif = TahunAjaran::aktif();
+
+    if (!$tahunAktif) {
+        abort(500, 'Tahun ajaran aktif belum diset');
+    }
 
     $rombels = Kelas::where('kelas_grup_id', $kelasGrupId)
         ->with([
@@ -183,7 +187,11 @@ class KelasController extends Controller
     }
     public function showRombel($id)
     {
-        $tahunAktif = TahunAjaran::where('aktif', 1)->firstOrFail();
+        $tahunAktif = TahunAjaran::aktif();
+
+        if (!$tahunAktif) {
+            abort(500, 'Tahun ajaran aktif belum diset');
+        }
 
         $rombel = Kelas::with('kelasGrup.angkatan')
             ->findOrFail($id);

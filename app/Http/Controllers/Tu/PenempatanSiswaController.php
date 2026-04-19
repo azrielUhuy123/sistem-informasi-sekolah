@@ -18,7 +18,11 @@ class PenempatanSiswaController extends Controller
      */
     public function create(Request $request)
     {
-        $tahunAktif = TahunAjaran::where('aktif', 1)->firstOrFail();
+        $tahunAktif = TahunAjaran::aktif();
+
+        if (!$tahunAktif) {
+            abort(500, 'Tahun ajaran aktif belum diset');
+        }
 
         // Ambil siswa yang BELUM punya penempatan aktif
         $siswa = Siswa::whereDoesntHave('penempatan', function ($q) use ($tahunAktif) {
@@ -45,7 +49,11 @@ class PenempatanSiswaController extends Controller
             'kelas_id' => 'required|exists:kelas,id',
         ]);
 
-        $tahunAktif = TahunAjaran::where('aktif', 1)->firstOrFail();
+        $tahunAktif = TahunAjaran::aktif();
+
+        if (!$tahunAktif) {
+            abort(500, 'Tahun ajaran aktif belum diset');
+        }
 
         DB::transaction(function () use ($request, $tahunAktif) {
 
@@ -76,7 +84,11 @@ class PenempatanSiswaController extends Controller
             'mapping'      => 'required|array'
         ]);
 
-        $tahunAktif = TahunAjaran::where('aktif', 1)->firstOrFail();
+        $tahunAktif = TahunAjaran::aktif();
+
+        if (!$tahunAktif) {
+            abort(500, 'Tahun ajaran aktif belum diset');
+        }
 
         DB::transaction(function () use ($request, $tahunAktif) {
 
@@ -112,7 +124,11 @@ class PenempatanSiswaController extends Controller
     }
     public function indexNaikKelas(Request $request)
     {
-        $tahunAktif = TahunAjaran::where('aktif', 1)->firstOrFail();
+        $tahunAktif = TahunAjaran::aktif();
+
+        if (!$tahunAktif) {
+            abort(500, 'Tahun ajaran aktif belum diset');
+        }
 
         $tingkatList = \App\Models\KelasMaster::orderBy('tingkat')
             ->pluck('tingkat');
@@ -151,7 +167,11 @@ class PenempatanSiswaController extends Controller
             'tingkat' => 'required|integer'
         ]);
 
-        $tahunAktif = TahunAjaran::where('aktif', 1)->firstOrFail();
+        $tahunAktif = TahunAjaran::aktif();
+
+        if (!$tahunAktif) {
+            abort(500, 'Tahun ajaran aktif belum diset');
+        }
 
         $tingkatAsal = $request->tingkat;
         $tingkatTujuan = $tingkatAsal + 1;

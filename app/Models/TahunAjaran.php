@@ -23,5 +23,9 @@ public static function aktif()
     return static::where('aktif', true)->first();
 }
 
+public function scopeAktif($query)
+{
+    return $query->where('aktif', true);
+}
 
 }

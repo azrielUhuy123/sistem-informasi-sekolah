@@ -25,7 +25,14 @@ class Kelas extends Model
 
     public function siswa()
     {
-        return $this->hasMany(Siswa::class, 'kelas_id');
+        return $this->hasManyThrough(
+            Siswa::class,
+            PenempatanSiswa::class,
+            'kelas_id', // FK di penempatan
+            'id',       // PK di siswa
+            'id',       // PK di kelas
+            'siswa_id'  // FK ke siswa
+        )->whereNull('penempatan_siswa.tanggal_keluar');
     }
 
     public function getAngkatanIdAttribute()

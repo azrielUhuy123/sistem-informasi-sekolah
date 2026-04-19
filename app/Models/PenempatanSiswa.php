@@ -34,12 +34,13 @@ class PenempatanSiswa extends Model
     }
     public function scopeTahunAktif($query)
     {
-        $tahunAktif = TahunAjaran::aktif();
+        $tahunAktif = \App\Models\TahunAjaran::aktif();
 
         if (!$tahunAktif) {
             return $query->whereRaw('1 = 0');
         }
 
-        return $query->where('tahun_ajaran_id', $tahunAktif->id);
+        return $query->where('tahun_ajaran_id', $tahunAktif->id)
+                    ->whereNull('tanggal_keluar');
     }
 }
