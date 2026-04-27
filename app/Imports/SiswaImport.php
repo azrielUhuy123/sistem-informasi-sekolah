@@ -20,10 +20,14 @@ class SiswaImport implements ToCollection, WithHeadingRow
 
     public function __construct()
     {
-        $this->tahunAjaran = TahunAjaran::where('aktif', 1)->first();
+        $this->tahunAjaran = TahunAjaran::aktif();
 
         if (!$this->tahunAjaran) {
             throw new \Exception("Tidak ada tahun ajaran aktif.");
+        }
+
+        if ($this->tahunAjaran->status !== 'aktif') {
+            throw new \Exception("Import hanya boleh saat tahun ajaran AKTIF (awal tahun).");
         }
     }
 
@@ -39,6 +43,8 @@ class SiswaImport implements ToCollection, WithHeadingRow
         if (!$angkatan) {
             throw new \Exception("Angkatan untuk tahun ajaran aktif tidak ditemukan.");
         }
+
+
         DB::transaction(function () use ($rows, $angkatan) {
             $total = 0;
             $created = 0;
@@ -80,14 +86,10 @@ class SiswaImport implements ToCollection, WithHeadingRow
                 ]);
 
                 // validasi isi baris
-                $jk = strtoupper(trim($row['jenis_kelamin']));
+                $jk = $this->normalizeJK($row['jenis_kelamin']);
 
-                if (!in_array($jk, ['L','P'])) {
-                    throw new \Exception("Jenis kelamin hanya boleh L atau P pada NIS {$nis}");
-                }
-
-                if (strlen($nisn) != 10) {
-                    throw new \Exception("NISN harus 10 digit pada NIS {$nis}");
+                if (!is_numeric($nisn) || strlen($nisn) != 10) {
+                    throw new \Exception("NISN harus 10 digit angka pada NIS {$nis}");
                 }
                 
                 //handle tanggal lahir yang bisa berupa string atau excel date
@@ -121,7 +123,7 @@ class SiswaImport implements ToCollection, WithHeadingRow
                 }
                 
                 // Buat atau ambil siswa
-                $siswa = Siswa::updateOrCreate(
+                $siswa = Siswa::firstOrCreate(
                     ['nis' => $nis],
                     [
                         'nisn'          => $nisn,
@@ -171,5 +173,14 @@ class SiswaImport implements ToCollection, WithHeadingRow
             'updated' => $updated
             ]);
         });
+    }
+    private function normalizeJK($value)
+    {
+        $v = strtoupper(trim($value));
+
+        if (in_array($v, ['L', 'LAKI-LAKI'])) return 'L';
+        if (in_array($v, ['P', 'PEREMPUAN'])) return 'P';
+
+        throw new \Exception("Jenis kelamin tidak valid: {$value}");
     }
 }

@@ -179,6 +179,13 @@ Route::middleware(['auth', 'role:tu'])
         Route::delete('/tahun/{id}/force-delete', [TahunAjaranController::class, 'forceDelete'])->name('tahun.forceDelete');
         Route::get('/tahun/{id}/detail', [TahunAjaranController::class, 'detail'])->name('tahun.detail');
         Route::resource('tahun', TahunAjaranController::class);
+        Route::post('/tahun/transisi',
+            [TahunAjaranController::class, 'masukTransisi']
+        )->name('tahun.transisi');
+
+        Route::post('/tahun/tutup',
+            [TahunAjaranController::class, 'tutupTahun']
+        )->name('tahun.tutup');
 
         /*
         |--------------------------------------------------------------------------

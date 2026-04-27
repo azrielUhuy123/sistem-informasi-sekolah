@@ -25,38 +25,45 @@ class Kelas extends Model
 
     public function siswa()
     {
+        $tahunAktif = \App\Models\TahunAjaran::aktif();
+
         return $this->hasManyThrough(
             Siswa::class,
             PenempatanSiswa::class,
-            'kelas_id', // FK di penempatan
-            'id',       // PK di siswa
-            'id',       // PK di kelas
-            'siswa_id'  // FK ke siswa
-        )->whereNull('penempatan_siswa.tanggal_keluar');
+            'kelas_id',
+            'id',
+            'id',
+            'siswa_id'
+        )
+        ->where('penempatan_siswa.tahun_ajaran_id', $tahunAktif?->id)
+        ->whereNull('penempatan_siswa.tanggal_keluar');
     }
 
     public function getAngkatanIdAttribute()
-{
-    return $this->kelasGrup?->angkatan_id;
-}
+    {
+        return $this->kelasGrup?->angkatan_id;
+    }
 
-public function getTingkatAttribute()
-{
-    return $this->kelasGrup?->kelasMaster?->tingkat;
-}
-public function penempatan()
-{
-    return $this->hasMany(PenempatanSiswa::class);
-}
+    public function getTingkatAttribute()
+    {
+        return $this->kelasGrup?->kelasMaster?->tingkat;
+    }
+    public function penempatan()
+    {
+        return $this->hasMany(PenempatanSiswa::class);
+    }
 
-public function siswaAktif()
-{
-    return $this->hasMany(PenempatanSiswa::class)
-        ->whereNull('tanggal_keluar');
-}
-public function waliKelas()
-{
-    return $this->hasOne(\App\Models\WaliKelas::class, 'kelas_id');
-}
+    public function siswaAktif()
+    {
+        $tahunAktif = \App\Models\TahunAjaran::aktif();
+
+        return $this->hasMany(PenempatanSiswa::class)
+            ->where('tahun_ajaran_id', $tahunAktif?->id)
+            ->whereNull('tanggal_keluar');
+    }
+    public function waliKelas()
+    {
+        return $this->hasOne(\App\Models\WaliKelas::class, 'kelas_id');
+    }
 
 }

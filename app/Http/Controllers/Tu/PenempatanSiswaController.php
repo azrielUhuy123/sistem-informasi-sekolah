@@ -54,15 +54,25 @@ class PenempatanSiswaController extends Controller
         if (!$tahunAktif) {
             abort(500, 'Tahun ajaran aktif belum diset');
         }
+        
+        $exists = PenempatanSiswa::where('siswa_id', $request->siswa_id)
+            ->where('tahun_ajaran_id', $tahunAktif->id)
+            ->whereNull('tanggal_keluar')
+            ->exists();
+
+        if ($exists) {
+            throw new \Exception("Siswa sudah punya penempatan aktif di tahun ini");
+        }
 
         DB::transaction(function () use ($request, $tahunAktif) {
 
             // Tutup penempatan aktif lama (jika ada)
             PenempatanSiswa::where('siswa_id', $request->siswa_id)
-                ->whereNull('tanggal_keluar')
-                ->update([
-                    'tanggal_keluar' => now()
-                ]);
+            ->where('tahun_ajaran_id', $tahunAktif->id)
+            ->whereNull('tanggal_keluar')
+            ->update([
+                'tanggal_keluar' => now()
+            ]);
 
             // Buat penempatan baru
             PenempatanSiswa::create([
@@ -80,41 +90,52 @@ class PenempatanSiswaController extends Controller
     public function naikKelas(Request $request)
     {
         $request->validate([
-            'tingkat_asal' => 'required|integer',
-            'mapping'      => 'required|array'
+            'mapping' => 'required|array',
+            'siswa'   => 'required|array'
         ]);
 
-        $tahunAktif = TahunAjaran::aktif();
+        $tahun = TahunAjaran::aktif();
 
-        if (!$tahunAktif) {
-            abort(500, 'Tahun ajaran aktif belum diset');
+        if (!$tahun) {
+            abort(500, 'Tidak ada tahun ajaran aktif');
         }
 
-        DB::transaction(function () use ($request, $tahunAktif) {
+        if ($tahun->status !== 'transisi') {
+            abort(403, 'Naik kelas hanya boleh saat masa transisi.');
+        }
 
-            foreach ($request->mapping as $rombelAsalId => $rombelTujuanId) {
+        DB::transaction(function () use ($request, $tahun) {
 
-                // Ambil semua penempatan aktif di rombel asal
-                $penempatanAktif = PenempatanSiswa::where('kelas_id', $rombelAsalId)
-                    ->where('tahun_ajaran_id', $tahunAktif->id)
+            foreach ($request->siswa as $penempatanId => $value) {
+
+                $item = PenempatanSiswa::where('id', $penempatanId)
+                    ->where('tahun_ajaran_id', $tahun->id)
                     ->whereNull('tanggal_keluar')
-                    ->get();
+                    ->first();
 
-                foreach ($penempatanAktif as $item) {
-
-                    // Tutup penempatan lama
-                    $item->update([
-                        'tanggal_keluar' => now()
-                    ]);
-
-                    // Buat penempatan baru
-                    PenempatanSiswa::create([
-                        'siswa_id'        => $item->siswa_id,
-                        'kelas_id'        => $rombelTujuanId,
-                        'tahun_ajaran_id' => $tahunAktif->id,
-                        'tanggal_masuk'   => now(),
-                    ]);
+                if (!$item || $item->tanggal_keluar) {
+                    continue;
                 }
+
+                // tutup lama
+                $item->update([
+                    'tanggal_keluar' => now()
+                ]);
+
+                $tujuan = $request->mapping[$item->kelas_id] ?? null;
+
+                // kalau tidak ada tujuan → LULUS
+                if (!$tujuan) {
+                    continue;
+                }
+
+                // buat penempatan baru
+                PenempatanSiswa::create([
+                    'siswa_id'        => $item->siswa_id,
+                    'kelas_id'        => $tujuan,
+                    'tahun_ajaran_id' => $tahun->id,
+                    'tanggal_masuk'   => now(),
+                ]);
             }
         });
 
@@ -206,7 +227,10 @@ class PenempatanSiswaController extends Controller
 
     public function keluarkan($id)
     {
-        $penempatan = PenempatanSiswa::whereNull('tanggal_keluar')
+        $tahunAktif = TahunAjaran::aktif();
+
+        $penempatan = PenempatanSiswa::where('tahun_ajaran_id', $tahunAktif->id)
+            ->whereNull('tanggal_keluar')
             ->findOrFail($id);
 
         $penempatan->update([

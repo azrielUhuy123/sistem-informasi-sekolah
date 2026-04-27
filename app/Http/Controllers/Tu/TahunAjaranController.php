@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Tu;
 use App\Http\Controllers\Controller;
 use App\Models\TahunAjaran;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 
 class TahunAjaranController extends Controller
 {
@@ -27,7 +28,7 @@ class TahunAjaranController extends Controller
         if ($request->q) {
             $query->where(function ($q) use ($request) {
                 $q->where('tahun', 'like', "%{$request->q}%")
-                  ->orWhere('aktif', 'like', "%{$request->q}%");
+                  ->orWhere('status', 'like', "%{$request->q}%");
             });
         }
 
@@ -35,7 +36,7 @@ class TahunAjaranController extends Controller
         $sort  = $request->sort ?? 'id';
         $order = $request->order ?? 'asc';
 
-        $allowed = ['id', 'tahun', 'aktif'];
+        $allowed = ['id', 'tahun', 'status'];
         if (!in_array($sort, $allowed)) {
             $sort = 'id';
         }
@@ -45,8 +46,9 @@ class TahunAjaranController extends Controller
         // PAGINATION
         $perPage = $request->per_page ?? 15;
         $tahun = $query->paginate($perPage)->withQueryString();
-
-        return view('tu.tahun.index', compact('tahun'));
+        $tahunAktif = TahunAjaran::aktif();
+        
+        return view('tu.tahun.index', compact('tahun', 'tahunAktif'));
     }
 
     /**
@@ -69,13 +71,13 @@ class TahunAjaranController extends Controller
     ]);
 
     if ($request->has('aktif')) {
-        TahunAjaran::query()->update(['aktif' => 0]);
+        TahunAjaran::query()->update(['status' => 'selesai']);
     }
 
     TahunAjaran::create([
         'tahun'    => $data['tahun'],
         'semester' => $data['semester'],
-        'aktif'    => $request->has('aktif') ? 1 : 0,
+        'status'   => $request->has('aktif') ? 'aktif' : 'selesai',
     ]);
 
     return redirect()->route('tu.tahun.index')
@@ -105,13 +107,13 @@ class TahunAjaranController extends Controller
     ]);
 
     if ($request->has('aktif')) {
-        TahunAjaran::query()->update(['aktif' => 0]);
+        TahunAjaran::query()->update(['status' => 'selesai']);
     }
 
     $tahun->update([
         'tahun'    => $data['tahun'],
         'semester' => $data['semester'],
-        'aktif'    => $request->has('aktif') ? 1 : 0,
+        'status' => $request->has('aktif') ? 'aktif' : 'selesai',
     ]);
 
     return redirect()->route('tu.tahun.index')
@@ -199,5 +201,57 @@ class TahunAjaranController extends Controller
     $tahun = TahunAjaran::withTrashed()->findOrFail($id);
     return view('tu.tahun.detail', compact('tahun'));
 }
+    public function masukTransisi()
+    {
+        $tahun = TahunAjaran::aktif();
+
+        if (!$tahun) {
+            abort(500, 'Tidak ada tahun aktif');
+        }
+
+        if ($tahun->status === 'transisi') {
+            return back()->with('info', 'Sudah dalam masa transisi');
+        }
+
+        $tahun->update([
+            'status' => 'transisi'
+        ]);
+
+        return back()->with('success', 'Berhasil masuk masa kenaikan kelas');
+    }
+    public function tutupTahun()
+    {
+        DB::transaction(function () {
+
+            $tahunLama = TahunAjaran::aktif();
+
+            if (!$tahunLama) {
+                abort(500, 'Tidak ada tahun aktif');
+            }
+
+            if ($tahunLama->status !== 'transisi') {
+                abort(403, 'Tahun harus dalam status transisi');
+            }
+
+            // tutup tahun lama
+            $tahunLama->update([
+                'status' => 'selesai'
+            ]);
+
+            // generate tahun baru
+            $tahunArr = explode('/', $tahunLama->tahun);
+
+            $start = (int)$tahunArr[0] + 1;
+            $end   = (int)$tahunArr[1] + 1;
+
+            TahunAjaran::create([
+                'tahun' => "{$start}/{$end}",
+                'semester' => 'Ganjil',
+                'status' => 'aktif'
+            ]);
+        });
+
+        return back()->with('success', 'Tahun ajaran baru berhasil dibuat');
+    }
 
 }
