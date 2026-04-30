@@ -56,33 +56,102 @@ class TahunAjaranController extends Controller
      */
     public function create()
     {
-        return view('tu.tahun.create');
+        $last = \App\Models\TahunAjaran::orderByDesc('id')->first();
+
+        if ($last) {
+            [$start, $end] = explode('/', $last->tahun);
+
+            if ($last->semester === 'Ganjil') {
+                // lanjut ke Genap (tahun sama)
+                $tahunAuto = "{$start}/{$end}";
+                $semesterAuto = 'Genap';
+            } else {
+                // lanjut ke tahun baru
+                $tahunAuto = ((int)$start + 1) . '/' . ((int)$end + 1);
+                $semesterAuto = 'Ganjil';
+            }
+        } else {
+            // kondisi awal (database kosong)
+            $year = now()->year;
+            $tahunAuto = "{$year}/" . ($year + 1);
+            $semesterAuto = 'Ganjil';
+        }
+
+        return view('tu.tahun.create', compact('tahunAuto', 'semesterAuto'));
     }
 
     /**
      * STORE
      */
     public function store(Request $request)
-{
-    $data = $request->validate([
-        'tahun'    => 'required',
-        'semester' => 'required|in:Ganjil,Genap',
-        'aktif'    => 'nullable',
-    ]);
+    {
+        $data = $request->validate([
+            'tahun'    => 'required|regex:/^\d{4}\/\d{4}$/',
+            'semester' => 'required|in:Ganjil,Genap',
+        ]);
 
-    if ($request->has('aktif')) {
-        TahunAjaran::query()->update(['status' => 'selesai']);
+        $exists = TahunAjaran::where('tahun', $data['tahun'])
+            ->where('semester', $data['semester'])
+            ->exists();
+
+        if ($exists) {
+            return back()->withErrors([
+                'tahun' => 'Tahun ajaran dan semester ini sudah ada.'
+            ])->withInput();
+        }
+
+        $last = TahunAjaran::orderByDesc('id')->first();
+
+        if ($last) {
+
+            [$lastStart, $lastEnd] = explode('/', $last->tahun);
+            [$newStart, $newEnd]   = explode('/', $data['tahun']);
+
+            $lastStart = (int)$lastStart;
+            $lastEnd   = (int)$lastEnd;
+            $newStart  = (int)$newStart;
+            $newEnd    = (int)$newEnd;
+
+            // CASE A: dari GANJIL → harus GENAP (tahun sama)
+            if ($last->semester === 'Ganjil') {
+
+                if (
+                    $data['semester'] !== 'Genap' ||
+                    $newStart !== $lastStart ||
+                    $newEnd !== $lastEnd
+                ) {
+                    return back()->withErrors([
+                        'tahun' => 'Urutan salah. Setelah Ganjil harus Genap di tahun yang sama.'
+                    ])->withInput();
+                }
+            }
+
+            // CASE B: dari GENAP → harus GANJIL tahun berikutnya
+            if ($last->semester === 'Genap') {
+
+                if (
+                    $data['semester'] !== 'Ganjil' ||
+                    $newStart !== $lastStart + 1 ||
+                    $newEnd !== $lastEnd + 1
+                ) {
+                    return back()->withErrors([
+                        'tahun' => 'Urutan salah. Setelah Genap harus Ganjil tahun berikutnya.'
+                    ])->withInput();
+                }
+            }
+        }
+
+        // 🔵 SIMPAN
+        TahunAjaran::create([
+            'tahun'    => $data['tahun'],
+            'semester' => $data['semester'],
+            'status'   => 'selesai',
+        ]);
+
+        return redirect()
+            ->route('tu.tahun.index')
+            ->with('success', 'Tahun ajaran berhasil dibuat');
     }
-
-    TahunAjaran::create([
-        'tahun'    => $data['tahun'],
-        'semester' => $data['semester'],
-        'status'   => $request->has('aktif') ? 'aktif' : 'selesai',
-    ]);
-
-    return redirect()->route('tu.tahun.index')
-        ->with('success', 'Tahun ajaran berhasil ditambahkan!');
-}
 
     /**
      * EDIT PAGE
@@ -252,6 +321,21 @@ class TahunAjaranController extends Controller
         });
 
         return back()->with('success', 'Tahun ajaran baru berhasil dibuat');
+    }
+    public function aktifkan($id)
+    {
+        DB::transaction(function () use ($id) {
+
+            // nonaktifkan semua
+            TahunAjaran::where('status', 'aktif')
+                ->update(['status' => 'selesai']);
+
+            // aktifkan yang dipilih
+            TahunAjaran::findOrFail($id)
+                ->update(['status' => 'aktif']);
+        });
+
+        return back()->with('success', 'Tahun ajaran diaktifkan');
     }
 
 }

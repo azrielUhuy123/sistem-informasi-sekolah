@@ -21,7 +21,8 @@ class PenempatanSiswaController extends Controller
         $tahunAktif = TahunAjaran::aktif();
 
         if (!$tahunAktif) {
-            abort(500, 'Tahun ajaran aktif belum diset');
+            return redirect()->route('tu.tahun.index')
+                ->with('error', 'Silakan aktifkan tahun ajaran terlebih dahulu');
         }
 
         // Ambil siswa yang BELUM punya penempatan aktif
@@ -54,25 +55,21 @@ class PenempatanSiswaController extends Controller
         if (!$tahunAktif) {
             abort(500, 'Tahun ajaran aktif belum diset');
         }
+
+        if ($tahunAktif->status !== 'aktif') {
+            abort(403, 'Assign hanya boleh saat tahun aktif.');
+        }
         
         $exists = PenempatanSiswa::where('siswa_id', $request->siswa_id)
             ->where('tahun_ajaran_id', $tahunAktif->id)
             ->whereNull('tanggal_keluar')
             ->exists();
 
-        if ($exists) {
-            throw new \Exception("Siswa sudah punya penempatan aktif di tahun ini");
-        }
+        return back()->withErrors([
+            'siswa_id' => 'Siswa sudah punya penempatan aktif di tahun ini'
+        ]);
 
         DB::transaction(function () use ($request, $tahunAktif) {
-
-            // Tutup penempatan aktif lama (jika ada)
-            PenempatanSiswa::where('siswa_id', $request->siswa_id)
-            ->where('tahun_ajaran_id', $tahunAktif->id)
-            ->whereNull('tanggal_keluar')
-            ->update([
-                'tanggal_keluar' => now()
-            ]);
 
             // Buat penempatan baru
             PenempatanSiswa::create([
@@ -147,8 +144,8 @@ class PenempatanSiswaController extends Controller
     {
         $tahunAktif = TahunAjaran::aktif();
 
-        if (!$tahunAktif) {
-            abort(500, 'Tahun ajaran aktif belum diset');
+        return redirect()->route('tu.tahun.index')
+                ->with('error', 'Silakan aktifkan tahun ajaran terlebih dahulu');
         }
 
         $tingkatList = \App\Models\KelasMaster::orderBy('tingkat')
@@ -191,7 +188,8 @@ class PenempatanSiswaController extends Controller
         $tahunAktif = TahunAjaran::aktif();
 
         if (!$tahunAktif) {
-            abort(500, 'Tahun ajaran aktif belum diset');
+            return redirect()->route('tu.tahun.index')
+                ->with('error', 'Silakan aktifkan tahun ajaran terlebih dahulu');
         }
 
         $tingkatAsal = $request->tingkat;
@@ -228,6 +226,10 @@ class PenempatanSiswaController extends Controller
     public function keluarkan($id)
     {
         $tahunAktif = TahunAjaran::aktif();
+        
+        if ($tahunAktif->status !== 'aktif') {
+            abort(403, 'Tidak bisa mengeluarkan siswa di fase ini.');
+        }
 
         $penempatan = PenempatanSiswa::where('tahun_ajaran_id', $tahunAktif->id)
             ->whereNull('tanggal_keluar')

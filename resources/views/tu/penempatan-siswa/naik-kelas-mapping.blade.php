@@ -3,46 +3,48 @@
 @section('title', 'Mapping Naik Kelas')
 
 @section('content')
-
 <div class="container-fluid">
 
-    <h4 class="mb-3">
-        Mapping Naik Kelas
-    </h4>
+    {{-- 🔷 HEADER --}}
+    <div class="mb-4">
+        <h4 class="mb-1">Mapping Naik Kelas</h4>
 
-    <div class="mb-4 text-muted">
-        Tingkat {{ $tingkatAsal }} → Tingkat {{ $tingkatTujuan }}
+        <small class="text-muted">
+            Tingkat {{ $tingkatAsal }} → {{ $tingkatTujuan }}
+
+            {!! match($tahunAktif->status) {
+                'aktif'    => '<span class="badge bg-success ms-2">AKTIF</span>',
+                'transisi' => '<span class="badge bg-warning text-dark ms-2">TRANSISI</span>',
+                'selesai'  => '<span class="badge bg-secondary ms-2">SELESAI</span>',
+            } !!}
+        </small>
     </div>
 
-    {{-- PROTEKSI STATUS --}}
+    {{-- 🔒 WARNING --}}
     @if($tahunAktif->status !== 'transisi')
         <div class="alert alert-warning">
-            Proses naik kelas hanya dapat dilakukan saat masa <b>transisi</b>.
+            Proses naik kelas hanya dapat dilakukan saat <b>masa transisi</b>.
         </div>
     @endif
 
     <form method="POST"
-          action="{{ route('tu.penempatan-siswa.naik-kelas') }}">
+          action="{{ route('tu.penempatan-siswa.naik-kelas') }}"
+          {{ $tahunAktif->status !== 'transisi' ? 'onsubmit=return false;' : '' }}>
         @csrf
 
-        <input type="hidden" name="tingkat_asal"
-               value="{{ $tingkatAsal }}">
+        <input type="hidden" name="tingkat_asal" value="{{ $tingkatAsal }}">
 
-        {{-- LOOP ROMBEL --}}
+        {{-- 🔁 LOOP ROMBEL --}}
         @foreach($rombelsAsal as $rombel)
 
-        <div class="card shadow-sm mb-4">
+        <div class="card shadow-sm mb-4 border-0">
             <div class="card-body">
 
-                {{-- HEADER --}}
+                {{-- HEADER ROMBEL --}}
                 <div class="d-flex justify-content-between align-items-center mb-3">
                     <div>
-                        <h5 class="mb-0">
-                            {{ $rombel->nama_kelas }}
-                        </h5>
-                        <small class="text-muted">
-                            Rombel asal
-                        </small>
+                        <h5 class="mb-0">{{ $rombel->nama_kelas }}</h5>
+                        <small class="text-muted">Rombel asal</small>
                     </div>
 
                     <span class="badge bg-primary">
@@ -50,12 +52,14 @@
                     </span>
                 </div>
 
-                {{-- PILIH TUJUAN --}}
+                {{-- SELECT TUJUAN --}}
                 <div class="mb-3">
-                    <label class="form-label">Rombel Tujuan</label>
+                    <label class="form-label fw-semibold">Rombel Tujuan</label>
+
                     <select name="mapping[{{ $rombel->id }}]"
                             class="form-select"
                             {{ $tahunAktif->status !== 'transisi' ? 'disabled' : '' }}>
+
                         <option value="">-- Lulus / Tidak naik --</option>
 
                         @foreach($rombelsTujuan as $tujuan)
@@ -66,7 +70,7 @@
                     </select>
                 </div>
 
-                {{-- TOOLBAR SISWA --}}
+                {{-- TOOLBAR --}}
                 <div class="d-flex justify-content-between align-items-center mb-2">
                     <small class="text-muted">
                         Pilih siswa yang akan diproses
@@ -74,7 +78,8 @@
 
                     <button type="button"
                             class="btn btn-sm btn-outline-secondary"
-                            onclick="toggleAll('{{ $rombel->id }}')">
+                            onclick="toggleAll('{{ $rombel->id }}')"
+                            {{ $tahunAktif->status !== 'transisi' ? 'disabled' : '' }}>
                         Pilih Semua
                     </button>
                 </div>
@@ -103,8 +108,7 @@
                             </tr>
                         @empty
                             <tr>
-                                <td colspan="2"
-                                    class="text-center text-muted">
+                                <td colspan="2" class="text-center text-muted">
                                     Tidak ada siswa
                                 </td>
                             </tr>
@@ -120,14 +124,14 @@
         @endforeach
 
         {{-- ACTION --}}
-        <div class="d-flex justify-content-between align-items-center">
+        <div class="d-flex justify-content-between align-items-center mt-4">
 
             <a href="{{ route('tu.penempatan-siswa.naik-kelas.index') }}"
                class="btn btn-secondary">
-                Kembali
+                ← Kembali
             </a>
 
-            <button class="btn btn-success"
+            <button class="btn btn-success px-4"
                 {{ $tahunAktif->status !== 'transisi' ? 'disabled' : '' }}>
                 Proses Naik Kelas
             </button>

@@ -186,6 +186,9 @@ Route::middleware(['auth', 'role:tu'])
         Route::post('/tahun/tutup',
             [TahunAjaranController::class, 'tutupTahun']
         )->name('tahun.tutup');
+        Route::post('/tahun/{id}/aktifkan', 
+            [TahunAjaranController::class, 'aktifkan']
+        )->name('tahun.aktifkan');
 
         /*
         |--------------------------------------------------------------------------

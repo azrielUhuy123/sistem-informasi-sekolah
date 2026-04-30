@@ -120,11 +120,37 @@
                                     } !!}
                                 </td>
 
-                                <td>
+                               <td class="d-flex gap-1">
+
+                                    {{-- ❌ JANGAN IZINKAN AKTIFKAN SAAT TRANSISI --}}
+                                    @if($tahunAktif?->status === 'transisi')
+
+                                        <button class="btn btn-sm btn-secondary" disabled>
+                                            Terkunci
+                                        </button>
+
+                                    @else
+
+                                        {{-- ✅ HANYA BOLEH AKTIFKAN JIKA BUKAN AKTIF --}}
+                                        @if($row->status !== 'aktif')
+                                            <form method="POST"
+                                                action="{{ route('tu.tahun.aktifkan', $row->id) }}">
+                                                @csrf
+                                                <button class="btn btn-sm btn-success">
+                                                    Aktifkan
+                                                </button>
+                                            </form>
+                                        @else
+                                            <span class="badge bg-success">Sedang Aktif</span>
+                                        @endif
+
+                                    @endif
+
                                     <a href="{{ route('tu.tahun.detail', $row->id) }}"
-                                       class="btn btn-sm btn-outline-secondary">
+                                    class="btn btn-sm btn-outline-secondary">
                                         Detail
                                     </a>
+
                                 </td>
                             </tr>
                         @empty

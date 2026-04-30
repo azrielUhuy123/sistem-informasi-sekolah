@@ -4,63 +4,103 @@
 
 @section('content')
 
-<h2 class="mb-4 fw-bold">Tambah Tahun Ajaran</h2>
+<div class="container-fluid">
 
-<div class="card shadow-sm">
-    <div class="card-body">
+    <h4 class="mb-4">Tambah Tahun Ajaran</h4>
 
-        <form action="{{ route('tu.tahun.store') }}" method="POST">
-            @csrf
+    <div class="card shadow-sm border-0">
+        <div class="card-body">
 
-            {{-- Tahun Ajaran --}}
-            <div class="mb-3">
-                <label class="form-label fw-semibold">Tahun Ajaran</label>
-                <input
-                    type="text"
-                    name="tahun"
-                    class="form-control"
-                    placeholder="2024/2025"
-                    required
-                >
-            </div>
+            <form action="{{ route('tu.tahun.store') }}" method="POST">
+                @csrf
 
-            {{-- Semester --}}
-            <div class="mb-3">
-                <label class="form-label fw-semibold">Semester</label>
-                <select name="semester" class="form-select" required>
-                    <option value="">— Pilih Semester —</option>
-                    <option value="Ganjil">Ganjil</option>
-                    <option value="Genap">Genap</option>
-                </select>
-            </div>
+                <!-- 🔘 TOGGLE -->
+                <div class="form-check mb-3">
+                    <input type="checkbox" id="manualToggle" class="form-check-input">
+                    <label class="form-check-label">
+                        Input manual (override sistem)
+                    </label>
+                </div>
 
-            {{-- Aktif --}}
-            <div class="form-check mb-4">
-                <input
-                    type="checkbox"
-                    name="aktif"
-                    class="form-check-input"
-                    id="aktifCheck"
-                >
-                <label class="form-check-label" for="aktifCheck">
-                    Set sebagai tahun ajaran aktif
-                </label>
-            </div>
+                <!-- 📅 TAHUN -->
+                <div class="mb-3">
+                    <label class="form-label fw-semibold">Tahun Ajaran</label>
 
-            {{-- Button --}}
-            <div class="d-flex justify-content-between">
-                <a href="{{ route('tu.tahun.index') }}" class="btn btn-secondary">
-                    ← Kembali
-                </a>
+                    <input
+                        type="text"
+                        name="tahun"
+                        id="tahunInput"
+                        class="form-control"
+                        value="{{ $tahunAuto }}"
+                        readonly
+                        required
+                    >
 
-                <button type="submit" class="btn btn-primary">
-                    Simpan
-                </button>
-            </div>
+                    <small class="text-muted">
+                        Otomatis mengikuti urutan sistem
+                    </small>
+                </div>
 
-        </form>
+                <!-- 📘 SEMESTER -->
+                <div class="mb-3">
+                    <label class="form-label fw-semibold">Semester</label>
 
+                    <select
+                        name="semester"
+                        id="semesterInput"
+                        class="form-select"
+                        disabled
+                    >
+                        <option value="Ganjil" {{ $semesterAuto === 'Ganjil' ? 'selected' : '' }}>Ganjil</option>
+                        <option value="Genap" {{ $semesterAuto === 'Genap' ? 'selected' : '' }}>Genap</option>
+                    </select>
+
+                    <!-- hidden agar tetap terkirim saat disabled -->
+                    <input type="hidden" name="semester" id="semesterHidden" value="{{ $semesterAuto }}">
+                </div>
+
+                <!-- 🔘 ACTION -->
+                <div class="d-flex justify-content-between">
+                    <a href="{{ route('tu.tahun.index') }}" class="btn btn-secondary">
+                        ← Kembali
+                    </a>
+
+                    <button type="submit" class="btn btn-primary">
+                        Simpan
+                    </button>
+                </div>
+
+            </form>
+
+        </div>
     </div>
+
 </div>
 
 @endsection
+
+@push('scripts')
+<script>
+    const toggle = document.getElementById('manualToggle');
+    const tahunInput = document.getElementById('tahunInput');
+    const semesterInput = document.getElementById('semesterInput');
+    const semesterHidden = document.getElementById('semesterHidden');
+
+    toggle.addEventListener('change', function() {
+
+        if (this.checked) {
+            // MODE MANUAL
+            tahunInput.removeAttribute('readonly');
+            semesterInput.removeAttribute('disabled');
+
+        } else {
+            // MODE AUTO
+            tahunInput.setAttribute('readonly', true);
+            semesterInput.setAttribute('disabled', true);
+        }
+
+        // sync hidden
+        semesterHidden.value = semesterInput.value;
+    });
+</script>
+@endpush

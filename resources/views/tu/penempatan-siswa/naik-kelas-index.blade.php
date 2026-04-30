@@ -6,32 +6,47 @@
 
 <div class="container-fluid">
 
-    <h4 class="mb-3">
-        Naik Kelas - Tahun Ajaran {{ $tahunAktif->tahun }}
-    </h4>
+    {{-- 🔷 HEADER --}}
+    <div class="mb-4">
+        <h4 class="mb-1">Naik Kelas</h4>
 
-    {{-- STATUS WARNING --}}
+        <small class="text-muted">
+            Tahun Ajaran {{ $tahunAktif->tahun }}
+
+            {!! match($tahunAktif->status) {
+                'aktif'    => '<span class="badge bg-success ms-2">AKTIF</span>',
+                'transisi' => '<span class="badge bg-warning text-dark ms-2">TRANSISI</span>',
+                'selesai'  => '<span class="badge bg-secondary ms-2">SELESAI</span>',
+            } !!}
+        </small>
+    </div>
+
+    {{-- 🔒 WARNING --}}
     @if($tahunAktif->status !== 'transisi')
         <div class="alert alert-warning">
-            Naik kelas hanya bisa dilakukan saat masa <b>transisi</b>.
+            Naik kelas hanya bisa dilakukan saat <b>masa transisi</b>.
         </div>
     @endif
 
-    {{-- FORM PILIH TINGKAT --}}
+    {{-- 🔷 FORM PILIH TINGKAT --}}
     <div class="card shadow-sm mb-4">
         <div class="card-body">
 
             <form method="GET"
-                  action="{{ route('tu.penempatan-siswa.naik-kelas.index') }}">
+                  action="{{ route('tu.penempatan-siswa.naik-kelas.index') }}"
+                  {{ $tahunAktif->status !== 'transisi' ? 'onsubmit=return false;' : '' }}>
 
                 <div class="row align-items-end">
+
                     <div class="col-md-4">
-                        <label class="form-label">Pilih Tingkat</label>
+                        <label class="form-label fw-semibold">Pilih Tingkat</label>
+
                         <select name="tingkat"
                                 class="form-select"
                                 {{ $tahunAktif->status !== 'transisi' ? 'disabled' : '' }}
                                 required>
                             <option value="">-- Pilih Tingkat --</option>
+
                             @foreach ($tingkatList as $tingkat)
                                 <option value="{{ $tingkat }}"
                                     {{ request('tingkat') == $tingkat ? 'selected' : '' }}>
@@ -47,6 +62,7 @@
                             Lanjut
                         </button>
                     </div>
+
                 </div>
 
             </form>
@@ -54,7 +70,7 @@
         </div>
     </div>
 
-    {{-- LIST ROMBEL --}}
+    {{-- 🔷 LIST ROMBEL --}}
     @if(isset($rombels))
 
         <div class="card shadow-sm">
@@ -65,16 +81,22 @@
                         Rombel Tingkat {{ request('tingkat') }}
                     </h5>
 
-                    @if($rombels->count())
+                    @if($rombels->count() && $tahunAktif->status === 'transisi')
                         <a href="{{ route('tu.penempatan-siswa.naik-kelas.mapping', [
                             'tingkat' => request('tingkat')
                         ]) }}"
-                        class="btn btn-success btn-sm"
-                        {{ $tahunAktif->status !== 'transisi' ? 'disabled' : '' }}>
+                        class="btn btn-success btn-sm">
                             Lanjut ke Mapping
                         </a>
                     @endif
                 </div>
+
+                {{-- EMPTY STATE --}}
+                @if(!$rombels->count())
+                    <div class="text-center text-muted py-4">
+                        Tidak ada rombel pada tingkat ini
+                    </div>
+                @else
 
                 <table class="table table-bordered align-middle">
                     <thead class="table-light">
@@ -84,7 +106,8 @@
                         </tr>
                     </thead>
                     <tbody>
-                        @forelse ($rombels as $rombel)
+
+                        @foreach ($rombels as $rombel)
                             <tr>
                                 <td>{{ $rombel->nama_kelas }}</td>
                                 <td>
@@ -93,16 +116,12 @@
                                     </span>
                                 </td>
                             </tr>
-                        @empty
-                            <tr>
-                                <td colspan="2"
-                                    class="text-center text-muted">
-                                    Tidak ada rombel
-                                </td>
-                            </tr>
-                        @endforelse
+                        @endforeach
+
                     </tbody>
                 </table>
+
+                @endif
 
             </div>
         </div>
