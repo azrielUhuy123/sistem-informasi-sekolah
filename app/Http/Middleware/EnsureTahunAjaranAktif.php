@@ -10,10 +10,12 @@ class EnsureTahunAjaranAktif
 {
     public function handle(Request $request, Closure $next)
     {
-        if (!TahunAjaran::aktif()) {
+        $tahun = TahunAjaran::current()->first();
+
+        if (!$tahun) {
             return redirect()
                 ->back()
-                ->with('error', 'Belum ada Tahun Ajaran aktif. Hubungi Admin.');
+                ->with('error', 'Belum ada Tahun Ajaran aktif atau transisi.');
         }
 
         return $next($request);

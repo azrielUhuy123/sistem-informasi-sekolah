@@ -15,59 +15,78 @@
     <div class="alert alert-success">{{ session('success') }}</div>
 @endif
 
-<div class="card">
-    <div class="card-body">
+<div class="card shadow-sm border-0">
+    <div class="card-body p-0">
 
-        <table class="table table-bordered table-striped">
-            <thead class="table-dark">
-                <tr>
-                    <th>No</th>
-                    <th>Nama</th>
+        <table class="table align-middle mb-0">
+
+            <thead class="border-bottom">
+                <tr class="text-muted small">
+                    <th width="50">No</th>
+                    <th>Nama Pegawai</th>
                     <th>NIP</th>
+                    <th>NUPTK</th>
                     <th>Jabatan</th>
-                    <th>Status Kerja</th>
-                    <th width="260px">Aksi</th>
+                    <th width="200" class="text-center">Aksi</th>
                 </tr>
             </thead>
 
             <tbody>
-                @foreach($data as $row)
-                    <tr>
+
+                @forelse($data as $row)
+                    <tr class="border-bottom">
+
                         <td>{{ $loop->iteration }}</td>
-                        <td>{{ $row->nama }}</td>
-                        <td>{{ $row->nip }}</td>
-                        <td>{{ $row->jabatan }}</td>
-                        <td>{{ $row->status_kerja }}</td>
+
+                        <td class="fw-semibold">
+                            {{ $row->nama }}
+                        </td>
+
+                        <td>{{ $row->nip ?? '-' }}</td>
+
+                        <td>{{ $row->nuptk ?? '-' }}</td>
 
                         <td>
+                            <span class="badge bg-light text-dark border">
+                                {{ $row->jabatan ?? '-' }}
+                            </span>
+                        </td>
 
-                            {{-- BUTTON DETAIL --}}
+                        <td class="text-center">
+
                             <a href="{{ route('tu.datakepegawaian.show', $row->id) }}"
-                               class="btn btn-info btn-sm text-white">
-                                <i class="bi bi-eye"></i> Detail
+                               class="btn btn-sm btn-info text-white px-2">
+                                Detail
                             </a>
 
-                            {{-- EDIT --}}
                             <a href="{{ route('tu.datakepegawaian.edit', $row->id) }}"
-                               class="btn btn-warning btn-sm">
-                                <i class="bi bi-pencil-square"></i> Edit
+                               class="btn btn-sm btn-warning px-2">
+                                Edit
                             </a>
 
-                            {{-- DELETE --}}
                             <form action="{{ route('tu.datakepegawaian.destroy', $row->id) }}"
                                   method="POST"
                                   class="d-inline"
                                   onsubmit="return confirm('Hapus data ini?')">
                                 @csrf
                                 @method('DELETE')
-                                <button class="btn btn-danger btn-sm">
-                                    <i class="bi bi-trash"></i> Hapus
+                                <button class="btn btn-sm btn-danger px-2">
+                                    Hapus
                                 </button>
                             </form>
+
                         </td>
 
                     </tr>
-                @endforeach
+
+                @empty
+                    <tr>
+                        <td colspan="6" class="text-center text-muted py-4">
+                            Belum ada data pegawai
+                        </td>
+                    </tr>
+                @endforelse
+
             </tbody>
 
         </table>

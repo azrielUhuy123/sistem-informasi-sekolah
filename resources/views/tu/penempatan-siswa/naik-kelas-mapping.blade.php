@@ -13,23 +13,23 @@
             Tingkat {{ $tingkatAsal }} → {{ $tingkatTujuan }}
 
             {!! match($tahunAktif->status) {
-                'aktif'    => '<span class="badge bg-success ms-2">AKTIF</span>',
-                'transisi' => '<span class="badge bg-warning text-dark ms-2">TRANSISI</span>',
-                'selesai'  => '<span class="badge bg-secondary ms-2">SELESAI</span>',
+                'aktif'   => '<span class="badge bg-success ms-2">AKTIF</span>',
+                'draft'   => '<span class="badge bg-dark ms-2">DRAFT</span>',
+                'selesai' => '<span class="badge bg-secondary ms-2">SELESAI</span>',
             } !!}
         </small>
     </div>
 
     {{-- 🔒 WARNING --}}
-    @if($tahunAktif->status !== 'transisi')
+    @if($tahunAktif->status !== 'aktif')
         <div class="alert alert-warning">
-            Proses naik kelas hanya dapat dilakukan saat <b>masa transisi</b>.
+            Proses naik kelas hanya dapat dilakukan saat <b>tahun ajaran aktif</b>.
         </div>
     @endif
 
     <form method="POST"
           action="{{ route('tu.penempatan-siswa.naik-kelas') }}"
-          {{ $tahunAktif->status !== 'transisi' ? 'onsubmit=return false;' : '' }}>
+          {{ $tahunAktif->status !== 'aktif' ? 'onsubmit=return false;' : '' }}>
         @csrf
 
         <input type="hidden" name="tingkat_asal" value="{{ $tingkatAsal }}">
@@ -48,26 +48,16 @@
                     </div>
 
                     <span class="badge bg-primary">
-                        {{ $rombel->siswa_count ?? 0 }} siswa
+                        {{ $rombel->siswa_count ?? $rombel->siswaAktif->count() ?? 0 }} siswa
                     </span>
                 </div>
 
                 {{-- SELECT TUJUAN --}}
                 <div class="mb-3">
-                    <label class="form-label fw-semibold">Rombel Tujuan</label>
-
-                    <select name="mapping[{{ $rombel->id }}]"
-                            class="form-select"
-                            {{ $tahunAktif->status !== 'transisi' ? 'disabled' : '' }}>
-
-                        <option value="">-- Lulus / Tidak naik --</option>
-
-                        @foreach($rombelsTujuan as $tujuan)
-                            <option value="{{ $tujuan->id }}">
-                                {{ $tujuan->nama_kelas }}
-                            </option>
-                        @endforeach
-                    </select>
+                    <div class="alert alert-info mb-3">
+                        Sistem akan otomatis memindahkan:
+                        <b>{{ $tingkatAsal }} → {{ $tingkatTujuan }}</b>
+                    </div>
                 </div>
 
                 {{-- TOOLBAR --}}
@@ -79,7 +69,7 @@
                     <button type="button"
                             class="btn btn-sm btn-outline-secondary"
                             onclick="toggleAll('{{ $rombel->id }}')"
-                            {{ $tahunAktif->status !== 'transisi' ? 'disabled' : '' }}>
+                            {{ $tahunAktif->status !== 'aktif' ? 'disabled' : '' }}>
                         Pilih Semua
                     </button>
                 </div>
@@ -102,7 +92,7 @@
                                            class="checkbox-{{ $rombel->id }}"
                                            name="siswa[{{ $s->id }}]"
                                            checked
-                                           {{ $tahunAktif->status !== 'transisi' ? 'disabled' : '' }}>
+                                           {{ $tahunAktif->status !== 'aktif' ? 'disabled' : '' }}>
                                 </td>
                                 <td>{{ $s->siswa->nama }}</td>
                             </tr>
@@ -132,7 +122,7 @@
             </a>
 
             <button class="btn btn-success px-4"
-                {{ $tahunAktif->status !== 'transisi' ? 'disabled' : '' }}>
+                {{ $tahunAktif->status !== 'aktif' ? 'disabled' : '' }}>
                 Proses Naik Kelas
             </button>
 

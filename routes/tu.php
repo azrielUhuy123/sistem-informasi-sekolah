@@ -106,7 +106,6 @@ Route::middleware(['auth', 'role:tu'])
         Route::post('/siswa/{id}/restore', [SiswaController::class, 'restore'])->name('siswa.restore');
         Route::delete('/siswa/{id}/force-delete', [SiswaController::class, 'forceDelete'])->name('siswa.forceDelete');
         Route::resource('siswa', SiswaController::class);
-
         /*
         |--------------------------------------------------------------------------
         | AJAX (ANGKATAN → GRUP → ROMBEL)
@@ -189,6 +188,8 @@ Route::middleware(['auth', 'role:tu'])
         Route::post('/tahun/{id}/aktifkan', 
             [TahunAjaranController::class, 'aktifkan']
         )->name('tahun.aktifkan');
+        Route::post('/tahun/lanjut-semester', [TahunAjaranController::class, 'lanjutSemester'])
+            ->name('tahun.lanjutSemester');
 
         /*
         |--------------------------------------------------------------------------

@@ -33,7 +33,12 @@ class KelasController extends Controller
             ->orderBy('kelas_master_id')
             ->get();
 
-        return view('tu.kelas.index', compact('grupKelas'));
+        $tahunAktif = TahunAjaran::current()->first();
+
+        return view('tu.kelas.index', compact(
+            'grupKelas',
+            'tahunAktif'
+        ));
     }
 
     /**
@@ -46,7 +51,7 @@ class KelasController extends Controller
     $kelasGrup = KelasGrup::with(['angkatan', 'kelasMaster'])
         ->findOrFail($kelasGrupId);
 
-    $tahunAktif = TahunAjaran::aktif();
+    $tahunAktif = TahunAjaran::current();
 
     if (!$tahunAktif) {
         abort(500, 'Tahun ajaran aktif belum diset');
@@ -187,7 +192,7 @@ class KelasController extends Controller
     }
     public function showRombel($id)
     {
-        $tahunAktif = TahunAjaran::aktif();
+        $tahunAktif = TahunAjaran::current();
 
         if (!$tahunAktif) {
             abort(500, 'Tahun ajaran aktif belum diset');

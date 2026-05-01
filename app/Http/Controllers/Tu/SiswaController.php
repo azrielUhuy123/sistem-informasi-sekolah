@@ -340,6 +340,7 @@ public function ajaxTable(Request $request)
             return back()->with('error', $e->getMessage());
         }
     }
+
     public function bulkAction(Request $request)
     {
         $ids = $request->ids;

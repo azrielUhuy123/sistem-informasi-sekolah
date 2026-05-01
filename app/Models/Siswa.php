@@ -2,7 +2,6 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
@@ -13,37 +12,21 @@ class Siswa extends Model
     protected $table = 'siswa';
 
     protected $fillable = [
-    'nama',
-    'nis',
-    'nisn',
-    'kelas_id',
-    'jenis_kelamin',
-    'tanggal_lahir',
-    'alamat',
-    'nama_wali',
-    'telepon_wali',
-];
+        'nama',
+        'nis',
+        'nisn',
+        'jenis_kelamin',
+        'tanggal_lahir',
+        'alamat',
+        'nama_wali',
+        'telepon_wali',
+    ];
 
-
-    public function kelas()
-    {
-        return $this->belongsTo(Kelas::class);
-    }
-
-    public function getAngkatanIdAttribute()
-    {
-        return $this->kelas?->kelasGrup?->angkatan_id;
-    }
-
-    public function kelasGrup()
-    {
-        return $this->kelas?->kelasGrup();
-    }
     public function penempatan()
     {
         return $this->hasMany(PenempatanSiswa::class)
-        ->with(['kelas.kelasGrup.angkatan'])
-        ->orderByDesc('tanggal_masuk');
+            ->with(['kelas.kelasGrup.angkatan', 'tahunAjaran'])
+            ->orderByDesc('tanggal_masuk');
     }
 
     public function penempatanAktif()
@@ -51,10 +34,24 @@ class Siswa extends Model
         return $this->hasOne(PenempatanSiswa::class)
             ->whereNull('tanggal_keluar')
             ->whereHas('tahunAjaran', function ($q) {
-                $q->where('aktif', 1);
-            });
+                $q->where('status', 'aktif');
+            })
+            ->with(['kelas.kelasGrup.angkatan', 'tahunAjaran']);
     }
 
+    public function getStatusTahunAktifAttribute()
+    {
+        $tahun = \App\Models\TahunAjaran::current();
+
+        if (!$tahun) {
+            return '-';
+        }
+
+        $penempatan = $this->penempatan()
+            ->where('tahun_ajaran_id', $tahun->id)
+            ->whereNull('tanggal_keluar')
+            ->first();
+
+        return $penempatan ? 'Aktif' : 'Belum ditempatkan';
+    }
 }
-
-

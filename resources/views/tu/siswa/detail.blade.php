@@ -128,7 +128,7 @@ NISN {{ $siswa->nisn ?? '-' }}
 <tr>
 
 <td>
-{{ $item->kelas?->kelasGrup?->angkatan?->tahun ?? '-' }}
+{{ $item->tahunAjaran?->tahun ?? '-' }} {{ $item->tahunAjaran?->semester ? '- '.$item->tahunAjaran->semester : '' }}
 </td>
 
 <td>

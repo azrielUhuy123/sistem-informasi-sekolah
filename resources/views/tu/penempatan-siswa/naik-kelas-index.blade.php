@@ -14,17 +14,17 @@
             Tahun Ajaran {{ $tahunAktif->tahun }}
 
             {!! match($tahunAktif->status) {
-                'aktif'    => '<span class="badge bg-success ms-2">AKTIF</span>',
-                'transisi' => '<span class="badge bg-warning text-dark ms-2">TRANSISI</span>',
-                'selesai'  => '<span class="badge bg-secondary ms-2">SELESAI</span>',
+                'aktif'   => '<span class="badge bg-success ms-2">AKTIF</span>',
+                'draft'   => '<span class="badge bg-dark ms-2">DRAFT</span>',
+                'selesai' => '<span class="badge bg-secondary ms-2">SELESAI</span>',
             } !!}
         </small>
     </div>
 
     {{-- 🔒 WARNING --}}
-    @if($tahunAktif->status !== 'transisi')
+    @if($tahunAktif->status !== 'aktif')
         <div class="alert alert-warning">
-            Naik kelas hanya bisa dilakukan saat <b>masa transisi</b>.
+            Naik kelas hanya bisa dilakukan saat <b>tahun ajaran aktif</b>.
         </div>
     @endif
 
@@ -34,7 +34,7 @@
 
             <form method="GET"
                   action="{{ route('tu.penempatan-siswa.naik-kelas.index') }}"
-                  {{ $tahunAktif->status !== 'transisi' ? 'onsubmit=return false;' : '' }}>
+                  {{ $tahunAktif->status !== 'aktif' ? 'onsubmit=return false;' : '' }}>
 
                 <div class="row align-items-end">
 
@@ -43,7 +43,7 @@
 
                         <select name="tingkat"
                                 class="form-select"
-                                {{ $tahunAktif->status !== 'transisi' ? 'disabled' : '' }}
+                                {{ $tahunAktif->status !== 'aktif' ? 'disabled' : '' }}
                                 required>
                             <option value="">-- Pilih Tingkat --</option>
 
@@ -58,7 +58,7 @@
 
                     <div class="col-md-2">
                         <button class="btn btn-primary w-100"
-                            {{ $tahunAktif->status !== 'transisi' ? 'disabled' : '' }}>
+                            {{ $tahunAktif->status !== 'aktif' ? 'disabled' : '' }}>
                             Lanjut
                         </button>
                     </div>
@@ -81,7 +81,7 @@
                         Rombel Tingkat {{ request('tingkat') }}
                     </h5>
 
-                    @if($rombels->count() && $tahunAktif->status === 'transisi')
+                    @if($rombels->count() && $tahunAktif->status === 'aktif')
                         <a href="{{ route('tu.penempatan-siswa.naik-kelas.mapping', [
                             'tingkat' => request('tingkat')
                         ]) }}"

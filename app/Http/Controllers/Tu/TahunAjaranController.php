@@ -6,7 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\TahunAjaran;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
-
+use App\Models\PenempatanSiswa;
 class TahunAjaranController extends Controller
 {
     /**
@@ -14,7 +14,7 @@ class TahunAjaranController extends Controller
      */
     public function index(Request $request)
     {
-        $deleted = $request->deleted ?? 'active'; // active | only | all
+        $deleted = $request->deleted ?? 'active';
 
         if ($deleted === 'only') {
             $query = TahunAjaran::onlyTrashed();
@@ -24,15 +24,13 @@ class TahunAjaranController extends Controller
             $query = TahunAjaran::query();
         }
 
-        // SEARCH
         if ($request->q) {
             $query->where(function ($q) use ($request) {
                 $q->where('tahun', 'like', "%{$request->q}%")
-                  ->orWhere('status', 'like', "%{$request->q}%");
+                ->orWhere('status', 'like', "%{$request->q}%");
             });
         }
 
-        // SORTING
         $sort  = $request->sort ?? 'id';
         $order = $request->order ?? 'asc';
 
@@ -43,11 +41,10 @@ class TahunAjaranController extends Controller
 
         $query->orderBy($sort, $order);
 
-        // PAGINATION
-        $perPage = $request->per_page ?? 15;
-        $tahun = $query->paginate($perPage)->withQueryString();
-        $tahunAktif = TahunAjaran::aktif();
-        
+        $tahun = $query->paginate($request->per_page ?? 15)->withQueryString();
+
+        $tahunAktif = TahunAjaran::current();
+
         return view('tu.tahun.index', compact('tahun', 'tahunAktif'));
     }
 
@@ -145,7 +142,7 @@ class TahunAjaranController extends Controller
         TahunAjaran::create([
             'tahun'    => $data['tahun'],
             'semester' => $data['semester'],
-            'status'   => 'selesai',
+            'status'   => 'draft',
         ]);
 
         return redirect()
@@ -166,28 +163,23 @@ class TahunAjaranController extends Controller
      * UPDATE
      */
     public function update(Request $request, $id)
-{
-    $tahun = TahunAjaran::findOrFail($id);
+    {
+        $tahun = TahunAjaran::findOrFail($id);
 
-    $data = $request->validate([
-        'tahun'    => 'required',
-        'semester' => 'required|in:Ganjil,Genap',
-        'aktif'    => 'nullable',
-    ]);
+        $data = $request->validate([
+            'tahun'    => 'required|regex:/^\d{4}\/\d{4}$/',
+            'semester' => 'required|in:Ganjil,Genap',
+        ]);
 
-    if ($request->has('aktif')) {
-        TahunAjaran::query()->update(['status' => 'selesai']);
+        $tahun->update([
+            'tahun'    => $data['tahun'],
+            'semester' => $data['semester'],
+        ]);
+
+        return redirect()
+            ->route('tu.tahun.index')
+            ->with('success', 'Tahun ajaran berhasil diperbarui!');
     }
-
-    $tahun->update([
-        'tahun'    => $data['tahun'],
-        'semester' => $data['semester'],
-        'status' => $request->has('aktif') ? 'aktif' : 'selesai',
-    ]);
-
-    return redirect()->route('tu.tahun.index')
-        ->with('success', 'Tahun ajaran berhasil diperbarui!');
-}
 
 
     /**
@@ -266,76 +258,97 @@ class TahunAjaranController extends Controller
     }
 
     public function detail($id)
-{
-    $tahun = TahunAjaran::withTrashed()->findOrFail($id);
-    return view('tu.tahun.detail', compact('tahun'));
-}
-    public function masukTransisi()
     {
-        $tahun = TahunAjaran::aktif();
-
-        if (!$tahun) {
-            abort(500, 'Tidak ada tahun aktif');
-        }
-
-        if ($tahun->status === 'transisi') {
-            return back()->with('info', 'Sudah dalam masa transisi');
-        }
-
-        $tahun->update([
-            'status' => 'transisi'
-        ]);
-
-        return back()->with('success', 'Berhasil masuk masa kenaikan kelas');
+        $tahun = TahunAjaran::withTrashed()->findOrFail($id);
+        return view('tu.tahun.detail', compact('tahun'));
     }
+
     public function tutupTahun()
     {
-        DB::transaction(function () {
+        $genap = TahunAjaran::where('status', 'aktif')
+            ->where('semester', 'Genap')
+            ->first();
 
-            $tahunLama = TahunAjaran::aktif();
+        if (!$genap) {
+            return back()->with('error', 'Tidak ada semester genap aktif');
+        }
 
-            if (!$tahunLama) {
-                abort(500, 'Tidak ada tahun aktif');
-            }
+        // VALIDASI WAJIB: semua siswa sudah diproses
+        $masihAda = PenempatanSiswa::where('tahun_ajaran_id', $genap->id)
+            ->whereNull('tanggal_keluar')
+            ->count();
 
-            if ($tahunLama->status !== 'transisi') {
-                abort(403, 'Tahun harus dalam status transisi');
-            }
+        if ($masihAda > 0) {
+            return back()->with('error', "Masih ada {$masihAda} siswa belum diproses naik kelas");
+        }
 
-            // tutup tahun lama
-            $tahunLama->update([
-                'status' => 'selesai'
-            ]);
-
-            // generate tahun baru
-            $tahunArr = explode('/', $tahunLama->tahun);
-
-            $start = (int)$tahunArr[0] + 1;
-            $end   = (int)$tahunArr[1] + 1;
-
-            TahunAjaran::create([
-                'tahun' => "{$start}/{$end}",
-                'semester' => 'Ganjil',
-                'status' => 'aktif'
-            ]);
+        DB::transaction(function () use ($genap) {
+            $genap->update(['status' => 'selesai']);
         });
 
-        return back()->with('success', 'Tahun ajaran baru berhasil dibuat');
+        return back()->with('success', 'Tahun ajaran berhasil ditutup');
     }
     public function aktifkan($id)
     {
-        DB::transaction(function () use ($id) {
+        $ta = TahunAjaran::findOrFail($id);
 
-            // nonaktifkan semua
-            TahunAjaran::where('status', 'aktif')
-                ->update(['status' => 'selesai']);
+        if ($ta->status !== 'draft') {
+            return back()->with('error', 'Hanya draft yang bisa diaktifkan');
+        }
 
-            // aktifkan yang dipilih
-            TahunAjaran::findOrFail($id)
-                ->update(['status' => 'aktif']);
+        // pastikan tidak ada aktif lain
+        if (TahunAjaran::where('status', 'aktif')->exists()) {
+            return back()->with('error', 'Masih ada tahun ajaran aktif');
+        }
+
+        // validasi urutan
+        $last = TahunAjaran::where('status', 'selesai')
+            ->orderByDesc('id')
+            ->first();
+
+        if ($last) {
+            if ($last->semester === 'Ganjil' && $ta->semester !== 'Genap') {
+                return back()->with('error', 'Urutan salah: setelah Ganjil harus Genap');
+            }
+
+            if ($last->semester === 'Genap' && $ta->semester !== 'Ganjil') {
+                return back()->with('error', 'Urutan salah: setelah Genap harus Ganjil');
+            }
+        }
+
+        $ta->update([
+            'status' => 'aktif'
+        ]);
+
+        return back()->with('success', 'Tahun ajaran berhasil diaktifkan');
+    }
+    public function lanjutSemester()
+    {
+        $ganjil = TahunAjaran::where('status', 'aktif')
+            ->where('semester', 'Ganjil')
+            ->first();
+
+        if (!$ganjil) {
+            return back()->with('error', 'Tidak ada semester ganjil aktif');
+        }
+
+        $genap = TahunAjaran::where('tahun', $ganjil->tahun)
+            ->where('semester', 'Genap')
+            ->first();
+
+        if (!$genap) {
+            return back()->with('error', 'Semester genap belum dibuat');
+        }
+
+        if ($genap->status !== 'draft') {
+            return back()->with('error', 'Semester genap sudah pernah diproses');
+        }
+
+        DB::transaction(function () use ($ganjil, $genap) {
+            $ganjil->update(['status' => 'selesai']);
+            $genap->update(['status' => 'aktif']);
         });
 
-        return back()->with('success', 'Tahun ajaran diaktifkan');
+        return back()->with('success', 'Berhasil pindah ke semester genap');
     }
-
 }

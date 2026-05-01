@@ -338,7 +338,7 @@
         <!-- SIDEBAR -->
 <div class="sidebar">
 
-    <div class="sidebar-title">MAIN TATA USAHA</div>
+    <div class="sidebar-title">MAIN OPERATOR</div>
 
     <a class="menu-item {{ request()->is('tu/dashboard') ? 'active' : '' }}"
        href="{{ route('tu.dashboard') }}">
@@ -348,6 +348,37 @@
         </div>
     </a>
 
+    <!-- Proses Akademik -->
+    <button class="menu-item border-0 bg-transparent text-start"
+        onclick="toggleMenu('menuProses','arrowProses')">
+
+        <div class="menu-left">
+            <i class="bi bi-arrow-repeat"></i>
+            <span>Proses Akademik</span>
+        </div>
+
+        <i class="bi bi-chevron-right dropdown-arrow" id="arrowProses"></i>
+    </button>
+
+    <div class="submenu" id="menuProses">
+
+        <a class="menu-item {{ request()->is('tu/tahun*') ? 'active' : '' }}"
+            href="{{ route('tu.tahun.index') }}">
+            <div class="menu-left">
+                <i class="bi bi-calendar3"></i>
+                <span>Tahun Ajaran</span>
+            </div>
+        </a>
+
+        <a class="menu-item {{ request()->is('tu/penempatan-siswa/preview-naik-kelas') ? 'active' : '' }}"
+            href="{{ route('tu.penempatan-siswa.naik-kelas.index') }}">
+            <div class="menu-left">
+                <i class="bi bi-arrow-up-circle"></i>
+                <span>Naik Kelas</span>
+            </div>
+        </a>
+
+    </div>
     <!-- Manajemen Sekolah -->
     <button class="menu-item border-0 bg-transparent text-start"
         onclick="toggleMenu('menuSekolah','arrowSekolah')">
@@ -370,13 +401,7 @@
             </div>
         </a>
 
-        <a class="menu-item {{ request()->is('tu/tahun*') ? 'active' : '' }}"
-            href="{{ route('tu.tahun.index') }}">
-            <div class="menu-left">
-                <i class="bi bi-calendar3"></i>
-                <span>Tahun Ajaran</span>
-            </div>
-        </a>
+
 
         <a class="menu-item {{ request()->is('tu/siswa*') ? 'active' : '' }}"
             href="{{ route('tu.siswa.index') }}">
@@ -428,37 +453,7 @@
 
     </div>
 
-    <!-- Proses Akademik -->
-    <button class="menu-item border-0 bg-transparent text-start"
-        onclick="toggleMenu('menuProses','arrowProses')">
-
-        <div class="menu-left">
-            <i class="bi bi-arrow-repeat"></i>
-            <span>Proses Akademik</span>
-        </div>
-
-        <i class="bi bi-chevron-right dropdown-arrow" id="arrowProses"></i>
-    </button>
-
-    <div class="submenu" id="menuProses">
-
-        <a class="menu-item {{ request()->is('tu/penempatan-siswa/create') ? 'active' : '' }}"
-            href="{{ route('tu.penempatan-siswa.create') }}">
-            <div class="menu-left">
-                <i class="bi bi-person-plus"></i>
-                <span>Penempatan Siswa</span>
-            </div>
-        </a>
-
-        <a class="menu-item {{ request()->is('tu/penempatan-siswa/preview-naik-kelas') ? 'active' : '' }}"
-            href="{{ route('tu.penempatan-siswa.naik-kelas.index') }}">
-            <div class="menu-left">
-                <i class="bi bi-arrow-up-circle"></i>
-                <span>Naik Kelas</span>
-            </div>
-        </a>
-
-    </div>
+    
     <!-- Arsip -->
     <button class="menu-item border-0 bg-transparent text-start"
         onclick="toggleMenu('menuArsip','arrowArsip')">

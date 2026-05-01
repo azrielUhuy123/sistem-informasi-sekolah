@@ -18,7 +18,7 @@ class PenempatanSiswaController extends Controller
      */
     public function create(Request $request)
     {
-        $tahunAktif = TahunAjaran::aktif();
+        $tahunAktif = TahunAjaran::current();
 
         if (!$tahunAktif) {
             return redirect()->route('tu.tahun.index')
@@ -50,7 +50,7 @@ class PenempatanSiswaController extends Controller
             'kelas_id' => 'required|exists:kelas,id',
         ]);
 
-        $tahunAktif = TahunAjaran::aktif();
+        $tahunAktif = TahunAjaran::current();
 
         if (!$tahunAktif) {
             abort(500, 'Tahun ajaran aktif belum diset');
@@ -59,15 +59,16 @@ class PenempatanSiswaController extends Controller
         if ($tahunAktif->status !== 'aktif') {
             abort(403, 'Assign hanya boleh saat tahun aktif.');
         }
-        
         $exists = PenempatanSiswa::where('siswa_id', $request->siswa_id)
             ->where('tahun_ajaran_id', $tahunAktif->id)
             ->whereNull('tanggal_keluar')
             ->exists();
-
-        return back()->withErrors([
-            'siswa_id' => 'Siswa sudah punya penempatan aktif di tahun ini'
-        ]);
+                
+        if ($exists) {
+            return back()->withErrors([
+                'siswa_id' => 'Siswa sudah punya penempatan aktif di tahun ini'
+            ]);
+        }
 
         DB::transaction(function () use ($request, $tahunAktif) {
 
@@ -87,50 +88,54 @@ class PenempatanSiswaController extends Controller
     public function naikKelas(Request $request)
     {
         $request->validate([
-            'mapping' => 'required|array',
-            'siswa'   => 'required|array'
+            'siswa' => 'required|array'
         ]);
 
-        $tahun = TahunAjaran::aktif();
+        $tahunAktif = TahunAjaran::current();
 
-        if (!$tahun) {
-            abort(500, 'Tidak ada tahun ajaran aktif');
+        $tahunSebelumnya = TahunAjaran::where('status', 'selesai')
+            ->latest('id')
+            ->first();
+
+        if (!$tahunAktif || !$tahunSebelumnya) {
+            abort(500, 'Tahun ajaran tidak valid');
         }
 
-        if ($tahun->status !== 'transisi') {
-            abort(403, 'Naik kelas hanya boleh saat masa transisi.');
-        }
-
-        DB::transaction(function () use ($request, $tahun) {
+        DB::transaction(function () use ($request, $tahunAktif, $tahunSebelumnya) {
 
             foreach ($request->siswa as $penempatanId => $value) {
 
-                $item = PenempatanSiswa::where('id', $penempatanId)
-                    ->where('tahun_ajaran_id', $tahun->id)
+                $item = PenempatanSiswa::with('kelas.kelasGrup.kelasMaster')
+                    ->where('id', $penempatanId)
+                    ->where('tahun_ajaran_id', $tahunSebelumnya->id)
                     ->whereNull('tanggal_keluar')
                     ->first();
 
-                if (!$item || $item->tanggal_keluar) {
-                    continue;
-                }
+                if (!$item) continue;
 
-                // tutup lama
+                // 🔒 tutup penempatan lama
                 $item->update([
                     'tanggal_keluar' => now()
                 ]);
 
-                $tujuan = $request->mapping[$item->kelas_id] ?? null;
+                // 🎯 AUTO MAPPING
+                $tingkatSekarang = $item->kelas->kelasGrup->kelasMaster->tingkat;
+                $tingkatTujuan = $tingkatSekarang + 1;
 
-                // kalau tidak ada tujuan → LULUS
-                if (!$tujuan) {
-                    continue;
-                }
+                $kelasTujuan = Kelas::whereHas('kelasGrup.kelasMaster', function ($q) use ($tingkatTujuan) {
+                    $q->where('tingkat', $tingkatTujuan);
+                })
+                ->where('nama_kelas', str_replace($tingkatSekarang, $tingkatTujuan, $item->kelas->nama_kelas))
+                ->first();
 
-                // buat penempatan baru
+                // ❗ kalau tidak ada (misal lulus)
+                if (!$kelasTujuan) continue;
+
+                // 🆕 buat penempatan baru
                 PenempatanSiswa::create([
                     'siswa_id'        => $item->siswa_id,
-                    'kelas_id'        => $tujuan,
-                    'tahun_ajaran_id' => $tahun->id,
+                    'kelas_id'        => $kelasTujuan->id,
+                    'tahun_ajaran_id' => $tahunAktif->id,
                     'tanggal_masuk'   => now(),
                 ]);
             }
@@ -138,14 +143,24 @@ class PenempatanSiswaController extends Controller
 
         return redirect()
             ->route('tu.penempatan-siswa.naik-kelas.index')
-            ->with('success', 'Naik kelas berhasil diproses');
+            ->with('success', 'Naik kelas berhasil diproses otomatis');
     }
     public function indexNaikKelas(Request $request)
     {
-        $tahunAktif = TahunAjaran::aktif();
+        $tahunSebelumnya = TahunAjaran::where('status', 'selesai')
+            ->latest('id')
+            ->first();
 
-        return redirect()->route('tu.tahun.index')
-                ->with('error', 'Silakan aktifkan tahun ajaran terlebih dahulu');
+        if (!$tahunSebelumnya) {
+            return redirect()->route('tu.tahun.index')
+                ->with('error', 'Harus ada tahun ajaran selesai dulu.');
+        }
+
+        $tahunAktif = TahunAjaran::current();
+
+        if (!$tahunAktif) {
+            return redirect()->route('tu.tahun.index')
+                ->with('error', 'Tidak ada tahun ajaran aktif.');
         }
 
         $tingkatList = \App\Models\KelasMaster::orderBy('tingkat')
@@ -159,13 +174,13 @@ class PenempatanSiswaController extends Controller
                 ->whereHas('kelasGrup.kelasMaster', function ($q) use ($request) {
                     $q->where('tingkat', $request->tingkat);
                 })
-                ->whereHas('penempatan', function ($q) use ($tahunAktif) {
-                    $q->where('tahun_ajaran_id', $tahunAktif->id)
+                ->whereHas('penempatan', function ($q) use ($tahunSebelumnya) {
+                    $q->where('tahun_ajaran_id', $tahunSebelumnya->id)
                     ->whereNull('tanggal_keluar');
                 })
                 ->withCount([
-                    'penempatan as siswa_count' => function ($q) use ($tahunAktif) {
-                        $q->where('tahun_ajaran_id', $tahunAktif->id)
+                    'penempatan as siswa_count' => function ($q) use ($tahunSebelumnya) {
+                        $q->where('tahun_ajaran_id', $tahunSebelumnya->id)
                         ->whereNull('tanggal_keluar');
                     }
                 ])
@@ -181,34 +196,43 @@ class PenempatanSiswaController extends Controller
     }
     public function mappingNaikKelas(Request $request)
     {
+        $tahunSebelumnya = TahunAjaran::where('status', 'selesai')
+            ->latest('id')
+            ->first();
+
+        if (!$tahunSebelumnya) {
+            return redirect()->route('tu.tahun.index')
+                ->with('error', 'Harus ada tahun ajaran selesai dulu.');
+        }
+
         $request->validate([
             'tingkat' => 'required|integer'
         ]);
 
-        $tahunAktif = TahunAjaran::aktif();
+        $tahunAktif = TahunAjaran::current();
 
         if (!$tahunAktif) {
             return redirect()->route('tu.tahun.index')
-                ->with('error', 'Silakan aktifkan tahun ajaran terlebih dahulu');
+                ->with('error', 'Tidak ada tahun ajaran aktif.');
         }
 
         $tingkatAsal = $request->tingkat;
         $tingkatTujuan = $tingkatAsal + 1;
 
-        // Rombel asal
-        $rombelsAsal = Kelas::withCount([
-            'penempatan as siswa_count' => function ($q) use ($tahunAktif) {
-                $q->where('tahun_ajaran_id', $tahunAktif->id)
-                ->whereNull('tanggal_keluar');
-            }
-        ])
-        ->whereHas('kelasGrup.kelasMaster', function ($q) use ($tingkatAsal) {
-            $q->where('tingkat', $tingkatAsal);
-        })
-        ->orderBy('nama_kelas')
-        ->get();
+        $rombelsAsal = Kelas::whereHas('kelasGrup.kelasMaster', function ($q) use ($tingkatAsal) {
+                $q->where('tingkat', $tingkatAsal);
+            })
+            ->orderBy('nama_kelas')
+            ->get();
 
-        // Rombel tujuan (tingkat berikutnya)
+        foreach ($rombelsAsal as $rombel) {
+            $rombel->siswaAktif = PenempatanSiswa::with('siswa')
+                ->where('kelas_id', $rombel->id)
+                ->where('tahun_ajaran_id', $tahunSebelumnya->id)
+                ->whereNull('tanggal_keluar')
+                ->get();
+        }
+
         $rombelsTujuan = Kelas::whereHas('kelasGrup.kelasMaster', function ($q) use ($tingkatTujuan) {
             $q->where('tingkat', $tingkatTujuan);
         })
@@ -219,14 +243,15 @@ class PenempatanSiswaController extends Controller
             'rombelsAsal',
             'rombelsTujuan',
             'tingkatAsal',
-            'tingkatTujuan'
+            'tingkatTujuan',
+            'tahunAktif'
         ));
     }
 
     public function keluarkan($id)
     {
-        $tahunAktif = TahunAjaran::aktif();
-        
+        $tahunAktif = TahunAjaran::current();
+
         if ($tahunAktif->status !== 'aktif') {
             abort(403, 'Tidak bisa mengeluarkan siswa di fase ini.');
         }
@@ -241,4 +266,6 @@ class PenempatanSiswaController extends Controller
 
         return back()->with('success', 'Siswa berhasil dikeluarkan dari rombel');
     }
+
+
 }
