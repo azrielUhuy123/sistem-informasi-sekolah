@@ -23,6 +23,7 @@ use App\Http\Controllers\Tu\KeuanganPemasukanController;
 use App\Http\Controllers\Tu\PenempatanSiswaController;
 use App\Http\Controllers\Tu\AngkatanController;
 use App\Http\Controllers\RombelController;
+use App\Http\Controllers\TU\DataKepegawaianExportController;
 
 /*
 |--------------------------------------------------------------------------
@@ -213,6 +214,12 @@ Route::middleware(['auth', 'role:tu'])
         Route::get('/arsip-dokumen/{id}/download', [ArsipDokumenController::class, 'download'])
             ->name('arsip-dokumen.download');
 
+        Route::get('/kepsek/datakepegawaian/approval',[DataKepegawaianController::class, 'approval'])
+            ->name('kepsek.datakepegawaian.approval');
+
+        Route::get('/datakepegawaian/export/excel',[DataKepegawaianExportController::class, 'export'])
+            ->name('datakepegawaian.export.excel');
+
         /*
         |--------------------------------------------------------------------------
         | DATA KEPEGAWAIAN
@@ -223,6 +230,9 @@ Route::middleware(['auth', 'role:tu'])
         Route::get('/datakepegawaian/{id}/detail',
             [DataKepegawaianController::class, 'detail'])
             ->name('datakepegawaian.detail');
+
+        Route::patch('/datakepegawaian/{id}/read-message',[DataKepegawaianController::class, 'readMessage'])
+            ->name('datakepegawaian.read-message');
 
         /*
         |--------------------------------------------------------------------------

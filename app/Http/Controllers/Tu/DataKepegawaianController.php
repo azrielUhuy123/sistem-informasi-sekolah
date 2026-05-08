@@ -12,7 +12,16 @@ class DataKepegawaianController extends Controller
     public function index()
     {
         $data = DataKepegawaian::orderBy('created_at', 'asc')->get();
-        return view('tu.datakepegawaian.index', compact('data'));
+
+        $belumApprove = DataKepegawaian::whereIn('approval_status', [
+            'pending',
+            'rejected'
+        ])->count();
+
+        return view('tu.datakepegawaian.index', compact(
+            'data',
+            'belumApprove'
+        ));
     }
 
     // FORM TAMBAH
@@ -23,18 +32,26 @@ class DataKepegawaianController extends Controller
 
     // SIMPAN DATA BARU
     public function store(Request $request)
-    {
-        $validated = $this->validateData($request);
+{
+    $validated = $this->validateData($request);
 
-        if ($request->filled('gaji_pokok')) {
-            $validated['gaji_pokok'] = $this->normalizeNumber($request->gaji_pokok);
-        }
-
-        DataKepegawaian::create($validated);
-
-        return redirect()->route('tu.datakepegawaian.index')
-            ->with('success', 'Data pegawai berhasil ditambahkan!');
+    // NORMALISASI GAJI
+    if ($request->filled('gaji_pokok')) {
+        $validated['gaji_pokok'] = $this->normalizeNumber(
+            $request->gaji_pokok
+        );
     }
+
+    // DEFAULT APPROVAL
+    $validated['approval_status'] = 'pending';
+
+    // SIMPAN DATA
+    DataKepegawaian::create($validated);
+
+    return redirect()
+        ->route('tu.datakepegawaian.index')
+        ->with('success', 'Data pegawai berhasil ditambahkan!');
+}
 
     // DETAIL DATA
     public function show($id)
@@ -52,20 +69,28 @@ class DataKepegawaianController extends Controller
 
     // UPDATE DATA
     public function update(Request $request, $id)
-    {
-        $pegawai = DataKepegawaian::findOrFail($id);
+{
+    $pegawai = DataKepegawaian::findOrFail($id);
 
-        $validated = $this->validateData($request);
+    $validated = $this->validateData($request);
 
-        if ($request->filled('gaji_pokok')) {
-            $validated['gaji_pokok'] = $this->normalizeNumber($request->gaji_pokok);
-        }
-
-        $pegawai->update($validated);
-
-        return redirect()->route('tu.datakepegawaian.index')
-            ->with('success', 'Data pegawai berhasil diperbarui!');
+    // NORMALISASI GAJI
+    if ($request->filled('gaji_pokok')) {
+        $validated['gaji_pokok'] = $this->normalizeNumber(
+            $request->gaji_pokok
+        );
     }
+
+    // RESET APPROVAL SAAT DATA DIUBAH
+    $validated['approval_status'] = 'pending';
+
+    // UPDATE DATA
+    $pegawai->update($validated);
+
+    return redirect()
+        ->route('tu.datakepegawaian.index')
+        ->with('success', 'Data pegawai berhasil diperbarui!');
+}
 
     // HAPUS DATA
     public function destroy($id)
@@ -130,12 +155,34 @@ class DataKepegawaianController extends Controller
         ]);
     }
 
-    private function normalizeNumber($value)
-{
-    // hapus semua non angka
-    $clean = preg_replace('/[^0-9]/', '', $value);
+    public function approval()
+    {
+        $data = DataKepegawaian::where('approval_status', 'pending')
+            ->orderBy('id', 'asc')
+            ->get();
 
-    // ambil maksimal 10 digit pertama (hindari double input)
-    return substr($clean, 0, 10);
-}
+        return view('kepsek.datakepegawaian.approval', compact('data'));
+    }
+
+    private function normalizeNumber($value)
+    {
+        // hapus semua non angka
+        $clean = preg_replace('/[^0-9]/', '', $value);
+
+        // ambil maksimal 10 digit pertama (hindari double input)
+        return substr($clean, 0, 10);
+    }
+
+    public function readMessage($id)
+    {
+        $data = DataKepegawaian::findOrFail($id);
+
+        $data->update([
+            'is_message_read' => true
+        ]);
+
+        return response()->json([
+            'success' => true
+        ]);
+    }
 }

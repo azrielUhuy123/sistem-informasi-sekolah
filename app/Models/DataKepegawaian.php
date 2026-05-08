@@ -43,7 +43,12 @@ class DataKepegawaian extends Model
         // TAMBAHAN
         'tugas_tambahan',
         'nomor_sertifikasi','tahun_sertifikasi',
-        'keterangan'
+        'keterangan',
+
+        'approval_status',
+        'rejected_reason',
+        'is_message_read',
+        'rejected_at',
     ];
 
     // =========================

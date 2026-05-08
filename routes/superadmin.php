@@ -9,6 +9,7 @@ use App\Models\Guru;
 use App\Models\MataPelajaran;
 use App\Models\HariSekolah;
 use App\Models\JamPelajaran;
+use App\Http\Controllers\SuperAdmin\DataKepegawaianApprovalController;
 
 Route::middleware(['auth', 'role:superadmin'])
     ->prefix('superadmin')
@@ -61,6 +62,26 @@ Route::middleware(['auth', 'role:superadmin'])
         )->name('monitoring-jadwal.reject');
 
         Route::get(
+            '/datakepegawaian/approval',
+            [DataKepegawaianApprovalController::class, 'index']
+        )->name('datakepegawaian.approval');
+
+        Route::get(
+            '/datakepegawaian/{id}',
+            [DataKepegawaianApprovalController::class, 'show']
+        )->name('datakepegawaian.show');
+
+        Route::patch(
+            '/datakepegawaian/{id}/approve',
+            [DataKepegawaianApprovalController::class, 'approve']
+        )->name('datakepegawaian.approve');
+
+        Route::patch(
+            '/datakepegawaian/{id}/reject',
+            [DataKepegawaianApprovalController::class, 'reject']
+        )->name('datakepegawaian.reject');
+
+        Route::get(
             '/monitoring-bentrok',
             function () {
                 return 'Monitoring Bentrok';
@@ -94,5 +115,7 @@ Route::middleware(['auth', 'role:superadmin'])
                 return 'Kelas';
             }
         )->name('kelas.index');
+
+        
 
     });
