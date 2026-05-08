@@ -41,4 +41,8 @@ class Guru extends Model
     {
         return $this->hasOne(WaliKelas::class);
     }
+    public function user()
+    {
+        return $this->belongsTo(\App\Models\User::class);
+    }
 }

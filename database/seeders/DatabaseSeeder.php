@@ -42,6 +42,13 @@ class DatabaseSeeder extends Seeder
             'role' => 'tu',
             'approved_at' => now(),
         ]);
+        
+        User::create([
+            'name' => 'Guru',
+            'email' => 'guru@example.com',
+            'password' => Hash::make('guru123'),
+            'role' => 'guru',
+        ]);
 
         $this->call(KelasMasterSeeder::class);
 

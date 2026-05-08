@@ -51,7 +51,17 @@ class AuthenticatedSessionController extends Controller
         // 5️⃣ SESSION & REDIRECT
         $request->session()->regenerate();
 
-        return redirect()->intended($user->getDashboardUrl());
+       return match(auth()->user()->role) {
+
+            'tu' => redirect()->route('tu.dashboard'),
+
+            'guru' => redirect()->route('guru.dashboard'),
+
+            'superadmin' => redirect()->route('superadmin.dashboard'),
+
+            default => abort(403),
+
+        };
 
 
 

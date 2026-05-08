@@ -1,4 +1,4 @@
-@extends('layouts.tu')
+@extends('layouts.app')
 
 @section('title', 'Rombel Jadwal')
 

@@ -147,31 +147,160 @@
         <!-- SIDEBAR -->
         <div class="sidebar">
 
-            <div class="sidebar-title">KEPALA SEKOLAH</div>
+            <div class="sidebar-title">
+                KEPALA SEKOLAH
+            </div>
 
-            <a class="menu-item {{ request()->is('kepsek/dashboard') ? 'active' : '' }}"
-               href="{{ route('superadmin.dashboard') }}">
-                <i class="bi bi-speedometer2"></i> Dashboard
+            {{-- DASHBOARD --}}
+            <a class="menu-item {{ request()->is('superadmin/dashboard') ? 'active' : '' }}"
+            href="{{ route('superadmin.dashboard') }}">
+
+                <i class="bi bi-speedometer2"></i>
+
+                Dashboard
+
             </a>
 
-            <a class="menu-item {{ request()->is('kepsek/users*') ? 'active' : '' }}"
-               href="{{ route('superadmin.users.pending') }}">
-                <i class="bi bi-person-check"></i> Approval User
-            </a>
-            <a class="menu-item {{ request()->is('kepsek/users/approved') ? 'active' : '' }}"
-            href="{{ route('superadmin.users.approved') }}">
-                <i class="bi bi-check-circle"></i> User Disetujui
-            </a>
+            {{-- APPROVAL USER --}}
+            <button
+                class="menu-item border-0 bg-transparent w-100 text-start"
+                type="button"
+                data-bs-toggle="collapse"
+                data-bs-target="#approvalMenu"
+            >
 
-            <a class="menu-item {{ request()->is('superadmin/users/rejected') ? 'active' : '' }}"
-            href="{{ route('superadmin.users.rejected') }}">
-                <i class="bi bi-x-circle"></i> User Ditolak
-            </a>
+                <i class="bi bi-person-check"></i>
 
+                Approval User
 
-            <a class="menu-item" href="#">
-                <i class="bi bi-bar-chart-line"></i> Monitoring Sistem
-            </a>
+            </button>
+
+            <div
+                class="collapse {{ request()->is('superadmin/users*') ? 'show' : '' }}"
+                id="approvalMenu"
+            >
+
+                <div class="submenu">
+
+                    <a class="menu-item {{ request()->is('superadmin/users/pending') ? 'active' : '' }}"
+                    href="{{ route('superadmin.users.pending') }}">
+
+                        <i class="bi bi-hourglass-split"></i>
+
+                        Pending
+
+                    </a>
+
+                    <a class="menu-item {{ request()->is('superadmin/users/approved') ? 'active' : '' }}"
+                    href="{{ route('superadmin.users.approved') }}">
+
+                        <i class="bi bi-check-circle"></i>
+
+                        Disetujui
+
+                    </a>
+
+                    <a class="menu-item {{ request()->is('superadmin/users/rejected') ? 'active' : '' }}"
+                    href="{{ route('superadmin.users.rejected') }}">
+
+                        <i class="bi bi-x-circle"></i>
+
+                        Ditolak
+
+                    </a>
+
+                </div>
+
+            </div>
+
+            {{-- MONITORING AKADEMIK --}}
+            <button
+                class="menu-item border-0 bg-transparent w-100 text-start"
+                type="button"
+                data-bs-toggle="collapse"
+                data-bs-target="#monitoringMenu"
+            >
+
+                <i class="bi bi-bar-chart-line"></i>
+
+                Monitoring Akademik
+
+            </button>
+
+            <div
+                class="collapse {{ request()->is('superadmin/monitoring*') ? 'show' : '' }}"
+                id="monitoringMenu"
+            >
+
+                <div class="submenu">
+
+                    <a class="menu-item {{ request()->is('superadmin/monitoring-jadwal') ? 'active' : '' }}"
+                    href="{{ route('superadmin.monitoring-jadwal.index') }}">
+
+                        <i class="bi bi-calendar-week"></i>
+
+                        Monitoring Jadwal
+
+                    </a>
+
+                    <a class="menu-item"
+                    href="#">
+
+                        <i class="bi bi-exclamation-triangle"></i>
+
+                        Bentrok Jadwal
+
+                    </a>
+
+                    <a class="menu-item"
+                    href="#">
+
+                        <i class="bi bi-grid"></i>
+
+                        Jadwal Final
+
+                    </a>
+
+                </div>
+
+            </div>
+
+            {{-- AKADEMIK --}}
+            <button
+                class="menu-item border-0 bg-transparent w-100 text-start"
+                type="button"
+                data-bs-toggle="collapse"
+                data-bs-target="#akademikMenu"
+            >
+
+                <i class="bi bi-journal-text"></i>
+
+                Akademik
+
+            </button>
+
+            <div class="collapse" id="akademikMenu">
+
+                <div class="submenu">
+
+                    <a class="menu-item" href="#">
+                        <i class="bi bi-book"></i>
+                        Mata Pelajaran
+                    </a>
+
+                    <a class="menu-item" href="#">
+                        <i class="bi bi-people"></i>
+                        Guru & Wali Kelas
+                    </a>
+
+                    <a class="menu-item" href="#">
+                        <i class="bi bi-diagram-3"></i>
+                        Struktur Kelas
+                    </a>
+
+                </div>
+
+            </div>
 
         </div>
 

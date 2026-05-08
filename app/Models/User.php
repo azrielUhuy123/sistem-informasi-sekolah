@@ -96,5 +96,9 @@ class User extends Authenticatable
     {
         return $this->belongsTo(User::class, 'approved_by');
     }
-
+    
+    public function guru()
+    {
+        return $this->hasOne(\App\Models\Guru::class);
+    }
 }

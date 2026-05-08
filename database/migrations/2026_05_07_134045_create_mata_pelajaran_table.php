@@ -1,0 +1,55 @@
+<?php
+
+use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Schema;
+
+return new class extends Migration
+{
+    public function up(): void
+    {
+        Schema::create('mata_pelajaran', function (Blueprint $table) {
+
+            $table->id();
+
+            $table->string('kode_mapel')->unique();
+
+            $table->string('nama_mapel');
+
+            // fase minimal:
+            // A = kelas 1-2
+            // B = kelas 3-4
+            // C = kelas 5-6
+            $table->enum('minimal_fase', [
+                'A',
+                'B',
+                'C'
+            ]);
+
+            $table->enum('kategori', [
+                'inti',
+                'lokal',
+                'tambahan'
+            ])->default('inti');
+
+            $table->boolean('is_wajib')
+                ->default(true);
+
+            // target JP weekly
+            $table->unsignedTinyInteger('jp_per_minggu')
+                ->default(0);
+
+            // warna grid jadwal
+            $table->string('warna', 20)
+                ->nullable();
+
+            $table->timestamps();
+
+        });
+    }
+
+    public function down(): void
+    {
+        Schema::dropIfExists('mata_pelajaran');
+    }
+};

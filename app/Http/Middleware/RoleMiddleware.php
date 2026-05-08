@@ -9,6 +9,8 @@ class RoleMiddleware
 {
     public function handle(Request $request, Closure $next, $roles)
     {
+        $user = auth()->user();
+
         if (! $request->user()) {
             return redirect()->route('login');
         }

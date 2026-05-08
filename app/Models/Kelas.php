@@ -76,4 +76,9 @@ class Kelas extends Model
             $q->where('tingkat', $tingkat);
         });
     }
+
+    public function pengajuanJadwal()
+    {
+        return $this->hasMany(PengajuanJadwal::class);
+    }
 }

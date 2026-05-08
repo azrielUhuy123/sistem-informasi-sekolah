@@ -12,7 +12,11 @@ class MataPelajaran extends Model
     protected $fillable = [
         'kode_mapel',
         'nama_mapel',
-        'kkm'
+        'minimal_fase',
+        'kategori',
+        'is_wajib',
+        'jp_per_minggu',
+        'warna',
     ];
 
     public function gurus()

@@ -4,7 +4,7 @@ namespace App\Http\Controllers\Guru;
 
 use App\Http\Controllers\Controller;
 
-class DashboardController extends Controller
+class DashboardGuruController extends Controller
 {
     public function index()
     {
