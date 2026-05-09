@@ -24,6 +24,9 @@ use App\Http\Controllers\Tu\PenempatanSiswaController;
 use App\Http\Controllers\Tu\AngkatanController;
 use App\Http\Controllers\RombelController;
 use App\Http\Controllers\TU\DataKepegawaianExportController;
+use App\Http\Controllers\Tu\DokumenController;
+use App\Http\Controllers\Tu\PengajuanSuratController;
+
 
 /*
 |--------------------------------------------------------------------------
@@ -201,24 +204,39 @@ Route::middleware(['auth', 'role:tu'])
         Route::resource('walikelas', WaliKelasController::class)
             ->except(['show', 'edit', 'update']);
 
-        /*
+         /*
         |--------------------------------------------------------------------------
-        | ARSIP DOKUMEN
+        | SURAT
         |--------------------------------------------------------------------------
         */
-        Route::resource('arsip-dokumen', ArsipDokumenController::class);
 
-        Route::get('/arsip-dokumen/{id}/preview', [ArsipDokumenController::class, 'preview'])
-            ->name('arsip-dokumen.preview');
+        // Dokumen Sekolah
+        Route::get('/dokumen-sekolah', [DokumenController::class, 'sekolah'])
+            ->name('dokumen.sekolah');
 
-        Route::get('/arsip-dokumen/{id}/download', [ArsipDokumenController::class, 'download'])
-            ->name('arsip-dokumen.download');
+        // Dokumen Siswa
+        Route::get('/dokumen-siswa', [DokumenController::class, 'siswa'])
+            ->name('dokumen.siswa');
 
-        Route::get('/kepsek/datakepegawaian/approval',[DataKepegawaianController::class, 'approval'])
-            ->name('kepsek.datakepegawaian.approval');
+        // Form Tambah Dokumen
+        Route::get('/dokumen/create/{jenis}', [DokumenController::class, 'create'])
+            ->name('dokumen.create');
 
-        Route::get('/datakepegawaian/export/excel',[DataKepegawaianExportController::class, 'export'])
-            ->name('datakepegawaian.export.excel');
+        // Simpan Dokumen
+        Route::post('/dokumen/store', [DokumenController::class, 'store'])
+            ->name('dokumen.store');
+
+        // Hapus Dokumen
+        Route::delete('/dokumen/{id}', [DokumenController::class, 'destroy'])
+            ->name('dokumen.destroy');
+
+            // Form Edit
+        Route::get('/dokumen/{id}/edit', [DokumenController::class, 'edit'])
+            ->name('dokumen.edit');
+
+        // Update Dokumen
+        Route::put('/dokumen/{id}', [DokumenController::class, 'update'])
+            ->name('dokumen.update');
 
         /*
         |--------------------------------------------------------------------------
@@ -234,6 +252,17 @@ Route::middleware(['auth', 'role:tu'])
         Route::patch('/datakepegawaian/{id}/read-message',[DataKepegawaianController::class, 'readMessage'])
             ->name('datakepegawaian.read-message');
 
+        Route::get('/pengajuan-surat',[PengajuanSuratController::class, 'index'])
+            ->name('pengajuan-surat.index');
+
+        Route::get('/pengajuan-surat/create',[PengajuanSuratController::class, 'create'])
+            ->name('pengajuan-surat.create');
+
+        Route::post('/pengajuan-surat/store',[PengajuanSuratController::class, 'store'])
+            ->name('pengajuan-surat.store');
+
+        Route::get('/pengajuan-surat/{id}',[PengajuanSuratController::class, 'show'])
+            ->name('pengajuan-surat.show');
         /*
         |--------------------------------------------------------------------------
         | KEUANGAN

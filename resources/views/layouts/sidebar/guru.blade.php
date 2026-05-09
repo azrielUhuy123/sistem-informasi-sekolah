@@ -102,4 +102,38 @@
 
     </div>
 
+    {{-- DOKUMEN --}}
+    <button
+        class="menu-item border-0 bg-transparent text-start"
+        onclick="toggleMenu('menuDokumen','arrowDokumen')"
+    >
+
+        <div class="menu-left">
+            <i class="bi bi-folder2-open"></i>
+            <span>Dokumen</span>
+        </div>
+
+        <i class="bi bi-chevron-right dropdown-arrow"
+        id="arrowDokumen"></i>
+
+    </button>
+
+    <div class="submenu show"
+        id="menuDokumen">
+
+        <a
+            class="menu-item
+            {{ request()->is('guru/dokumen*') ? 'active' : '' }}"
+            href="{{ route('guru.dokumen.surat') }}"
+        >
+
+            <div class="menu-left">
+                <i class="bi bi-file-earmark-text"></i>
+                <span>Arsip Surat</span>
+            </div>
+
+        </a>
+
+    </div>
+
 </div>

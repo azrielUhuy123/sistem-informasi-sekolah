@@ -68,7 +68,7 @@ class DataKepegawaianController extends Controller
     }
 
     // UPDATE DATA
-    public function update(Request $request, $id)
+   public function update(Request $request, $id)
 {
     $pegawai = DataKepegawaian::findOrFail($id);
 
@@ -76,20 +76,29 @@ class DataKepegawaianController extends Controller
 
     // NORMALISASI GAJI
     if ($request->filled('gaji_pokok')) {
+
         $validated['gaji_pokok'] = $this->normalizeNumber(
             $request->gaji_pokok
         );
-    }
 
-    // RESET APPROVAL SAAT DATA DIUBAH
+    }
     $validated['approval_status'] = 'pending';
+
+    $validated['rejected_reason'] = null;
+
+    $validated['rejected_at'] = null;
+
+    $validated['is_message_read'] = false;
 
     // UPDATE DATA
     $pegawai->update($validated);
 
     return redirect()
         ->route('tu.datakepegawaian.index')
-        ->with('success', 'Data pegawai berhasil diperbarui!');
+        ->with(
+            'success',
+            'Data pegawai berhasil diperbarui dan menunggu approval ulang!'
+        );
 }
 
     // HAPUS DATA

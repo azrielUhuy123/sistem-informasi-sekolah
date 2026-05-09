@@ -10,6 +10,9 @@ use App\Models\MataPelajaran;
 use App\Models\HariSekolah;
 use App\Models\JamPelajaran;
 use App\Http\Controllers\SuperAdmin\DataKepegawaianApprovalController;
+use App\Http\Controllers\SuperAdmin\DokumenSuperAdminController;
+use App\Http\Controllers\SuperAdmin\ValidasiSuratController;
+
 
 Route::middleware(['auth', 'role:superadmin'])
     ->prefix('superadmin')
@@ -80,6 +83,29 @@ Route::middleware(['auth', 'role:superadmin'])
             '/datakepegawaian/{id}/reject',
             [DataKepegawaianApprovalController::class, 'reject']
         )->name('datakepegawaian.reject');
+
+        Route::get('/dokumen/surat', [DokumenSuperAdminController::class, 'index'])
+    ->name('dokumen.surat');
+
+    Route::get(
+    '/pengajuan-surat',
+    [ValidasiSuratController::class, 'index']
+)->name('pengajuan-surat.index');
+
+Route::get(
+    '/pengajuan-surat/{id}',
+    [ValidasiSuratController::class, 'show']
+)->name('pengajuan-surat.show');
+
+Route::patch(
+    '/pengajuan-surat/{id}/validasi',
+    [ValidasiSuratController::class, 'validasi']
+)->name('pengajuan.validasi');
+
+Route::patch(
+    '/pengajuan-surat/{id}/tolak',
+    [ValidasiSuratController::class, 'tolak']
+)->name('pengajuan.tolak');
 
         Route::get(
             '/monitoring-bentrok',

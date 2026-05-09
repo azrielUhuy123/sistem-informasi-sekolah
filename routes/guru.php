@@ -5,6 +5,7 @@ use App\Http\Controllers\Guru\DashboardGuruController;
 use App\Http\Controllers\Guru\PengajuanJadwalController;
 use App\Http\Controllers\Guru\JadwalSayaController;
 use App\Http\Controllers\Guru\StatusValidasiController;
+use App\Http\Controllers\Guru\DokumenGuruController;
 
 Route::prefix('guru')
     ->name('guru.')
@@ -44,4 +45,6 @@ Route::prefix('guru')
             [StatusValidasiController::class, 'index']
         )->name('status-validasi.index');
 
+        Route::get('/dokumen/surat', [DokumenGuruController::class, 'index'])
+            ->name('dokumen.surat');
     });

@@ -203,59 +203,85 @@
 
     </div>
 
-    {{-- ARSIP --}}
-    <button
-        class="menu-item border-0 bg-transparent text-start"
-        onclick="toggleMenu('menuArsip','arrowArsip')"
+    {{-- ARSIP & DOKUMEN --}}
+<button
+    class="menu-item border-0 bg-transparent text-start"
+    onclick="toggleMenu('menuArsip','arrowArsip')"
+>
+
+    <div class="menu-left">
+        <i class="bi bi-folder2-open"></i>
+        <span>Arsip & Dokumen</span>
+    </div>
+
+    <i
+        class="bi bi-chevron-right dropdown-arrow"
+        id="arrowArsip"
+    ></i>
+
+</button>
+
+<div
+    class="submenu
+        {{ request()->is('tu/dokumen-sekolah*') ||
+           request()->is('tu/dokumen-siswa*') ||
+           request()->is('tu/datakepegawaian*')
+           ? 'show': '' }}"id="menuArsip">
+
+    {{-- DOKUMEN SEKOLAH --}}
+    <a
+        class="menu-item
+            {{ request()->is('tu/dokumen-sekolah*') ? 'active' : '' }}"
+        href="{{ route('tu.dokumen.sekolah') }}"
     >
 
         <div class="menu-left">
-            <i class="bi bi-folder2-open"></i>
-            <span>Arsip & Dokumen</span>
+            <i class="bi bi-file-earmark-text"></i>
+            <span>Arsip Surat</span>
         </div>
 
-        <i
-            class="bi bi-chevron-right dropdown-arrow"
-            id="arrowArsip"
-        ></i>
+    </a>
 
-    </button>
+    {{-- DOKUMEN SISWA --}}
+    <a
+        class="menu-item
+            {{ request()->is('tu/dokumen-siswa*') ? 'active' : '' }}"
+        href="{{ route('tu.dokumen.siswa') }}">
 
-    <div
-        class="submenu
-            {{ request()->is('tu/arsip-dokumen*') ||
-               request()->is('tu/datakepegawaian*')
-               ? 'show'
-               : '' }}"
-        id="menuArsip"
+        <div class="menu-left">
+            <i class="bi bi-mortarboard-fill"></i>
+            <span>Arsip Surat Siswa</span>
+        </div>
+
+    </a>
+
+    {{-- PENGAJUAN SURAT --}}
+    <a
+        class="menu-item
+            {{ request()->is('tu/pengajuan-surat*') ? 'active' : '' }}"
+        href="{{ route('tu.pengajuan-surat.index') }}">
+
+        <div class="menu-left">
+            <i class="bi bi-send-check"></i>
+            <span>Pengajuan Surat</span>
+        </div>
+
+    </a>
+
+    {{-- DATA KEPEGAWAIAN --}}
+    <a
+        class="menu-item
+            {{ request()->is('tu/datakepegawaian*') ? 'active' : '' }}"
+        href="{{ route('tu.datakepegawaian.index') }}"
     >
 
-        <a
-            class="menu-item
-                {{ request()->is('tu/arsip-dokumen*') ? 'active' : '' }}"
-            href="{{ route('tu.arsip-dokumen.index') }}"
-        >
+        <div class="menu-left">
+            <i class="bi bi-people-fill"></i>
+            <span>Data Kepegawaian</span>
+        </div>
 
-            <div class="menu-left">
-                <i class="bi bi-file-earmark-text"></i>
-                <span>Surat</span>
-            </div>
+    </a>
 
-        </a>
-
-        <a
-            class="menu-item
-                {{ request()->is('tu/datakepegawaian*') ? 'active' : '' }}"
-            href="{{ route('tu.datakepegawaian.index') }}"
-        >
-
-            <div class="menu-left">
-                <i class="bi bi-people-fill"></i>
-                <span>Data Kepegawaian</span>
-            </div>
-
-        </a>
-
-    </div>
+</div>
 
 </div>

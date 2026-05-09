@@ -207,40 +207,72 @@
     </div>
 
         {{-- DOKUMEN --}}
-    <button
-        class="menu-item border-0 bg-transparent text-start"
-        onclick="toggleMenu('menuDokumen','arrowDokumen')"
-    >
+                <button
+                class="menu-item border-0 bg-transparent text-start"
+                onclick="toggleMenu('menuDokumen','arrowDokumen')"
+            >
 
-        <div class="menu-left">
-            <i class="bi bi-folder2-open"></i>
-            <span>Dokumen</span>
-        </div>
+                <div class="menu-left">
+                    <i class="bi bi-folder2-open"></i>
+                    <span>Dokumen</span>
+                </div>
 
-        <i
-            class="bi bi-chevron-right dropdown-arrow"
-            id="arrowDokumen"
-        ></i>
+                <i
+                    class="bi bi-chevron-right dropdown-arrow"
+                    id="arrowDokumen"
+                ></i>
 
-    </button>
+            </button>
 
-    <div
-        class="submenu"
-        id="menuDokumen"
-    >
+            <div
+                class="submenu
+                    {{ request()->is('superadmin/dokumen*') ||
+                    request()->is('superadmin/datakepegawaian/approval*')
+                    ? 'show'
+                    : '' }}"
+                id="menuDokumen"
+            >
 
-        <a
-            class="menu-item {{ request()->is('superadmin/datakepegawaian/approval*') ? 'active' : '' }}"
-            href="{{ route('superadmin.datakepegawaian.approval') }}"
-        >
+                {{-- SURAT --}}
+                <a
+                    class="menu-item
+                        {{ request()->is('superadmin/dokumen*') ? 'active' : '' }}"
+                    href="{{ route('superadmin.dokumen.surat') }}"
+                >
 
-            <div class="menu-left">
-                <i class="bi bi-person-vcard"></i>
-                <span>Data Kepegawaian</span>
+                    <div class="menu-left">
+                        <i class="bi bi-file-earmark-text"></i>
+                        <span>Arsip Surat</span>
+                    </div>
+
+                </a>
+
+                {{-- DATA KEPEGAWAIAN --}}
+                <a
+                    class="menu-item
+                        {{ request()->is('superadmin/datakepegawaian/approval*') ? 'active' : '' }}"
+                    href="{{ route('superadmin.datakepegawaian.approval') }}"
+                >
+
+                    <div class="menu-left">
+                        <i class="bi bi-person-vcard"></i>
+                        <span>Data Kepegawaian</span>
+                    </div>
+
+                </a>
+
+                <a class="menu-item {{ request()->is('superadmin/pengajuan-surat*') ? 'active' : '' }}"
+                    href="{{ route('superadmin.pengajuan-surat.index') }}">
+                    <div class="menu-left">
+
+                        <i class="bi bi-send-check"></i>
+
+                        <span>Ajuan Surat</span>
+
+                    </div>
+
+                </a>
+
             </div>
-
-        </a>
-
-    </div>
 
 </div>
