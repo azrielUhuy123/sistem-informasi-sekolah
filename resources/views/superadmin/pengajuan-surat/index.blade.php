@@ -13,7 +13,7 @@
         </h4>
 
         <p class="text-muted mb-0">
-            Validasi surat keluar dari TU / Guru
+            Validasi pengajuan surat dari TU / Guru
         </p>
 
     </div>
@@ -31,6 +31,7 @@
                         <th>No</th>
                         <th>Nama Surat</th>
                         <th>Kategori</th>
+                        <th>Pengirim</th>
                         <th>Status</th>
                         <th>Aksi</th>
 
@@ -58,28 +59,38 @@
 
                             <td>
 
-                                @if($row->status == 'pending')
+                                <span class="badge rounded-pill bg-light text-dark border px-3 py-2">
+
+                                    {{ strtoupper($row->pengirim) }}
+
+                                </span>
+
+                            </td>
+
+                            <td>
+
+                                @if($row->status == 'draft')
+
+                                    <span class="badge bg-secondary">
+                                        Draft
+                                    </span>
+
+                                @elseif($row->status == 'pending')
 
                                     <span class="badge bg-warning text-dark">
-
                                         Pending
-
                                     </span>
 
                                 @elseif($row->status == 'disetujui')
 
                                     <span class="badge bg-success">
-
-                                        Disetujui
-
+                                        Valid
                                     </span>
 
                                 @else
 
                                     <span class="badge bg-danger">
-
                                         Ditolak
-
                                     </span>
 
                                 @endif

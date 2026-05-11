@@ -10,11 +10,11 @@
     <div class="mb-4">
 
         <h3 class="fw-bold mb-1">
-            Template Surat 
+            Template Dokumen 
         </h3>
 
         <p class="text-muted mb-0">
-            Download template surat resmi sekolah yang dapat digunakan untuk keperluan administrasi sekolah
+            Download template dokumen resmi sekolah yang dapat digunakan untuk keperluan administrasi sekolah
         </p>
 
     </div>
@@ -65,7 +65,7 @@
                         <tr>
 
                             <th class="ps-4">
-                                Nama Surat
+                                Nama Dokumen
                             </th>
 
                             <th width="15%" class="text-center">

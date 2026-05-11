@@ -11,11 +11,11 @@
 
         <div>
             <h3 class="fw-bold mb-1">
-                Template Surat Sekolah
+                Template Dokumen Sekolah
             </h3>
 
             <p class="text-muted mb-0">
-                Kelola Template dokumen / surat internal sekolah yang dapat diakses oleh guru dan kepsek
+                Kelola Template dokumen internal sekolah yang dapat diakses oleh guru dan kepsek
             </p>
         </div>
 
@@ -71,7 +71,7 @@
                             </th>
 
                             <th class="py-3">
-                                Nama Surat
+                                Nama Dokumen
                             </th>
 
                             <th class="py-3">

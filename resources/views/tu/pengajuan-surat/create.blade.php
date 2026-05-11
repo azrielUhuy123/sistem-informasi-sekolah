@@ -58,6 +58,20 @@
 
                 @csrf
 
+                {{-- KATEGORI --}}
+                <div class="mb-3">
+
+                    <label class="form-label fw-semibold">
+                        Kategori Surat
+                    </label>
+
+                    <input type="text"
+                           name="kategori_surat"
+                           class="form-control rounded-3"
+                           required>
+
+                </div>
+
                 {{-- NAMA SURAT --}}
                 <div class="mb-3">
 
@@ -72,17 +86,20 @@
 
                 </div>
 
-                {{-- KATEGORI --}}
-                <div class="mb-3">
+                {{-- PERIHAL --}}
+                <div class="mb-4">
 
                     <label class="form-label fw-semibold">
-                        Kategori Surat
+                        Perihal
                     </label>
 
-                    <input type="text"
-                           name="kategori_surat"
-                           class="form-control rounded-3"
-                           required>
+                    <input
+                        type="text"
+                        name="perihal"
+                        class="form-control rounded-3"
+                        placeholder="Masukkan perihal surat"
+                        required
+                    >
 
                 </div>
 

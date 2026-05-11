@@ -10,12 +10,13 @@ class PengajuanSurat extends Model
         'user_id',
         'nama_surat',
         'kategori_surat',
+        'perihal',
+        'pengirim',
         'tujuan_surat',
         'file_surat',
         'status',
         'validated_by',
-        'validated_at',
-        'file_final'
+        'validated_at'
     ];
 
     /*

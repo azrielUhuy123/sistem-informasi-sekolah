@@ -12,6 +12,7 @@ use App\Models\JamPelajaran;
 use App\Http\Controllers\SuperAdmin\DataKepegawaianApprovalController;
 use App\Http\Controllers\SuperAdmin\DokumenSuperAdminController;
 use App\Http\Controllers\SuperAdmin\ValidasiSuratController;
+use App\Http\Controllers\SuperAdmin\NomorSuratController;
 
 
 Route::middleware(['auth', 'role:superadmin'])
@@ -106,6 +107,25 @@ Route::patch(
     '/pengajuan-surat/{id}/tolak',
     [ValidasiSuratController::class, 'tolak']
 )->name('pengajuan.tolak');
+
+Route::resource(
+    'nomor-surat',
+    NomorSuratController::class
+);
+
+Route::post(
+    '/nomor-surat/generate',
+    [NomorSuratController::class, 'generate']
+)->name('nomor-surat.generate');
+Route::get(
+    '/nomor-surat',
+    [NomorSuratController::class, 'index']
+)->name('nomor-surat.index');
+
+Route::post(
+    '/nomor-surat/generate',
+    [NomorSuratController::class, 'generate']
+)->name('nomor-surat.generate');
 
         Route::get(
             '/monitoring-bentrok',

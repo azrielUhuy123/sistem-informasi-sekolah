@@ -242,9 +242,9 @@
 
                     <div class="menu-left">
                         <i class="bi bi-file-earmark-text"></i>
-                        <span>Arsip Surat</span>
+                        <span>Arsip Dokumen</span>
                     </div>
-
+    
                 </a>
 
                 {{-- DATA KEPEGAWAIAN --}}
@@ -269,6 +269,17 @@
 
                         <span>Ajuan Surat</span>
 
+                    </div>
+
+                </a>
+                <a
+                    class="menu-item
+                    {{ request()->is('superadmin/nomor-surat*') ? 'active' : '' }}"
+                    href="{{ route('superadmin.nomor-surat.index') }}">
+
+                    <div class="menu-left">
+                        <i class="bi bi-hash"></i>
+                        <span>Nomor Surat</span>
                     </div>
 
                 </a>

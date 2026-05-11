@@ -26,6 +26,7 @@ use App\Http\Controllers\RombelController;
 use App\Http\Controllers\TU\DataKepegawaianExportController;
 use App\Http\Controllers\Tu\DokumenController;
 use App\Http\Controllers\Tu\PengajuanSuratController;
+use App\Http\Controllers\TU\NomorSuratTuController;
 
 
 /*
@@ -244,6 +245,10 @@ Route::middleware(['auth', 'role:tu'])
         |--------------------------------------------------------------------------
         */
         Route::resource('datakepegawaian', DataKepegawaianController::class);
+        Route::get(
+    '/datakepegawaian/export/excel',
+    [DataKepegawaianExportController::class, 'export']
+)->name('datakepegawaian.export.excel');
 
         Route::get('/datakepegawaian/{id}/detail',
             [DataKepegawaianController::class, 'detail'])
@@ -263,6 +268,31 @@ Route::middleware(['auth', 'role:tu'])
 
         Route::get('/pengajuan-surat/{id}',[PengajuanSuratController::class, 'show'])
             ->name('pengajuan-surat.show');
+
+        Route::get('/pengajuan-surat/{id}/edit', [PengajuanSuratController::class, 'edit'])
+            ->name('pengajuan-surat.edit');
+
+        Route::put(
+            '/pengajuan-surat/{id}',
+            [PengajuanSuratController::class, 'update']
+        )->name('pengajuan-surat.update');
+
+        Route::delete(
+            '/pengajuan-surat/{id}',
+            [PengajuanSuratController::class, 'destroy']
+        )->name('pengajuan-surat.destroy');
+
+        Route::get(
+    '/nomor-surat',
+    [NomorSuratTuController::class, 'index']
+)->name('nomor-surat.index');
+
+Route::post(
+    '/nomor-surat/generate',
+    [NomorSuratTuController::class, 'generate']
+)->name('nomor-surat.generate');
+
+        
         /*
         |--------------------------------------------------------------------------
         | KEUANGAN

@@ -6,6 +6,8 @@ use App\Http\Controllers\Guru\PengajuanJadwalController;
 use App\Http\Controllers\Guru\JadwalSayaController;
 use App\Http\Controllers\Guru\StatusValidasiController;
 use App\Http\Controllers\Guru\DokumenGuruController;
+use App\Http\Controllers\Guru\PengajuanSuratController;
+use App\Http\Controllers\Guru\NomorSuratGuruController;
 
 Route::prefix('guru')
     ->name('guru.')
@@ -47,4 +49,12 @@ Route::prefix('guru')
 
         Route::get('/dokumen/surat', [DokumenGuruController::class, 'index'])
             ->name('dokumen.surat');
+
+        Route::resource('pengajuan-surat',App\Http\Controllers\Guru\PengajuanSuratController::class);
+
+        Route::get('/nomor-surat',[NomorSuratGuruController::class, 'index'])
+            ->name('nomor-surat.index');
+
+        Route::post('/nomor-surat/generate',[NomorSuratGuruController::class, 'generate'])
+            ->name('nomor-surat.generate');
     });

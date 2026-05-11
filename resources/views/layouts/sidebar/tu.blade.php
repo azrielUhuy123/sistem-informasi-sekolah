@@ -237,7 +237,7 @@
 
         <div class="menu-left">
             <i class="bi bi-file-earmark-text"></i>
-            <span>Arsip Surat</span>
+            <span>Arsip Dokumen</span>
         </div>
 
     </a>
@@ -250,12 +250,12 @@
 
         <div class="menu-left">
             <i class="bi bi-mortarboard-fill"></i>
-            <span>Arsip Surat Siswa</span>
+            <span>Arsip Dokumen Siswa</span>
         </div>
 
     </a>
 
-    {{-- PENGAJUAN SURAT --}}
+    {{-- PENGAJUAN SURAT  --}}
     <a
         class="menu-item
             {{ request()->is('tu/pengajuan-surat*') ? 'active' : '' }}"
@@ -272,8 +272,7 @@
     <a
         class="menu-item
             {{ request()->is('tu/datakepegawaian*') ? 'active' : '' }}"
-        href="{{ route('tu.datakepegawaian.index') }}"
-    >
+        href="{{ route('tu.datakepegawaian.index') }}">
 
         <div class="menu-left">
             <i class="bi bi-people-fill"></i>
@@ -281,6 +280,18 @@
         </div>
 
     </a>
+
+    <a
+    class="menu-item
+    {{ request()->is('tu/nomor-surat*') ? 'active' : '' }}"
+    href="{{ route('tu.nomor-surat.index') }}">
+
+    <div class="menu-left">
+        <i class="bi bi-hash"></i>
+        <span>Nomor Surat</span>
+    </div>
+
+</a>
 
 </div>
 

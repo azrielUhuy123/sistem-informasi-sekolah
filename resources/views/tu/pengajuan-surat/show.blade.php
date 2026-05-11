@@ -59,6 +59,19 @@
 
             </div>
 
+            {{-- PERIHAL --}}
+            <div class="mb-4">
+
+                <label class="fw-semibold text-muted">
+                    Perihal
+                </label>
+
+                <h5>
+                    {{ $pengajuan->perihal }}
+                </h5>
+
+            </div>
+
             {{-- TUJUAN --}}
             <div class="mb-4">
 
@@ -81,16 +94,16 @@
 
                 <br>
 
-                @if($pengajuan->status == 'pending')
+                @if($pengajuan->status == 'draft')
 
-                    <span class="badge bg-warning text-dark px-3 py-2">
-                        Pending
+                    <span class="badge bg-secondary px-3 py-2">
+                        Draft
                     </span>
 
                 @elseif($pengajuan->status == 'disetujui')
 
                     <span class="badge bg-success px-3 py-2">
-                        Disetujui
+                        Valid
                     </span>
 
                 @else
@@ -112,38 +125,25 @@
 
                 <br><br>
 
+                {{-- LIHAT SURAT --}}
                 <a href="{{ asset('uploads/pengajuan-surat/' . $pengajuan->file_surat) }}"
-                   target="_blank"
-                   class="btn btn-primary rounded-3">
+                target="_blank"
+                class="btn btn-primary rounded-3">
 
                     <i class="bi bi-eye"></i>
                     Lihat Surat
 
                 </a>
 
-                @if($pengajuan->status == 'disetujui' && $pengajuan->file_final)
+                {{-- DOWNLOAD SURAT --}}
+                <a href="{{ asset('uploads/pengajuan-surat/' . $pengajuan->file_surat) }}"
+                class="btn btn-success rounded-3"
+                download>
 
-                        <a href="{{ url('uploads/pengajuan-surat/validated/' . $pengajuan->file_final) }}"
-                        class="btn btn-success"
-                        download>
+                    <i class="bi bi-download"></i>
+                    Download Surat
 
-                            <i class="bi bi-download"></i>
-                            Download Surat Final
-
-                        </a>
-
-                    @else
-
-                        <a href="{{ url('uploads/pengajuan-surat/' . $pengajuan->file_surat) }}"
-                        class="btn btn-success"
-                        download>
-
-                            <i class="bi bi-download"></i>
-                            Download Surat
-
-                        </a>
-
-                @endif
+                </a>
 
             </div>
 

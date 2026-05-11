@@ -14,7 +14,7 @@
         </h3>
 
         <p class="text-muted mb-0">
-            Download dokumen dan surat resmi sekolah
+            Download dokumen resmi sekolah yang dapat digunakan untuk keperluan administrasi sekolah
         </p>
 
     </div>

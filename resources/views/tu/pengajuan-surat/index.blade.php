@@ -15,7 +15,7 @@
             </h4>
 
             <p class="text-muted mb-0">
-                Kelola pengajuan surat keluar sekolah
+                Kelola pengajuan Surat atau Laporan untuk divalidasi kepala sekolah
             </p>
 
         </div>
@@ -41,7 +41,7 @@
                     <tr>
 
                         <th>No</th>
-                        <th>Nama Surat</th>
+                        <th>Nama Dokumen</th>
                         <th>Kategori</th>
                         <th>Status</th>
                         <th>Aksi</th>
@@ -70,22 +70,66 @@
 
                             <td>
 
-                                <span class="badge bg-warning text-dark">
+                                @if($row->status == 'draft')
 
-                                    {{ ucfirst($row->status) }}
+                                    <span class="badge bg-secondary">
 
-                                </span>
+                                        Draft
+
+                                    </span>
+
+                                @elseif($row->status == 'disetujui')
+
+                                    <span class="badge bg-success">
+
+                                        Valid
+
+                                    </span>
+
+                                @else
+
+                                    <span class="badge bg-danger">
+
+                                        Ditolak
+
+                                    </span>
+
+                                @endif
 
                             </td>
 
                             <td>
+                                <div class="d-flex gap-2">
 
-                                <a href="{{ route('tu.pengajuan-surat.show', $row->id) }}"
-                                    class="btn btn-sm btn-primary rounded-3">
-
+                                    {{-- DETAIL --}}
+                                    <a href="{{ route('tu.pengajuan-surat.show', $row->id) }}"
+                                    class="btn btn-primary btn-sm rounded-3">
                                         Detail
-
                                     </a>
+
+                                    {{-- EDIT --}}
+                                    <a href="{{ route('tu.pengajuan-surat.edit', $row->id) }}"
+                                    class="btn btn-warning btn-sm rounded-3">
+                                        Edit
+                                    </a>
+
+                                    {{-- DELETE --}}
+                                    <form action="{{ route('tu.pengajuan-surat.destroy', $row->id) }}"
+                                        method="POST"
+                                        onsubmit="return confirm('Yakin ingin menghapus ajuan ini?')">
+
+                                        @csrf
+                                        @method('DELETE')
+
+                                        <button class="btn btn-danger btn-sm rounded-3">
+
+                                            Hapus
+
+                                        </button>
+
+                                    </form>
+
+                                </div>
 
                             </td>
 

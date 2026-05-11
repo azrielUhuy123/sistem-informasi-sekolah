@@ -70,6 +70,30 @@
 
             </div>
 
+            <div class="mb-4">
+
+                <label class="fw-semibold text-muted">
+                    Perihal
+                </label>
+
+                <h5>
+                    {{ $pengajuan->perihal }}
+                </h5>
+
+            </div>
+
+            <div class="mb-4">
+
+                <label class="fw-semibold text-muted">
+                    Pengirim
+                </label>
+
+                <h5>
+                    {{ strtoupper($pengajuan->pengirim) }}
+                </h5>
+
+            </div>
+
             {{-- TUJUAN --}}
             <div class="mb-4">
 
@@ -92,16 +116,17 @@
 
                 <br>
 
-                @if($pengajuan->status == 'pending')
+                @if($pengajuan->status == 'draft')
 
-                    <span class="badge bg-warning text-dark px-3 py-2">
-                        Pending
+                    <span class="badge bg-secondary px-3 py-2">
+                        Draft
                     </span>
+
 
                 @elseif($pengajuan->status == 'disetujui')
 
                     <span class="badge bg-success px-3 py-2">
-                        Disetujui
+                        Valid
                     </span>
 
                 @else
@@ -146,7 +171,8 @@
             </div>
 
             {{-- ACTION VALIDASI --}}
-            @if($pengajuan->status == 'pending')
+            @if($pengajuan->status == 'pending' ||
+            $pengajuan->status == 'draft')
 
                 <div class="d-flex gap-2">
 

@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Tu;
 use App\Http\Controllers\Controller;
 use App\Models\PengajuanSurat;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\File;
 
 class PengajuanSuratController extends Controller
 {
@@ -42,13 +43,11 @@ class PengajuanSuratController extends Controller
     {
         $request->validate([
 
-            'nama_surat' => 'required',
-
+            'nama_surat'     => 'required',
             'kategori_surat' => 'required',
-
-            'tujuan_surat' => 'required',
-
-            'file_surat' => 'required|mimes:pdf,doc,docx'
+            'perihal'        => 'required',
+            'tujuan_surat'   => 'required',
+            'file_surat'     => 'required|mimes:pdf,doc,docx'
 
         ]);
 
@@ -73,17 +72,19 @@ class PengajuanSuratController extends Controller
         */
         PengajuanSurat::create([
 
-            'user_id' => auth()->id(),
+            'user_id'         => auth()->id(),
 
-            'nama_surat' => $request->nama_surat,
+            // PENGIRIM OTOMATIS
+            'pengirim'        => auth()->user()->role,
 
-            'kategori_surat' => $request->kategori_surat,
+            'nama_surat'      => $request->nama_surat,
+            'kategori_surat'  => $request->kategori_surat,
+            'perihal'         => $request->perihal,
+            'tujuan_surat'    => $request->tujuan_surat,
 
-            'tujuan_surat' => $request->tujuan_surat,
+            'file_surat'      => $namaFile,
 
-            'file_surat' => $namaFile,
-
-            'status' => 'pending'
+            'status'          => 'draft'
 
         ]);
 
@@ -95,6 +96,11 @@ class PengajuanSuratController extends Controller
             );
     }
 
+    /*
+    |--------------------------------------------------------------------------
+    | SHOW
+    |--------------------------------------------------------------------------
+    */
     public function show($id)
     {
         $pengajuan = PengajuanSurat::findOrFail($id);
@@ -103,5 +109,136 @@ class PengajuanSuratController extends Controller
             'tu.pengajuan-surat.show',
             compact('pengajuan')
         );
+    }
+
+    /*
+    |--------------------------------------------------------------------------
+    | EDIT
+    |--------------------------------------------------------------------------
+    */
+    public function edit($id)
+    {
+        $pengajuan = PengajuanSurat::findOrFail($id);
+
+        return view(
+            'tu.pengajuan-surat.edit',
+            compact('pengajuan')
+        );
+    }
+
+    /*
+    |--------------------------------------------------------------------------
+    | UPDATE
+    |--------------------------------------------------------------------------
+    */
+    public function update(Request $request, $id)
+    {
+        $pengajuan = PengajuanSurat::findOrFail($id);
+
+        $request->validate([
+
+            'nama_surat'     => 'required',
+            'kategori_surat' => 'required',
+            'perihal'        => 'required',
+            'tujuan_surat'   => 'required',
+
+        ]);
+
+        /*
+        |--------------------------------------------------------------------------
+        | DATA UPDATE
+        |--------------------------------------------------------------------------
+        */
+        $data = [
+
+            'nama_surat'      => $request->nama_surat,
+            'kategori_surat'  => $request->kategori_surat,
+            'perihal'         => $request->perihal,
+            'tujuan_surat'    => $request->tujuan_surat,
+
+            /*
+            |--------------------------------------------------------------------------
+            | RESET VALIDASI
+            |--------------------------------------------------------------------------
+            */
+            'status'          => 'draft',
+            'validated_by'    => null,
+            'validated_at'    => null,
+
+        ];
+
+        /*
+        |--------------------------------------------------------------------------
+        | UPDATE FILE BARU
+        |--------------------------------------------------------------------------
+        */
+        if ($request->hasFile('file_surat')) {
+
+            // HAPUS FILE LAMA
+            $oldFile = public_path(
+                'uploads/pengajuan-surat/' . $pengajuan->file_surat
+            );
+
+            if (File::exists($oldFile)) {
+
+                File::delete($oldFile);
+
+            }
+
+            // SIMPAN FILE BARU
+            $file = $request->file('file_surat');
+
+            $namaFile = time() . '_' . $file->getClientOriginalName();
+
+            $file->move(
+                public_path('uploads/pengajuan-surat'),
+                $namaFile
+            );
+
+            $data['file_surat'] = $namaFile;
+        }
+
+        $pengajuan->update($data);
+
+        return redirect()
+            ->route('tu.pengajuan-surat.index')
+            ->with(
+                'success',
+                'Pengajuan surat berhasil diupdate'
+            );
+    }
+
+    /*
+    |--------------------------------------------------------------------------
+    | DESTROY
+    |--------------------------------------------------------------------------
+    */
+    public function destroy($id)
+    {
+        $pengajuan = PengajuanSurat::findOrFail($id);
+
+        /*
+        |--------------------------------------------------------------------------
+        | HAPUS FILE SURAT
+        |--------------------------------------------------------------------------
+        */
+        $fileSurat = public_path(
+            'uploads/pengajuan-surat/' . $pengajuan->file_surat
+        );
+
+        if (File::exists($fileSurat)) {
+
+            File::delete($fileSurat);
+
+        }
+
+        $pengajuan->delete();
+
+        return redirect()
+            ->route('tu.pengajuan-surat.index')
+            ->with(
+                'success',
+                'Pengajuan surat berhasil dihapus'
+            );
     }
 }

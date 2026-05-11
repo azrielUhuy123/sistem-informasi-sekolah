@@ -129,10 +129,35 @@
 
             <div class="menu-left">
                 <i class="bi bi-file-earmark-text"></i>
-                <span>Arsip Surat</span>
+                <span>Arsip Dokumen</span>
             </div>
 
         </a>
+
+            <a
+                class="menu-item
+                {{ request()->is('guru/pengajuan-surat*') ? 'active' : '' }}"
+                href="{{ route('guru.pengajuan-surat.index') }}"
+            >
+
+                <div class="menu-left">
+                    <i class="bi bi-send"></i>
+                    <span>Pengajuan Surat</span>
+                </div>
+
+            </a>
+
+            <a
+                class="menu-item
+                {{ request()->is('guru/nomor-surat*') ? 'active' : '' }}"
+                href="{{ route('guru.nomor-surat.index') }}">
+
+                <div class="menu-left">
+                    <i class="bi bi-hash"></i>
+                    <span>Nomor Surat</span>
+                </div>
+
+            </a>
 
     </div>
 
