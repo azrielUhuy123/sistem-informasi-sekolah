@@ -28,4 +28,11 @@ class MataPelajaran extends Model
             'guru_id'
         );
     }
+    public function pengampuMapel()
+    {
+        return $this->hasMany(
+            PengampuMapel::class,
+            'mata_pelajaran_id'
+        );
+    }
 }

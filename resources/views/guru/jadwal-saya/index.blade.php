@@ -14,121 +14,199 @@
         </h4>
 
         <small class="text-muted">
-            Kelas {{ $kelas->nama_kelas }}
+            Scheduling Guru
         </small>
 
     </div>
 
-    {{-- INFO TOTAL JP --}}
-    <div class="alert alert-info shadow-sm border-0">
+    {{-- FILTER --}}
+    <div class="card shadow-sm border-0 mb-3">
 
-        <strong>Total Jam Pelajaran:</strong>
+        <div class="card-body">
 
-        {{ $totalJP }} / {{ $maxJP }}
+            <form method="GET" class="row g-3">
+
+                {{-- KELAS --}}
+                <div class="col-md-6">
+
+                    <label class="form-label fw-semibold">
+                        Pilih Kelas
+                    </label>
+
+                    <select
+                        name="kelas_id"
+                        class="form-select"
+                        onchange="this.form.submit()"
+                    >
+
+                        <option value="">
+                            -- Pilih Kelas --
+                        </option>
+
+                        @foreach(
+                            $pengampu->unique('kelas_id')
+                            as $item
+                        )
+
+                            @if($item->kelas)
+
+                                <option
+                                    value="{{ $item->kelas_id }}"
+                                    {{ $selectedKelas == $item->kelas_id ? 'selected' : '' }}
+                                >
+
+                                    {{ $item->kelas->nama_kelas }}
+
+                                    @if(isset($item->sumber) && $item->sumber === 'wali_kelas')
+                                        (Wali Kelas)
+                                    @endif
+
+                                </option>
+
+                            @endif
+
+                        @endforeach
+
+                    </select>
+
+                </div>
+
+                {{-- MAPEL --}}
+                <div class="col-md-6">
+
+                    <label class="form-label fw-semibold">
+                        Pilih Mata Pelajaran
+                    </label>
+
+                    <select
+                        name="mapel_id"
+                        class="form-select"
+                        onchange="this.form.submit()"
+                    >
+
+                        <option value="">
+                            -- Pilih Mata Pelajaran --
+                        </option>
+
+                        @foreach(
+                            $pengampu
+                                ->where('kelas_id', $selectedKelas)
+                                ->unique('mata_pelajaran_id')
+                            as $item
+                        )
+
+                            @if($item->mapel)
+
+                                @php
+
+                                    $jp = $jpTracker[
+                                        $item->mata_pelajaran_id
+                                    ] ?? null;
+
+                                    $badge = '🟢';
+
+                                    if (
+                                        $jp &&
+                                        $jp['status'] === 'hampir'
+                                    ) {
+
+                                        $badge = '🟡';
+
+                                    }
+
+                                    if (
+                                        $jp &&
+                                        $jp['status'] === 'penuh'
+                                    ) {
+
+                                        $badge = '🔴';
+
+                                    }
+
+                                @endphp
+
+                                <option
+                                    value="{{ $item->mata_pelajaran_id }}"
+                                    {{ $selectedMapel == $item->mata_pelajaran_id ? 'selected' : '' }}
+                                >
+
+                                    {{ $badge }}
+
+                                    {{ $item->mapel->nama_mapel }}
+
+                                    @if($jp)
+                                        ({{ $jp['current'] }}/{{ $jp['target'] }})
+                                    @endif
+
+                                </option>
+
+                            @endif
+
+                        @endforeach
+
+                    </select>
+
+                </div>
+
+            </form>
+
+        </div>
 
     </div>
 
-    {{-- CARD --}}
+    {{-- INFO JP --}}
+    @if($selectedKelas)
+
+        <div class="alert alert-info shadow-sm border-0">
+
+            <strong>Total Jam Pelajaran:</strong>
+
+            {{ $totalJP }} / {{ $maxJP }}
+
+        </div>
+
+    @endif
+
+    {{-- SUBMIT --}}
+    @if($selectedKelas && $selectedMapel)
+
+        <div class="mb-3">
+
+            <form
+                method="POST"
+                action="{{ route('guru.jadwal-saya.submit') }}"
+            >
+
+                @csrf
+
+                <input
+                    type="hidden"
+                    name="kelas_id"
+                    value="{{ $selectedKelas }}"
+                >
+
+                <button
+                    class="btn btn-primary"
+                    onclick="return confirm(
+                        'Submit seluruh draft jadwal?'
+                    )"
+                >
+
+                    Submit Jadwal
+
+                </button>
+
+            </form>
+
+        </div>
+
+    @endif
+
+    {{-- TABLE --}}
     <div class="card shadow-sm border-0">
 
         <div class="card-body">
 
-            {{-- PILIH MAPEL --}}
-            <form method="GET" class="mb-4">
-
-                <label class="form-label fw-semibold">
-                    Pilih Mata Pelajaran
-                </label>
-
-                <select
-                    name="mapel_id"
-                    onchange="this.form.submit()"
-                    class="form-select"
-                >
-
-                    <option value="">
-                        -- Pilih Mata Pelajaran --
-                    </option>
-
-                    @foreach($mapels as $mapel)
-
-                        @php
-
-                            $jp = $jpTracker[$mapel->id];
-
-                            $badge = '🟢';
-
-                            if ($jp['status'] === 'hampir') {
-
-                                $badge = '🟡';
-
-                            }
-
-                            if ($jp['status'] === 'penuh') {
-
-                                $badge = '🔴';
-
-                            }
-
-                        @endphp
-
-                        <option
-                            value="{{ $mapel->id }}"
-                            {{ $selectedMapel == $mapel->id ? 'selected' : '' }}
-                        >
-
-                            {{ $badge }}
-
-                            {{ $mapel->nama_mapel }}
-
-                            ({{ $jp['current'] }}/{{ $jp['target'] }})
-
-                        </option>
-
-                    @endforeach
-
-                </select>
-
-            </form>
-
-            {{-- SELECTED JP --}}
-            @php
-
-                $selectedJP = null;
-
-                if ($selectedMapel) {
-
-                    $selectedJP = $jpTracker[$selectedMapel] ?? null;
-
-                }
-
-            @endphp
-
-            <div class="mb-3">
-
-                <form
-                    method="POST"
-                    action="{{ route('guru.jadwal-saya.submit') }}"
-                >
-
-                    @csrf
-
-                    <button
-                        class="btn btn-primary"
-                        onclick="return confirm(
-                            'Submit seluruh draft jadwal?'
-                        )"
-                    >
-
-                        Submit Jadwal
-
-                    </button>
-
-                </form>
-
-            </div>
-
-            {{-- TABLE --}}
             <div class="table-responsive">
 
                 <table class="table table-bordered align-middle text-center mb-0">
@@ -181,46 +259,54 @@
 
                                     @php
 
-                                        $item = $jadwals[$hari->id][$jam->id] ?? null;
+                                        $item = $jadwals[
+                                            $hari->id
+                                        ][
+                                            $jam->id
+                                        ] ?? null;
 
                                     @endphp
 
                                     <td style="min-width:140px;">
 
-                                        {{-- SUDAH ADA --}}
+                                        {{-- ADA JADWAL --}}
                                         @if($item)
 
                                             <div
                                                 class="p-2 rounded text-white position-relative"
-                                                style="background: {{ $item->mapel->warna ?? '#198754' }}"
+                                                style="
+                                                    background:
+                                                    {{ $item->mapel->warna ?? '#198754' }}
+                                                "
                                             >
 
                                                 {{-- HAPUS --}}
                                                 @if(
-                                                    $item->status === 'draft' ||
+                                                    $item->status === 'draft'
+                                                    ||
                                                     $item->status === 'rejected'
                                                 )
 
-                                                <form
-                                                    method="POST"
-                                                    action="{{ route(
-                                                        'guru.jadwal-saya.hapus-slot',
-                                                        $item->id
-                                                    ) }}"
-                                                    class="position-absolute top-0 end-0"
-                                                >
-
-                                                    @csrf
-                                                    @method('DELETE')
-
-                                                    <button
-                                                        class="btn btn-sm text-white border-0"
-                                                        onclick="return confirm('Hapus slot ini?')"
+                                                    <form
+                                                        method="POST"
+                                                        action="{{ route(
+                                                            'guru.jadwal-saya.hapus-slot',
+                                                            $item->id
+                                                        ) }}"
+                                                        class="position-absolute top-0 end-0"
                                                     >
-                                                        ×
-                                                    </button>
 
-                                                </form>
+                                                        @csrf
+                                                        @method('DELETE')
+
+                                                        <button
+                                                            class="btn btn-sm text-white border-0"
+                                                            onclick="return confirm('Hapus slot ini?')"
+                                                        >
+                                                            ×
+                                                        </button>
+
+                                                    </form>
 
                                                 @endif
 
@@ -238,24 +324,29 @@
 
                                             </div>
 
-                                        {{-- BELUM PILIH MAPEL --}}
-                                        @elseif(!$selectedMapel)
+                                        {{-- BELUM PILIH --}}
+                                        @elseif(
+                                            !$selectedKelas
+                                            ||
+                                            !$selectedMapel
+                                        )
 
                                             <div class="text-muted small">
 
-                                                Pilih mapel dulu
+                                                Pilih kelas & mapel
 
                                             </div>
 
                                         {{-- JP PENUH --}}
                                         @elseif(
-                                            $selectedJP &&
+                                            $selectedJP
+                                            &&
                                             $selectedJP['status'] === 'penuh'
                                         )
 
                                             <div class="text-danger small fw-semibold">
 
-                                                Jam Pelajaran penuh
+                                                JP penuh
 
                                             </div>
 
@@ -264,10 +355,18 @@
 
                                             <form
                                                 method="POST"
-                                                action="{{ route('guru.jadwal-saya.pilih-slot') }}"
+                                                action="{{ route(
+                                                    'guru.jadwal-saya.pilih-slot'
+                                                ) }}"
                                             >
 
                                                 @csrf
+
+                                                <input
+                                                    type="hidden"
+                                                    name="kelas_id"
+                                                    value="{{ $selectedKelas }}"
+                                                >
 
                                                 <input
                                                     type="hidden"

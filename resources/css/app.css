@@ -1,5 +1,5 @@
 /* IMPORT MODULE DULU */
-@import './modules/rombel.css';
+
 @import "bootstrap/dist/css/bootstrap.min.css";
 
 
@@ -8,3 +8,4 @@
 @tailwind components;
 @tailwind utilities;
 
+@import './modules/rombel.css';

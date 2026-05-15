@@ -16,8 +16,11 @@ class KelasMaster extends Model
         'kode',
     ];
 
-    public function kelas()
+    public function kelasGrup()
     {
-        return $this->hasMany(Kelas::class);
+        return $this->hasMany(
+            KelasGrup::class,
+            'kelas_master_id'
+        );
     }
 }

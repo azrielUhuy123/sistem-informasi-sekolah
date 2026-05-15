@@ -3,6 +3,27 @@
 @section('title', 'Jadwal Kelas')
 
 @section('content')
+@php
+    use App\Models\PengajuanJadwal;
+
+    $tahunId = current_tahun_id();
+
+    $submittedCount = PengajuanJadwal::where('tahun_ajaran_id', $tahunId)
+        ->where('status', 'submitted')
+        ->count();
+
+    $approvedCount = PengajuanJadwal::where('tahun_ajaran_id', $tahunId)
+        ->where('status', 'approved')
+        ->count();
+
+    $rejectedCount = PengajuanJadwal::where('tahun_ajaran_id', $tahunId)
+        ->where('status', 'rejected')
+        ->count();
+
+    $publishedCount = PengajuanJadwal::where('tahun_ajaran_id', $tahunId)
+        ->where('status', 'published')
+        ->count();
+@endphp
 
 <div class="container-fluid">
 
@@ -10,14 +31,14 @@
         Monitoring Jadwal
     </h2>
 
-    <div class="row mb-4">
+    <div class="row mb-4 g-3">
 
         <div class="col-md-3">
             <div class="card shadow-sm border-0">
-                <div class="ca rd-body">
+                <div class="card-body">
                     <h6>Submitted</h6>
                     <h3 class="text-warning">
-                        {{ \App\Models\PengajuanJadwal::where('status', 'submitted')->count() }}
+                        {{ $submittedCount }}
                     </h3>
                 </div>
             </div>
@@ -28,7 +49,7 @@
                 <div class="card-body">
                     <h6>Approved</h6>
                     <h3 class="text-success">
-                        {{ \App\Models\PengajuanJadwal::where('status', 'approved')->count() }}
+                        {{ $approvedCount }}
                     </h3>
                 </div>
             </div>
@@ -39,7 +60,18 @@
                 <div class="card-body">
                     <h6>Rejected</h6>
                     <h3 class="text-danger">
-                        {{ \App\Models\PengajuanJadwal::where('status', 'rejected')->count() }}
+                        {{ $rejectedCount }}
+                    </h3>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-3">
+            <div class="card shadow-sm border-0">
+                <div class="card-body">
+                    <h6>Published</h6>
+                    <h3 class="text-primary">
+                        {{ $publishedCount }}
                     </h3>
                 </div>
             </div>
@@ -47,136 +79,156 @@
 
     </div>
 
+    @php
+        use Illuminate\Support\Str;
+    @endphp
+
     <div class="accordion" id="accordionTingkat">
 
-        @foreach($kelasPerTingkat as $tingkat => $kelasList)
+    @foreach($kelasPerTingkat as $tingkat => $kelasList)
 
-            @php
-                $pendingCount = $kelasList->sum(function($kelas) {
-                    return $kelas->pengajuanJadwal
-                        ->where('status', 'submitted')
-                        ->count();
-                });
-            @endphp
+        @php
+            $slug = Str::slug((string) $tingkat);
 
-            <div class="accordion-item mb-3 border-0 shadow-sm">
+            $collapseId = "tingkat-$slug";
+            $headingId = "heading-$slug";
+        @endphp
 
-                <h2 class="accordion-header">
+        <div class="accordion-item mb-3 border-0 shadow-sm">
 
-                    <button class="accordion-button collapsed"
-                            type="button"
-                            data-bs-toggle="collapse"
-                            data-bs-target="#tingkat{{ $tingkat }}">
+            <h2 class="accordion-header" id="{{ $headingId }}">
 
-                        <div class="d-flex justify-content-between w-100 me-3">
+                <button
+                    class="accordion-button collapsed"
+                    type="button"
+                    data-bs-toggle="collapse"
+                    data-bs-target="#{{ $collapseId }}"
+                    aria-expanded="false"
+                    aria-controls="{{ $collapseId }}"
+                >
+                    Kelas Tingkat {{ $tingkat }}
+                </button>
 
-                            <div>
-                                <strong>Kelas Tingkat {{ $tingkat }}</strong>
-                            </div>
+            </h2>
 
-                            <div>
-                                <span class="badge bg-warning">
-                                    {{ $pendingCount }} Pending
-                                </span>
-                            </div>
+            <div
+                id="{{ $collapseId }}"
+                class="accordion-collapse collapse"
+                aria-labelledby="{{ $headingId }}"
+                data-bs-parent="#accordionTingkat"
+            >
 
-                        </div>
+                <div class="accordion-body">
 
-                    </button>
+                    <div class="table-responsive">
 
-                </h2>
+                        <table class="table table-bordered align-middle">
 
-                <div id="tingkat{{ $tingkat }}"
-                     class="accordion-collapse collapse"
-                     data-bs-parent="#accordionTingkat">
+                            <thead class="table-light">
+                                <tr>
+                                    <th>Kelas</th>
+                                    <th>Status</th>
+                                    <th>Total Jadwal</th>
+                                    <th>Aksi</th>
+                                </tr>
+                            </thead>
 
-                    <div class="accordion-body">
+                            <tbody>
 
-                        <div class="table-responsive">
+                            @forelse($kelasList as $itemKelas)
 
-                            <table class="table align-middle">
+                                @php
+                                    $submitted = $itemKelas->pengajuanJadwal
+                                        ->where('status', 'submitted')
+                                        ->count();
 
-                                <thead>
-                                    <tr>
-                                        <th>Kelas</th>
-                                        <th>Status</th>
-                                        <th>Total Jadwal</th>
-                                        <th>Aksi</th>
-                                    </tr>
-                                </thead>
+                                    $approved = $itemKelas->pengajuanJadwal
+                                        ->where('status', 'approved')
+                                        ->count();
 
-                                <tbody>
+                                    $rejected = $itemKelas->pengajuanJadwal
+                                        ->where('status', 'rejected')
+                                        ->count();
 
-                                @foreach($kelasList as $kelas)
+                                    $published = $itemKelas->pengajuanJadwal
+                                        ->where('status', 'published')
+                                        ->count();
 
-                                    @php
-                                        $latestStatus = optional(
-                                            $kelas->pengajuanJadwal->last()
-                                        )->status;
-                                    @endphp
+                                    $total = $itemKelas->pengajuanJadwal->count();
 
-                                    <tr>
+                                    if ($published > 0) {
+                                        $kelasStatus = 'published';
+                                    } elseif ($submitted > 0) {
+                                        $kelasStatus = 'submitted';
+                                    } elseif ($rejected > 0) {
+                                        $kelasStatus = 'rejected';
+                                    } elseif ($approved > 0) {
+                                        $kelasStatus = 'approved';
+                                    } else {
+                                        $kelasStatus = 'draft';
+                                    }
+                                @endphp
 
-                                        <td>
-                                            <strong>
-                                                {{ $kelas->nama_kelas }}
-                                            </strong>
-                                        </td>
+                                <tr>
 
-                                        <td>
+                                    <td>
+                                        <strong>
+                                            {{ $itemKelas->nama_kelas }}
+                                        </strong>
+                                    </td>
 
-                                            @if($latestStatus == 'submitted')
+                                    <td>
 
-                                                <span class="badge bg-warning">
-                                                    Submitted
-                                                </span>
+                                        <span class="
+                                            badge
 
-                                            @elseif($latestStatus == 'approved')
-
-                                                <span class="badge bg-success">
-                                                    Approved
-                                                </span>
-
-                                            @elseif($latestStatus == 'rejected')
-
-                                                <span class="badge bg-danger">
-                                                    Rejected
-                                                </span>
-
+                                            @if($kelasStatus == 'published')
+                                                bg-primary
+                                            @elseif($kelasStatus == 'submitted')
+                                                bg-warning
+                                            @elseif($kelasStatus == 'approved')
+                                                bg-success
+                                            @elseif($kelasStatus == 'rejected')
+                                                bg-danger
                                             @else
-
-                                                <span class="badge bg-secondary">
-                                                    Draft
-                                                </span>
-
+                                                bg-secondary
                                             @endif
+                                        ">
+                                            {{ ucfirst($kelasStatus) }}
+                                        </span>
 
-                                        </td>
+                                    </td>
 
-                                        <td>
-                                            {{ $kelas->pengajuanJadwal->count() }}
-                                        </td>
+                                    <td>
+                                        {{ $total }}
+                                    </td>
 
-                                        <td>
+                                    <td>
 
-                                            <a href="{{ route('superadmin.monitoring-jadwal.show', $kelas->id) }}"
-                                               class="btn btn-sm btn-primary">
+                                        <a
+                                            href="{{ route('superadmin.monitoring-jadwal.show', $itemKelas->id) }}"
+                                            class="btn btn-sm btn-primary"
+                                        >
+                                            Lihat
+                                        </a>
 
-                                                Lihat
+                                    </td>
 
-                                            </a>
+                                </tr>
 
-                                        </td>
+                            @empty
 
-                                    </tr>
+                                <tr>
+                                    <td colspan="4" class="text-center text-muted">
+                                        Tidak ada data kelas
+                                    </td>
+                                </tr>
 
-                                @endforeach
+                            @endforelse
 
-                                </tbody>
+                            </tbody>
 
-                            </table>
-
-                        </div>
+                        </table>
 
                     </div>
 
@@ -184,10 +236,11 @@
 
             </div>
 
-        @endforeach
+        </div>
+
+    @endforeach
 
     </div>
 
 </div>
-
 @endsection

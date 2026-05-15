@@ -38,14 +38,6 @@
             </div>
         </a>
 
-        <a class="menu-item {{ request()->is('guru/pengajuan-jadwal*') ? 'active' : '' }}"
-           href="{{ route('guru.pengajuan-jadwal.index') }}">
-            <div class="menu-left">
-                <i class="bi bi-send-check"></i>
-                <span>Pengajuan Jadwal</span>
-            </div>
-        </a>
-
         <a class="menu-item {{ request()->is('guru/status-validasi*') ? 'active' : '' }}"
            href="{{ route('guru.status-validasi.index') }}">
             <div class="menu-left">

@@ -282,3 +282,32 @@ window.toggleMenu = function (
     }
 
 }
+const selectedCount =
+    document.getElementById('selectedCount');
+
+if (selectedCount) {
+
+    const checkboxes =
+        document.querySelectorAll('.kelas-checkbox');
+
+    function updateCounter()
+    {
+        const checked =
+            document.querySelectorAll(
+                '.kelas-checkbox:checked'
+            ).length;
+
+        selectedCount.innerText =
+            checked + ' kelas dipilih';
+    }
+
+    checkboxes.forEach(cb => {
+
+        cb.addEventListener(
+            'change',
+            updateCounter
+        );
+
+    });
+
+}

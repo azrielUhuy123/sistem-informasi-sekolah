@@ -22,8 +22,10 @@ class Kelas extends Model
 
     public function kelasGrup()
     {
-        return $this->belongsTo(KelasGrup::class, 'kelas_grup_id')
-            ->with(['kelasMaster', 'angkatan']);
+        return $this->belongsTo(
+            KelasGrup::class,
+            'kelas_grup_id'
+        );
     }
 
     public function penempatan()
@@ -80,5 +82,9 @@ class Kelas extends Model
     public function pengajuanJadwal()
     {
         return $this->hasMany(PengajuanJadwal::class);
+    }
+    public function pengampuMapel()
+    {
+        return $this->hasMany(PengampuMapel::class);
     }
 }

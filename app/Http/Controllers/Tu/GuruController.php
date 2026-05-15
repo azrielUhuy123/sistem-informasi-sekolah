@@ -6,6 +6,9 @@ use App\Http\Controllers\Controller;
 use App\Models\Guru;
 use App\Models\MataPelajaran;
 use Illuminate\Http\Request;
+use App\Models\User;
+use Illuminate\Support\Facades\Hash;
+
 
 class GuruController extends Controller
 {
@@ -37,25 +40,61 @@ class GuruController extends Controller
             'alamat'
         ]);
 
+        // =========================
         // HANDLE FOTO
+        // =========================
         if ($request->hasFile('foto')) {
+
             $file = $request->file('foto');
-            $namaFile = time() . '.' . $file->getClientOriginalExtension();
-            $file->move(public_path('foto-guru'), $namaFile);
+
+            $namaFile =
+                time() . '.' .
+                $file->getClientOriginalExtension();
+
+            $file->move(
+                public_path('foto-guru'),
+                $namaFile
+            );
 
             $data['foto'] = $namaFile;
         }
 
+        // =========================
+        // CREATE USER LOGIN
+        // =========================
+        $user = User::create([
+            'name' => $request->nama,
+            'email' => $request->email,
+            'password' => Hash::make('password123'),
+            'role' => 'guru',
+        ]);
+
+        // =========================
+        // RELASI USER
+        // =========================
+        $data['user_id'] = $user->id;
+
+        // =========================
         // SIMPAN GURU
+        // =========================
         $guru = Guru::create($data);
 
-        // SIMPAN RELASI MAPEL (PIVOT)
+        // =========================
+        // SIMPAN MAPEL
+        // =========================
         if ($request->has('mapel_ids')) {
-            $guru->mapels()->sync($request->mapel_ids);
+
+            $guru->mapels()->sync(
+                $request->mapel_ids
+            );
         }
 
-        return redirect()->route('tu.guru.index')
-            ->with('success', 'Data guru berhasil ditambahkan');
+        return redirect()
+            ->route('tu.guru.index')
+            ->with(
+                'success',
+                'Data guru berhasil ditambahkan'
+            );
     }
 
     public function edit($id)

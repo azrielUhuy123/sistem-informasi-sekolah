@@ -14,7 +14,13 @@ class WaliKelas extends Model
     ];
 
     // RELASI
-
+    public function tahunAjaran()
+    {
+        return $this->belongsTo(
+            TahunAjaran::class,
+            'tahun_ajaran_id'
+        );
+    }
     public function kelas()
     {
         return $this->belongsTo(Kelas::class);

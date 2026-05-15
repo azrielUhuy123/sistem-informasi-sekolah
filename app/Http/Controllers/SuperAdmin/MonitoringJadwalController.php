@@ -14,6 +14,8 @@ class MonitoringJadwalController extends Controller
     public function index()
     {
         $kelasPerTingkat = Kelas::with([
+            'kelasGrup.kelasMaster',
+
             'pengajuanJadwal' => function ($query) {
 
                 $query->where(
@@ -23,13 +25,15 @@ class MonitoringJadwalController extends Controller
 
             }
         ])
-        ->orderBy('nama_kelas')
         ->get()
+
         ->groupBy(function ($kelas) {
 
-            preg_match('/^\d+/', $kelas->nama_kelas, $match);
+            return optional(
+                optional($kelas->kelasGrup)
+                    ->kelasMaster
+            )->tingkat ?? 'Lainnya';
 
-            return $match[0] ?? 'Lainnya';
         });
 
         return view(
@@ -142,5 +146,54 @@ class MonitoringJadwalController extends Controller
         return redirect()
             ->back()
             ->with('success', 'Jadwal berhasil direject.');
+    }
+
+    public function publish(Kelas $kelas)
+    {
+        $masihBelumFinal =
+            PengajuanJadwal::where(
+                'kelas_id',
+                $kelas->id
+            )
+            ->where(
+                'tahun_ajaran_id',
+                current_tahun_id()
+            )
+            ->whereIn('status', [
+                'draft',
+                'submitted',
+                'rejected'
+            ])
+            ->exists();
+
+        if ($masihBelumFinal) {
+
+            return back()->with(
+                'error',
+                'Masih ada jadwal yang belum final.'
+            );
+
+        }
+
+        PengajuanJadwal::where(
+                'kelas_id',
+                $kelas->id
+            )
+            ->where(
+                'tahun_ajaran_id',
+                current_tahun_id()
+            )
+            ->where(
+                'status',
+                'approved'
+            )
+            ->update([
+                'status' => 'published'
+            ]);
+
+        return back()->with(
+            'success',
+            'Jadwal berhasil dipublish.'
+        );
     }
 }

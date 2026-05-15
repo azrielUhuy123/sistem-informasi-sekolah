@@ -109,6 +109,12 @@
                                         <span class="badge bg-danger">
                                             Rejected
                                         </span>
+                                    
+                                    @elseif($item->status == 'published')
+
+                                        <span class="badge bg-primary">
+                                            Published
+                                        </span>
 
                                     @else
 

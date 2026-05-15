@@ -4,7 +4,7 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\SuperAdmin\DashboardController;
 use App\Http\Controllers\SuperAdmin\UserController;
 use App\Http\Controllers\SuperAdmin\UserApprovalController;
-use App\Http\Controllers\Superadmin\MonitoringJadwalController;
+use App\Http\Controllers\SuperAdmin\MonitoringJadwalController;
 use App\Models\Guru;
 use App\Models\MataPelajaran;
 use App\Models\HariSekolah;
@@ -13,7 +13,10 @@ use App\Http\Controllers\SuperAdmin\DataKepegawaianApprovalController;
 use App\Http\Controllers\SuperAdmin\DokumenSuperAdminController;
 use App\Http\Controllers\SuperAdmin\ValidasiSuratController;
 use App\Http\Controllers\SuperAdmin\NomorSuratController;
-
+use App\Http\Controllers\SuperAdmin\GuruController;
+use App\Http\Controllers\SuperAdmin\PengampuMapelController;
+use App\Http\Controllers\SuperAdmin\WaliKelasController;
+use App\Http\Controllers\SuperAdmin\JadwalFinalController;
 
 Route::middleware(['auth', 'role:superadmin'])
     ->prefix('superadmin')
@@ -64,6 +67,60 @@ Route::middleware(['auth', 'role:superadmin'])
             '/monitoring-jadwal/{kelas}/reject',
             [MonitoringJadwalController::class, 'reject']
         )->name('monitoring-jadwal.reject');
+
+        Route::patch(
+            '/monitoring-jadwal/{kelas}/publish',
+            [MonitoringJadwalController::class, 'publish']
+        )->name('monitoring-jadwal.publish');
+
+        Route::resource(
+            'guru',
+            GuruController::class
+        );
+        
+        Route::prefix('wali-kelas')
+        ->name('wali-kelas.')
+        ->controller(WaliKelasController::class)
+        ->group(function () {
+
+            Route::get('/', 'index')
+                ->name('index');
+
+            Route::get('/create', 'create')
+                ->name('create');
+
+            Route::post('/', 'store')
+                ->name('store');
+
+            Route::delete('/{waliKelas}', 'destroy')
+                ->name('destroy');
+
+        });
+
+
+        Route::get(
+            '/pengampu-mapel',
+            [PengampuMapelController::class, 'index']
+        )->name('pengampu-mapel.index');
+
+        Route::post(
+            '/pengampu-mapel',
+            [PengampuMapelController::class, 'store']
+        )->name('pengampu-mapel.store');
+
+        Route::delete(
+            '/pengampu-mapel/{pengampuMapel}',
+            [PengampuMapelController::class, 'destroy']
+        )->name('pengampu-mapel.destroy');
+
+        Route::get(
+            '/jadwal-final',
+            [JadwalFinalController::class, 'index']
+        )->name('jadwal-final.index');
+        Route::post(
+            '/jadwal-final/export',
+            [JadwalFinalController::class, 'export']
+        )->name('jadwal-final.export');
 
         Route::get(
             '/datakepegawaian/approval',
@@ -134,12 +191,6 @@ Route::post(
             }
         )->name('monitoring-bentrok.index');
 
-        Route::get(
-            '/jadwal-final',
-            function () {
-                return 'Jadwal Final';
-            }
-        )->name('jadwal-final.index');
 
         Route::get(
             '/akademik/mapel',

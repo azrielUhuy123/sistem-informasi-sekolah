@@ -196,6 +196,8 @@ Route::middleware(['auth', 'role:tu'])
         Route::post('/tahun/lanjut-semester', [TahunAjaranController::class, 'lanjutSemester'])
             ->name('tahun.lanjutSemester');
 
+        
+
         /*
         |--------------------------------------------------------------------------
         | RUANGAN & WALI KELAS

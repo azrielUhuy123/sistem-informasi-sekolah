@@ -22,7 +22,129 @@
         </div>
 
     </a>
+        {{-- AKADEMIK --}}
+    <button
+        class="menu-item border-0 bg-transparent text-start"
+        onclick="toggleMenu('menuAkademik','arrowAkademik')"
+    >
 
+        <div class="menu-left">
+            <i class="bi bi-journal-text"></i>
+            <span>Akademik</span>
+        </div>
+
+        <i
+            class="bi bi-chevron-right dropdown-arrow"
+            id="arrowAkademik"
+        ></i>
+
+    </button>
+
+    <div
+        class="submenu"
+        id="menuAkademik"
+    >
+
+        <a
+            class="menu-item {{ request()->is('superadmin/akademik/mapel*') ? 'active' : '' }}"
+            href="{{ route('superadmin.mapel.index') }}"
+        >
+
+            <div class="menu-left">
+                <i class="bi bi-book"></i>
+                <span>Mata Pelajaran</span>
+            </div>
+
+        </a>
+
+        <a
+            class="menu-item {{ request()->is('superadmin/guru*') ? 'active' : '' }}"
+            href="{{ route('superadmin.guru.index') }}"
+        >
+
+            <div class="menu-left">
+                <i class="bi bi-people"></i>
+                <span>Guru & Wali Kelas</span>
+            </div>
+
+        </a>
+
+        <a
+            class="menu-item {{ request()->is('superadmin/pengampu-mapel*') ? 'active' : '' }}"
+            href="{{ route('superadmin.pengampu-mapel.index') }}"
+        >
+
+            <div class="menu-left">
+                <i class="bi bi-diagram-3"></i>
+                <span>Pengampu Mapel</span>
+            </div>
+
+        </a>
+
+        <a
+            class="menu-item {{ request()->is('superadmin/wali-kelas*') ? 'active' : '' }}"
+            href="{{ route('superadmin.wali-kelas.index') }}"
+        >
+
+            <div class="menu-left">
+                <i class="bi bi-person-badge"></i>
+                <span>Wali Kelas</span>
+            </div>
+
+        </a>
+
+    </div>
+
+    
+
+    {{-- MONITORING AKADEMIK --}}
+    <button
+        class="menu-item border-0 bg-transparent text-start"
+        onclick="toggleMenu('menuMonitoring','arrowMonitoring')"
+    >
+
+        <div class="menu-left">
+            <i class="bi bi-bar-chart-line"></i>
+            <span>Monitoring Akademik</span>
+        </div>
+
+        <i
+            class="bi bi-chevron-right dropdown-arrow"
+            id="arrowMonitoring"
+        ></i>
+
+    </button>
+
+    <div
+        class="submenu"
+        id="menuMonitoring"
+    >
+
+        <a
+            class="menu-item {{ request()->is('superadmin/monitoring-jadwal*') ? 'active' : '' }}"
+            href="{{ route('superadmin.monitoring-jadwal.index') }}"
+        >
+
+            <div class="menu-left">
+                <i class="bi bi-calendar-week"></i>
+                <span>Monitoring Jadwal</span>
+            </div>
+
+        </a>
+
+        <a
+            class="menu-item {{ request()->is('superadmin/jadwal-final*') ? 'active' : '' }}"
+            href="{{ route('superadmin.jadwal-final.index') }}"
+        >
+
+            <div class="menu-left">
+                <i class="bi bi-grid-3x3-gap"></i>
+                <span>Jadwal Final</span>
+            </div>
+
+        </a>
+
+    </div>
     {{-- APPROVAL USER --}}
     <button
         class="menu-item border-0 bg-transparent text-start"
@@ -84,127 +206,7 @@
 
     </div>
 
-    {{-- MONITORING AKADEMIK --}}
-    <button
-        class="menu-item border-0 bg-transparent text-start"
-        onclick="toggleMenu('menuMonitoring','arrowMonitoring')"
-    >
 
-        <div class="menu-left">
-            <i class="bi bi-bar-chart-line"></i>
-            <span>Monitoring Akademik</span>
-        </div>
-
-        <i
-            class="bi bi-chevron-right dropdown-arrow"
-            id="arrowMonitoring"
-        ></i>
-
-    </button>
-
-    <div
-        class="submenu"
-        id="menuMonitoring"
-    >
-
-        <a
-            class="menu-item {{ request()->is('superadmin/monitoring-jadwal*') ? 'active' : '' }}"
-            href="{{ route('superadmin.monitoring-jadwal.index') }}"
-        >
-
-            <div class="menu-left">
-                <i class="bi bi-calendar-week"></i>
-                <span>Monitoring Jadwal</span>
-            </div>
-
-        </a>
-
-        <a
-            class="menu-item {{ request()->is('superadmin/monitoring-bentrok*') ? 'active' : '' }}"
-            href="{{ route('superadmin.monitoring-bentrok.index') }}"
-        >
-
-            <div class="menu-left">
-                <i class="bi bi-exclamation-triangle"></i>
-                <span>Bentrok Jadwal</span>
-            </div>
-
-        </a>
-
-        <a
-            class="menu-item {{ request()->is('superadmin/jadwal-final*') ? 'active' : '' }}"
-            href="{{ route('superadmin.jadwal-final.index') }}"
-        >
-
-            <div class="menu-left">
-                <i class="bi bi-grid-3x3-gap"></i>
-                <span>Jadwal Final</span>
-            </div>
-
-        </a>
-
-    </div>
-
-    {{-- AKADEMIK --}}
-    <button
-        class="menu-item border-0 bg-transparent text-start"
-        onclick="toggleMenu('menuAkademik','arrowAkademik')"
-    >
-
-        <div class="menu-left">
-            <i class="bi bi-journal-text"></i>
-            <span>Akademik</span>
-        </div>
-
-        <i
-            class="bi bi-chevron-right dropdown-arrow"
-            id="arrowAkademik"
-        ></i>
-
-    </button>
-
-    <div
-        class="submenu"
-        id="menuAkademik"
-    >
-
-        <a
-            class="menu-item {{ request()->is('superadmin/akademik/mapel*') ? 'active' : '' }}"
-            href="{{ route('superadmin.mapel.index') }}"
-        >
-
-            <div class="menu-left">
-                <i class="bi bi-book"></i>
-                <span>Mata Pelajaran</span>
-            </div>
-
-        </a>
-
-        <a
-            class="menu-item {{ request()->is('superadmin/akademik/guru*') ? 'active' : '' }}"
-            href="{{ route('superadmin.guru.index') }}"
-        >
-
-            <div class="menu-left">
-                <i class="bi bi-people"></i>
-                <span>Guru & Wali Kelas</span>
-            </div>
-
-        </a>
-
-        <a
-            class="menu-item {{ request()->is('superadmin/akademik/kelas*') ? 'active' : '' }}"
-            href="{{ route('superadmin.kelas.index') }}"
-        >
-
-            <div class="menu-left">
-                <i class="bi bi-diagram-3"></i>
-                <span>Struktur Kelas</span>
-            </div>
-
-        </a>
-
-    </div>
 
         {{-- DOKUMEN --}}
                 <button

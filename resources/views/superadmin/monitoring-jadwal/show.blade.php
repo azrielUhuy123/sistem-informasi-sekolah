@@ -118,6 +118,29 @@
 
         </button>
 
+        {{-- PUBLISH --}}
+        <form
+            method="POST"
+            action="{{ route(
+                'superadmin.monitoring-jadwal.publish',
+                $kelas->id
+            ) }}"
+        >
+
+            @csrf
+
+            <button
+                type="submit"
+                class="btn btn-primary"
+            >
+
+                <i class="bi bi-send-check"></i>
+
+                Publish Jadwal
+
+            </button>
+
+        </form>
     </div>
     {{-- CARD --}}
     @if($view == 'grid')
