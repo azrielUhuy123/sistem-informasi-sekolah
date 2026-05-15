@@ -5,13 +5,19 @@ namespace App\Imports;
 use App\Models\Siswa;
 use App\Models\Kelas;
 use App\Models\KelasGrup;
+use App\Models\KelasMaster;
 use App\Models\TahunAjaran;
 use App\Models\PenempatanSiswa;
+use App\Models\Angkatan;
+
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
+
 use Carbon\Carbon;
+
 use Maatwebsite\Excel\Concerns\ToCollection;
 use Maatwebsite\Excel\Concerns\WithHeadingRow;
+
 use PhpOffice\PhpSpreadsheet\Shared\Date;
 
 class SiswaImport implements ToCollection, WithHeadingRow
@@ -20,123 +26,208 @@ class SiswaImport implements ToCollection, WithHeadingRow
 
     public function __construct()
     {
-        $this->tahunAjaran = TahunAjaran::aktif();
+        /*
+        |--------------------------------------------------------------------------
+        | AMBIL TAHUN AJARAN TERBARU
+        |--------------------------------------------------------------------------
+        */
+
+        $this->tahunAjaran = TahunAjaran::latest()->first();
 
         if (!$this->tahunAjaran) {
-            throw new \Exception("Tidak ada tahun ajaran aktif.");
-        }
-
-        if ($this->tahunAjaran->status !== 'aktif') {
-            throw new \Exception("Import hanya boleh saat tahun ajaran AKTIF (awal tahun).");
+            throw new \Exception("Data tahun ajaran belum tersedia.");
         }
     }
 
     public function collection(Collection $rows)
     {
-        
         if (!$rows->count()) {
             throw new \Exception("File kosong atau header tidak sesuai.");
         }
 
-        $angkatan = \App\Models\Angkatan::where('aktif', 1)->first();
+        DB::transaction(function () use ($rows) {
 
-        if (!$angkatan) {
-            throw new \Exception("Angkatan untuk tahun ajaran aktif tidak ditemukan.");
-        }
-
-
-        DB::transaction(function () use ($rows, $angkatan) {
-            $total = 0;
+            $total   = 0;
             $created = 0;
             $updated = 0;
 
             foreach ($rows as $row) {
-            
+
+                /*
+                |--------------------------------------------------------------------------
+                | SKIP ROW KOSONG
+                |--------------------------------------------------------------------------
+                */
+
                 if (empty($row['nis'])) {
                     continue;
                 }
+
                 $total++;
+
+                /*
+                |--------------------------------------------------------------------------
+                | BASIC DATA
+                |--------------------------------------------------------------------------
+                */
 
                 $nis     = trim((string) $row['nis']);
                 $nisn    = trim((string) $row['nisn']);
-                $tingkat = trim($row['tingkat']);
-                $rombel  = trim($row['rombel']);
+                $nama    = trim((string) $row['nama']);
+                $tingkat = trim((string) $row['tingkat']);
+                $rombel  = strtoupper(trim((string) $row['rombel']));
 
-                $namaKelas = $tingkat . $rombel;
+                /*
+                |--------------------------------------------------------------------------
+                | VALIDASI NISN
+                |--------------------------------------------------------------------------
+                */
 
-                // Cari kelas_master berdasarkan tingkat
-                $kelasMaster = \App\Models\KelasMaster::where('tingkat', $tingkat)->first();
+                if (!is_numeric($nisn) || strlen($nisn) != 10) {
+
+                    throw new \Exception(
+                        "NISN harus 10 digit angka pada siswa NIS {$nis}"
+                    );
+                }
+
+                /*
+                |--------------------------------------------------------------------------
+                | RESOLVE ANGKATAN
+                |--------------------------------------------------------------------------
+                */
+
+                $angkatan = $this->resolveAngkatanByTingkat($tingkat);
+
+                /*
+                |--------------------------------------------------------------------------
+                | VALIDASI KELAS MASTER
+                |--------------------------------------------------------------------------
+                */
+
+                $kelasMaster = KelasMaster::where('tingkat', $tingkat)->first();
 
                 if (!$kelasMaster) {
-                    throw new \Exception("Tingkat {$tingkat} tidak ditemukan di kelas_master.");
+
+                    throw new \Exception(
+                        "Kelas master tingkat {$tingkat} tidak ditemukan."
+                    );
                 }
-                // Cari kelas_grup berdasarkan kelas_master + angkatan
-                $kelasGrup = \App\Models\KelasGrup::where('kelas_master_id', $kelasMaster->id)
+
+                /*
+                |--------------------------------------------------------------------------
+                | RESOLVE KELAS GRUP
+                |--------------------------------------------------------------------------
+                */
+
+                $kelasGrup = KelasGrup::where('kelas_master_id', $kelasMaster->id)
                     ->where('angkatan_id', $angkatan->id)
                     ->first();
 
                 if (!$kelasGrup) {
-                    throw new \Exception("KelasGrup untuk tingkat {$tingkat} tidak ditemukan.");
+
+                    throw new \Exception(
+                        "Kelas grup tingkat {$tingkat} untuk angkatan {$angkatan->tahun} tidak ditemukan."
+                    );
                 }
 
-                // Auto create rombel jika belum ada
+                /*
+                |--------------------------------------------------------------------------
+                | RESOLVE KELAS
+                |--------------------------------------------------------------------------
+                */
+
+                $namaKelas = $tingkat . $rombel;
+
                 $kelas = Kelas::firstOrCreate([
-                    'nama_kelas'   => $namaKelas,
-                    'kelas_grup_id'=> $kelasGrup->id
+                    'nama_kelas'    => $namaKelas,
+                    'kelas_grup_id' => $kelasGrup->id
                 ]);
 
-                // validasi isi baris
+                /*
+                |--------------------------------------------------------------------------
+                | VALIDASI JENIS KELAMIN
+                |--------------------------------------------------------------------------
+                */
+
                 $jk = $this->normalizeJK($row['jenis_kelamin']);
 
-                if (!is_numeric($nisn) || strlen($nisn) != 10) {
-                    throw new \Exception("NISN harus 10 digit angka pada NIS {$nis}");
-                }
-                
-                //handle tanggal lahir yang bisa berupa string atau excel date
+                /*
+                |--------------------------------------------------------------------------
+                | HANDLE TANGGAL LAHIR
+                |--------------------------------------------------------------------------
+                */
+
                 $tanggalLahir = null;
 
                 if (!empty($row['tanggal_lahir'])) {
 
                     $raw = $row['tanggal_lahir'];
 
-                    // Jika Excel numeric date (serial)
+                    // Excel serial number
                     if (is_numeric($raw)) {
+
                         $tanggalLahir = Date::excelToDateTimeObject($raw)
-                                            ->format('Y-m-d');
-                    } 
-                    else {
-                        // Coba format US: m/d/Y (karena Excel Anda US style)
+                            ->format('Y-m-d');
+
+                    } else {
+
+                        // Format m/d/Y
                         try {
+
                             $tanggalLahir = Carbon::createFromFormat('m/d/Y', $raw)
-                                                ->format('Y-m-d');
+                                ->format('Y-m-d');
+
                         } catch (\Exception $e) {
 
-                            // Fallback jika memang sudah Y-m-d
+                            // Format Y-m-d
                             try {
+
                                 $tanggalLahir = Carbon::createFromFormat('Y-m-d', $raw)
-                                                    ->format('Y-m-d');
+                                    ->format('Y-m-d');
+
                             } catch (\Exception $e) {
-                                throw new \Exception("Format tanggal_lahir tidak valid: {$raw}");
+
+                                throw new \Exception(
+                                    "Format tanggal_lahir tidak valid: {$raw}"
+                                );
                             }
                         }
                     }
                 }
-                
-                // Buat atau ambil siswa
+
+                /*
+                |--------------------------------------------------------------------------
+                | CREATE / GET SISWA
+                |--------------------------------------------------------------------------
+                */
+
                 $siswa = Siswa::firstOrCreate(
                     ['nis' => $nis],
                     [
                         'nisn'          => $nisn,
-                        'nama'          => $row['nama'],
+                        'nama'          => $nama,
                         'jenis_kelamin' => $jk,
                         'tanggal_lahir' => $tanggalLahir,
+                        'status'        => 'aktif'
                     ]
                 );
+
+                /*
+                |--------------------------------------------------------------------------
+                | CEK PENEMPATAN AKTIF
+                |--------------------------------------------------------------------------
+                */
 
                 $penempatanAktif = PenempatanSiswa::where('siswa_id', $siswa->id)
                     ->where('tahun_ajaran_id', $this->tahunAjaran->id)
                     ->whereNull('tanggal_keluar')
                     ->first();
+
+                /*
+                |--------------------------------------------------------------------------
+                | BELUM ADA PENEMPATAN
+                |--------------------------------------------------------------------------
+                */
 
                 if (!$penempatanAktif) {
 
@@ -147,40 +238,96 @@ class SiswaImport implements ToCollection, WithHeadingRow
                         'tanggal_masuk'   => now(),
                         'tanggal_keluar'  => null
                     ]);
+
                     $created++;
-                } else {
 
-                    if ($penempatanAktif->kelas_id != $kelas->id) {
+                    continue;
+                }
 
-                        $penempatanAktif->update([
-                            'tanggal_keluar' => now()
-                        ]);
+                /*
+                |--------------------------------------------------------------------------
+                | JIKA PINDAH KELAS
+                |--------------------------------------------------------------------------
+                */
 
-                        PenempatanSiswa::create([
-                            'siswa_id'        => $siswa->id,
-                            'kelas_id'        => $kelas->id,
-                            'tahun_ajaran_id' => $this->tahunAjaran->id,
-                            'tanggal_masuk'   => now(),
-                            'tanggal_keluar'  => null
-                        ]);
-                        $updated++;
-                    }
+                if ($penempatanAktif->kelas_id != $kelas->id) {
+
+                    // Tutup penempatan lama
+                    $penempatanAktif->update([
+                        'tanggal_keluar' => now()
+                    ]);
+
+                    // Buat penempatan baru
+                    PenempatanSiswa::create([
+                        'siswa_id'        => $siswa->id,
+                        'kelas_id'        => $kelas->id,
+                        'tahun_ajaran_id' => $this->tahunAjaran->id,
+                        'tanggal_masuk'   => now(),
+                        'tanggal_keluar'  => null
+                    ]);
+
+                    $updated++;
                 }
             }
+
+            /*
+            |--------------------------------------------------------------------------
+            | REPORT
+            |--------------------------------------------------------------------------
+            */
+
             session()->flash('import_report', [
-            'total'   => $total,
-            'created' => $created,
-            'updated' => $updated
+                'total'   => $total,
+                'created' => $created,
+                'updated' => $updated
             ]);
         });
     }
+
+    /*
+    |--------------------------------------------------------------------------
+    | RESOLVE ANGKATAN BERDASARKAN TINGKAT
+    |--------------------------------------------------------------------------
+    */
+
+    private function resolveAngkatanByTingkat($tingkat)
+    {
+        $tahunAwal = (int) explode('/', $this->tahunAjaran->tahun)[0];
+
+        $tahunAngkatan = $tahunAwal - ((int)$tingkat - 1);
+
+        $angkatan = Angkatan::where('tahun', $tahunAngkatan)->first();
+
+        if (!$angkatan) {
+
+            throw new \Exception(
+                "Angkatan {$tahunAngkatan} tidak ditemukan."
+            );
+        }
+
+        return $angkatan;
+    }
+
+    /*
+    |--------------------------------------------------------------------------
+    | NORMALIZE JENIS KELAMIN
+    |--------------------------------------------------------------------------
+    */
+
     private function normalizeJK($value)
     {
         $v = strtoupper(trim($value));
 
-        if (in_array($v, ['L', 'LAKI-LAKI'])) return 'L';
-        if (in_array($v, ['P', 'PEREMPUAN'])) return 'P';
+        if (in_array($v, ['L', 'LAKI-LAKI'])) {
+            return 'L';
+        }
 
-        throw new \Exception("Jenis kelamin tidak valid: {$value}");
+        if (in_array($v, ['P', 'PEREMPUAN'])) {
+            return 'P';
+        }
+
+        throw new \Exception(
+            "Jenis kelamin tidak valid: {$value}"
+        );
     }
 }

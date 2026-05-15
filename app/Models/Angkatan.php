@@ -10,12 +10,11 @@ class Angkatan extends Model
 
     protected $fillable = [
         'tahun',
-        'keterangan',
-        'aktif',
+        'keterangan'
     ];
 
-    protected $casts = [
-        'tahun' => 'integer',
-        'aktif' => 'boolean',
-    ];
+    public function kelasGrup()
+    {
+        return $this->hasMany(KelasGrup::class);
+    }
 }

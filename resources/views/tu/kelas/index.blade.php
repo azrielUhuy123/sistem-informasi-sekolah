@@ -14,7 +14,7 @@
                     {{ session('error') }}
                 </div>
             @endif
-            @if($tahunAktif && $tahunAktif->status === 'aktif')
+
                 <form action="{{ route('tu.siswa.import') }}" method="POST" enctype="multipart/form-data" class="d-flex gap-2">
                     @csrf
                     <input type="file" name="file" class="form-control form-control-sm" required>
@@ -22,11 +22,7 @@
                         Import Excel
                     </button>
                 </form>
-            @else
-                <button class="btn btn-secondary" disabled>
-                    Import (hanya saat aktif)
-                </button>
-            @endif
+
             <a href="{{ route('tu.kelas.grup.create') }}"
                class="btn btn-primary btn-sm">
                 <i class="bi bi-plus-circle"></i> Tambah Grup
