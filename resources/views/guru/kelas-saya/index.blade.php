@@ -56,6 +56,12 @@
                                 Jenis Kelamin
                             </th>
 
+                            <th width="150">
+
+                                Aksi
+
+                            </th>
+
                         </tr>
 
                     </thead>
@@ -99,6 +105,27 @@
                                 <td>
 
                                     {{ $p->siswa->jenis_kelamin }}
+
+                                </td>
+                                <td class="d-flex gap-2">
+
+                                    <a
+                                        href="{{ route('guru.kelas-saya.show', $p->siswa->id) }}"
+                                        class="btn btn-primary btn-sm"
+                                    >
+
+                                        Detail
+
+                                    </a>
+
+                                    <a
+                                        href="{{ route('guru.raport.show', $p->siswa->id) }}"
+                                        class="btn btn-success btn-sm"
+                                    >
+
+                                        Raport
+
+                                    </a>
 
                                 </td>
                             </tr>

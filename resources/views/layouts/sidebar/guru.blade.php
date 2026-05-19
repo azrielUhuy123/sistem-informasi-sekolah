@@ -10,8 +10,8 @@
         MAIN GURU
     </div>
 
-    <a class="menu-item {{ request()->is('guru/dashboard') ? 'active' : '' }}"
-       href="{{ route('guru.dashboard') }}">
+    <a class="menu-item {{ request()->is('guru/dashboard-walikelas') ? 'active' : '' }}"
+       href="{{ route('guru.dashboard-walikelas') }}">
         <div class="menu-left">
             <i class="bi bi-speedometer2"></i>
             <span>Dashboard</span>
@@ -87,16 +87,24 @@
         <a class="menu-item {{ request()->is('guru/nilai*') ? 'active' : '' }}"
            href="{{ route('guru.nilai.index') }}">
             <div class="menu-left">
-                <i class="bi bi-patch-check"></i>
+                <i class="bi bi-journal-check"></i>
                 <span>Nilai</span>
             </div>
         </a>
 
-        <a class="menu-item {{ request()->is('guru/status-validasi*') ? 'active' : '' }}"
-           href="{{ route('guru.status-validasi.index') }}">
+        <a class="menu-item {{ request()->is('guru/perkembangan*') ? 'active' : '' }}"
+           href="{{ route('guru.perkembangan.index') }}">
             <div class="menu-left">
-                <i class="bi bi-patch-check"></i>
+                <i class="bi bi-graph-up-arrow"></i>
                 <span>Pengembangan Siswa</span>
+            </div>
+        </a>
+
+        <a class="menu-item {{ request()->is('guru/kenaikan*') ? 'active' : '' }}"
+           href="{{ route('guru.kenaikan.index') }}">
+            <div class="menu-left">
+                <i class="bi bi-mortarboard"></i>
+                <span>Kenaikan Kelas</span>
             </div>
         </a>
 

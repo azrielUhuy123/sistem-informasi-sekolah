@@ -11,6 +11,11 @@ use App\Http\Controllers\Guru\NomorSuratGuruController;
 use App\Http\Controllers\Guru\WaliKelasController;
 use App\Http\Controllers\Guru\AbsensiController;
 use App\Http\Controllers\Guru\NilaiController;
+use App\Http\Controllers\Guru\PerkembanganSiswaController;
+use App\Http\Controllers\Guru\KenaikanKelasGuruController;
+use App\Http\Controllers\Guru\RaportController;
+use App\Http\Controllers\Guru\DashboardWaliKelasController;
+
 Route::prefix('guru')
     ->name('guru.')
     ->middleware(['auth', 'role:guru'])
@@ -18,6 +23,11 @@ Route::prefix('guru')
 
         Route::get('/dashboard', [DashboardGuruController::class, 'index'])
             ->name('dashboard');
+        
+        Route::get(
+            '/dashboard-walikelas',
+            [DashboardWaliKelasController::class, 'index']
+        )->name('dashboard-walikelas');
 
         Route::get(
             '/jadwal-saya',
@@ -50,6 +60,11 @@ Route::prefix('guru')
         )->name('kelas-saya');
 
         Route::get(
+            '/raport/{siswa}',
+            [RaportController::class, 'show']
+        )->name('raport.show');
+
+        Route::get(
             '/absensi',
             [AbsensiController::class, 'index']
         )->name('absensi.index');
@@ -77,6 +92,31 @@ Route::prefix('guru')
             '/nilai',
             [NilaiController::class, 'store']
         )->name('nilai.store');
+
+        Route::get(
+            '/perkembangan-siswa',
+            [PerkembanganSiswaController::class, 'index']
+        )->name('perkembangan.index');
+
+        Route::post(
+            '/perkembangan-siswa',
+            [PerkembanganSiswaController::class, 'store']
+        )->name('perkembangan.store');
+
+        Route::get(
+            '/siswa/{siswa}',
+            [WaliKelasController::class, 'show']
+        )->name('kelas-saya.show');
+
+        Route::get(
+            '/kenaikan-kelas',
+            [KenaikanKelasGuruController::class, 'index']
+        )->name('kenaikan.index');
+
+        Route::post(
+            '/kenaikan-kelas',
+            [KenaikanKelasGuruController::class, 'store']
+        )->name('kenaikan.store');
 
         Route::get(
             '/status-validasi',

@@ -15,6 +15,7 @@ if (!function_exists('current_tahun')) {
         return TahunAjaran::find(current_tahun_id());
     }
 }
+
 if (!function_exists('max_jp_kelas')) {
 
     function max_jp_kelas($tingkat)
