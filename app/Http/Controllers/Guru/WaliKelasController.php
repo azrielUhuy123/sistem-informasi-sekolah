@@ -3,11 +3,13 @@
 namespace App\Http\Controllers\Guru;
 
 use App\Http\Controllers\Controller;
-use App\Models\WaliKelas;
-use App\Models\Siswa;
-use App\Models\NilaiSiswa;
 use App\Models\AbsensiSiswa;
+use App\Models\GuruMapel;
+use App\Models\NilaiSiswa;
+use App\Models\PengajuanJadwal;
 use App\Models\PerkembanganSiswa;
+use App\Models\Siswa;
+use App\Models\WaliKelas;
 
 class WaliKelasController extends Controller
 {
@@ -18,47 +20,119 @@ class WaliKelasController extends Controller
         if (!$guru) {
 
             abort(403);
-
         }
 
-        $waliKelas = WaliKelas::with([
+        /*
+        |--------------------------------------------------------------------------
+        | CEK WALIKELAS
+        |--------------------------------------------------------------------------
+        */
 
-            'kelas',
-        ])
-        ->where(
-            'guru_id',
-            $guru->id
-        )
-        ->where(
-            'tahun_ajaran_id',
-            current_tahun_id()
-        )
-        ->first();
+        $waliKelas = WaliKelas::with('kelas')
+            ->where(
+                'guru_id',
+                $guru->id
+            )
+            ->where(
+                'tahun_ajaran_id',
+                current_tahun_id()
+            )
+            ->first();
 
-        if (!$waliKelas) {
+        /*
+        |--------------------------------------------------------------------------
+        | JIKA WALIKELAS
+        |--------------------------------------------------------------------------
+        */
+
+        if ($waliKelas) {
+
+            $kelas = $waliKelas->kelas;
+
+            $penempatan = $kelas
+                ->siswaAktif()
+                ->with('siswa')
+                ->get();
 
             return view(
-                'guru.kelas-saya.empty'
+                'guru.kelas-saya.index',
+                compact(
+                    'waliKelas',
+                    'kelas',
+                    'penempatan'
+                )
             );
-
         }
 
-        $kelas = $waliKelas->kelas;
+        /*
+        |--------------------------------------------------------------------------
+        | GURU BIDANG
+        |--------------------------------------------------------------------------
+        */
 
-        $penempatan = $kelas
-            ->siswaAktif()
-            ->with('siswa')
-            ->get();
-
-        return view(
-            'guru.kelas-saya.index',
-            compact(
-                'waliKelas',
+        $kelasDiampu = PengajuanJadwal::with([
                 'kelas',
-                'penempatan'
+                'mapel',
+            ])
+            ->where(
+                'guru_id',
+                $guru->id
+            )
+            ->whereIn(
+                'status',
+                ['approved', 'published']
+            )
+            ->where(
+                'tahun_ajaran_id',
+                current_tahun_id()
+            )
+            ->get()
+            ->unique(function ($item) {
+
+                return $item->kelas_id . '-' . $item->mapel_id;
+            })
+            ->values();
+
+        foreach ($kelasDiampu as $item) {
+
+            /*
+            |--------------------------------------------------------------------------
+            | TOTAL SISWA
+            |--------------------------------------------------------------------------
+            */
+
+            $item->total_siswa = $item->kelas
+                ->siswaAktif()
+                ->count();
+
+            /*
+            |--------------------------------------------------------------------------
+            | NILAI TERISI
+            |--------------------------------------------------------------------------
+            */
+
+            $item->nilai_terisi = NilaiSiswa::where(
+                    'kelas_id',
+                    $item->kelas_id
+                )
+                ->where(
+                    'mapel_id',
+                    $item->mapel_id
+                )
+                ->where(
+                    'tahun_ajaran_id',
+                    current_tahun_id()
+                )
+                ->count();
+        }
+        return view(
+            'guru.kelas-saya.guru-bidang',
+            compact(
+                'kelasDiampu'
             )
         );
     }
+
     public function show(Siswa $siswa)
     {
         /*

@@ -40,7 +40,10 @@ class PengajuanJadwal extends Model
 
     public function hari()
     {
-        return $this->belongsTo(HariSekolah::class, 'hari_id');
+        return $this->belongsTo(
+            HariSekolah::class,
+            'hari_id'
+        );
     }
 
     public function tahunAjaran()
@@ -48,9 +51,11 @@ class PengajuanJadwal extends Model
         return $this->belongsTo(TahunAjaran::class);
     }
 
-
     public function jamPelajaran()
     {
-        return $this->belongsTo(JamPelajaran::class, 'jam_pelajaran_id');
+        return $this->belongsTo(
+            JamPelajaran::class,
+            'jam_pelajaran_id'
+        );
     }
 }

@@ -75,6 +75,16 @@ Route::prefix('guru')
         )->name('absensi.store');
 
         Route::get(
+            '/absensi/{absensi}/edit',
+            [AbsensiController::class, 'edit']
+        )->name('absensi.edit');
+
+        Route::put(
+            '/absensi/{absensi}',
+            [AbsensiController::class, 'update']
+        )->name('absensi.update');
+
+        Route::get(
             '/rekap-absensi',
             [AbsensiController::class, 'rekap']
         )->name('absensi.rekap');

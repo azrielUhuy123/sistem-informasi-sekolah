@@ -10,6 +10,7 @@ class AbsensiSiswa extends Model
 
     protected $fillable = [
 
+        'jadwal_id',
         'siswa_id',
         'kelas_id',
         'tahun_ajaran_id',
@@ -40,6 +41,13 @@ class AbsensiSiswa extends Model
         return $this->belongsTo(
             User::class,
             'created_by'
+        );
+    }
+    public function jadwal()
+    {
+        return $this->belongsTo(
+            PengajuanJadwal::class,
+            'jadwal_id'
         );
     }
 }

@@ -101,4 +101,9 @@ class User extends Authenticatable
     {
         return $this->hasOne(\App\Models\Guru::class);
     }
+
+    public function siswa()
+    {
+        return $this->hasOne(Siswa::class);
+    }
 }

@@ -2,6 +2,22 @@
     $tahun = current_tahun();
 @endphp
 
+@php
+
+    $guru = auth()->user()->guru;
+
+    $isWaliKelas = \App\Models\WaliKelas::where(
+        'guru_id',
+        $guru?->id
+    )
+    ->where(
+        'tahun_ajaran_id',
+        current_tahun_id()
+    )
+    ->exists();
+
+@endphp
+
 <div class="sidebar">
 
     @include('layouts.partials.tahun-ajaran')
@@ -17,6 +33,8 @@
             <span>Dashboard</span>
         </div>
     </a>
+
+    
 
     <button class="menu-item border-0 bg-transparent text-start"
             onclick="toggleMenu('menuJadwal','arrowJadwal')">
@@ -59,14 +77,15 @@
     </button>
 
     <div class="submenu" id="menuKelas">
-
-        <a class="menu-item {{ request()->is('guru/kelas-saya*') ? 'active' : '' }}"
-           href="{{ route('guru.kelas-saya') }}">
-            <div class="menu-left">
-                <i class="bi bi-people"></i>
-                <span>Kelas Saya</span>
-            </div>
-        </a>
+        @if($isWaliKelas)
+            <a class="menu-item {{ request()->is('guru/kelas-saya*') ? 'active' : '' }}"
+            href="{{ route('guru.kelas-saya') }}">
+                <div class="menu-left">
+                    <i class="bi bi-people"></i>
+                    <span>Kelas Saya</span>
+                </div>
+            </a>
+        @endif
 
         <a class="menu-item {{ request()->is('guru/absensi*') ? 'active' : '' }}"
            href="{{ route('guru.absensi.index') }}">
@@ -100,13 +119,15 @@
             </div>
         </a>
 
-        <a class="menu-item {{ request()->is('guru/kenaikan*') ? 'active' : '' }}"
-           href="{{ route('guru.kenaikan.index') }}">
-            <div class="menu-left">
-                <i class="bi bi-mortarboard"></i>
-                <span>Kenaikan Kelas</span>
-            </div>
-        </a>
+        @if($isWaliKelas)
+            <a class="menu-item {{ request()->is('guru/kenaikan*') ? 'active' : '' }}"
+            href="{{ route('guru.kenaikan.index') }}">
+                <div class="menu-left">
+                    <i class="bi bi-mortarboard"></i>
+                    <span>Kenaikan Kelas</span>
+                </div>
+            </a>
+        @endif
 
     </div>
 

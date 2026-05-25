@@ -17,6 +17,7 @@ use App\Http\Controllers\SuperAdmin\GuruController;
 use App\Http\Controllers\SuperAdmin\PengampuMapelController;
 use App\Http\Controllers\SuperAdmin\WaliKelasController;
 use App\Http\Controllers\SuperAdmin\JadwalFinalController;
+use App\Http\Controllers\SuperAdmin\MataPelajaranController;
 
 Route::middleware(['auth', 'role:superadmin'])
     ->prefix('superadmin')
@@ -97,7 +98,11 @@ Route::middleware(['auth', 'role:superadmin'])
 
         });
 
-
+        Route::get(
+            '/mapel',
+            [MataPelajaranController::class, 'index']
+        )->name('mapel.index');
+        
         Route::get(
             '/pengampu-mapel',
             [PengampuMapelController::class, 'index']

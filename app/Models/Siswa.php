@@ -54,4 +54,9 @@ class Siswa extends Model
 
         return $penempatan ? 'Aktif' : 'Belum ditempatkan';
     }
+
+    public function user()
+    {
+        return $this->belongsTo(User::class);
+    }
 }

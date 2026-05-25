@@ -1,20 +1,23 @@
 <div class="topbar">
-    <h4>SDN MEKAR JAYA</h4>
+    <div class="d-flex align-items-center gap-2">
+
+        <img
+            src="{{ asset('assets/images/logo kolaan.png') }}"
+            alt="Logo"
+            width="40"
+            height="50"
+            class="rounded-circle"
+        >
+
+        <h3 class="mt-2">
+
+            SDN MEKAR JAYA
+
+        </h3>
+
+    </div>
 
     <div class="topbar-right">
-        <div class="search-box">
-            <input
-                type="text"
-                id="globalSearch"
-                class="form-control shadow-sm"
-                placeholder="Cari siswa / kelas..."
-            >
-            <div
-                id="searchResults"
-                class="bg-white border rounded shadow-sm mt-1"
-                style="display:none; position:absolute; width:100%; z-index:1000;"
-            ></div>
-        </div>
 
         <button id="darkToggle" class="btn">🌙</button>
 

@@ -53,17 +53,11 @@ class DashboardWaliKelasController extends Controller
         */
 
         $totalLaki = $penempatan
-            ->filter(fn ($p) =>
-                strtolower($p->siswa->jenis_kelamin)
-                == 'L'
-            )
+            ->where('siswa.jenis_kelamin', 'L')
             ->count();
 
         $totalPerempuan = $penempatan
-            ->filter(fn ($p) =>
-                strtolower($p->siswa->jenis_kelamin)
-                == 'P'
-            )
+            ->where('siswa.jenis_kelamin', 'P')
             ->count();
 
         /*

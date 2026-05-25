@@ -6,30 +6,87 @@
 
 <div class="container-fluid py-3">
 
+    {{-- HEADER --}}
     <div class="mb-4">
 
         <h4 class="fw-bold mb-1">
 
-            Absensi Kelas {{ $kelas->nama_kelas }}
+            Absensi Jadwal Mengajar
 
         </h4>
 
+        <small class="text-muted">
+
+            Input absensi berdasarkan jadwal pelajaran hari ini
+
+        </small>
+
     </div>
 
-    <form
-        action="{{ route('guru.absensi.store') }}"
-        method="POST"
-    >
+    {{-- FILTER JADWAL --}}
+    <div class="card border-0 shadow-sm mb-4">
 
-        @csrf
+        <div class="card-body">
 
-        <div class="card border-0 shadow-sm mb-4">
+            <form method="GET">
 
-            <div class="card-body">
+                <div class="row g-3 align-items-end">
 
-                <div class="row">
+                    {{-- JADWAL --}}
+                    <div class="col-lg-7">
 
-                    <div class="col-md-4">
+                        <label class="form-label">
+
+                            Jadwal Hari Ini
+
+                        </label>
+
+                        <select
+                            name="jadwal_id"
+                            class="form-select"
+                            onchange="this.form.submit()"
+                        >
+
+                            @forelse($jadwals as $j)
+
+                                <option
+                                    value="{{ $j->id }}"
+                                    {{
+                                        $jadwalId == $j->id
+                                        ? 'selected'
+                                        : ''
+                                    }}
+                                >
+
+                                    {{ $j->kelas->nama_kelas }}
+                                    -
+                                    {{ $j->mapel->nama_mapel }}
+                                    -
+                                    Jam {{ $j->jamPelajaran->jam_ke }}
+                                    (
+                                    {{ substr($j->jamPelajaran->mulai, 0, 5) }}
+                                    -
+                                    {{ substr($j->jamPelajaran->selesai, 0, 5) }}
+                                    )
+
+                                </option>
+
+                            @empty
+
+                                <option>
+
+                                    Tidak ada jadwal hari ini
+
+                                </option>
+
+                            @endforelse
+
+                        </select>
+
+                    </div>
+
+                    {{-- TANGGAL --}}
+                    <div class="col-lg-3">
 
                         <label class="form-label">
 
@@ -39,124 +96,115 @@
 
                         <input
                             type="date"
-                            name="tanggal"
                             class="form-control"
-                            value="{{ date('Y-m-d') }}"
-                            required
+                            value="{{ request('tanggal') ?? date('Y-m-d') }}"
+                            disabled
                         >
 
                     </div>
 
+                    {{-- INFO --}}
+                    <div class="col-lg-2">
+
+                        <div class="small text-muted">
+
+                            Total Jadwal
+
+                        </div>
+
+                        <div class="fw-bold fs-5">
+
+                            {{ $jadwals->count() }}
+
+                        </div>
+
+                    </div>
+
                 </div>
-                <div class="mt-4">
 
-                    <button class="btn btn-primary">
-
-                        Simpan Absensi
-
-                    </button>
-
-                </div>
-            </div>
-
+            </form>
 
         </div>
 
-        <div class="card border-0 shadow-sm">
+    </div>
+
+    {{-- DETAIL JADWAL --}}
+    @if($jadwal)
+
+        <div class="card border-0 shadow-sm mb-4">
 
             <div class="card-body">
 
-                <div class="table-responsive">
+                <div class="row">
 
-                    <table class="table align-middle">
+                    <div class="col-md-3">
 
-                        <thead class="table-light">
+                        <small class="text-muted d-block">
 
-                            <tr>
+                            Kelas
 
-                                <th width="70">
-                                    No
-                                </th>
+                        </small>
 
-                                <th>
-                                    Nama Siswa
-                                </th>
+                        <div class="fw-semibold">
 
-                                <th width="220">
-                                    Status
-                                </th>
+                            {{ $jadwal->kelas->nama_kelas }}
 
-                                <th>
-                                    Keterangan
-                                </th>
+                        </div>
 
-                            </tr>
+                    </div>
 
-                        </thead>
+                    <div class="col-md-3">
 
-                        <tbody>
+                        <small class="text-muted d-block">
 
-                            @foreach($penempatan as $i => $p)
+                            Mata Pelajaran
 
-                                <tr>
+                        </small>
 
-                                    <td>
+                        <div class="fw-semibold">
 
-                                        {{ $i + 1 }}
+                            {{ $jadwal->mapel->nama_mapel }}
 
-                                    </td>
+                        </div>
 
-                                    <td>
+                    </div>
 
-                                        {{ $p->siswa->nama }}
+                    <div class="col-md-3">
 
-                                    </td>
+                        <small class="text-muted d-block">
 
-                                    <td>
+                            Hari
 
-                                        <select
-                                            name="absensi[{{ $p->siswa->id }}][status]"
-                                            class="form-select"
-                                        >
+                        </small>
 
-                                            <option value="hadir">
-                                                Hadir
-                                            </option>
+                        <div class="fw-semibold">
 
-                                            <option value="izin">
-                                                Izin
-                                            </option>
+                            {{ $jadwal->hari->nama }}
 
-                                            <option value="sakit">
-                                                Sakit
-                                            </option>
+                        </div>
 
-                                            <option value="alpha">
-                                                Alpha
-                                            </option>
+                    </div>
 
-                                        </select>
+                    <div class="col-md-3">
 
-                                    </td>
+                        <small class="text-muted d-block">
 
-                                    <td>
+                            Jam Pelajaran
 
-                                        <input
-                                            type="text"
-                                            name="absensi[{{ $p->siswa->id }}][keterangan]"
-                                            class="form-control"
-                                            placeholder="Opsional"
-                                        >
+                        </small>
 
-                                    </td>
+                        <div class="fw-semibold">
 
-                                </tr>
+                            Jam {{ $jadwal->jamPelajaran->jam_ke }}
+                            (
+                            {{ substr($jadwal->jamPelajaran->mulai, 0, 5) }}
+                            -
+                            {{ substr($jadwal->jamPelajaran->selesai, 0, 5) }}
+                            )
 
-                            @endforeach
+                        </div>
 
-                        </tbody>
-
-                    </table>
+                    </div>
 
                 </div>
 
@@ -164,9 +212,369 @@
 
         </div>
 
+        {{-- FORM ABSENSI --}}
+        <form
+            action="{{ route('guru.absensi.store') }}"
+            method="POST"
+        >
 
+            @csrf
 
-    </form>
+            <input
+                type="hidden"
+                name="jadwal_id"
+                value="{{ $jadwal->id }}"
+            >
+
+            <input
+                type="hidden"
+                name="kelas_id"
+                value="{{ $jadwal->kelas_id }}"
+            >
+
+            <input
+                type="hidden"
+                name="tanggal"
+                value="{{ date('Y-m-d') }}"
+            >
+
+            <div class="card border-0 shadow-sm">
+
+                <div class="card-body">
+
+                    <div class="d-flex justify-content-between align-items-center mb-4">
+
+                        <div>
+
+                            <h5 class="fw-bold mb-1">
+
+                                Daftar Kehadiran Siswa
+
+                            </h5>
+
+                            <small class="text-muted">
+
+                                Total siswa:
+                                {{ $penempatan->count() }}
+
+                            </small>
+
+                        </div>
+
+                        <button class="btn btn-primary px-4">
+
+                            Simpan Absensi
+
+                        </button>
+
+                    </div>
+
+                    <div class="table-responsive">
+
+                        <table class="table align-middle">
+
+                            <thead class="table-light">
+
+                                <tr>
+
+                                    <th width="70">
+
+                                        No
+
+                                    </th>
+
+                                    <th>
+
+                                        Nama Siswa
+
+                                    </th>
+
+                                    <th width="220">
+
+                                        Status Kehadiran
+
+                                    </th>
+
+                                </tr>
+
+                            </thead>
+
+                            <tbody>
+
+                                @forelse($penempatan as $i => $p)
+
+                                    <tr>
+
+                                        <td>
+
+                                            {{ $i + 1 }}
+
+                                        </td>
+
+                                        <td>
+
+                                            <div class="fw-semibold">
+
+                                                {{ $p->siswa->nama }}
+
+                                            </div>
+
+                                            <small class="text-muted">
+
+                                                NIS:
+                                                {{ $p->siswa->nis }}
+
+                                            </small>
+
+                                        </td>
+
+                                        <td>
+
+                                            <select
+                                                name="absensi[{{ $p->siswa->id }}][status]"
+                                                class="form-select"
+                                            >
+
+                                                <option value="hadir">
+
+                                                    Hadir
+
+                                                </option>
+
+                                                <option value="izin">
+
+                                                    Izin
+
+                                                </option>
+
+                                                <option value="sakit">
+
+                                                    Sakit
+
+                                                </option>
+
+                                                <option value="alpha">
+
+                                                    Alpha
+
+                                                </option>
+
+                                            </select>
+
+                                        </td>
+
+                                    </tr>
+
+                                @empty
+
+                                    <tr>
+
+                                        <td
+                                            colspan="3"
+                                            class="text-center text-muted py-4"
+                                        >
+
+                                            Tidak ada siswa pada kelas ini
+
+                                        </td>
+
+                                    </tr>
+
+                                @endforelse
+
+                            </tbody>
+
+                        </table>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </form>
+
+    @endif
+    {{-- HISTORY ABSENSI --}}
+    <div class="card border-0 shadow-sm mt-4">
+
+        <div class="card-body">
+
+            <div class="d-flex justify-content-between align-items-center mb-4">
+
+                <div>
+
+                    <h5 class="fw-bold mb-1">
+
+                        Riwayat Absensi
+
+                    </h5>
+
+                    <small class="text-muted">
+
+                        Absensi pertemuan sebelumnya
+
+                    </small>
+
+                </div>
+
+            </div>
+
+            <div class="table-responsive">
+
+                <table class="table align-middle">
+
+                    <thead class="table-light">
+
+                        <tr>
+
+                            <th>
+
+                                Tanggal
+
+                            </th>
+
+                            <th>
+
+                                Kelas
+
+                            </th>
+
+                            <th>
+
+                                Mapel
+
+                            </th>
+
+                            <th>
+
+                                Jam
+
+                            </th>
+
+                            <th>
+
+                                Siswa
+
+                            </th>
+
+                            <th>
+
+                                Status
+
+                            </th>
+
+                            <th width="120">
+
+                                Aksi
+
+                            </th>
+
+                        </tr>
+
+                    </thead>
+
+                    <tbody>
+
+                        @forelse($history as $h)
+
+                            <tr>
+
+                                <td>
+
+                                    {{ $h->tanggal }}
+
+                                </td>
+
+                                <td>
+
+                                    {{ $h->jadwal->kelas->nama_kelas }}
+
+                                </td>
+
+                                <td>
+
+                                    {{ $h->jadwal->mapel->nama_mapel }}
+
+                                </td>
+
+                                <td>
+
+                                    Jam
+                                    {{ $h->jadwal->jamPelajaran->jam_ke }}
+
+                                </td>
+
+                                <td>
+
+                                    {{ $h->siswa->nama }}
+
+                                </td>
+
+                                <td>
+
+                                    <span class="
+                                        badge
+                                        bg-{{
+                                            match($h->status) {
+                                                'hadir' => 'success',
+                                                'izin' => 'warning',
+                                                'sakit' => 'info',
+                                                default => 'danger'
+                                            }
+                                        }}
+                                    ">
+
+                                        {{ ucfirst($h->status) }}
+
+                                    </span>
+
+                                </td>
+
+                                <td>
+
+                                    <a
+                                        href="{{ route(
+                                            'guru.absensi.edit',
+                                            $h->id
+                                        ) }}"
+                                        class="btn btn-sm btn-warning"
+                                    >
+
+                                        Edit
+
+                                    </a>
+
+                                </td>
+
+                            </tr>
+
+                        @empty
+
+                            <tr>
+
+                                <td
+                                    colspan="7"
+                                    class="text-center text-muted py-4"
+                                >
+
+                                    Belum ada riwayat absensi
+
+                                </td>
+
+                            </tr>
+
+                        @endforelse
+
+                    </tbody>
+
+                </table>
+
+            </div>
+
+        </div>
+
+    </div>
 
 </div>
 

@@ -4,83 +4,188 @@ namespace App\Http\Controllers\Guru;
 
 use App\Http\Controllers\Controller;
 use App\Models\AbsensiSiswa;
-use App\Models\WaliKelas;
+use App\Models\PengajuanJadwal;
+use App\Models\HariSekolah;
 use Illuminate\Http\Request;
 use Barryvdh\DomPDF\Facade\Pdf;
+use Carbon\Carbon;
+
 class AbsensiController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
         $guru = auth()->user()->guru;
 
-        $waliKelas = WaliKelas::with([
-            'kelas'
-        ])
-        ->where(
-            'guru_id',
-            $guru->id
-        )
-        ->where(
-            'tahun_ajaran_id',
-            current_tahun_id()
-        )
-        ->first();
+        /*
+        |--------------------------------------------------------------------------
+        | HARI AKTIF
+        |--------------------------------------------------------------------------
+        */
 
-        if (!$waliKelas) {
+        Carbon::setLocale('id');
 
-            abort(403);
+        $namaHari = now()->translatedFormat('l');
 
+        $hari = HariSekolah::where(
+            'nama',
+            $namaHari
+        )->first();
+
+        /*
+        |--------------------------------------------------------------------------
+        | JADWAL HARI INI
+        |--------------------------------------------------------------------------
+        */
+
+        $jadwals = PengajuanJadwal::with([
+                'kelas',
+                'mapel',
+                'hari',
+                'jamPelajaran',
+            ])
+            ->where(
+                'guru_id',
+                $guru->id
+            )
+            ->where(
+                'hari_id',
+                $hari?->id
+            )
+            ->whereIn(
+                'status',
+                ['approved', 'published']
+            )
+            ->where(
+                'tahun_ajaran_id',
+                current_tahun_id()
+            )
+            ->orderBy('jam_pelajaran_id')
+            ->get();
+
+        /*
+        |--------------------------------------------------------------------------
+        | JADWAL TERPILIH
+        |--------------------------------------------------------------------------
+        */
+
+        $jadwalId = $request->jadwal_id
+            ?? optional($jadwals->first())->id;
+
+        $jadwal = PengajuanJadwal::with([
+                'kelas',
+                'mapel',
+                'hari',
+                'jamPelajaran',
+            ])
+            ->find($jadwalId);
+
+        /*
+        |--------------------------------------------------------------------------
+        | SISWA
+        |--------------------------------------------------------------------------
+        */
+
+        $penempatan = collect();
+
+        if ($jadwal) {
+
+            $penempatan = $jadwal
+                ->kelas
+                ->siswaAktif()
+                ->with('siswa')
+                ->get();
         }
 
-        $kelas = $waliKelas->kelas;
+        /*
+        |--------------------------------------------------------------------------
+        | HISTORY ABSENSI
+        |--------------------------------------------------------------------------
+        */
 
-        $penempatan = $kelas
-            ->siswaAktif()
-            ->with('siswa')
+        $history = AbsensiSiswa::with([
+                'jadwal.kelas',
+                'jadwal.mapel',
+                'jadwal.jamPelajaran',
+                'siswa',
+            ])
+            ->whereHas(
+                'jadwal',
+                function ($q) use ($guru) {
+
+                    $q->where(
+                        'guru_id',
+                        $guru->id
+                    );
+                }
+            )
+            ->latest('tanggal')
+            ->latest()
+            ->take(20)
             ->get();
 
         return view(
             'guru.absensi.index',
             compact(
-                'kelas',
-                'penempatan'
+                'jadwals',
+                'jadwal',
+                'jadwalId',
+                'penempatan',
+                'history'
             )
         );
     }
 
     public function store(Request $request)
     {
+        $request->validate([
+
+            'jadwal_id' => 'required|exists:pengajuan_jadwal,id',
+
+            'tanggal' => 'required|date',
+
+            'absensi' => 'required|array',
+        ]);
+
         $guru = auth()->user()->guru;
 
-        $waliKelas = WaliKelas::where(
-            'guru_id',
-            $guru->id
-        )
-        ->where(
-            'tahun_ajaran_id',
-            current_tahun_id()
-        )
-        ->firstOrFail();
+        /*
+        |--------------------------------------------------------------------------
+        | VALIDASI JADWAL MILIK GURU
+        |--------------------------------------------------------------------------
+        */
 
-        foreach ($request->absensi as $siswaId => $data) {
+        $jadwal = PengajuanJadwal::where(
+                'id',
+                $request->jadwal_id
+            )
+            ->where(
+                'guru_id',
+                $guru->id
+            )
+            ->firstOrFail();
+
+        foreach ($request->absensi as $siswaId => $a) {
 
             AbsensiSiswa::updateOrCreate(
 
                 [
+                    'jadwal_id' => $jadwal->id,
+
                     'siswa_id' => $siswaId,
+
                     'tanggal' => $request->tanggal,
                 ],
 
                 [
-                    'kelas_id' => $waliKelas->kelas_id,
+                    'kelas_id' => $jadwal->kelas_id,
 
                     'tahun_ajaran_id' => current_tahun_id(),
 
+                    'status' => $a['status'],
+
+                    'keterangan' => $a['keterangan'] ?? null,
+
                     'created_by' => auth()->id(),
-
-                    'status' => $data['status'],
-
-                    'keterangan' => $data['keterangan'] ?? null,
                 ]
             );
         }
@@ -90,24 +195,47 @@ class AbsensiController extends Controller
             'Absensi berhasil disimpan'
         );
     }
+
     public function rekap(Request $request)
     {
         $guru = auth()->user()->guru;
 
-        $waliKelas = WaliKelas::with([
-            'kelas'
-        ])
-        ->where(
-            'guru_id',
-            $guru->id
-        )
-        ->where(
-            'tahun_ajaran_id',
-            current_tahun_id()
-        )
-        ->firstOrFail();
+        /*
+        |--------------------------------------------------------------------------
+        | KELAS DIAMPU
+        |--------------------------------------------------------------------------
+        */
 
-        $kelas = $waliKelas->kelas;
+        $kelasDiampu = PengajuanJadwal::with([
+                'kelas',
+                'mapel',
+                'hari',
+                'jamPelajaran',
+            ])
+            ->where(
+                'guru_id',
+                $guru->id
+            )
+            ->whereIn(
+                'status',
+                ['approved', 'published']
+            )
+            ->where(
+                'tahun_ajaran_id',
+                current_tahun_id()
+            )
+            ->get()
+            ->unique(function ($item) {
+
+                return $item->kelas_id . '-' . $item->mapel_id;
+            })
+            ->values();
+
+        $kelasId = $request->kelas_id
+            ?? optional($kelasDiampu->first())->kelas_id;
+
+        $mapelId = $request->mapel_id
+            ?? optional($kelasDiampu->first())->mapel_id;
 
         $mode = $request->mode ?? 'semester';
 
@@ -115,98 +243,118 @@ class AbsensiController extends Controller
 
         $tahun = $request->tahun ?? date('Y');
 
-        $penempatan = $kelas
-            ->siswaAktif()
-            ->with('siswa')
-            ->get();
+        $selected = $kelasDiampu->first(function ($item)
+            use ($kelasId, $mapelId) {
+
+            return
+                $item->kelas_id == $kelasId
+                &&
+                $item->mapel_id == $mapelId;
+        });
 
         $rekap = [];
 
-        foreach ($penempatan as $p) {
+        if ($selected) {
 
-            $siswa = $p->siswa;
+            $penempatan = $selected
+                ->kelas
+                ->siswaAktif()
+                ->with('siswa')
+                ->get();
 
-            $query = AbsensiSiswa::where(
-                'siswa_id',
-                $siswa->id
-            );
+            foreach ($penempatan as $p) {
 
-            /*
-            |--------------------------------------------------------------------------
-            | MODE BULANAN
-            |--------------------------------------------------------------------------
-            */
+                $siswa = $p->siswa;
 
-            if ($mode == 'bulanan') {
-
-                $query
-                    ->whereMonth(
-                        'tanggal',
-                        $bulan
+                $query = AbsensiSiswa::where(
+                        'siswa_id',
+                        $siswa->id
                     )
-                    ->whereYear(
+                    ->where(
+                        'jadwal_id',
+                        $selected->id
+                    );
+
+                /*
+                |--------------------------------------------------------------------------
+                | MODE BULANAN
+                |--------------------------------------------------------------------------
+                */
+
+                if ($mode == 'bulanan') {
+
+                    $query
+                        ->whereMonth(
+                            'tanggal',
+                            $bulan
+                        )
+                        ->whereYear(
+                            'tanggal',
+                            $tahun
+                        );
+                }
+
+                /*
+                |--------------------------------------------------------------------------
+                | MODE SEMESTER
+                |--------------------------------------------------------------------------
+                */
+
+                elseif ($mode == 'semester') {
+
+                    $query->where(
+                        'tahun_ajaran_id',
+                        current_tahun_id()
+                    );
+                }
+
+                /*
+                |--------------------------------------------------------------------------
+                | MODE TAHUNAN
+                |--------------------------------------------------------------------------
+                */
+
+                elseif ($mode == 'tahunan') {
+
+                    $query->whereYear(
                         'tanggal',
                         $tahun
                     );
+                }
+
+                $absensi = $query->get();
+
+                $rekap[] = [
+
+                    'siswa' => $siswa,
+
+                    'hadir' => $absensi
+                        ->where('status', 'hadir')
+                        ->count(),
+
+                    'izin' => $absensi
+                        ->where('status', 'izin')
+                        ->count(),
+
+                    'sakit' => $absensi
+                        ->where('status', 'sakit')
+                        ->count(),
+
+                    'alpha' => $absensi
+                        ->where('status', 'alpha')
+                        ->count(),
+
+                ];
             }
-
-            /*
-            |--------------------------------------------------------------------------
-            | MODE SEMESTER
-            |--------------------------------------------------------------------------
-            */
-
-            elseif ($mode == 'semester') {
-
-                $query->where(
-                    'tahun_ajaran_id',
-                    current_tahun_id()
-                );
-            }
-
-            /*
-            |--------------------------------------------------------------------------
-            | MODE TAHUNAN
-            |--------------------------------------------------------------------------
-            */
-
-            elseif ($mode == 'tahunan') {
-
-                $query->whereYear(
-                    'tanggal',
-                    $tahun
-                );
-            }
-
-            $absensi = $query->get();
-
-            $rekap[] = [
-
-                'siswa' => $siswa,
-
-                'hadir' => $absensi
-                    ->where('status', 'hadir')
-                    ->count(),
-
-                'izin' => $absensi
-                    ->where('status', 'izin')
-                    ->count(),
-
-                'sakit' => $absensi
-                    ->where('status', 'sakit')
-                    ->count(),
-
-                'alpha' => $absensi
-                    ->where('status', 'alpha')
-                    ->count(),
-
-            ];
         }
 
         return view(
             'guru.absensi.rekap',
             compact(
-                'kelas',
+                'kelasDiampu',
+                'kelasId',
+                'mapelId',
+                'selected',
                 'rekap',
                 'bulan',
                 'tahun',
@@ -214,31 +362,94 @@ class AbsensiController extends Controller
             )
         );
     }
+
+    public function edit(AbsensiSiswa $absensi)
+    {
+        return view(
+            'guru.absensi.edit',
+            compact('absensi')
+        );
+    }
+
+    public function update(
+        Request $request,
+        AbsensiSiswa $absensi
+    ) {
+
+        $absensi->update([
+
+            'status' => $request->status,
+
+            'keterangan' => $request->keterangan,
+        ]);
+
+        return redirect()
+            ->route('guru.absensi.index')
+            ->with(
+                'success',
+                'Absensi berhasil diperbarui'
+            );
+    }
+    
     public function exportPdf(Request $request)
     {
         $guru = auth()->user()->guru;
 
-        $waliKelas = WaliKelas::with([
-            'kelas',
-            'tahunAjaran'
-        ])
-        ->where(
-            'guru_id',
-            $guru->id
-        )
-        ->where(
-            'tahun_ajaran_id',
-            current_tahun_id()
-        )
-        ->firstOrFail();
+        /*
+        |--------------------------------------------------------------------------
+        | FILTER
+        |--------------------------------------------------------------------------
+        */
 
-        $kelas = $waliKelas->kelas;
+        $kelasId = $request->kelas_id;
+
+        $mapelId = $request->mapel_id;
 
         $mode = $request->mode ?? 'semester';
 
         $bulan = $request->bulan ?? date('m');
 
         $tahun = $request->tahun ?? date('Y');
+
+        /*
+        |--------------------------------------------------------------------------
+        | JADWAL
+        |--------------------------------------------------------------------------
+        */
+
+        $selected = PengajuanJadwal::with([
+                'kelas',
+                'mapel',
+                'hari',
+                'jamPelajaran',
+            ])
+            ->where(
+                'guru_id',
+                $guru->id
+            )
+            ->where(
+                'kelas_id',
+                $kelasId
+            )
+            ->where(
+                'mapel_id',
+                $mapelId
+            )
+            ->whereIn(
+                'status',
+                ['approved', 'published']
+            )
+            ->firstOrFail();
+
+        $kelas = $selected->kelas;
+
+        $mapel = $selected->mapel;
+
+        /*
+        |--------------------------------------------------------------------------
+        | SISWA
+        |--------------------------------------------------------------------------
+        */
 
         $penempatan = $kelas
             ->siswaAktif()
@@ -252,9 +463,13 @@ class AbsensiController extends Controller
             $siswa = $p->siswa;
 
             $query = AbsensiSiswa::where(
-                'siswa_id',
-                $siswa->id
-            );
+                    'siswa_id',
+                    $siswa->id
+                )
+                ->where(
+                    'kelas_id',
+                    $kelasId
+                );
 
             /*
             |--------------------------------------------------------------------------
@@ -320,16 +535,29 @@ class AbsensiController extends Controller
             'guru.absensi.pdf',
             compact(
                 'kelas',
+                'mapel',
                 'rekap',
                 'mode',
                 'bulan',
-                'tahun',
-                'waliKelas'
+                'tahun'
             )
         );
 
         return $pdf->download(
-            'rekap-absensi-'.$kelas->nama_kelas.'.pdf'
+            'rekap-absensi-'.$kelas->nama_kelas.'-'.$mapel->nama.'.pdf'
         );
+    }
+    private function waliKelas()
+    {
+        return WaliKelas::with('kelas')
+            ->where(
+                'guru_id',
+                auth()->user()->guru->id
+            )
+            ->where(
+                'tahun_ajaran_id',
+                current_tahun_id()
+            )
+            ->firstOrFail();
     }
 }

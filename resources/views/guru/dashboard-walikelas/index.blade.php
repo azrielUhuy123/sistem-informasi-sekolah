@@ -7,45 +7,94 @@
 <div class="container-fluid py-3">
 
     {{-- HEADER --}}
-    <div class="mb-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
 
-        <h3 class="fw-bold mb-1">
+        <div>
 
-            Dashboard Wali Kelas
+            <h3 class="fw-bold mb-1">
 
-        </h3>
+                Dashboard Wali Kelas
 
-        <small class="text-muted">
+            </h3>
 
-            {{ $kelas->nama_kelas }}
-            -
-            Tahun Ajaran
-            {{ current_tahun()?->tahun }}
+            <small class="text-muted">
 
-        </small>
+                {{ $kelas->nama_kelas }}
+                •
+                Tahun Ajaran
+                {{ current_tahun()?->tahun }}
+
+            </small>
+
+        </div>
+
+        <div class="d-flex gap-2">
+
+            <a
+                href="{{ route('guru.kelas-saya') }}"
+                class="btn btn-primary shadow-sm"
+            >
+
+                <i class="bi bi-file-earmark-text"></i>
+                Raport
+
+            </a>
+
+            <a
+                href="{{ route('guru.absensi.rekap') }}"
+                class="btn btn-light border shadow-sm"
+            >
+
+                <i class="bi bi-clipboard-data"></i>
+                Rekap
+
+            </a>
+
+        </div>
 
     </div>
 
     {{-- SUMMARY --}}
     <div class="row g-3 mb-4">
 
+        {{-- TOTAL SISWA --}}
         <div class="col-md-3">
 
             <div class="card border-0 shadow-sm h-100">
 
                 <div class="card-body">
 
-                    <small class="text-muted">
+                    <div class="d-flex justify-content-between">
 
-                        Total Siswa
+                        <div>
 
-                    </small>
+                            <small class="text-muted">
 
-                    <h2 class="fw-bold mb-0">
+                                Total Siswa
 
-                        {{ $totalSiswa }}
+                            </small>
 
-                    </h2>
+                            <h2 class="fw-bold mb-1 mt-2">
+
+                                {{ $totalSiswa }}
+
+                            </h2>
+
+                            <small class="text-success">
+
+                                Siswa aktif
+
+                            </small>
+
+                        </div>
+
+                        <div class="fs-2 text-primary">
+
+                            <i class="bi bi-people-fill"></i>
+
+                        </div>
+
+                    </div>
 
                 </div>
 
@@ -53,23 +102,44 @@
 
         </div>
 
+        {{-- LAKI --}}
         <div class="col-md-3">
 
             <div class="card border-0 shadow-sm h-100">
 
                 <div class="card-body">
 
-                    <small class="text-muted">
+                    <div class="d-flex justify-content-between">
 
-                        Laki-Laki
+                        <div>
 
-                    </small>
+                            <small class="text-muted">
 
-                    <h2 class="fw-bold mb-0">
+                                Laki-Laki
 
-                        {{ $totalLaki }}
+                            </small>
 
-                    </h2>
+                            <h2 class="fw-bold mb-1 mt-2">
+
+                                {{ $totalLaki }}
+
+                            </h2>
+
+                            <small class="text-muted">
+
+                                Peserta didik
+
+                            </small>
+
+                        </div>
+
+                        <div class="fs-2 text-info">
+
+                            <i class="bi bi-gender-male"></i>
+
+                        </div>
+
+                    </div>
 
                 </div>
 
@@ -77,23 +147,44 @@
 
         </div>
 
+        {{-- PEREMPUAN --}}
         <div class="col-md-3">
 
             <div class="card border-0 shadow-sm h-100">
 
                 <div class="card-body">
 
-                    <small class="text-muted">
+                    <div class="d-flex justify-content-between">
 
-                        Perempuan
+                        <div>
 
-                    </small>
+                            <small class="text-muted">
 
-                    <h2 class="fw-bold mb-0">
+                                Perempuan
 
-                        {{ $totalPerempuan }}
+                            </small>
 
-                    </h2>
+                            <h2 class="fw-bold mb-1 mt-2">
+
+                                {{ $totalPerempuan }}
+
+                            </h2>
+
+                            <small class="text-muted">
+
+                                Peserta didik
+
+                            </small>
+
+                        </div>
+
+                        <div class="fs-2 text-danger">
+
+                            <i class="bi bi-gender-female"></i>
+
+                        </div>
+
+                    </div>
 
                 </div>
 
@@ -101,23 +192,50 @@
 
         </div>
 
+        {{-- KEHADIRAN --}}
         <div class="col-md-3">
 
             <div class="card border-0 shadow-sm h-100">
 
                 <div class="card-body">
 
-                    <small class="text-muted">
+                    <div class="d-flex justify-content-between">
 
-                        Kehadiran Kelas
+                        <div>
 
-                    </small>
+                            <small class="text-muted">
 
-                    <h2 class="fw-bold mb-0">
+                                Kehadiran
 
-                        {{ $persentaseHadir }}%
+                            </small>
 
-                    </h2>
+                            <h2 class="fw-bold mb-1 mt-2">
+
+                                {{ $persentaseHadir }}%
+
+                            </h2>
+
+                            <small class="
+                                {{
+                                    $persentaseHadir >= 90
+                                    ? 'text-success'
+                                    : 'text-danger'
+                                }}
+                            ">
+
+                                Monitoring semester
+
+                            </small>
+
+                        </div>
+
+                        <div class="fs-2 text-success">
+
+                            <i class="bi bi-clipboard-check"></i>
+
+                        </div>
+
+                    </div>
 
                 </div>
 
@@ -130,23 +248,44 @@
     {{-- SECOND ROW --}}
     <div class="row g-3 mb-4">
 
+        {{-- RATA NILAI --}}
         <div class="col-md-6">
 
             <div class="card border-0 shadow-sm h-100">
 
                 <div class="card-body">
 
-                    <small class="text-muted">
+                    <div class="d-flex justify-content-between">
 
-                        Rata-Rata Nilai Kelas
+                        <div>
 
-                    </small>
+                            <small class="text-muted">
 
-                    <h2 class="fw-bold mb-0">
+                                Rata-Rata Nilai Kelas
 
-                        {{ $rataNilai }}
+                            </small>
 
-                    </h2>
+                            <h2 class="fw-bold mt-2 mb-1">
+
+                                {{ $rataNilai }}
+
+                            </h2>
+
+                            <small class="text-success">
+
+                                Akademik kelas stabil
+
+                            </small>
+
+                        </div>
+
+                        <div class="fs-1 text-warning">
+
+                            <i class="bi bi-bar-chart-line"></i>
+
+                        </div>
+
+                    </div>
 
                 </div>
 
@@ -154,23 +293,44 @@
 
         </div>
 
+        {{-- PERKEMBANGAN --}}
         <div class="col-md-6">
 
             <div class="card border-0 shadow-sm h-100">
 
                 <div class="card-body">
 
-                    <small class="text-muted">
+                    <div class="d-flex justify-content-between">
 
-                        Belum Ada Perkembangan
+                        <div>
 
-                    </small>
+                            <small class="text-muted">
 
-                    <h2 class="fw-bold mb-0 text-danger">
+                                Belum Ada Perkembangan
 
-                        {{ $belumPerkembangan }}
+                            </small>
 
-                    </h2>
+                            <h2 class="fw-bold mt-2 mb-1 text-danger">
+
+                                {{ $belumPerkembangan }}
+
+                            </h2>
+
+                            <small class="text-danger">
+
+                                Perlu tindak lanjut
+
+                            </small>
+
+                        </div>
+
+                        <div class="fs-1 text-danger">
+
+                            <i class="bi bi-exclamation-circle"></i>
+
+                        </div>
+
+                    </div>
 
                 </div>
 
@@ -180,69 +340,17 @@
 
     </div>
 
-    {{-- NILAI TERENDAH --}}
-    <div class="card border-0 shadow-sm mb-4">
+    {{-- ALERT --}}
+    <div class="alert alert-warning border-0 shadow-sm mb-4">
 
-        <div class="card-body">
+        <div class="d-flex align-items-center gap-2">
 
-            <h5 class="fw-bold mb-4">
+            <i class="bi bi-exclamation-triangle-fill"></i>
 
-                Nilai Terendah
+            <div>
 
-            </h5>
-
-            <div class="table-responsive">
-
-                <table class="table align-middle">
-
-                    <thead class="table-light">
-
-                        <tr>
-
-                            <th>Nama</th>
-                            <th>Nilai Akhir</th>
-
-                        </tr>
-
-                    </thead>
-
-                    <tbody>
-
-                        @forelse($nilaiTerendah as $n)
-
-                            <tr>
-
-                                <td>
-
-                                    {{ $n->siswa->nama }}
-
-                                </td>
-
-                                <td>
-
-                                    {{ $n->nilai_akhir }}
-
-                                </td>
-
-                            </tr>
-
-                        @empty
-
-                            <tr>
-
-                                <td colspan="2" class="text-center">
-
-                                    Belum ada data
-
-                                </td>
-
-                            </tr>
-
-                        @endforelse
-
-                    </tbody>
-
-                </table>
+                Monitoring kelas membantu wali kelas
+                memantau siswa yang memerlukan perhatian khusus.
 
             </div>
 
@@ -250,69 +358,180 @@
 
     </div>
 
-    {{-- ALPHA --}}
-    <div class="card border-0 shadow-sm">
+    {{-- MONITORING --}}
+    <div class="row g-3">
 
-        <div class="card-body">
+        {{-- NILAI TERENDAH --}}
+        <div class="col-lg-6">
 
-            <h5 class="fw-bold mb-4">
+            <div class="card border-0 shadow-sm h-100">
 
-                Alpha Terbanyak
+                <div class="card-body">
 
-            </h5>
+                    <div class="d-flex justify-content-between align-items-center mb-4">
 
-            <div class="table-responsive">
+                        <h5 class="fw-bold mb-0">
 
-                <table class="table align-middle">
+                            Perlu Perhatian Akademik
 
-                    <thead class="table-light">
+                        </h5>
 
-                        <tr>
+                        <span class="badge bg-danger">
 
-                            <th>Nama</th>
-                            <th>Total Alpha</th>
+                            Nilai Rendah
 
-                        </tr>
+                        </span>
 
-                    </thead>
+                    </div>
 
-                    <tbody>
+                    <div class="table-responsive">
 
-                        @forelse($alphaTerbanyak as $a)
+                        <table class="table align-middle">
 
-                            <tr>
+                            <thead class="table-light">
 
-                                <td>
+                                <tr>
 
-                                    {{ $a['nama'] }}
+                                    <th>Nama</th>
+                                    <th>Nilai</th>
 
-                                </td>
+                                </tr>
 
-                                <td>
+                            </thead>
 
-                                    {{ $a['alpha'] }}
+                            <tbody>
 
-                                </td>
+                                @forelse($nilaiTerendah as $n)
 
-                            </tr>
+                                    <tr>
 
-                        @empty
+                                        <td>
 
-                            <tr>
+                                            {{ $n->siswa->nama }}
 
-                                <td colspan="2" class="text-center">
+                                        </td>
 
-                                    Belum ada data
+                                        <td>
 
-                                </td>
+                                            <span class="badge bg-danger">
 
-                            </tr>
+                                                {{ $n->nilai_akhir }}
 
-                        @endforelse
+                                            </span>
 
-                    </tbody>
+                                        </td>
 
-                </table>
+                                    </tr>
+
+                                @empty
+
+                                    <tr>
+
+                                        <td colspan="2" class="text-center text-muted py-4">
+
+                                            Belum ada data
+
+                                        </td>
+
+                                    </tr>
+
+                                @endforelse
+
+                            </tbody>
+
+                        </table>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+        {{-- ALPHA --}}
+        <div class="col-lg-6">
+
+            <div class="card border-0 shadow-sm h-100">
+
+                <div class="card-body">
+
+                    <div class="d-flex justify-content-between align-items-center mb-4">
+
+                        <h5 class="fw-bold mb-0">
+
+                            Kehadiran Bermasalah
+
+                        </h5>
+
+                        <span class="badge bg-warning text-dark">
+
+                            Alpha
+
+                        </span>
+
+                    </div>
+
+                    <div class="table-responsive">
+
+                        <table class="table align-middle">
+
+                            <thead class="table-light">
+
+                                <tr>
+
+                                    <th>Nama</th>
+                                    <th>Total Alpha</th>
+
+                                </tr>
+
+                            </thead>
+
+                            <tbody>
+
+                                @forelse($alphaTerbanyak as $a)
+
+                                    <tr>
+
+                                        <td>
+
+                                            {{ $a['nama'] }}
+
+                                        </td>
+
+                                        <td>
+
+                                            <span class="badge bg-warning text-dark">
+
+                                                {{ $a['alpha'] }}
+
+                                            </span>
+
+                                        </td>
+
+                                    </tr>
+
+                                @empty
+
+                                    <tr>
+
+                                        <td colspan="2" class="text-center text-muted py-4">
+
+                                            Belum ada data
+
+                                        </td>
+
+                                    </tr>
+
+                                @endforelse
+
+                            </tbody>
+
+                        </table>
+
+                    </div>
+
+                </div>
 
             </div>
 
