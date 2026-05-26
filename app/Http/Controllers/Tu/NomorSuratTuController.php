@@ -12,11 +12,11 @@ class NomorSuratTuController extends Controller
     | INDEX
     |--------------------------------------------------------------------------
     */
-    public function index()
+     public function index()
     {
         $nomorSurat = NomorSurat::where(
-                'pengirim',
-                auth()->user()->role
+                'user_id',
+                auth()->id()
             )
             ->latest()
             ->get();

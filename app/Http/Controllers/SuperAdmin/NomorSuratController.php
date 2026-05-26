@@ -15,8 +15,8 @@ class NomorSuratController extends Controller
     public function index()
     {
         $nomorSurat = NomorSurat::where(
-                'pengirim',
-                auth()->user()->role
+                'user_id',
+                auth()->id()
             )
             ->latest()
             ->get();

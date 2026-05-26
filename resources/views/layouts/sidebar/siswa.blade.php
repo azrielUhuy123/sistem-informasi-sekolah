@@ -63,12 +63,60 @@
         <a
             class="menu-item
             {{ request()->is('siswa/absensi*') ? 'active' : '' }}"
-            href="{{ route('siswa.absensi.index') }}"
-        >
+            href="{{ route('siswa.absensi.index') }}">
 
             <div class="menu-left">
                 <i class="bi bi-send-check"></i>
                 <span>Absensi</span>
+            </div>
+
+        </a>
+
+    </div>
+    {{-- ARSIP & DOKUMEN --}}
+    <button
+        class="menu-item border-0 bg-transparent text-start"
+        onclick="toggleMenu('menuDokumen','arrowDokumen')"
+    >
+
+        <div class="menu-left">
+            <i class="bi bi-folder2-open"></i>
+            <span>Arsip & Dokumen</span>
+        </div>
+
+        <i
+            class="bi bi-chevron-right dropdown-arrow"
+            id="arrowDokumen"
+        ></i>
+
+    </button>
+
+    <div class="submenu" id="menuDokumen">
+
+        {{-- DOWNLOAD DOKUMEN --}}
+        <a
+            class="menu-item
+            {{ request()->is('siswa/download-dokumen*') ? 'active' : '' }}"
+            href="{{ route('siswa.download-dokumen.index') }}"
+        >
+
+            <div class="menu-left">
+                <i class="bi bi-download"></i>
+                <span>Download Dokumen</span>
+            </div>
+
+        </a>
+
+        {{-- NOMOR SURAT --}}
+        <a
+            class="menu-item
+            {{ request()->is('siswa/nomor-surat*') ? 'active' : '' }}"
+            href="{{ route('siswa.nomor-surat.index') }}"
+        >
+
+            <div class="menu-left">
+                <i class="bi bi-hash"></i>
+                <span>Nomor Surat</span>
             </div>
 
         </a>
