@@ -82,6 +82,10 @@
 
                     @include('layouts.sidebar.tu')
 
+                @elseif(auth()->user()->role === 'siswa')
+
+                    @include('layouts.sidebar.siswa')
+
                 @endif
 
             @endauth

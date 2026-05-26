@@ -1,3 +1,4 @@
+@include('layouts.partials.modal-profile')
 <div class="topbar">
     <div class="d-flex align-items-center gap-2">
 
@@ -32,7 +33,12 @@
 
             <ul class="dropdown-menu dropdown-menu-end shadow-sm">
                 <li>
-                    <a class="dropdown-item" href="{{ route('profile.edit') }}">
+                    <a
+                        class="dropdown-item"
+                        href="#"
+                        data-bs-toggle="modal"
+                        data-bs-target="#profileModal"
+                    >
                         Profil
                     </a>
                 </li>
@@ -49,3 +55,4 @@
         </div>
     </div>
 </div>
+

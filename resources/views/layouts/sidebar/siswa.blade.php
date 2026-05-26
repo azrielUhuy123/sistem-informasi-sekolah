@@ -9,20 +9,29 @@
     <a
         class="menu-item
         {{ request()->is('siswa/dashboard*') ? 'active' : '' }}"
-        href="{{ route('siswa.dashboard') }}"
-    >
+        href="{{ route('siswa.dashboard') }}">
 
         <div class="menu-left">
             <i class="bi bi-speedometer2"></i>
             <span>Dashboard</span>
+        </div>
+    </a>
+
+    <a
+        class="menu-item
+        {{ request()->is('siswa/profile*') ? 'active' : '' }}"
+        href="{{ route('siswa.profile') }}">
+
+        <div class="menu-left">
+            <i class="bi bi-person-circle"></i>
+            <span>My Profile</span>
         </div>
 
     </a>
 
     <button
         class="menu-item border-0 bg-transparent text-start"
-        onclick="toggleMenu('menuAkademik','arrowAkademik')"
-    >
+        onclick="toggleMenu('menuAkademik','arrowAkademik')">
 
         <div class="menu-left">
             <i class="bi bi-mortarboard"></i>

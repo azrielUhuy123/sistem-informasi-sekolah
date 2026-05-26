@@ -25,4 +25,8 @@ Route::prefix('siswa')
             [AbsensiController::class, 'index']
         )->name('absensi.index');
 
+        Route::get(
+            '/profile',
+            [\App\Http\Controllers\Siswa\ProfileController::class, 'index']
+        )->name('profile');
     });

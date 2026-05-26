@@ -34,7 +34,17 @@
         </div>
     </a>
 
-    
+    <a
+        class="menu-item
+        {{ request()->is('guru/profile*') ? 'active' : '' }}"
+        href="{{ route('guru.profile') }}">
+
+        <div class="menu-left">
+            <i class="bi bi-person-circle"></i>
+            <span>My Profile</span>
+        </div>
+
+    </a>
 
     <button class="menu-item border-0 bg-transparent text-start"
             onclick="toggleMenu('menuJadwal','arrowJadwal')">

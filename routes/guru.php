@@ -15,6 +15,7 @@ use App\Http\Controllers\Guru\PerkembanganSiswaController;
 use App\Http\Controllers\Guru\KenaikanKelasGuruController;
 use App\Http\Controllers\Guru\RaportController;
 use App\Http\Controllers\Guru\DashboardWaliKelasController;
+use App\Http\Controllers\Guru\ProfileController;
 
 Route::prefix('guru')
     ->name('guru.')
@@ -143,4 +144,7 @@ Route::prefix('guru')
 
         Route::post('/nomor-surat/generate',[NomorSuratGuruController::class, 'generate'])
             ->name('nomor-surat.generate');
+
+        Route::get('/profile', [ProfileController::class, 'index'])
+            ->name('profile');
     });
