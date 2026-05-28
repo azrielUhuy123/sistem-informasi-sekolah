@@ -31,6 +31,7 @@ return Application::configure(basePath: dirname(__DIR__))
             'forbid.superadmin' => \App\Http\Middleware\ForbidSuperadminTarget::class,
             'approved' => \App\Http\Middleware\EnsureUserApproved::class,
             'tahun.aktif' => \App\Http\Middleware\EnsureTahunAjaranAktif::class,
+            'guru.mode' => \App\Http\Middleware\GuruModeMiddleware::class,
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions): void {

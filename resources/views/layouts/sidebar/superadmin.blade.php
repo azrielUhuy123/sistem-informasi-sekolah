@@ -93,6 +93,19 @@
 
         </a>
 
+        <a
+            class="menu-item
+            {{ request()->is('superadmin/pembina-ekskul*') ? 'active' : '' }}"
+            href="{{ route('superadmin.pembina-ekskul.index') }}"
+        >
+
+            <div class="menu-left">
+                <i class="bi bi-trophy"></i>
+                <span>Pembina Ekskul</span>
+            </div>
+
+        </a>
+
     </div>
 
     

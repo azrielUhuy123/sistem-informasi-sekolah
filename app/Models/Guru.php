@@ -49,4 +49,10 @@ class Guru extends Model
     {
         return $this->hasMany(PengampuMapel::class);
     }
+    public function pembinaEkskul()
+    {
+        return $this->hasMany(
+            PembinaEkskul::class
+        );
+    }
 }

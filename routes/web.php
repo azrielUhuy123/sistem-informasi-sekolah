@@ -29,12 +29,6 @@ Route::get('/dashboard', function () {
 */
 
 
-// MURID
-use App\Http\Controllers\Murid\DashboardController as MuridDashboard;
-Route::middleware(['auth', 'role:murid'])->group(function () {
-    Route::get('/murid/dashboard', [MuridDashboard::class, 'index'])->name('murid.dashboard');
-});
-
 // SPMB
 use App\Http\Controllers\Spmb\DashboardController as SpmbDashboard;
 Route::middleware(['auth', 'role:spmb'])->group(function () {
@@ -57,10 +51,10 @@ Route::middleware('auth')->group(function () {
 | ROUTE FILE TERPISAH
 |--------------------------------------------------------------------------
 */
-require __DIR__.'/admin.php';
 require __DIR__.'/superadmin.php';
 require __DIR__.'/tu.php';
 require __DIR__.'/guru.php';
+require __DIR__.'/siswa.php';
 require __DIR__.'/auth.php';
 
 

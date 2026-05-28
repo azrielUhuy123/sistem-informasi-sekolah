@@ -16,15 +16,123 @@ use App\Http\Controllers\Guru\KenaikanKelasGuruController;
 use App\Http\Controllers\Guru\RaportController;
 use App\Http\Controllers\Guru\DashboardWaliKelasController;
 use App\Http\Controllers\Guru\ProfileController;
+use App\Http\Controllers\Guru\EkskulController;
+use App\Http\Controllers\Guru\EkskulAnggotaController;
+use App\Http\Controllers\Guru\Ekskul\AbsensiEkskulController;
+use App\Http\Controllers\Guru\Ekskul\JurnalEkskulController;
+use Illuminate\Support\Facades\Session;
 
 Route::prefix('guru')
     ->name('guru.')
-    ->middleware(['auth', 'role:guru'])
+    ->middleware(['auth', 'role:guru', 'guru.mode'])
     ->group(function () {
 
         Route::get('/dashboard', [DashboardGuruController::class, 'index'])
             ->name('dashboard');
         
+        Route::get(
+            '/switch-mode/{mode}',
+            function ($mode) {
+
+                if (
+                    in_array(
+                        $mode,
+                        ['akademik', 'ekskul']
+                    )
+                ) {
+
+                    session([
+                        'guru_mode' => $mode
+                    ]);
+                }
+
+                return back();
+            }
+        )->name('switch-mode');
+
+        Route::get(
+            '/ekskul/dashboard',
+            [EkskulController::class, 'dashboard']
+        )->name('ekskul.dashboard');
+
+        Route::get(
+            '/ekskul',
+            [EkskulController::class, 'index']
+        )->name('ekskul.index');
+
+        /*
+        |--------------------------------------------------------------------------
+        | ANGGOTA EKSKUL
+        |--------------------------------------------------------------------------
+        */
+
+        Route::get(
+            '/ekskul/anggota',
+            [EkskulAnggotaController::class, 'index']
+        )->name('ekskul.anggota.index');
+
+        Route::post(
+            '/ekskul/anggota/store',
+            [EkskulAnggotaController::class, 'store']
+        )->name('ekskul.anggota.store');
+
+        Route::delete(
+            '/ekskul/anggota/{id}',
+            [EkskulAnggotaController::class, 'destroy']
+        )->name('ekskul.anggota.destroy');
+        
+        /*
+        |--------------------------------------------------------------------------
+        | DAFTAR ANGGOTA EKSKUL
+        |--------------------------------------------------------------------------
+        */
+
+        Route::get(
+            '/ekskul/daftar-anggota',
+            [EkskulAnggotaController::class, 'daftar']
+        )->name('ekskul.daftar-anggota');
+
+        Route::delete(
+            '/ekskul/daftar-anggota/{id}',
+            [EkskulAnggotaController::class, 'destroy']
+        )->name('ekskul.daftar-anggota.destroy');
+
+        Route::prefix('ekskul')
+            ->name('ekskul.')
+            ->group(function () {
+
+                Route::get(
+                    '/absensi',
+                    [AbsensiEkskulController::class, 'index']
+                )->name('absensi.index');
+
+                Route::post(
+                    '/absensi',
+                    [AbsensiEkskulController::class, 'store']
+                )->name('absensi.store');
+
+                Route::get(
+                    '/rekap-absensi',
+                    [AbsensiEkskulController::class, 'rekap']
+                )->name('absensi.rekap');
+
+            });
+
+        Route::get(
+            '/ekskul/jurnal',
+            [JurnalEkskulController::class, 'index']
+        )->name('ekskul.jurnal.index');
+
+        Route::post(
+            '/ekskul/jurnal',
+            [JurnalEkskulController::class, 'store']
+        )->name('ekskul.jurnal.store');
+
+        Route::delete(
+            '/ekskul/jurnal/{id}',
+            [JurnalEkskulController::class, 'destroy']
+        )->name('ekskul.jurnal.destroy');
+
         Route::get(
             '/dashboard-walikelas',
             [DashboardWaliKelasController::class, 'index']

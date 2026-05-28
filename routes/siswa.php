@@ -6,6 +6,9 @@ use App\Http\Controllers\Siswa\NilaiController;
 use App\Http\Controllers\Siswa\AbsensiController;
 use App\Http\Controllers\Siswa\NomorSuratSiswaController;
 use App\Http\Controllers\Siswa\DownloadDokumenController;
+use App\Http\Controllers\Siswa\ProfileController;
+use App\Http\Controllers\Siswa\JadwalController;
+use App\Http\Controllers\Siswa\EkskulController;
 
 Route::prefix('siswa')
     ->name('siswa.')
@@ -15,7 +18,12 @@ Route::prefix('siswa')
         Route::get(
             '/dashboard',
             [DashboardController::class, 'index']
-        )->name('dashboard');
+        )->name('dashboard.index');
+
+        Route::get(
+            '/jadwal',
+            [JadwalController::class, 'index']
+        )->name('jadwal.index');
 
         Route::get(
             '/nilai',
@@ -29,8 +37,23 @@ Route::prefix('siswa')
 
         Route::get(
             '/profile',
-            [\App\Http\Controllers\Siswa\ProfileController::class, 'index']
+            [ProfileController::class, 'index']
         )->name('profile');
+
+        Route::get(
+            '/ekskul',
+            [EkskulController::class, 'index']
+        )->name('ekskul.index');
+
+        Route::post(
+            '/ekskul/{ekskul}/daftar',
+            [EkskulController::class, 'daftar']
+        )->name('ekskul.daftar');
+
+        Route::delete(
+            '/ekskul/{id}/batal',
+            [EkskulController::class, 'batal']
+        )->name('ekskul.batal');
 
         Route::get(
             '/download-dokumen',

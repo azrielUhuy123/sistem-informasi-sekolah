@@ -34,12 +34,18 @@ class NilaiSiswa extends Model
 
     public function guru()
     {
-        return $this->belongsTo(Guru::class);
+        return $this->belongsTo(
+            Guru::class,
+            'guru_id'
+        );
     }
 
     public function mapel()
     {
-        return $this->belongsTo(MataPelajaran::class);
+        return $this->belongsTo(
+            MataPelajaran::class,
+            'mapel_id'
+        );
     }
 
     public function tahunAjaran()

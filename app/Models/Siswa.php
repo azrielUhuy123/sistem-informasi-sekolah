@@ -63,6 +63,11 @@ class Siswa extends Model
         );
     }
 
-    
-    
+    public function ekskul()
+    {
+        return $this->belongsToMany(
+            Ekskul::class,
+            'ekskul_siswa'
+        );
+    }
 }

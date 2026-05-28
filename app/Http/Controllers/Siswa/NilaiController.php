@@ -9,9 +9,26 @@ class NilaiController extends Controller
 {
     public function index()
     {
+        /*
+        |--------------------------------------------------------------------------
+        | SISWA LOGIN
+        |--------------------------------------------------------------------------
+        */
+
         $siswa = auth()->user()->siswa;
 
-        $nilai = NilaiSiswa::with('mapel')
+        /*
+        |--------------------------------------------------------------------------
+        | NILAI SISWA
+        |--------------------------------------------------------------------------
+        */
+
+        $nilai = NilaiSiswa::with([
+
+                'mapel',
+                'guru'
+
+            ])
             ->where(
                 'siswa_id',
                 $siswa->id
@@ -20,13 +37,22 @@ class NilaiController extends Controller
                 'tahun_ajaran_id',
                 current_tahun_id()
             )
+            ->orderBy('mapel_id')
             ->get();
+
+        /*
+        |--------------------------------------------------------------------------
+        | VIEW
+        |--------------------------------------------------------------------------
+        */
 
         return view(
             'siswa.nilai.index',
             compact(
+
                 'siswa',
                 'nilai'
+
             )
         );
     }

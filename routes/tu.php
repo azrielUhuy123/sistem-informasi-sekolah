@@ -27,6 +27,7 @@ use App\Http\Controllers\TU\DataKepegawaianExportController;
 use App\Http\Controllers\Tu\DokumenController;
 use App\Http\Controllers\Tu\PengajuanSuratController;
 use App\Http\Controllers\TU\NomorSuratTuController;
+use App\Http\Controllers\Tu\EkskulController;
 
 
 /*
@@ -311,6 +312,10 @@ Route::post(
             Route::post('/pemasukan', [KeuanganPemasukanController::class, 'store'])
                 ->name('pemasukan.store');
         });
+        Route::resource(
+            'ekskul',
+            EkskulController::class
+        );
 
         /*
         |--------------------------------------------------------------------------

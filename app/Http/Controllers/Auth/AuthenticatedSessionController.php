@@ -59,7 +59,7 @@ class AuthenticatedSessionController extends Controller
 
             'superadmin' => redirect()->route('superadmin.dashboard'),
 
-            'siswa' => redirect()->route('siswa.dashboard'),
+            'siswa' => redirect()->route('siswa.dashboard.index'),
 
             default => abort(403),
 

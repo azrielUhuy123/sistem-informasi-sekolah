@@ -18,6 +18,7 @@ use App\Http\Controllers\SuperAdmin\PengampuMapelController;
 use App\Http\Controllers\SuperAdmin\WaliKelasController;
 use App\Http\Controllers\SuperAdmin\JadwalFinalController;
 use App\Http\Controllers\SuperAdmin\MataPelajaranController;
+use App\Http\Controllers\Superadmin\PembinaEkskulController;
 
 Route::middleware(['auth', 'role:superadmin'])
     ->prefix('superadmin')
@@ -117,6 +118,21 @@ Route::middleware(['auth', 'role:superadmin'])
             '/pengampu-mapel/{pengampuMapel}',
             [PengampuMapelController::class, 'destroy']
         )->name('pengampu-mapel.destroy');
+
+        Route::get(
+            '/pembina-ekskul',
+            [PembinaEkskulController::class, 'index']
+        )->name('pembina-ekskul.index');
+
+        Route::post(
+            '/pembina-ekskul',
+            [PembinaEkskulController::class, 'store']
+        )->name('pembina-ekskul.store');
+
+        Route::delete(
+            '/pembina-ekskul/{id}',
+            [PembinaEkskulController::class, 'destroy']
+        )->name('pembina-ekskul.destroy');
 
         Route::get(
             '/jadwal-final',

@@ -9,7 +9,7 @@
     <a
         class="menu-item
         {{ request()->is('siswa/dashboard*') ? 'active' : '' }}"
-        href="{{ route('siswa.dashboard') }}">
+        href="{{ route('siswa.dashboard.index') }}">
 
         <div class="menu-left">
             <i class="bi bi-speedometer2"></i>
@@ -49,6 +49,20 @@
 
         <a
             class="menu-item
+            {{ request()->is('siswa/jadwal*') ? 'active' : '' }}"
+            href="{{ route('siswa.jadwal.index') }}"
+        >
+
+            <div class="menu-left">
+                <i class="bi bi-calendar-week"></i>
+                <span>Jadwal Pelajaran</span>
+            </div>
+
+        </a>
+
+
+        <a
+            class="menu-item
             {{ request()->is('siswa/nilai*') ? 'active' : '' }}"
             href="{{ route('siswa.nilai.index') }}"
         >
@@ -68,6 +82,19 @@
             <div class="menu-left">
                 <i class="bi bi-send-check"></i>
                 <span>Absensi</span>
+            </div>
+
+        </a>
+
+        <a
+            class="menu-item
+            {{ request()->is('siswa/ekskul*') ? 'active' : '' }}"
+            href="{{ route('siswa.ekskul.index') }}"
+        >
+
+            <div class="menu-left">
+                <i class="bi bi-trophy"></i>
+                <span>Ekskul</span>
             </div>
 
         </a>

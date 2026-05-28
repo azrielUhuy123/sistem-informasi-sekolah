@@ -190,13 +190,16 @@
 
         <a
             class="menu-item
-                {{ request()->is('tu/walikelas*') ? 'active' : '' }}"
-            href="{{ route('tu.walikelas.index') }}"
+            {{ request()->is('tu/ekskul*') ? 'active' : '' }}"
+            href="{{ route('tu.ekskul.index') }}"
         >
 
             <div class="menu-left">
-                <i class="bi bi-person-workspace"></i>
-                <span>Wali Kelas</span>
+
+                <i class="bi bi-dribbble"></i>
+
+                <span>Ekskul</span>
+
             </div>
 
         </a>
