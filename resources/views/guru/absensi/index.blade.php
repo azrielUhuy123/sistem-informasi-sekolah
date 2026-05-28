@@ -242,7 +242,8 @@
 
                 <div class="card-body">
 
-                    <div class="d-flex justify-content-between align-items-center mb-4">
+                    {{-- HEADER --}}
+                    <div class="d-flex justify-content-between align-items-center flex-wrap gap-3 mb-4">
 
                         <div>
 
@@ -261,14 +262,58 @@
 
                         </div>
 
-                        <button class="btn btn-primary px-4">
+                        {{-- ACTION --}}
+                        <div class="d-flex align-items-center gap-2">
 
-                            Simpan Absensi
+                            <select
+                                class="form-select"
+                                id="bulkAction"
+                                style="width: 180px"
+                            >
 
-                        </button>
+                                <option value="">
+
+                                    Aksi Massal
+
+                                </option>
+
+                                <option value="hadir">
+
+                                    Hadir
+
+                                </option>
+
+                                <option value="izin">
+
+                                    Izin
+
+                                </option>
+
+                                <option value="sakit">
+
+                                    Sakit
+
+                                </option>
+
+                                <option value="alpha">
+
+                                    Alpha
+
+                                </option>
+
+                            </select>
+
+                            <button class="btn btn-primary px-4">
+
+                                Simpan Absensi
+
+                            </button>
+
+                        </div>
 
                     </div>
 
+                    {{-- TABLE --}}
                     <div class="table-responsive">
 
                         <table class="table align-middle">
@@ -276,6 +321,17 @@
                             <thead class="table-light">
 
                                 <tr>
+
+                                    {{-- CHECKBOX ALL --}}
+                                    <th width="50">
+
+                                        <input
+                                            type="checkbox"
+                                            class="form-check-input"
+                                            id="tableCheckAll"
+                                        >
+
+                                    </th>
 
                                     <th width="70">
 
@@ -289,7 +345,19 @@
 
                                     </th>
 
+                                    <th width="120">
+
+                                        Jam Hadir
+
+                                    </th>
+
                                     <th width="220">
+
+                                        Update Kehadiran
+
+                                    </th>
+
+                                    <th width="180">
 
                                         Status Kehadiran
 
@@ -303,14 +371,47 @@
 
                                 @forelse($penempatan as $i => $p)
 
+                                    @php
+
+                                        $absen = \App\Models\AbsensiSiswa::where(
+                                                'jadwal_id',
+                                                $jadwal->id
+                                            )
+                                            ->where(
+                                                'siswa_id',
+                                                $p->siswa->id
+                                            )
+                                            ->where(
+                                                'tanggal',
+                                                date('Y-m-d')
+                                            )
+                                            ->first();
+
+                                        $status =
+                                            $absen->status ?? 'hadir';
+
+                                    @endphp
+
                                     <tr>
 
+                                        {{-- CHECKBOX --}}
+                                        <td>
+
+                                            <input
+                                                type="checkbox"
+                                                class="form-check-input student-checkbox"
+                                            >
+
+                                        </td>
+
+                                        {{-- NO --}}
                                         <td>
 
                                             {{ $i + 1 }}
 
                                         </td>
 
+                                        {{-- NAMA --}}
                                         <td>
 
                                             <div class="fw-semibold">
@@ -328,38 +429,66 @@
 
                                         </td>
 
+                                        {{-- JAM HADIR --}}
                                         <td>
 
-                                            <select
+                                            <small class="text-muted">
+
+                                                {{
+                                                    optional(
+                                                        $absen?->created_at
+                                                    )->format('H:i')
+                                                    ?? '--'
+                                                }}
+
+                                            </small>
+
+                                        </td>
+
+                                        {{-- UPDATE --}}
+                                        <td>
+
+                                            <small class="text-muted">
+
+                                                {{
+                                                    optional(
+                                                        $absen?->updated_at
+                                                    )->format('d M Y H:i')
+                                                    ?? '--'
+                                                }}
+
+                                            </small>
+
+                                        </td>
+
+                                        {{-- STATUS --}}
+                                        <td>
+
+                                            <input
+                                                type="hidden"
                                                 name="absensi[{{ $p->siswa->id }}][status]"
-                                                class="form-select"
+                                                value="{{ $status }}"
+                                                class="statusInput"
                                             >
 
-                                                <option value="hadir">
+                                            <span
+                                                class="
+                                                    badge
+                                                    statusBadge
+                                                    bg-{{
+                                                        match($status) {
+                                                            'hadir' => 'success',
+                                                            'izin' => 'warning',
+                                                            'sakit' => 'info',
+                                                            default => 'danger'
+                                                        }
+                                                    }}
+                                                "
+                                            >
 
-                                                    Hadir
+                                                {{ ucfirst($status) }}
 
-                                                </option>
-
-                                                <option value="izin">
-
-                                                    Izin
-
-                                                </option>
-
-                                                <option value="sakit">
-
-                                                    Sakit
-
-                                                </option>
-
-                                                <option value="alpha">
-
-                                                    Alpha
-
-                                                </option>
-
-                                            </select>
+                                            </span>
 
                                         </td>
 
@@ -370,7 +499,7 @@
                                     <tr>
 
                                         <td
-                                            colspan="3"
+                                            colspan="6"
                                             class="text-center text-muted py-4"
                                         >
 
@@ -394,187 +523,131 @@
 
         </form>
 
+        <script>
+
+            /*
+            |--------------------------------------------------------------------------
+            | CHECKBOX ALL
+            |--------------------------------------------------------------------------
+            */
+
+            document
+                .getElementById('tableCheckAll')
+                .addEventListener('change', function () {
+
+                    document
+                        .querySelectorAll('.student-checkbox')
+                        .forEach(cb => {
+
+                            cb.checked = this.checked;
+
+                        });
+
+                });
+
+            /*
+            |--------------------------------------------------------------------------
+            | BULK ACTION AUTO
+            |--------------------------------------------------------------------------
+            */
+
+            document
+                .getElementById('bulkAction')
+                .addEventListener('change', function () {
+
+                    let action = this.value;
+
+                    if (!action) return;
+
+                    let rows =
+                        document.querySelectorAll('.table tbody tr');
+
+                    rows.forEach(row => {
+
+                        let checked =
+                            row.querySelector('.student-checkbox');
+
+                        if (
+                            checked &&
+                            checked.checked
+                        ) {
+
+                            let badge =
+                                row.querySelector('.statusBadge');
+
+                            let input =
+                                row.querySelector('.statusInput');
+
+                            /*
+                            |--------------------------------------------------------------------------
+                            | UPDATE INPUT
+                            |--------------------------------------------------------------------------
+                            */
+
+                            input.value = action;
+
+                            /*
+                            |--------------------------------------------------------------------------
+                            | RESET BADGE
+                            |--------------------------------------------------------------------------
+                            */
+
+                            badge.className =
+                                'badge statusBadge';
+
+                            /*
+                            |--------------------------------------------------------------------------
+                            | COLOR
+                            |--------------------------------------------------------------------------
+                            */
+
+                            if (action === 'hadir') {
+
+                                badge.classList.add('bg-success');
+
+                            }
+
+                            else if (action === 'izin') {
+
+                                badge.classList.add('bg-warning');
+
+                            }
+
+                            else if (action === 'sakit') {
+
+                                badge.classList.add('bg-info');
+
+                            }
+
+                            else {
+
+                                badge.classList.add('bg-danger');
+
+                            }
+
+                            /*
+                            |--------------------------------------------------------------------------
+                            | TEXT
+                            |--------------------------------------------------------------------------
+                            */
+
+                            badge.innerText =
+                                action.charAt(0).toUpperCase()
+                                + action.slice(1);
+
+                        }
+
+                    });
+
+                });
+
+        </script>
+
+
+
+
+
     @endif
-    {{-- HISTORY ABSENSI --}}
-    <div class="card border-0 shadow-sm mt-4">
-
-        <div class="card-body">
-
-            <div class="d-flex justify-content-between align-items-center mb-4">
-
-                <div>
-
-                    <h5 class="fw-bold mb-1">
-
-                        Riwayat Absensi
-
-                    </h5>
-
-                    <small class="text-muted">
-
-                        Absensi pertemuan sebelumnya
-
-                    </small>
-
-                </div>
-
-            </div>
-
-            <div class="table-responsive">
-
-                <table class="table align-middle">
-
-                    <thead class="table-light">
-
-                        <tr>
-
-                            <th>
-
-                                Tanggal
-
-                            </th>
-
-                            <th>
-
-                                Kelas
-
-                            </th>
-
-                            <th>
-
-                                Mapel
-
-                            </th>
-
-                            <th>
-
-                                Jam
-
-                            </th>
-
-                            <th>
-
-                                Siswa
-
-                            </th>
-
-                            <th>
-
-                                Status
-
-                            </th>
-
-                            <th width="120">
-
-                                Aksi
-
-                            </th>
-
-                        </tr>
-
-                    </thead>
-
-                    <tbody>
-
-                        @forelse($history as $h)
-
-                            <tr>
-
-                                <td>
-
-                                    {{ $h->tanggal }}
-
-                                </td>
-
-                                <td>
-
-                                    {{ $h->jadwal->kelas->nama_kelas }}
-
-                                </td>
-
-                                <td>
-
-                                    {{ $h->jadwal->mapel->nama_mapel }}
-
-                                </td>
-
-                                <td>
-
-                                    Jam
-                                    {{ $h->jadwal->jamPelajaran->jam_ke }}
-
-                                </td>
-
-                                <td>
-
-                                    {{ $h->siswa->nama }}
-
-                                </td>
-
-                                <td>
-
-                                    <span class="
-                                        badge
-                                        bg-{{
-                                            match($h->status) {
-                                                'hadir' => 'success',
-                                                'izin' => 'warning',
-                                                'sakit' => 'info',
-                                                default => 'danger'
-                                            }
-                                        }}
-                                    ">
-
-                                        {{ ucfirst($h->status) }}
-
-                                    </span>
-
-                                </td>
-
-                                <td>
-
-                                    <a
-                                        href="{{ route(
-                                            'guru.absensi.edit',
-                                            $h->id
-                                        ) }}"
-                                        class="btn btn-sm btn-warning"
-                                    >
-
-                                        Edit
-
-                                    </a>
-
-                                </td>
-
-                            </tr>
-
-                        @empty
-
-                            <tr>
-
-                                <td
-                                    colspan="7"
-                                    class="text-center text-muted py-4"
-                                >
-
-                                    Belum ada riwayat absensi
-
-                                </td>
-
-                            </tr>
-
-                        @endforelse
-
-                    </tbody>
-
-                </table>
-
-            </div>
-
-        </div>
-
-    </div>
 
 </div>
 

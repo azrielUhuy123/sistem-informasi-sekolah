@@ -271,9 +271,21 @@ class AbsensiController extends Controller
                         $siswa->id
                     )
                     ->where(
-                        'jadwal_id',
-                        $selected->id
+                        'kelas_id',
+                        $kelasId
+                    )
+                    ->whereHas(
+                        'jadwal',
+                        function ($q) use ($mapelId) {
+
+                            $q->where(
+                                'mapel_id',
+                                $mapelId
+                            );
+
+                        }
                     );
+
 
                 /*
                 |--------------------------------------------------------------------------
