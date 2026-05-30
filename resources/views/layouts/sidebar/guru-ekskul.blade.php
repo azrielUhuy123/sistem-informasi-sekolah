@@ -266,9 +266,9 @@
         </a>
 
         <a
-            class="menu-item"
-            href="#"
-        >
+            class="menu-item
+            {{ request()->is('guru/ekskul/catatan-pembinaan*') ? 'active' : '' }}"
+            href="{{ route('guru.ekskul.pembinaan.index') }}">
 
             <div class="menu-left">
 

@@ -20,6 +20,7 @@ use App\Http\Controllers\Guru\EkskulController;
 use App\Http\Controllers\Guru\EkskulAnggotaController;
 use App\Http\Controllers\Guru\Ekskul\AbsensiEkskulController;
 use App\Http\Controllers\Guru\Ekskul\JurnalEkskulController;
+use App\Http\Controllers\Guru\Ekskul\CatatanPembinaanController;
 use Illuminate\Support\Facades\Session;
 
 Route::prefix('guru')
@@ -255,4 +256,14 @@ Route::prefix('guru')
 
         Route::get('/profile', [ProfileController::class, 'index'])
             ->name('profile');
-    });
+
+        Route::get(
+            '/ekskul/catatan-pembinaan',
+            [CatatanPembinaanController::class, 'index']
+        )->name('ekskul.pembinaan.index');
+
+        Route::post(
+            '/ekskul/catatan-pembinaan/store',
+            [CatatanPembinaanController::class, 'store']
+        )->name('ekskul.pembinaan.store');
+});
