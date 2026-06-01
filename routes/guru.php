@@ -21,6 +21,8 @@ use App\Http\Controllers\Guru\EkskulAnggotaController;
 use App\Http\Controllers\Guru\Ekskul\AbsensiEkskulController;
 use App\Http\Controllers\Guru\Ekskul\JurnalEkskulController;
 use App\Http\Controllers\Guru\Ekskul\CatatanPembinaanController;
+use App\Http\Controllers\Guru\Ekskul\JadwalEkskulController;
+use App\Http\Controllers\Guru\Ekskul\StatusValidasiEkskulController;
 use Illuminate\Support\Facades\Session;
 
 Route::prefix('guru')
@@ -266,4 +268,44 @@ Route::prefix('guru')
             '/ekskul/catatan-pembinaan/store',
             [CatatanPembinaanController::class, 'store']
         )->name('ekskul.pembinaan.store');
+
+        Route::get(
+            '/ekskul/jadwal',
+            [JadwalEkskulController::class, 'index']
+        )->name('ekskul.jadwal.index');
+
+        Route::post(
+            '/ekskul/jadwal/store',
+            [JadwalEkskulController::class, 'store']
+        )->name('ekskul.jadwal.store');
+
+        Route::post(
+            '/ekskul/jadwal/submit',
+            [JadwalEkskulController::class, 'submit']
+        )->name('ekskul.jadwal.submit');
+
+        Route::get(
+            '/ekskul/status-validasi',
+            [StatusValidasiEkskulController::class, 'index']
+        )->name('ekskul.validasi.index');
+
+        Route::get(
+            '/ekskul/jadwal/{jadwal}/edit',
+            [
+                JadwalEkskulController::class,
+                'edit'
+            ]
+        )->name(
+            'ekskul.jadwal.edit'
+        );
+
+        Route::put(
+            '/ekskul/jadwal/{jadwal}',
+            [
+                JadwalEkskulController::class,
+                'update'
+            ]
+        )->name(
+            'ekskul.jadwal.update'
+        );
 });

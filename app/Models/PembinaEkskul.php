@@ -12,6 +12,7 @@ class PembinaEkskul extends Model
 
         'guru_id',
         'ekskul_id',
+        'tahun_ajaran_id',
 
     ];
 

@@ -99,10 +99,9 @@
     <div class="submenu" id="menuJadwalEkskul">
 
         <a
-            class="menu-item"
-            href="#"
-        >
-
+            class="menu-item
+            {{ request()->is('guru/ekskul/jadwal*') ? 'active' : '' }}"
+            href="{{ route('guru.ekskul.jadwal.index') }}">
             <div class="menu-left">
 
                 <i class="bi bi-calendar-week"></i>
@@ -118,9 +117,9 @@
         </a>
 
         <a
-            class="menu-item"
-            href="#"
-        >
+            class="menu-item
+            {{ request()->is('guru/ekskul/status-validasi*') ? 'active' : '' }}"
+            href="{{ route('guru.ekskul.validasi.index') }}">
 
             <div class="menu-left">
 

@@ -19,6 +19,8 @@ use App\Http\Controllers\SuperAdmin\WaliKelasController;
 use App\Http\Controllers\SuperAdmin\JadwalFinalController;
 use App\Http\Controllers\SuperAdmin\MataPelajaranController;
 use App\Http\Controllers\Superadmin\PembinaEkskulController;
+use App\Http\Controllers\Superadmin\MonitoringEkskulController;
+use App\Http\Controllers\Superadmin\JadwalFinalEkskulController;
 
 Route::middleware(['auth', 'role:superadmin'])
     ->prefix('superadmin')
@@ -234,6 +236,34 @@ Route::post(
             }
         )->name('kelas.index');
 
-        
+        Route::get(
+            '/monitoring-ekskul',
+            [MonitoringEkskulController::class, 'index']
+        )->name('monitoring-ekskul.index');
+
+        Route::get(
+            '/monitoring-ekskul/{ekskul}',
+            [MonitoringEkskulController::class, 'show']
+        )->name('monitoring-ekskul.show');
+
+        Route::post(
+            '/monitoring-ekskul/{ekskul}/approve',
+            [MonitoringEkskulController::class, 'approve']
+        )->name('monitoring-ekskul.approve');
+
+        Route::post(
+            '/monitoring-ekskul/{ekskul}/reject',
+            [MonitoringEkskulController::class, 'reject']
+        )->name('monitoring-ekskul.reject');
+
+        Route::post(
+            '/monitoring-ekskul/{ekskul}/publish',
+            [MonitoringEkskulController::class, 'publish']
+        )->name('monitoring-ekskul.publish');
+
+        Route::get(
+            '/jadwal-final-ekskul',
+            [JadwalFinalEkskulController::class, 'index']
+        )->name('jadwal-final-ekskul.index');
 
     });
