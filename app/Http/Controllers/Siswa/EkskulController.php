@@ -3,8 +3,10 @@
 namespace App\Http\Controllers\Siswa;
 
 use App\Http\Controllers\Controller;
+
 use App\Models\Ekskul;
 use App\Models\EkskulSiswa;
+use App\Models\AbsensiEkskul;
 
 class EkskulController extends Controller
 {
@@ -12,146 +14,164 @@ class EkskulController extends Controller
     {
         $siswa = auth()->user()->siswa;
 
-        $ekskul = Ekskul::with('guru')
-            ->where('status', 'aktif')
-            ->latest()
-            ->get();
+        $ekskul = EkskulSiswa::with([
 
-        $pendaftaran = EkskulSiswa::where(
+                'ekskul',
+                'ekskul.pembina.guru'
+
+            ])
+            ->where(
                 'siswa_id',
                 $siswa->id
             )
             ->where(
-                'tahun_ajaran_id',
-                current_tahun_id()
+                'status',
+                'aktif'
             )
-            ->pluck('ekskul_id')
-            ->toArray();
+            ->get();
 
         return view(
             'siswa.ekskul.index',
             compact(
-                'ekskul',
-                'pendaftaran'
+                'ekskul'
             )
         );
     }
 
-    /*
-    |--------------------------------------------------------------------------
-    | DAFTAR
-    |--------------------------------------------------------------------------
-    */
+    public function show(Ekskul $ekskul)
+{
+    $siswa = auth()->user()->siswa;
 
-    public function daftar($id)
-    {
-        $siswa = auth()->user()->siswa;
+    $anggota = EkskulSiswa::where(
+            'ekskul_id',
+            $ekskul->id
+        )
+        ->where(
+            'status',
+            'aktif'
+        )
+        ->count();
 
-        $ekskul = Ekskul::findOrFail($id);
+    $totalPertemuan = AbsensiEkskul::where(
+            'ekskul_id',
+            $ekskul->id
+        )
+        ->distinct('tanggal')
+        ->count();
 
-        /*
-        |--------------------------------------------------------------------------
-        | SUDAH TERDAFTAR?
-        |--------------------------------------------------------------------------
-        */
+    $hadir = AbsensiEkskul::where(
+            'ekskul_id',
+            $ekskul->id
+        )
+        ->where(
+            'siswa_id',
+            $siswa->id
+        )
+        ->where(
+            'status',
+            'hadir'
+        )
+        ->count();
 
-        $sudah = EkskulSiswa::where(
-                'siswa_id',
-                $siswa->id
-            )
-            ->where(
-                'ekskul_id',
-                $ekskul->id
-            )
-            ->where(
-                'tahun_ajaran_id',
-                current_tahun_id()
-            )
-            ->exists();
+    $persentase = $totalPertemuan > 0
+        ? round(
+            ($hadir / $totalPertemuan) * 100
+        )
+        : 0;
 
-        if ($sudah) {
+    return view(
+        'siswa.ekskul.detail',
+        compact(
+            'ekskul',
+            'anggota',
+            'totalPertemuan',
+            'hadir',
+            'persentase'
+        )
+    );
+}
 
-            return back()->with(
-                'error',
-                'Sudah terdaftar pada ekskul ini'
-            );
-        }
+    public function absensi(Ekskul $ekskul)
+{
+    $siswa = auth()->user()->siswa;
 
-        /*
-        |--------------------------------------------------------------------------
-        | CEK KUOTA
-        |--------------------------------------------------------------------------
-        */
+    $absensi = AbsensiEkskul::where(
+            'ekskul_id',
+            $ekskul->id
+        )
+        ->where(
+            'siswa_id',
+            $siswa->id
+        )
+        ->latest('tanggal')
+        ->paginate(15);
 
-        $jumlah = EkskulSiswa::where(
-                'ekskul_id',
-                $ekskul->id
-            )
-            ->where(
-                'tahun_ajaran_id',
-                current_tahun_id()
-            )
-            ->count();
+    $hadir = AbsensiEkskul::where(
+            'ekskul_id',
+            $ekskul->id
+        )
+        ->where(
+            'siswa_id',
+            $siswa->id
+        )
+        ->where(
+            'status',
+            'hadir'
+        )
+        ->count();
 
-        if ($jumlah >= $ekskul->kuota) {
+    $izin = AbsensiEkskul::where(
+            'ekskul_id',
+            $ekskul->id
+        )
+        ->where(
+            'siswa_id',
+            $siswa->id
+        )
+        ->where(
+            'status',
+            'izin'
+        )
+        ->count();
 
-            return back()->with(
-                'error',
-                'Kuota ekskul penuh'
-            );
-        }
+    $sakit = AbsensiEkskul::where(
+            'ekskul_id',
+            $ekskul->id
+        )
+        ->where(
+            'siswa_id',
+            $siswa->id
+        )
+        ->where(
+            'status',
+            'sakit'
+        )
+        ->count();
 
-        /*
-        |--------------------------------------------------------------------------
-        | SIMPAN
-        |--------------------------------------------------------------------------
-        */
+    $alpa = AbsensiEkskul::where(
+            'ekskul_id',
+            $ekskul->id
+        )
+        ->where(
+            'siswa_id',
+            $siswa->id
+        )
+        ->where(
+            'status',
+            'alpa'
+        )
+        ->count();
 
-        EkskulSiswa::create([
-
-            'ekskul_id' => $ekskul->id,
-
-            'siswa_id' => $siswa->id,
-
-            'tahun_ajaran_id' => current_tahun_id(),
-
-            'status' => 'aktif'
-
-        ]);
-
-        return back()->with(
-            'success',
-            'Berhasil mendaftar ekskul'
-        );
-    }
-
-    /*
-    |--------------------------------------------------------------------------
-    | BATALKAN
-    |--------------------------------------------------------------------------
-    */
-
-    public function batal($id)
-    {
-        $siswa = auth()->user()->siswa;
-
-        EkskulSiswa::where(
-                'ekskul_id',
-                $id
-            )
-            ->where(
-                'siswa_id',
-                $siswa->id
-            )
-            ->where(
-                'tahun_ajaran_id',
-                current_tahun_id()
-            )
-            ->delete();
-
-        return back()->with(
-            'success',
-            'Pendaftaran dibatalkan'
-        );
-    }
+    return view(
+        'siswa.ekskul.absensi',
+        compact(
+            'ekskul',
+            'absensi',
+            'hadir',
+            'izin',
+            'sakit',
+            'alpa'
+        )
+    );
+}
 }

@@ -1,6 +1,6 @@
 @extends('layouts.app')
 
-@section('title', 'Ekskul')
+@section('title', 'Ekskul Saya')
 
 @section('content')
 
@@ -10,13 +10,13 @@
 
         <h3 class="fw-bold mb-1">
 
-            Ekstrakurikuler
+            Ekskul Saya
 
         </h3>
 
         <p class="text-muted mb-0">
 
-            Daftar kegiatan ekstrakurikuler sekolah
+            Daftar ekstrakurikuler yang sedang saya ikuti
 
         </p>
 
@@ -28,19 +28,41 @@
 
             <div class="table-responsive">
 
-                <table class="table align-middle">
+                <table class="table table-hover align-middle">
 
                     <thead class="table-light">
 
                         <tr>
 
-                            <th>No</th>
-                            <th>Ekskul</th>
-                            <th>Pembina</th>
-                            <th>Hari</th>
-                            <th>Jam</th>
-                            <th>Kuota</th>
-                            <th>Aksi</th>
+                            <th width="60">
+
+                                No
+
+                            </th>
+
+                            <th>
+
+                                Nama Ekskul
+
+                            </th>
+
+                            <th>
+
+                                Pembina
+
+                            </th>
+
+                            <th>
+
+                                Status
+
+                            </th>
+
+                            <th width="180">
+
+                                Aksi
+
+                            </th>
 
                         </tr>
 
@@ -48,13 +70,13 @@
 
                     <tbody>
 
-                        @forelse($ekskul as $i => $e)
+                        @forelse($ekskul as $item)
 
                             <tr>
 
                                 <td>
 
-                                    {{ $i + 1 }}
+                                    {{ $loop->iteration }}
 
                                 </td>
 
@@ -62,82 +84,63 @@
 
                                     <div class="fw-semibold">
 
-                                        {{ $e->nama }}
+                                        {{ $item->ekskul->nama }}
 
                                     </div>
 
-                                    <small class="text-muted">
+                                </td>
 
-                                        {{ $e->deskripsi }}
+                                <td>
 
-                                    </small>
+                                    {{ $item->ekskul->pembina->guru->nama ?? '-' }}
 
                                 </td>
 
                                 <td>
 
-                                    {{ $e->guru->nama ?? '-' }}
+                                    @if($item->status == 'aktif')
 
-                                </td>
+                                        <span class="badge bg-success">
 
-                                <td>
+                                            Aktif
 
-                                    {{ $e->hari }}
-
-                                </td>
-
-                                <td>
-
-                                    {{ $e->jam_mulai }}
-                                    -
-                                    {{ $e->jam_selesai }}
-
-                                </td>
-
-                                <td>
-
-                                    {{ $e->kuota }}
-
-                                </td>
-
-                                <td>
-
-                                    @if(in_array($e->id, $pendaftaran))
-
-                                        <form
-                                            action="{{ route('siswa.ekskul.batal', $e->id) }}"
-                                            method="POST"
-                                        >
-
-                                            @csrf
-                                            @method('DELETE')
-
-                                            <button class="btn btn-danger btn-sm">
-
-                                                Batal
-
-                                            </button>
-
-                                        </form>
+                                        </span>
 
                                     @else
 
-                                        <form
-                                            action="{{ route('siswa.ekskul.daftar', $e->id) }}"
-                                            method="POST"
-                                        >
+                                        <span class="badge bg-secondary">
 
-                                            @csrf
+                                            Tidak Aktif
 
-                                            <button class="btn btn-dark btn-sm">
-
-                                                Daftar
-
-                                            </button>
-
-                                        </form>
+                                        </span>
 
                                     @endif
+
+                                </td>
+
+                                <td>
+
+                                    <div class="d-flex gap-2">
+
+                                        <a
+                                            href="{{ route('siswa.ekskul.show', $item->ekskul_id) }}"
+                                            class="btn btn-info btn-sm"
+                                        >
+
+                                            Detail
+
+                                        </a>
+
+                                        <a
+                                            href="{{ route('siswa.ekskul.absensi', $item->ekskul_id) }}"
+                                            class="btn btn-primary btn-sm"
+                                        >
+
+                                            Absensi
+
+                                        </a>
+
+                                    </div>
 
                                 </td>
 
@@ -148,11 +151,11 @@
                             <tr>
 
                                 <td
-                                    colspan="7"
+                                    colspan="5"
                                     class="text-center text-muted py-4"
                                 >
 
-                                    Belum ada ekskul
+                                    Anda belum terdaftar pada ekskul manapun
 
                                 </td>
 

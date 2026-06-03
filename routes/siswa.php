@@ -45,15 +45,20 @@ Route::prefix('siswa')
             [EkskulController::class, 'index']
         )->name('ekskul.index');
 
-        Route::post(
-            '/ekskul/{ekskul}/daftar',
-            [EkskulController::class, 'daftar']
-        )->name('ekskul.daftar');
+        Route::get(
+            '/ekskul',
+            [EkskulController::class, 'index']
+        )->name('ekskul.index');
 
-        Route::delete(
-            '/ekskul/{id}/batal',
-            [EkskulController::class, 'batal']
-        )->name('ekskul.batal');
+        Route::get(
+            '/ekskul/{ekskul}',
+            [EkskulController::class, 'show']
+        )->name('ekskul.show');
+
+        Route::get(
+            '/ekskul/{ekskul}/absensi',
+            [EkskulController::class, 'absensi']
+        )->name('ekskul.absensi');
 
         Route::get(
             '/download-dokumen',
