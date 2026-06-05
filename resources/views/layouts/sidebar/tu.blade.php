@@ -12,7 +12,6 @@
     {{-- DASHBOARD --}}
     <a
         class="menu-item
-            {{ request()->is('tu/dashboard') ? 'active' : '' }}"
         href="{{ route('tu.dashboard') }}"
     >
 
@@ -52,7 +51,6 @@
 
         <a
             class="menu-item
-                {{ request()->is('tu/tahun*') ? 'active' : '' }}"
             href="{{ route('tu.tahun.index') }}"
         >
 
@@ -65,7 +63,6 @@
 
         <a
             class="menu-item
-                {{ request()->is('tu/penempatan-siswa*') ? 'active' : '' }}"
             href="{{ route('tu.penempatan-siswa.naik-kelas.index') }}"
         >
 
@@ -112,7 +109,6 @@
 
         <a
             class="menu-item
-                {{ request()->is('tu/kelas*') ? 'active' : '' }}"
             href="{{ route('tu.kelas.index') }}"
         >
 
@@ -125,7 +121,6 @@
 
         <a
             class="menu-item
-                {{ request()->is('tu/siswa*') ? 'active' : '' }}"
             href="{{ route('tu.siswa.index') }}"
         >
 
@@ -138,7 +133,6 @@
 
         <a
             class="menu-item
-                {{ request()->is('tu/guru*') ? 'active' : '' }}"
             href="{{ route('tu.guru.index') }}"
         >
 
@@ -151,7 +145,6 @@
 
         <a
             class="menu-item
-                {{ request()->is('tu/jadwal*') ? 'active' : '' }}"
             href="{{ route('tu.jadwal.index') }}"
         >
 
@@ -164,7 +157,6 @@
 
         <a
             class="menu-item
-                {{ request()->is('tu/mapel*') ? 'active' : '' }}"
             href="{{ route('tu.mapel.index') }}"
         >
 
@@ -177,7 +169,6 @@
 
         <a
             class="menu-item
-                {{ request()->is('tu/ruangan*') ? 'active' : '' }}"
             href="{{ route('tu.ruangan.index') }}"
         >
 
@@ -190,7 +181,6 @@
 
         <a
             class="menu-item
-            {{ request()->is('tu/ekskul*') ? 'active' : '' }}"
             href="{{ route('tu.ekskul.index') }}"
         >
 
@@ -207,95 +197,128 @@
     </div>
 
     {{-- ARSIP & DOKUMEN --}}
-<button
-    class="menu-item border-0 bg-transparent text-start"
-    onclick="toggleMenu('menuArsip','arrowArsip')"
->
-
-    <div class="menu-left">
-        <i class="bi bi-folder2-open"></i>
-        <span>Arsip & Dokumen</span>
-    </div>
-
-    <i
-        class="bi bi-chevron-right dropdown-arrow"
-        id="arrowArsip"
-    ></i>
-
-</button>
-
-<div
-    class="submenu
-        {{ request()->is('tu/dokumen-sekolah*') ||
-           request()->is('tu/dokumen-siswa*') ||
-           request()->is('tu/datakepegawaian*')
-           ? 'show': '' }}"id="menuArsip">
-
-    {{-- DOKUMEN SEKOLAH --}}
-    <a
-        class="menu-item
-            {{ request()->is('tu/dokumen-sekolah*') ? 'active' : '' }}"
-        href="{{ route('tu.dokumen.sekolah') }}"
+    <button
+        class="menu-item border-0 bg-transparent text-start"
+        onclick="toggleMenu('menuArsip','arrowArsip')"
     >
 
         <div class="menu-left">
-            <i class="bi bi-file-earmark-text"></i>
-            <span>Arsip Dokumen</span>
+            <i class="bi bi-folder2-open"></i>
+            <span>Arsip & Dokumen</span>
         </div>
 
-    </a>
+        <i
+            class="bi bi-chevron-right dropdown-arrow"
+            id="arrowArsip"
+        ></i>
 
-    {{-- DOKUMEN SISWA --}}
-    <a
-        class="menu-item
-            {{ request()->is('tu/dokumen-siswa*') ? 'active' : '' }}"
-        href="{{ route('tu.dokumen.siswa') }}">
+    </button>
 
-        <div class="menu-left">
-            <i class="bi bi-mortarboard-fill"></i>
-            <span>Arsip Dokumen Siswa</span>
-        </div>
+    <div
+        class="submenu
+            {{ request()->is('tu/dokumen-sekolah*') ||
+            request()->is('tu/dokumen-siswa*') ||
+            request()->is('tu/pengajuan-surat*') ||
+            request()->is('tu/datakepegawaian*') ||
+            request()->is('tu/nomor-surat*')
+            ? 'show': '' }}"id="menuArsip">
 
-    </a>
+        {{-- DOKUMEN SEKOLAH --}}
+            <a
+                class="menu-item
+                href="{{ route('tu.dokumen.sekolah') }}"
+            >
 
-    {{-- PENGAJUAN SURAT  --}}
-    <a
-        class="menu-item
-            {{ request()->is('tu/pengajuan-surat*') ? 'active' : '' }}"
-        href="{{ route('tu.pengajuan-surat.index') }}">
+                <div class="menu-left">
+                    <i class="bi bi-file-earmark-text"></i>
+                    <span>Arsip Dokumen</span>
+                </div>
 
-        <div class="menu-left">
-            <i class="bi bi-send-check"></i>
-            <span>Pengajuan Surat</span>
-        </div>
+            </a>
 
-    </a>
+            {{-- DOKUMEN SISWA --}}
+            <a
+                class="menu-item
+                href="{{ route('tu.dokumen.siswa') }}">
 
-    {{-- DATA KEPEGAWAIAN --}}
-    <a
-        class="menu-item
-            {{ request()->is('tu/datakepegawaian*') ? 'active' : '' }}"
-        href="{{ route('tu.datakepegawaian.index') }}">
+                <div class="menu-left">
+                    <i class="bi bi-mortarboard-fill"></i>
+                    <span>Arsip Dokumen Siswa</span>
+                </div>
 
-        <div class="menu-left">
-            <i class="bi bi-people-fill"></i>
-            <span>Data Kepegawaian</span>
-        </div>
+            </a>
 
-    </a>
+            {{-- PENGAJUAN SURAT  --}}
+            <a
+                class="menu-item
+                href="{{ route('tu.pengajuan-surat.index') }}">
 
-    <a
-    class="menu-item
-    {{ request()->is('tu/nomor-surat*') ? 'active' : '' }}"
-    href="{{ route('tu.nomor-surat.index') }}">
+                <div class="menu-left">
+                    <i class="bi bi-send-check"></i>
+                    <span>Pengajuan Surat</span>
+                </div>
 
-    <div class="menu-left">
-        <i class="bi bi-hash"></i>
-        <span>Nomor Surat</span>
+            </a>
+
+            {{-- DATA KEPEGAWAIAN --}}
+            <a
+                class="menu-item
+                href="{{ route('tu.datakepegawaian.index') }}">
+
+                <div class="menu-left">
+                    <i class="bi bi-people-fill"></i>
+                    <span>Data Kepegawaian</span>
+                </div>
+
+            </a>
+
+            <a
+            class="menu-item
+            href="{{ route('tu.nomor-surat.index') }}">
+
+            <div class="menu-left">
+                <i class="bi bi-hash"></i>
+                <span>Nomor Surat</span>
+            </div>
+
+        </a>
+
     </div>
+    {{-- WEBSITE SEKOLAH --}}
+    <button
+        class="menu-item border-0 bg-transparent text-start"
+        onclick="toggleMenu('menuWebsite','arrowWebsite')"
+    >
 
-</a>
+        <div class="menu-left">
+            <i class="bi bi-globe"></i>
+            <span>Website Sekolah</span>
+        </div>
 
-</div>
+        <i
+            class="bi bi-chevron-right dropdown-arrow"
+            id="arrowWebsite"
+        ></i>
+
+    </button>
+
+    <div
+        class="submenu"
+        id="menuWebsite"
+    >
+
+        <a
+            class="menu-item"
+            href="{{ route('tu.website.berita.index') }}"
+        >
+
+            <div class="menu-left">
+                <i class="bi bi-newspaper"></i>
+                <span>Berita</span>
+            </div>
+
+        </a>
+
+    </div>
 
 </div>

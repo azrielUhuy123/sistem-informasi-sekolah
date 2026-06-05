@@ -186,7 +186,7 @@
     {{-- LEFT --}}
     <div class="login-left">
         <div class="login-header">
-            <img src="{{ asset('assets/images/logo kolaan.png') }}" class="login-logo">
+            <img src="{{ asset('assets/images/logo-kolaan.png') }}" class="login-logo">
             <div class="login-school">
                 Sekolah Dasar Negeri<br>Mekar Jaya
             </div>

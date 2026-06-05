@@ -3,7 +3,7 @@
     <div class="d-flex align-items-center gap-2">
 
         <img
-            src="{{ asset('assets/images/logo kolaan.png') }}"
+            src="{{ asset('assets/images/logo-kolaan.png') }}"
             alt="Logo"
             width="40"
             height="50"

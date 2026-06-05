@@ -9,9 +9,12 @@ use App\Http\Controllers\GatewayController;
 | PUBLIC (GATEWAY)
 |--------------------------------------------------------------------------
 */
-Route::get('/', [GatewayController::class, 'index'])->name('gateway');
-Route::get('/ppdb', [GatewayController::class, 'ppdb'])->name('ppdb');
-Route::get('/informasi', [GatewayController::class, 'informasi'])->name('informasi');
+Route::get('/{any?}', [GatewayController::class, 'index'])
+    ->where(
+        'any',
+        '^(?!login|dashboard|guru|tu|siswa|superadmin).*$'
+    )
+    ->name('gateway');
 
 /*
 |--------------------------------------------------------------------------

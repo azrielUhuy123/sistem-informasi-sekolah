@@ -28,7 +28,7 @@ use App\Http\Controllers\Tu\DokumenController;
 use App\Http\Controllers\Tu\PengajuanSuratController;
 use App\Http\Controllers\TU\NomorSuratTuController;
 use App\Http\Controllers\Tu\EkskulController;
-
+use App\Http\Controllers\Tu\BeritaController;
 
 /*
 |--------------------------------------------------------------------------
@@ -47,6 +47,18 @@ Route::middleware(['auth', 'role:tu'])
         */
         Route::get('/dashboard', [DashboardController::class, 'index'])
             ->name('dashboard');
+        
+
+        Route::prefix('website')
+            ->name('website.')
+            ->group(function () {
+
+                Route::resource(
+                    'berita',
+                    BeritaController::class
+                );
+
+            });
 
         /*
         |--------------------------------------------------------------------------
@@ -353,4 +365,5 @@ Route::post(
         Route::post('angkatan/{angkatan}/toggle',
             [AngkatanController::class, 'toggle'])
             ->name('angkatan.toggle');
+
     });

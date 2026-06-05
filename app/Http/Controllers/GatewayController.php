@@ -8,14 +8,4 @@ class GatewayController extends Controller
     {
         return view('gateway.index');
     }
-
-    public function ppdb()
-    {
-        return view('ppdb.index');
-    }
-
-    public function informasi()
-    {
-        return view('informasi.index');
-    }
 }

@@ -48,7 +48,7 @@
 </style>
 <header id="navbar">
     <div class="nav-left">
-        <img src="{{ asset('assets/images/logo kolaan.png') }}" alt="Logo Sekolah">
+        <img src="{{ asset('assets/images/logo-kolaan.png') }}" alt="Logo Sekolah">
         <strong>SDN Mekar Jaya</strong>
     </div>
 
