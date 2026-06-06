@@ -35,7 +35,11 @@ use App\Http\Controllers\Tu\BeritaController;
 | TU ROUTES
 |--------------------------------------------------------------------------
 */
-Route::middleware(['auth', 'role:tu'])
+Route::middleware([
+        'auth',
+        'role:tu',
+        'tu.mode'
+    ])
     ->prefix('tu')
     ->name('tu.')
     ->group(function () {
@@ -48,6 +52,35 @@ Route::middleware(['auth', 'role:tu'])
         Route::get('/dashboard', [DashboardController::class, 'index'])
             ->name('dashboard');
         
+        /*
+        |--------------------------------------------------------------------------
+        | SWITCH MODE
+        |--------------------------------------------------------------------------
+        */
+
+        Route::get(
+            '/switch-mode/{mode}',
+            function ($mode) {
+
+                if (
+                    in_array(
+                        $mode,
+                        [
+                            'operasional',
+                            'ppdb'
+                        ]
+                    )
+                ) {
+
+                    session([
+                        'tu_mode' => $mode
+                    ]);
+
+                }
+
+                return back();
+            }
+        )->name('switch-mode');
 
         Route::prefix('website')
             ->name('website.')
