@@ -4,6 +4,13 @@ namespace App\Http\Controllers\PPDB;
 
 use App\Http\Controllers\Controller;
 use App\Models\PpdbPendaftar;
+use App\Models\User;
+use App\Models\Siswa;
+use App\Models\Angkatan;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Hash;
+use App\Enums\UserRole;
 
 class PendaftarController extends Controller
 {
@@ -30,10 +37,13 @@ class PendaftarController extends Controller
 
     public function verifikasi()
     {
-        $data = PpdbPendaftar::where(
-            'status',
-            'pending'
-        )->latest()->paginate(20);
+        $data = PpdbPendaftar::with([
+            'ayah',
+            'ibu'
+        ])
+        ->where('status','pending')
+        ->latest()
+        ->paginate(20);
 
         return view(
             'ppdb.pendaftar.verifikasi',
@@ -43,10 +53,12 @@ class PendaftarController extends Controller
 
     public function diterima()
     {
-        $data = PpdbPendaftar::where(
-            'status',
-            'diterima'
-        )->latest()->paginate(20);
+        $data = PpdbPendaftar::with([
+            'siswa'
+        ])
+        ->where('status','diterima')
+        ->latest()
+        ->paginate(20);
 
         return view(
             'ppdb.pendaftar.diterima',
@@ -59,7 +71,9 @@ class PendaftarController extends Controller
         $data = PpdbPendaftar::where(
             'status',
             'ditolak'
-        )->latest()->paginate(20);
+        )
+        ->latest()
+        ->paginate(20);
 
         return view(
             'ppdb.pendaftar.ditolak',
@@ -71,13 +85,114 @@ class PendaftarController extends Controller
         PpdbPendaftar $pendaftar
     )
     {
-        $pendaftar->update([
-            'status' => 'diterima'
-        ]);
+        if (
+            !in_array(
+                $pendaftar->status,
+                ['verifikasi']
+            )
+        )
+            {
+                return back()->with(
+                    'error',
+                    'Pendaftar harus diverifikasi terlebih dahulu'
+                );
+            }
+
+        if ($pendaftar->siswa_id) {
+
+            return back()->with(
+                'error',
+                'Pendaftar sudah menjadi siswa'
+            );
+        }
+
+        DB::transaction(function () use ($pendaftar) {
+
+            $angkatan = Angkatan::firstOrCreate(
+                [
+                    'tahun' => now()->year
+                ],
+                [
+                    'keterangan' => 'Angkatan '.now()->year
+                ]
+            );
+
+            $nis = $this->generateNis();
+
+            $password = \Carbon\Carbon::parse(
+                $pendaftar->tanggal_lahir
+                )->format('dmY');
+
+            $user = User::create([
+
+                'name'
+                    => $pendaftar->nama,
+
+                'email' => $pendaftar->nik .
+                        '.' .
+                        $pendaftar->id .
+                        '@siswa.local',
+
+                'password' => Hash::make($password),
+
+                'role' => UserRole::MURID,
+
+                'is_active'
+                    => true,
+
+                'approval_status'
+                    => 'approved',
+            ]);
+
+            $siswa = Siswa::create([
+
+                'user_id'
+                    => $user->id,
+
+                'angkatan_id'
+                    => $angkatan?->id,
+
+                'nama'
+                    => $pendaftar->nama,
+
+                'nis'
+                    => $nis,
+
+                'nisn'
+                    => null,
+
+                'jenis_kelamin'
+                    => $pendaftar->jenis_kelamin,
+
+                'tanggal_lahir'
+                    => $pendaftar->tanggal_lahir,
+
+                'alamat'
+                    => $pendaftar->alamat,
+
+                'nama_wali'
+                    => optional(
+                        $pendaftar->ayah
+                    )->nama,
+
+                'telepon_wali'
+                    => $pendaftar->hp_ayah,
+            ]);
+
+            $pendaftar->update([
+
+                'status'
+                    => 'diterima',
+
+                'siswa_id'
+                    => $siswa->id,
+            ]);
+        });
+
 
         return back()->with(
             'success',
-            'Pendaftar diterima'
+            'Pendaftar berhasil diterima'
         );
     }
 
@@ -93,5 +208,74 @@ class PendaftarController extends Controller
             'success',
             'Pendaftar ditolak'
         );
+    }
+    public function formVerifikasi(
+        PpdbPendaftar $pendaftar
+    )
+    {
+        return view(
+            'ppdb.pendaftar.verifikasi-form',
+            compact('pendaftar')
+        );
+    }
+    public function simpanVerifikasi(
+        Request $request,
+        PpdbPendaftar $pendaftar
+    )
+    {
+        if (
+            !$pendaftar->kartu_keluarga ||
+            !$pendaftar->akta_lahir ||
+            !$pendaftar->foto
+        )
+        {
+            return back()->with(
+                'error',
+                'Dokumen belum lengkap'
+            );
+        }
+        $request->validate([
+            'catatan_verifikasi'
+                => 'nullable|string'
+        ]);
+
+        $pendaftar->update([
+
+            'status'
+                => 'verifikasi',
+
+            'catatan_verifikasi'
+                => $request->catatan_verifikasi
+        ]);
+
+        return redirect()
+            ->route(
+                'tu.ppdb.pendaftar.show',
+                $pendaftar
+            )
+            ->with(
+                'success',
+                'Berkas berhasil diverifikasi'
+            );
+    }
+    private function generateNis()
+    {
+        $tahun = now()->year;
+
+        $last = Siswa::withTrashed()
+            ->orderByDesc('id')
+            ->first();
+
+        $urut = $last
+            ? ((int) substr($last->nis, -4)) + 1
+            : 1;
+
+        return $tahun .
+            str_pad(
+                $urut,
+                4,
+                '0',
+                STR_PAD_LEFT
+            );
     }
 }

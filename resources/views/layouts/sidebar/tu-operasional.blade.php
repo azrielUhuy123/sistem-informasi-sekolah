@@ -4,6 +4,7 @@
 <div class="sidebar">
 
     @include('layouts.partials.tahun-ajaran')
+    @include('layouts.partials.tu-mode')
 
     <div class="sidebar-title">
         MAIN OPERATOR

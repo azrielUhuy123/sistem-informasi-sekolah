@@ -58,6 +58,8 @@ require __DIR__.'/superadmin.php';
 require __DIR__.'/tu.php';
 require __DIR__.'/guru.php';
 require __DIR__.'/siswa.php';
+require __DIR__.'/ppdb-public.php';
+require __DIR__.'/ppdb-admin.php';
 require __DIR__.'/auth.php';
 
 

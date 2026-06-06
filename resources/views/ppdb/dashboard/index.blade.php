@@ -44,6 +44,24 @@
             </div>
         </div>
 
+        <div class="col-md-3">
+            <div class="card shadow-sm">
+                <div class="card-body">
+                    <h6>Kuota</h6>
+                    <h2>{{ $kuota }}</h2>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-3">
+            <div class="card shadow-sm">
+                <div class="card-body">
+                    <h6>Sisa Kuota</h6>
+                    <h2>{{ $sisaKuota }}</h2>
+                </div>
+            </div>
+        </div>
+
     </div>
 
 </div>

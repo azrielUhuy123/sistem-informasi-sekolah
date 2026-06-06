@@ -17,7 +17,7 @@
     {{-- DASHBOARD PPDB --}}
     <a
         class="menu-item
-        {{ request()->is('tu/ppdb/dashboard*') ? 'active' : '' }}"
+        {{ request()->is('tu.ppdb/dashboard*') ? 'active' : '' }}"
         href="{{ route('tu.ppdb.dashboard') }}"
     >
 
@@ -63,12 +63,11 @@
     <div
         class="submenu
         {{
-            request()->is('tu/ppdb/pendaftar*') ||
-            request()->is('tu/ppdb/verifikasi*') ||
-            request()->is('tu/ppdb/diterima*') ||
-            request()->is('tu/ppdb/ditolak*') ||
-            request()->is('tu/ppdb/daftar-ulang*') ||
-            request()->is('tu/ppdb/generate-akun*')
+            request()->is('tu.ppdb/pendaftar*') ||
+            request()->is('tu.ppdb/verifikasi*') ||
+            request()->is('tu.ppdb/diterima*') ||
+            request()->is('tu.ppdb/ditolak*') ||
+            request()->is('tu.ppdb/generate-akun*')
             ? 'show'
             : ''
         }}"
@@ -77,7 +76,7 @@
 
         <a
             class="menu-item
-            {{ request()->is('tu/ppdb/pendaftar*') ? 'active' : '' }}"
+            {{ request()->is('tu.ppdb/pendaftar*') ? 'active' : '' }}"
             href="{{ route('tu.ppdb.pendaftar.index') }}"
         >
 
@@ -97,7 +96,7 @@
 
         <a
             class="menu-item
-            {{ request()->is('tu/ppdb/verifikasi*') ? 'active' : '' }}"
+            {{ request()->is('tu.ppdb/verifikasi*') ? 'active' : '' }}"
             href="{{ route('tu.ppdb.verifikasi.index') }}"
         >
 
@@ -117,7 +116,7 @@
 
         <a
             class="menu-item
-            {{ request()->is('tu/ppdb/diterima*') ? 'active' : '' }}"
+            {{ request()->is('tu.ppdb/diterima*') ? 'active' : '' }}"
             href="{{ route('tu.ppdb.diterima.index') }}"
         >
 
@@ -137,7 +136,7 @@
 
         <a
             class="menu-item
-            {{ request()->is('tu/ppdb/ditolak*') ? 'active' : '' }}"
+            {{ request()->is('tu.ppdb/ditolak*') ? 'active' : '' }}"
             href="{{ route('tu.ppdb.ditolak.index') }}"
         >
 
@@ -157,8 +156,8 @@
 
         <a
             class="menu-item
-            {{ request()->is('tu/ppdb/daftar-ulang*') ? 'active' : '' }}"
-            href="{{ route('tu.ppdb.daftar-ulang.index') }}"
+            {{ request()->is('tu.ppdb/daftar-ulang*') ? 'active' : '' }}"
+            href="#"
         >
 
             <div class="menu-left">
@@ -177,8 +176,8 @@
 
         <a
             class="menu-item
-            {{ request()->is('tu/ppdb/generate-akun*') ? 'active' : '' }}"
-            href="{{ route('tu.ppdb.generate-akun.index') }}"
+            {{ request()->is('tu.ppdb/generate-akun*') ? 'active' : '' }}"
+            href="#"
         >
 
             <div class="menu-left">
@@ -224,7 +223,7 @@
 
     <div
         class="submenu
-        {{ request()->is('tu/ppdb/pengaturan*') ? 'show' : '' }}"
+        {{ request()->is('tu.ppdb/pengaturan*') ? 'show' : '' }}"
         id="menuPengaturanPpdb"
     >
 

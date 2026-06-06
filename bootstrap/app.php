@@ -24,7 +24,7 @@ return Application::configure(basePath: dirname(__DIR__))
             
             Route::middleware('web')
                 ->group(
-                    base_path('routes/ppdb.php')
+                    base_path('routes/ppdb-public.php')
                 );
         },
         api: __DIR__.'/../routes/api.php',

@@ -68,6 +68,16 @@ Route::middleware([
             [PendaftarController::class, 'tolak']
         )->name('pendaftar.tolak');
 
+        Route::get(
+            '/pendaftar/{pendaftar}/verifikasi',
+            [PendaftarController::class, 'formVerifikasi']
+        )->name('pendaftar.verifikasi');
+
+        Route::post(
+            '/pendaftar/{pendaftar}/verifikasi',
+            [PendaftarController::class, 'simpanVerifikasi']
+        )->name('pendaftar.verifikasi.store');
+
         /*
         |--------------------------------------------------------------------------
         | FILTER STATUS

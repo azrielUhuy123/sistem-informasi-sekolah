@@ -1,109 +1,95 @@
 @extends('layouts.app')
 
-@section('title', 'Data Ditolak PPDB')
+@section('title','Data Ditolak')
 
 @section('content')
 
 <div class="container-fluid">
 
-    <div class="card">
+    <div class="card shadow-sm">
 
         <div class="card-header">
 
-            Data Pendaftar PPDB
+            <h5 class="mb-0">
+                Data Pendaftar Ditolak
+            </h5>
 
         </div>
 
         <div class="card-body">
 
-            <table class="table">
+            <div class="table-responsive">
 
-                <thead>
+                <table class="table table-bordered">
 
-                    <tr>
-                        <th>No</th>
-                        <th>No Pendaftaran</th>
-                        <th>Nama</th>
-                        <th>Status</th>
-                        <th>Aksi</th>
-                    </tr>
+                    <thead>
 
-                </thead>
+                        <tr>
 
-                <tbody>
+                            <th>No</th>
+                            <th>No Pendaftaran</th>
+                            <th>Nama</th>
+                            <th>Alasan</th>
+                            <th>Aksi</th>
 
-                    @foreach($data as $item)
+                        </tr>
 
-                    <tr>
+                    </thead>
 
-                        <td>{{ $loop->iteration }}</td>
+                    <tbody>
 
-                        <td>{{ $item->no_pendaftaran }}</td>
+                        @forelse($data as $item)
 
-                        <td>{{ $item->nama }}</td>
+                        <tr>
 
-                        <td>
+                            <td>
+                                {{ $loop->iteration }}
+                            </td>
 
-                            <span class="badge bg-secondary">
+                            <td>
+                                {{ $item->no_pendaftaran }}
+                            </td>
 
-                                {{ strtoupper($item->status) }}
+                            <td>
+                                {{ $item->nama }}
+                            </td>
 
-                            </span>
+                            <td>
+                                {{ $item->catatan_verifikasi }}
+                            </td>
 
-                        </td>
+                            <td>
 
-                        <td>
-
-                            <a
-                                href="{{ route('tu.ppdb.pendaftar.show',$item) }}"
-                                class="btn btn-sm btn-primary"
-                            >
-                                Detail
-                            </a>
-
-                            @if($item->status == 'pending')
-
-                                <form
-                                    action="{{ route('tu.ppdb.pendaftar.terima',$item) }}"
-                                    method="POST"
-                                    class="d-inline"
+                                <a
+                                    href="{{ route('tu.ppdb.pendaftar.show',$item) }}"
+                                    class="btn btn-sm btn-primary"
                                 >
-                                    @csrf
+                                    Detail
+                                </a>
 
-                                    <button
-                                        class="btn btn-success btn-sm"
-                                    >
-                                        Terima
-                                    </button>
+                            </td>
 
-                                </form>
+                        </tr>
 
-                                <form
-                                    action="{{ route('tu.ppdb.pendaftar.tolak',$item) }}"
-                                    method="POST"
-                                    class="d-inline"
-                                >
-                                    @csrf
+                        @empty
 
-                                    <button
-                                        class="btn btn-danger btn-sm"
-                                    >
-                                        Tolak
-                                    </button>
+                        <tr>
 
-                                </form>
+                            <td colspan="5" class="text-center">
 
-                            @endif
+                                Tidak ada data
 
-                        </td>
+                            </td>
 
-                    </tr>
+                        </tr>
 
-                    @endforeach
+                        @endforelse
 
-                </tbody>
+                    </tbody>
 
-            </table>
+                </table>
+
+            </div>
 
             {{ $data->links() }}
 
