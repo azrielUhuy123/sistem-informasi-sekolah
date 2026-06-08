@@ -36,6 +36,16 @@ Route::middleware([
             PengaturanController::class
         );
 
+        Route::get(
+            '/pengaturan',
+            [PengaturanController::class, 'index']
+        )->name('pengaturan.index');
+
+        Route::post(
+            '/pengaturan',
+            [PengaturanController::class, 'store']
+        )->name('pengaturan.store');
+
         /*
         |--------------------------------------------------------------------------
         | PENDAFTAR
@@ -73,10 +83,15 @@ Route::middleware([
             [PendaftarController::class, 'formVerifikasi']
         )->name('pendaftar.verifikasi');
 
+        Route::get(
+            '/pendaftar/{pendaftar}/verifikasi',
+            [PendaftarController::class, 'formVerifikasi']
+        )->name('pendaftar.form-verifikasi');
+
         Route::post(
             '/pendaftar/{pendaftar}/verifikasi',
-            [PendaftarController::class, 'simpanVerifikasi']
-        )->name('pendaftar.verifikasi.store');
+            [PendaftarController::class, 'simpanVerifikasi'
+        ])->name('pendaftar.simpan-verifikasi');
 
         /*
         |--------------------------------------------------------------------------

@@ -10,105 +10,91 @@
 
         <div class="card-header">
 
-            Verifikasi Berkas PPDB
+            Verifikasi Berkas
 
         </div>
 
         <div class="card-body">
 
-            <h5>
-
-                {{ $pendaftar->nama }}
-
-            </h5>
+            <h5>{{ $pendaftar->nama }}</h5>
 
             <hr>
 
             <div class="mb-3">
 
-                <label class="form-label">
+                <label>Kartu Keluarga</label>
 
-                    Kartu Keluarga
+                @if($pendaftar->kartu_keluarga)
 
-                </label>
+                    <a
+                        href="{{ asset('storage/'.$pendaftar->kartu_keluarga) }}"
+                        target="_blank"
+                        class="btn btn-sm btn-primary"
+                    >
+                        Lihat File
+                    </a>
 
-                <br>
+                @else
 
-                <a
-                    href="{{ asset('storage/'.$pendaftar->kartu_keluarga) }}"
-                    target="_blank"
-                    class="btn btn-outline-primary"
-                >
+                    <span class="badge bg-danger">
+                        Belum Upload
+                    </span>
 
-                    Lihat KK
-
-                </a>
-
-            </div>
-
-            <div class="mb-3">
-
-                <label class="form-label">
-
-                    Akta Kelahiran
-
-                </label>
-
-                <br>
-
-                <a
-                    href="{{ asset('storage/'.$pendaftar->akta_lahir) }}"
-                    target="_blank"
-                    class="btn btn-outline-primary"
-                >
-
-                    Lihat Akta
-
-                </a>
+                @endif
 
             </div>
 
             <div class="mb-3">
 
-                <label class="form-label">
+                <label>Akta Kelahiran</label>
 
-                    Pas Foto
+                @if($pendaftar->akta_lahir)
 
-                </label>
+                    <a
+                        href="{{ asset('storage/'.$pendaftar->akta_lahir) }}"
+                        target="_blank"
+                        class="btn btn-sm btn-primary"
+                    >
+                        Lihat File
+                    </a>
 
-                <br>
+                @endif
 
-                <a
-                    href="{{ asset('storage/'.$pendaftar->foto) }}"
-                    target="_blank"
-                    class="btn btn-outline-primary"
-                >
+            </div>
 
-                    Lihat Foto
+            <div class="mb-3">
 
-                </a>
+                <label>Pas Foto</label>
+
+                @if($pendaftar->foto)
+
+                    <a
+                        href="{{ asset('storage/'.$pendaftar->foto) }}"
+                        target="_blank"
+                        class="btn btn-sm btn-primary"
+                    >
+                        Lihat File
+                    </a>
+
+                @endif
 
             </div>
 
             <form
-                action="{{ route('tu.ppdb.pendaftar.verifikasi.store',$pendaftar) }}"
                 method="POST"
+                action="{{ route('tu.ppdb.pendaftar.simpan-verifikasi',$pendaftar) }}"
             >
 
                 @csrf
 
                 <div class="mb-3">
 
-                    <label class="form-label">
-
-                        Catatan Verifikasi
-
-                    </label>
+                    <label>Catatan Verifikasi</label>
 
                     <textarea
                         name="catatan_verifikasi"
                         class="form-control"
-                        rows="4"
+                        rows="3"
                     ></textarea>
 
                 </div>
@@ -117,7 +103,7 @@
                     class="btn btn-success"
                 >
 
-                    Tandai Sudah Diverifikasi
+                    Verifikasi Berkas
 
                 </button>
 

@@ -12,7 +12,7 @@ use App\Http\Controllers\GatewayController;
 Route::get('/{any?}', [GatewayController::class, 'index'])
     ->where(
         'any',
-        '^(?!login|dashboard|guru|tu|siswa|superadmin).*$'
+        '^(?!login|dashboard|guru|tu|siswa|superadmin|ppdb).*$'
     )
     ->name('gateway');
 

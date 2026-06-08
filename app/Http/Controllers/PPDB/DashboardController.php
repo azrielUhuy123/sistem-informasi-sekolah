@@ -27,12 +27,16 @@ class DashboardController extends Controller
             'ditolak'
         )->count();
 
+        $setting = PpdbSetting::first();
+
         $kuota = PpdbSetting::latest()->first()?->kuota ?? 0;
         
         $sisaKuota = max(
             0,
             $kuota - $diterima
         );
+
+        $statusPpdb = $setting?->status;
         return view(
             'ppdb.dashboard.index',
             compact(
@@ -41,7 +45,8 @@ class DashboardController extends Controller
                 'diterima',
                 'ditolak',
                 'kuota',
-                'sisaKuota'
+                'sisaKuota',
+                'statusPpdb'
             )
         );
     }

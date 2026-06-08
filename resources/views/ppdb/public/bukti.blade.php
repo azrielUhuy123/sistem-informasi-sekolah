@@ -1,4 +1,6 @@
-@extends('layouts.app')
+@extends('layouts.public')
+
+@section('title','Bukti Pendaftaran')
 
 @section('content')
 
@@ -6,52 +8,85 @@
 
     <div class="card shadow">
 
-        <div class="card-body text-center">
+        <div class="card-body">
 
-            <h2>
+            <div class="text-center mb-4">
 
-                Bukti Pendaftaran PPDB
+                <h2>
+                    Bukti Pendaftaran PPDB
+                </h2>
 
-            </h2>
-
-            <hr>
-
-            <h4>
-
-                {{ $data->nama }}
-
-            </h4>
-
-            <p>
-
-                Nomor Pendaftaran
-
-            </p>
-
-            <h3>
-
-                {{ $data->no_pendaftaran }}
-
-            </h3>
-
-            <span class="badge bg-warning">
-
-                {{ strtoupper($data->status) }}
-
-            </span>
-
-            <div class="mt-4">
-
-                <a
-                    href="{{ route('ppdb.status') }}"
-                    class="btn btn-primary"
-                >
-
-                    Cek Status
-
-                </a>
+                <h5>
+                    SDN Mekar Jaya
+                </h5>
 
             </div>
+
+            <table class="table">
+
+                <tr>
+                    <th width="250">
+                        Nomor Pendaftaran
+                    </th>
+
+                    <td>
+                        {{ $data->no_pendaftaran }}
+                    </td>
+                </tr>
+
+                <tr>
+                    <th>
+                        Nama
+                    </th>
+
+                    <td>
+                        {{ $data->nama }}
+                    </td>
+                </tr>
+
+                <tr>
+                    <th>
+                        NIK
+                    </th>
+
+                    <td>
+                        {{ $data->nik }}
+                    </td>
+                </tr>
+
+                <tr>
+                    <th>
+                        Status
+                    </th>
+
+                    <td>
+
+                        <span class="badge bg-warning">
+
+                            {{ strtoupper($data->status) }}
+
+                        </span>
+
+                    </td>
+                </tr>
+
+            </table>
+
+            <div class="alert alert-info">
+
+                Simpan nomor pendaftaran ini untuk
+                mengecek status PPDB.
+
+            </div>
+
+            <button
+                onclick="window.print()"
+                class="btn btn-primary"
+            >
+
+                Cetak Bukti
+
+            </button>
 
         </div>
 

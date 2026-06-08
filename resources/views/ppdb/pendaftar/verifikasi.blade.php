@@ -1,6 +1,6 @@
 @extends('layouts.app')
 
-@section('title', 'Verifikasi Pendaftar PPDB')
+@section('title','Verifikasi Berkas')
 
 @section('content')
 
@@ -10,22 +10,24 @@
 
         <div class="card-header">
 
-            Data Pendaftar PPDB
+            Verifikasi Berkas
 
         </div>
 
         <div class="card-body">
 
-            <table class="table">
+            <table class="table table-bordered">
 
                 <thead>
 
                     <tr>
+
                         <th>No</th>
                         <th>No Pendaftaran</th>
                         <th>Nama</th>
                         <th>Status</th>
                         <th>Aksi</th>
+
                     </tr>
 
                 </thead>
@@ -42,58 +44,16 @@
 
                         <td>{{ $item->nama }}</td>
 
-                        <td>
-
-                            <span class="badge bg-secondary">
-
-                                {{ strtoupper($item->status) }}
-
-                            </span>
-
-                        </td>
+                        <td>{{ strtoupper($item->status) }}</td>
 
                         <td>
 
                             <a
-                                href="{{ route('tu.ppdb.pendaftar.show',$item) }}"
-                                class="btn btn-sm btn-primary"
+                                href="{{ route('tu.ppdb.pendaftar.form-verifikasi',$item) }}"
+                                class="btn btn-primary btn-sm"
                             >
-                                Detail
+                                Verifikasi
                             </a>
-
-                            @if($item->status == 'pending')
-
-                                <form
-                                    action="{{ route('tu.ppdb.pendaftar.terima',$item) }}"
-                                    method="POST"
-                                    class="d-inline"
-                                >
-                                    @csrf
-
-                                    <button
-                                        class="btn btn-success btn-sm"
-                                    >
-                                        Terima
-                                    </button>
-
-                                </form>
-
-                                <form
-                                    action="{{ route('tu.ppdb.pendaftar.tolak',$item) }}"
-                                    method="POST"
-                                    class="d-inline"
-                                >
-                                    @csrf
-
-                                    <button
-                                        class="btn btn-danger btn-sm"
-                                    >
-                                        Tolak
-                                    </button>
-
-                                </form>
-
-                            @endif
 
                         </td>
 

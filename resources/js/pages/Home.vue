@@ -24,12 +24,12 @@
 
                 <div class="hero-actions">
 
-                    <router-link
-                        to="/ppdb"
+                    <a
+                        href="/ppdb"
                         class="btn-primary"
                     >
                         PPDB Online
-                    </router-link>
+                    </a>
 
                     <router-link
                         to="/informasi"
