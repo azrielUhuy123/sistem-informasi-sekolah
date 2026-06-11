@@ -330,4 +330,53 @@ class PublicController extends Controller
             compact('setting')
         );
     }
+
+    public function formDaftarUlang()
+    {
+        return view(
+            'ppdb.public.daftar-ulang'
+        );
+    }
+
+    public function simpanDaftarUlang(
+        Request $request
+    )
+    {
+        $request->validate([
+            'no_pendaftaran'
+                => 'required'
+        ]);
+
+        $pendaftar = PpdbPendaftar::where(
+            'no_pendaftaran',
+            $request->no_pendaftaran
+        )
+        ->where(
+            'status',
+            'diterima'
+        )
+        ->first();
+
+        if (!$pendaftar) {
+
+            return back()->with(
+                'error',
+                'Data tidak ditemukan'
+            );
+        }
+
+        $pendaftar->update([
+
+            'status_daftar_ulang'
+                => 'sudah',
+
+            'tanggal_daftar_ulang'
+                => now(),
+        ]);
+
+        return back()->with(
+            'success',
+            'Daftar ulang berhasil'
+        );
+    }
 }

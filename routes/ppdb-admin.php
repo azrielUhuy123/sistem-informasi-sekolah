@@ -114,4 +114,9 @@ Route::middleware([
             [PendaftarController::class, 'verifikasi']
         )->name('verifikasi.index');
 
+        Route::get(
+            '/daftar-ulang',
+            [PendaftarController::class, 'daftarUlang']
+        )->name('daftar-ulang.index');
+
     });

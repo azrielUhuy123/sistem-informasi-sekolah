@@ -10,6 +10,7 @@ use App\Models\Angkatan;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
+
 use App\Enums\UserRole;
 
 class PendaftarController extends Controller
@@ -278,4 +279,19 @@ class PendaftarController extends Controller
                 STR_PAD_LEFT
             );
     }
+    public function daftarUlang()
+    {
+        $data = PpdbPendaftar::where(
+            'status_daftar_ulang',
+            'sudah'
+        )
+        ->paginate(20);
+
+        return view(
+            'ppdb.pendaftar.daftar-ulang',
+            compact('data')
+        );
+    }
+
+    
 }

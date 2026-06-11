@@ -157,7 +157,7 @@
         <a
             class="menu-item
             {{ request()->is('tu.ppdb/daftar-ulang*') ? 'active' : '' }}"
-            href="#"
+            href="{{ route('tu.ppdb.daftar-ulang.index') }}"
         >
 
             <div class="menu-left">
@@ -174,25 +174,6 @@
 
         </a>
 
-        <a
-            class="menu-item
-            {{ request()->is('tu.ppdb/generate-akun*') ? 'active' : '' }}"
-            href="#"
-        >
-
-            <div class="menu-left">
-
-                <i class="bi bi-person-plus"></i>
-
-                <span>
-
-                    Generate Akun
-
-                </span>
-
-            </div>
-
-        </a>
 
     </div>
 

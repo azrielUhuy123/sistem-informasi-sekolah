@@ -8,5 +8,5 @@ class UserRole
     public const ADMIN      = 'admin';
     public const TU         = 'tu';
     public const GURU       = 'guru';
-    public const MURID      = 'murid';
+    public const MURID      = 'siswa';
 }

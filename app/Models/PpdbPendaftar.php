@@ -10,6 +10,14 @@ class PpdbPendaftar extends Model
 
     protected $guarded = [];
 
+    public function siswa()
+    {
+        return $this->belongsTo(
+            Siswa::class,
+            'siswa_id'
+        );
+    }
+
     public function orangtua()
     {
         return $this->hasMany(
@@ -32,5 +40,10 @@ class PpdbPendaftar extends Model
             PpdbOrangtua::class,
             'ppdb_pendaftar_id'
         )->where('jenis', 'ibu');
+    }
+
+    public function tahunAjaran()
+    {
+        return $this->belongsTo(TahunAjaran::class);
     }
 }

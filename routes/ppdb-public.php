@@ -2,6 +2,7 @@
 
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\PPDB\PublicController;
+use App\Http\Controllers\PPDB\PendaftarController;
 
 Route::prefix('ppdb')
     ->name('ppdb.')
@@ -41,4 +42,16 @@ Route::prefix('ppdb')
             '/status',
             [PublicController::class, 'cekStatus']
         )->name('status.cek');
+
+        Route::get(
+            '/daftar-ulang',
+            [PublicController::class, 'formDaftarUlang']
+        )->name('daftar-ulang');
+
+        Route::post(
+            '/daftar-ulang',
+            [PublicController::class, 'simpanDaftarUlang']
+        )->name('daftar-ulang.simpan');
+
+        
     });

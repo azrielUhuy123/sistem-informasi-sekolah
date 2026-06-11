@@ -14,7 +14,7 @@
 
         </div>
 
-        @if($pendaftar->status == 'pending')
+        @if($pendaftar->status == 'verifikasi')
 
             <form
                 action="{{ route('tu.ppdb.pendaftar.terima',$pendaftar) }}"
@@ -23,7 +23,7 @@
             >
                 @csrf
                 <a
-                    href="{{ route('tu.ppdb.pendaftar.verifikasi',$pendaftar) }}"
+                    href="{{ route('tu.ppdb.pendaftar.form-verifikasi',$pendaftar) }}"
                     class="btn btn-warning"
                 >
                     Verifikasi Berkas

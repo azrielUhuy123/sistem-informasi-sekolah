@@ -20,6 +20,7 @@ class Siswa extends Model
         'alamat',
         'nama_wali',
         'telepon_wali',
+        'user_id'
     ];
 
     public function penempatan()

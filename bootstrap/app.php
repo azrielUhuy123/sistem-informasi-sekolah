@@ -22,10 +22,6 @@ return Application::configure(basePath: dirname(__DIR__))
             Route::middleware('web')
             ->group(base_path('routes/siswa.php'));
             
-            Route::middleware('web')
-                ->group(
-                    base_path('routes/ppdb-public.php')
-                );
         },
         api: __DIR__.'/../routes/api.php',
         commands: __DIR__.'/../routes/console.php',
