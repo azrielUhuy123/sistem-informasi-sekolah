@@ -4,115 +4,159 @@
 
 @section('content')
 
+<div class="hero-gradient text-white py-5">
+
+
+<div class="container text-center">
+
+    <h1 class="display-4 fw-bold mb-3">
+        PPDB SDN Mekar Jaya
+    </h1>
+
+    <p class="lead mb-4">
+        Penerimaan Peserta Didik Baru
+        Tahun Ajaran
+        <strong>
+            {{ $setting?->tahunAjaran?->tahun }}
+        </strong>
+    </p>
+
+    @if($setting?->status == 'dibuka')
+
+        <a
+            href="{{ route('ppdb.create') }}"
+            class="btn btn-light btn-lg me-2"
+        >
+            Daftar Sekarang
+        </a>
+
+    @else
+
+        <button
+            class="btn btn-secondary btn-lg"
+            disabled
+        >
+            PPDB Ditutup
+        </button>
+
+    @endif
+
+    <a
+        href="{{ route('ppdb.alur') }}"
+        class="btn btn-outline-light btn-lg"
+    >
+        Lihat Alur
+    </a>
+
+</div>
+```
+
+</div>
+
 <div class="container py-5">
 
-    <div class="card shadow-sm">
+```
+<div class="row g-4 mb-5">
 
-        <div class="card-body text-center">
+    <div class="col-md-4">
 
-            <h1>
+        <div class="card shadow-soft h-100">
 
-                PPDB SDN Mekar Jaya
+            <div class="card-body text-center">
 
-            </h1>
+                <h6 class="text-muted">
+                    Kuota Siswa
+                </h6>
 
-            <p>
-
-                Tahun Ajaran
-
-                <strong>
-
-                    {{ $setting?->tahunAjaran?->tahun }}
-
-                </strong>
-
-            </p>
-
-            <hr>
-
-            <div class="row">
-
-                <div class="col-md-4">
-
-                    <h6>Kuota</h6>
-
-                    <h3>
-
-                        {{ $setting?->kuota }}
-
-                    </h3>
-
-                </div>
-
-                <div class="col-md-4">
-
-                    <h6>Tanggal Mulai</h6>
-
-                    <h3>
-
-                        {{ $setting?->tanggal_mulai }}
-
-                    </h3>
-
-                </div>
-
-                <div class="col-md-4">
-
-                    <h6>Tanggal Selesai</h6>
-
-                    <h3>
-
-                        {{ $setting?->tanggal_selesai }}
-
-                    </h3>
-
-                </div>
+                <h2 class="fw-bold text-primary">
+                    {{ $setting?->kuota }}
+                </h2>
 
             </div>
 
-            <hr>
+        </div>
 
-            @if($setting?->status == 'dibuka')
+    </div>
 
-                <a
-                    href="{{ route('ppdb.create') }}"
-                    class="btn btn-primary btn-lg"
-                >
+    <div class="col-md-4">
 
-                    Daftar Sekarang
+        <div class="card shadow-soft h-100">
 
-                </a>
+            <div class="card-body text-center">
 
-            @else
+                <h6 class="text-muted">
+                    Tanggal Mulai
+                </h6>
 
-                <button
-                    class="btn btn-secondary btn-lg"
-                    disabled
-                >
+                <h5 class="fw-bold">
+                    {{ $setting?->tanggal_mulai }}
+                </h5>
 
-                    PPDB Ditutup
-
-                </button>
-
-            @endif
+            </div>
 
         </div>
 
-        <div class="mt-4">
+    </div>
 
-            <a
-                href="{{ route('ppdb.alur') }}"
-                class="btn btn-outline-secondary"
-            >
+    <div class="col-md-4">
 
-                Lihat Alur PPDB
+        <div class="card shadow-soft h-100">
 
-            </a>
+            <div class="card-body text-center">
+
+                <h6 class="text-muted">
+                    Tanggal Selesai
+                </h6>
+
+                <h5 class="fw-bold">
+                    {{ $setting?->tanggal_selesai }}
+                </h5>
+
+            </div>
 
         </div>
 
     </div>
 
 </div>
+
+<div class="card shadow-soft">
+
+    <div class="card-body p-5">
+
+        <h3 class="fw-bold mb-4 text-center">
+            Mengapa Memilih SDN Mekar Jaya?
+        </h3>
+
+        <div class="row text-center">
+
+            <div class="col-md-3">
+                <h5>👨‍🏫</h5>
+                <p>Guru Profesional</p>
+            </div>
+
+            <div class="col-md-3">
+                <h5>🏫</h5>
+                <p>Fasilitas Lengkap</p>
+            </div>
+
+            <div class="col-md-3">
+                <h5>🎨</h5>
+                <p>Ekstrakurikuler Aktif</p>
+            </div>
+
+            <div class="col-md-3">
+                <h5>🌱</h5>
+                <p>Lingkungan Nyaman</p>
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+</div>
+
 
 @endsection

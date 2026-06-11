@@ -6,139 +6,148 @@
 
 <div class="container py-5">
 
-    <div class="text-center mb-5">
 
-        <h1>
+<div class="text-center mb-5">
 
-            Alur Pendaftaran PPDB
+    <h1 class="fw-bold">
+        Alur PPDB SDN Mekar Jaya
+    </h1>
 
-        </h1>
+    <p class="text-muted">
+        Ikuti tahapan berikut sampai resmi menjadi siswa baru.
+    </p>
 
-        <p class="text-muted">
+</div>
 
-            Ikuti tahapan berikut untuk melakukan pendaftaran.
+<div class="row justify-content-center">
 
-        </p>
+    <div class="col-lg-8">
 
-    </div>
+        <div class="card shadow-soft">
 
-    <div class="row g-4">
+            <div class="card-body p-4">
 
-        <div class="col-md-2">
+                <div class="d-flex mb-4">
 
-            <div class="card h-100 shadow-sm">
+                    <div class="me-4">
+                        <span class="badge bg-primary fs-6">1</span>
+                    </div>
 
-                <div class="card-body text-center">
+                    <div>
+                        <h5>Isi Formulir Pendaftaran</h5>
+                        <p class="text-muted mb-0">
+                            Lengkapi seluruh data calon peserta didik.
+                        </p>
+                    </div>
 
-                    <h1>1</h1>
+                </div>
 
-                    <h6>
+                <hr>
 
-                        Isi Formulir
+                <div class="d-flex mb-4">
 
-                    </h6>
+                    <div class="me-4">
+                        <span class="badge bg-primary fs-6">2</span>
+                    </div>
+
+                    <div>
+                        <h5>Upload Berkas</h5>
+                        <p class="text-muted mb-0">
+                            Unggah foto, akta kelahiran, dan kartu keluarga.
+                        </p>
+                    </div>
+
+                </div>
+
+                <hr>
+
+                <div class="d-flex mb-4">
+
+                    <div class="me-4">
+                        <span class="badge bg-primary fs-6">3</span>
+                    </div>
+
+                    <div>
+                        <h5>Verifikasi Berkas</h5>
+                        <p class="text-muted mb-0">
+                            Tim Tata Usaha akan memverifikasi kelengkapan data.
+                        </p>
+                    </div>
+
+                </div>
+
+                <hr>
+
+                <div class="d-flex mb-4">
+
+                    <div class="me-4">
+                        <span class="badge bg-primary fs-6">4</span>
+                    </div>
+
+                    <div>
+                        <h5>Pengumuman Hasil</h5>
+                        <p class="text-muted mb-0">
+                            Calon siswa dapat melihat status pendaftaran secara online.
+                        </p>
+                    </div>
+
+                </div>
+
+                <hr>
+
+                <div class="d-flex mb-4">
+
+                    <div class="me-4">
+                        <span class="badge bg-success fs-6">5</span>
+                    </div>
+
+                    <div>
+                        <h5>Daftar Ulang</h5>
+                        <p class="text-muted mb-0">
+                            Peserta yang diterima wajib melakukan daftar ulang.
+                        </p>
+                    </div>
+
+                </div>
+
+                <hr>
+
+                <div class="d-flex">
+
+                    <div class="me-4">
+                        <span class="badge bg-success fs-6">✓</span>
+                    </div>
+
+                    <div>
+                        <h5>Resmi Menjadi Siswa</h5>
+                        <p class="text-muted mb-0">
+                            Akun siswa dibuat dan siap mengikuti kegiatan belajar.
+                        </p>
+                    </div>
 
                 </div>
 
             </div>
 
         </div>
-
-        <div class="col-md-2">
-
-            <div class="card h-100 shadow-sm">
-
-                <div class="card-body text-center">
-
-                    <h1>2</h1>
-
-                    <h6>
-
-                        Upload Berkas
-
-                    </h6>
-
-                </div>
-
-            </div>
-
-        </div>
-
-        <div class="col-md-2">
-
-            <div class="card h-100 shadow-sm">
-
-                <div class="card-body text-center">
-
-                    <h1>3</h1>
-
-                    <h6>
-
-                        Verifikasi TU
-
-                    </h6>
-
-                </div>
-
-            </div>
-
-        </div>
-
-        <div class="col-md-2">
-
-            <div class="card h-100 shadow-sm">
-
-                <div class="card-body text-center">
-
-                    <h1>4</h1>
-
-                    <h6>
-
-                        Pengumuman
-
-                    </h6>
-
-                </div>
-
-            </div>
-
-        </div>
-
-        <div class="col-md-2">
-
-            <div class="card h-100 shadow-sm">
-
-                <div class="card-body text-center">
-
-                    <h1>5</h1>
-
-                    <h6>
-
-                        Daftar Ulang
-
-                    </h6>
-
-                </div>
-
-            </div>
-
-        </div>
-
-    </div>
-
-    <div class="text-center mt-5">
-
-        <a
-            href="{{ route('ppdb.create') }}"
-            class="btn btn-primary btn-lg"
-        >
-
-            Mulai Pendaftaran
-
-        </a>
 
     </div>
 
 </div>
+
+<div class="text-center mt-5">
+
+    <a
+        href="{{ route('ppdb.create') }}"
+        class="btn btn-primary btn-lg px-5"
+    >
+        Mulai Pendaftaran
+    </a>
+
+</div>
+
+
+</div>
+
 
 @endsection

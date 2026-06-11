@@ -6,87 +6,147 @@
 
 <div class="container py-5">
 
-    <div class="card shadow">
+    <div class="row justify-content-center">
 
-        <div class="card-body">
+        <div class="col-lg-8">
 
-            <div class="text-center mb-4">
+            <div class="card shadow-lg border-0">
 
-                <h2>
-                    Bukti Pendaftaran PPDB
-                </h2>
+                <div class="card-body p-5">
 
-                <h5>
-                    SDN Mekar Jaya
-                </h5>
+                    <div class="text-center mb-4">
+
+                        <h2 class="fw-bold text-primary">
+                            BUKTI PENDAFTARAN PPDB
+                        </h2>
+
+                        <h5>
+                            SDN Mekar Jaya
+                        </h5>
+
+                        <p class="text-muted">
+                            Tahun Ajaran {{ date('Y') }}/{{ date('Y') + 1 }}
+                        </p>
+
+                    </div>
+
+                    <div class="alert alert-success">
+
+                        <strong>Pendaftaran Berhasil!</strong>
+
+                        Simpan nomor pendaftaran berikut untuk
+                        pengecekan status dan daftar ulang.
+
+                    </div>
+
+                    <div class="text-center mb-4">
+
+                        <h1 class="fw-bold text-primary">
+
+                            {{ $data->no_pendaftaran }}
+
+                        </h1>
+
+                    </div>
+
+                    <table class="table table-bordered">
+
+                        <tr>
+                            <th width="250">
+                                Nomor Pendaftaran
+                            </th>
+                            <td>
+                                {{ $data->no_pendaftaran }}
+                            </td>
+                        </tr>
+
+                        <tr>
+                            <th>
+                                Nama Lengkap
+                            </th>
+                            <td>
+                                {{ $data->nama }}
+                            </td>
+                        </tr>
+
+                        <tr>
+                            <th>
+                                NIK
+                            </th>
+                            <td>
+                                {{ $data->nik }}
+                            </td>
+                        </tr>
+
+                        <tr>
+                            <th>
+                                Tanggal Pendaftaran
+                            </th>
+                            <td>
+                                {{ \Carbon\Carbon::parse($data->tanggal_pendaftaran)->format('d F Y') }}
+                            </td>
+                        </tr>
+
+                        <tr>
+                            <th>
+                                Status
+                            </th>
+
+                            <td>
+
+                                <span class="badge bg-warning fs-6">
+
+                                    MENUNGGU VERIFIKASI
+
+                                </span>
+
+                            </td>
+
+                        </tr>
+
+                    </table>
+
+                    <div class="bg-light rounded p-4 mt-4">
+
+                        <h6 class="fw-bold">
+                            Langkah Selanjutnya
+                        </h6>
+
+                        <ol class="mb-0">
+
+                            <li>
+                                Simpan nomor pendaftaran.
+                            </li>
+
+                            <li>
+                                Cek status secara berkala melalui menu
+                                <b>Cek Status PPDB</b>.
+                            </li>
+
+                            <li>
+                                Jika dinyatakan diterima, lakukan daftar ulang.
+                            </li>
+
+                        </ol>
+
+                    </div>
+
+                    <div class="text-center mt-4">
+
+                        <button
+                            onclick="window.print()"
+                            class="btn btn-primary btn-lg"
+                        >
+
+                            Cetak Bukti Pendaftaran
+
+                        </button>
+
+                    </div>
+
+                </div>
 
             </div>
-
-            <table class="table">
-
-                <tr>
-                    <th width="250">
-                        Nomor Pendaftaran
-                    </th>
-
-                    <td>
-                        {{ $data->no_pendaftaran }}
-                    </td>
-                </tr>
-
-                <tr>
-                    <th>
-                        Nama
-                    </th>
-
-                    <td>
-                        {{ $data->nama }}
-                    </td>
-                </tr>
-
-                <tr>
-                    <th>
-                        NIK
-                    </th>
-
-                    <td>
-                        {{ $data->nik }}
-                    </td>
-                </tr>
-
-                <tr>
-                    <th>
-                        Status
-                    </th>
-
-                    <td>
-
-                        <span class="badge bg-warning">
-
-                            {{ strtoupper($data->status) }}
-
-                        </span>
-
-                    </td>
-                </tr>
-
-            </table>
-
-            <div class="alert alert-info">
-
-                Simpan nomor pendaftaran ini untuk
-                mengecek status PPDB.
-
-            </div>
-
-            <button
-                onclick="window.print()"
-                class="btn btn-primary"
-            >
-
-                Cetak Bukti
-
-            </button>
 
         </div>
 
