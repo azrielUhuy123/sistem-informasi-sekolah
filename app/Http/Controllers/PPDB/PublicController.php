@@ -34,7 +34,7 @@ class PublicController extends Controller
         }
 
         return view(
-                'ppdb.public.create',
+                'ppdb.public.ppdb.form',
                 compact('setting')
         );
     }

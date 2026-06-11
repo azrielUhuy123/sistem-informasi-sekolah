@@ -30,7 +30,7 @@
 
     
 
-    <a class="menu-item {{ request()->is('guru/dashboard-walikelas') ? 'active' : '' }}"
+    <a class="menu-item {{ request()->is('guru/dashboard-walikelas') ?  : '' }}"
        href="{{ route('guru.dashboard-walikelas') }}">
         <div class="menu-left">
             <i class="bi bi-speedometer2"></i>
@@ -40,7 +40,7 @@
 
     <a
         class="menu-item
-        {{ request()->is('guru/profile*') ? 'active' : '' }}"
+        {{ request()->is('guru/profile*') ?  : '' }}"
         href="{{ route('guru.profile') }}">
 
         <div class="menu-left">
@@ -62,7 +62,7 @@
 
     <div class="submenu" id="menuJadwal">
 
-        <a class="menu-item {{ request()->is('guru/jadwal-saya*') ? 'active' : '' }}"
+        <a class="menu-item {{ request()->is('guru/jadwal-saya*') ?  : '' }}"
            href="{{ route('guru.jadwal-saya.index') }}">
             <div class="menu-left">
                 <i class="bi bi-calendar3"></i>
@@ -70,7 +70,7 @@
             </div>
         </a>
 
-        <a class="menu-item {{ request()->is('guru/status-validasi*') ? 'active' : '' }}"
+        <a class="menu-item {{ request()->is('guru/status-validasi*') ?  : '' }}"
            href="{{ route('guru.status-validasi.index') }}">
             <div class="menu-left">
                 <i class="bi bi-patch-check"></i>
@@ -92,32 +92,18 @@
 
     <div class="submenu" id="menuKelas">
         @if($isWaliKelas)
-            <a class="menu-item {{ request()->is('guru/kelas-saya*') ? 'active' : '' }}"
+            <a class="menu-item {{ request()->is('guru/kelas-saya*') ?  : '' }}"
             href="{{ route('guru.kelas-saya') }}">
                 <div class="menu-left">
-                    <i class="bi bi-people"></i>
+                    <i class="bi bi-person"></i>
                     <span>Kelas Saya</span>
                 </div>
             </a>
         @endif
 
-        <a class="menu-item {{ request()->is('guru/absensi*') ? 'active' : '' }}"
-           href="{{ route('guru.absensi.index') }}">
-            <div class="menu-left">
-                <i class="bi bi-send-check"></i>
-                <span>Absensi</span>
-            </div>
-        </a>
+        
 
-        <a class="menu-item {{ request()->is('guru/rekap-absensi*') ? 'active' : '' }}"
-           href="{{ route('guru.absensi.rekap') }}">
-            <div class="menu-left">
-                <i class="bi bi-bar-chart"></i>
-                <span>Rekap Absensi</span>
-            </div>
-        </a>
-
-        <a class="menu-item {{ request()->is('guru/nilai*') ? 'active' : '' }}"
+        <a class="menu-item {{ request()->is('guru/nilai*') ?  : '' }}"
            href="{{ route('guru.nilai.index') }}">
             <div class="menu-left">
                 <i class="bi bi-journal-check"></i>
@@ -125,7 +111,7 @@
             </div>
         </a>
 
-        <a class="menu-item {{ request()->is('guru/perkembangan*') ? 'active' : '' }}"
+        <a class="menu-item {{ request()->is('guru/perkembangan*') ?  : '' }}"
            href="{{ route('guru.perkembangan.index') }}">
             <div class="menu-left">
                 <i class="bi bi-graph-up-arrow"></i>
@@ -134,7 +120,7 @@
         </a>
 
         @if($isWaliKelas)
-            <a class="menu-item {{ request()->is('guru/kenaikan*') ? 'active' : '' }}"
+            <a class="menu-item {{ request()->is('guru/kenaikan*') ?  : '' }}"
             href="{{ route('guru.kenaikan.index') }}">
                 <div class="menu-left">
                     <i class="bi bi-mortarboard"></i>
@@ -144,6 +130,67 @@
         @endif
 
     </div>
+
+    <button class="menu-item border-0 bg-transparent text-start"
+            onclick="toggleMenu('menuAbsen','arrowAbsen')">
+        <div class="menu-left">
+            <i class="bi bi-journal-text"></i>
+            <span>Absensi</span>
+        </div>
+
+        <i class="bi bi-chevron-right dropdown-arrow" id="arrowAbsen"></i>
+    </button>
+    <div class="submenu" id="menuAbsen">
+        <a class="menu-item {{ request()->is('guru/absensi*') ?  : '' }}"
+           href="{{ route('guru.absensi.index') }}">
+            <div class="menu-left">
+                <i class="bi bi-send-check"></i>
+                <span>Absensi Kelas</span>
+            </div>
+        </a>
+
+        <a
+            class="menu-item
+            {{ request()->is('guru/rekap-bulanan*') ?  : '' }}"
+            href="{{ route('guru.absensi.rekap-bulanan') }}"
+        >
+            <div class="menu-left">
+                <i class="bi bi-calendar3"></i>
+                <span>Rekap Bulanan</span>
+            </div>
+        </a>
+
+        <a
+            class="menu-item
+            {{ request()->is('guru/rekap-semester*') ? 'active' : '' }}"
+            href="{{ route('guru.absensi.rekap-semester') }}"
+        >
+            <div class="menu-left">
+                <i class="bi bi-calendar-range"></i>
+                <span>Rekap Semester</span>
+            </div>
+        </a>
+
+        <a class="menu-item {{ request()->is('guru/rekap-absensi*') ?  : '' }}"
+           href="{{ route('guru.absensi.rekap') }}">
+            <div class="menu-left">
+                <i class="bi bi-bar-chart"></i>
+                <span>Statistik Absensi</span>
+            </div>
+        </a>
+    </div>
+
+    <a
+        class="menu-item
+        {{ request()->is('guru/e-learning*') ?  : '' }}"
+        href="{{ route('guru.e-learning.index') }}">
+
+        <div class="menu-left">
+            <i class="bi bi-mortarboard"></i>
+            <span>E-Learning</span>
+        </div>
+
+    </a>
 
     {{-- DOKUMEN --}}
     <button
@@ -166,7 +213,7 @@
 
         <a
             class="menu-item
-            {{ request()->is('guru/dokumen*') ? 'active' : '' }}"
+            {{ request()->is('guru/dokumen*') ?  : '' }}"
             href="{{ route('guru.dokumen.surat') }}"
         >
 
@@ -179,7 +226,7 @@
 
             <a
                 class="menu-item
-                {{ request()->is('guru/pengajuan-surat*') ? 'active' : '' }}"
+                {{ request()->is('guru/pengajuan-surat*') ?  : '' }}"
                 href="{{ route('guru.pengajuan-surat.index') }}"
             >
 
@@ -192,7 +239,7 @@
 
             <a
                 class="menu-item
-                {{ request()->is('guru/nomor-surat*') ? 'active' : '' }}"
+                {{ request()->is('guru/nomor-surat*') ?  : '' }}"
                 href="{{ route('guru.nomor-surat.index') }}">
 
                 <div class="menu-left">

@@ -48,6 +48,13 @@
         Lihat Alur
     </a>
 
+    <a
+        href="{{ route('gateway') }}"
+        class="btn btn-outline-light btn-lg"
+    >
+        Kembali
+    </a>
+
 </div>
 ```
 

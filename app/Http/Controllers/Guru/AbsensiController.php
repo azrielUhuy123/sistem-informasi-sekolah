@@ -572,4 +572,252 @@ class AbsensiController extends Controller
             )
             ->firstOrFail();
     }
+
+    public function rekapBulanan(Request $request)
+    {
+        $guru = auth()->user()->guru;
+
+        $kelasDiampu = PengajuanJadwal::with([
+                'kelas',
+                'mapel'
+            ])
+            ->where('guru_id', $guru->id)
+            ->whereIn('status', ['approved', 'published'])
+            ->where('tahun_ajaran_id', current_tahun_id())
+            ->get()
+            ->unique(fn ($j) =>
+                $j->kelas_id . '-' . $j->mapel_id
+            )
+            ->values();
+
+        $kelasId =
+            $request->kelas_id
+            ?? optional($kelasDiampu->first())->kelas_id;
+
+        $mapelId =
+            $request->mapel_id
+            ?? optional($kelasDiampu->first())->mapel_id;
+
+        $bulan =
+            $request->bulan
+            ?? now()->month;
+
+        $tahun =
+            $request->tahun
+            ?? now()->year;
+
+        $selected = $kelasDiampu->first(function ($item)
+            use ($kelasId, $mapelId) {
+
+            return
+                $item->kelas_id == $kelasId
+                &&
+                $item->mapel_id == $mapelId;
+        });
+
+        $jumlahHari =
+            cal_days_in_month(
+                CAL_GREGORIAN,
+                $bulan,
+                $tahun
+            );
+
+        $rekap = [];
+
+        if ($selected) {
+
+            $penempatan = $selected
+                ->kelas
+                ->siswaAktif()
+                ->get();
+
+            foreach ($penempatan as $p) {
+
+                $siswa = $p->siswa;
+
+                $absensi = AbsensiSiswa::where(
+                        'siswa_id',
+                        $siswa->id
+                    )
+                    ->where(
+                        'kelas_id',
+                        $kelasId
+                    )
+                    ->whereMonth(
+                        'tanggal',
+                        $bulan
+                    )
+                    ->whereYear(
+                        'tanggal',
+                        $tahun
+                    )
+                    ->whereHas(
+                        'jadwal',
+                        function ($q) use ($mapelId) {
+
+                            $q->where(
+                                'mapel_id',
+                                $mapelId
+                            );
+                        }
+                    )
+                    ->get()
+                    ->keyBy(function ($item) {
+
+                        return date(
+                            'j',
+                            strtotime($item->tanggal)
+                        );
+                    });
+
+                $rekap[] = [
+
+                    'siswa' => $siswa,
+
+                    'absensi' => $absensi,
+
+                    'hadir' =>
+                        $absensi
+                            ->where('status', 'hadir')
+                            ->count(),
+
+                    'izin' =>
+                        $absensi
+                            ->where('status', 'izin')
+                            ->count(),
+
+                    'sakit' =>
+                        $absensi
+                            ->where('status', 'sakit')
+                            ->count(),
+
+                    'alpha' =>
+                        $absensi
+                            ->where('status', 'alpha')
+                            ->count(),
+                ];
+            }
+        }
+
+        return view(
+            'guru.absensi.rekap-bulanan',
+            compact(
+                'kelasDiampu',
+                'kelasId',
+                'mapelId',
+                'bulan',
+                'tahun',
+                'selected',
+                'rekap',
+                'jumlahHari'
+            )
+        );
+    }
+
+    public function rekapSemester(Request $request)
+    {
+        $guru = auth()->user()->guru;
+
+        $kelasDiampu = PengajuanJadwal::with([
+                'kelas',
+                'mapel'
+            ])
+            ->where('guru_id', $guru->id)
+            ->whereIn('status', ['approved', 'published'])
+            ->where('tahun_ajaran_id', current_tahun_id())
+            ->get()
+            ->unique(fn($j) =>
+                $j->kelas_id.'-'.$j->mapel_id
+            )
+            ->values();
+
+        $kelasId =
+            $request->kelas_id
+            ?? optional($kelasDiampu->first())->kelas_id;
+
+        $mapelId =
+            $request->mapel_id
+            ?? optional($kelasDiampu->first())->mapel_id;
+
+        $selected = $kelasDiampu->first(function ($item)
+            use ($kelasId, $mapelId) {
+
+            return
+                $item->kelas_id == $kelasId
+                &&
+                $item->mapel_id == $mapelId;
+        });
+
+        $rekap = [];
+
+        if ($selected) {
+
+            $penempatan = $selected
+                ->kelas
+                ->siswaAktif()
+                ->get();
+
+            foreach ($penempatan as $p) {
+
+                $siswa = $p->siswa;
+
+                $bulanData = [];
+
+                for ($bulan = 1; $bulan <= 12; $bulan++) {
+
+                    $bulanData[$bulan] =
+                        AbsensiSiswa::where(
+                            'siswa_id',
+                            $siswa->id
+                        )
+                        ->where(
+                            'kelas_id',
+                            $kelasId
+                        )
+                        ->whereMonth(
+                            'tanggal',
+                            $bulan
+                        )
+                        ->whereHas(
+                            'jadwal',
+                            function ($q) use ($mapelId) {
+
+                                $q->where(
+                                    'mapel_id',
+                                    $mapelId
+                                );
+                            }
+                        )
+                        ->where(
+                            'status',
+                            'hadir'
+                        )
+                        ->count();
+                }
+
+                $rekap[] = [
+
+                    'siswa' => $siswa,
+
+                    'bulan' => $bulanData,
+
+                    'total' => array_sum(
+                        $bulanData
+                    ),
+
+                ];
+            }
+        }
+
+        return view(
+            'guru.absensi.rekap-semester',
+            compact(
+                'kelasDiampu',
+                'kelasId',
+                'mapelId',
+                'selected',
+                'rekap'
+            )
+        );
+    }
 }

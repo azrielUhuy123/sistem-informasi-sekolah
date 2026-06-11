@@ -23,6 +23,8 @@ use App\Http\Controllers\Guru\Ekskul\JurnalEkskulController;
 use App\Http\Controllers\Guru\Ekskul\CatatanPembinaanController;
 use App\Http\Controllers\Guru\Ekskul\JadwalEkskulController;
 use App\Http\Controllers\Guru\Ekskul\StatusValidasiEkskulController;
+use App\Http\Controllers\Guru\ElearningController;
+use App\Http\Controllers\Guru\ElearningKomentarController;
 use Illuminate\Support\Facades\Session;
 
 Route::prefix('guru')
@@ -204,6 +206,31 @@ Route::prefix('guru')
             '/rekap-absensi/export',
             [AbsensiController::class, 'exportPdf']
         )->name('absensi.export');
+
+        Route::get(
+            '/rekap-bulanan',
+            [AbsensiController::class, 'rekapBulanan']
+        )->name('absensi.rekap-bulanan');
+
+        Route::get(
+            '/rekap-semester',
+            [AbsensiController::class, 'rekapSemester']
+        )->name('absensi.rekap-semester');
+
+        Route::resource(
+        'e-learning',
+        ElearningController::class
+        );
+
+            Route::post(
+            '/e-learning/upload-image',
+            [ElearningController::class, 'uploadImage']
+        )->name('e-learning.upload-image');
+
+        Route::post(
+            '/e-learning/{elearning}/komentar',
+            [ElearningKomentarController::class, 'store']
+        )->name('e-learning.komentar.store');
 
         Route::get(
             '/nilai',

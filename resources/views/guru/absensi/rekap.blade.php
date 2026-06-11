@@ -1,6 +1,6 @@
 @extends('layouts.app')
 
-@section('title', 'Rekap Absensi')
+@section('title', 'Statistik Absensi')
 
 @section('content')
 
@@ -10,13 +10,13 @@
 
         <h4 class="fw-bold mb-1">
 
-            Rekap Absensi Mapel
+            Statistik Absensi Mapel
 
         </h4>
 
         <small class="text-muted">
 
-            Monitoring absensi siswa berdasarkan mata pelajaran
+            Statistik absensi siswa berdasarkan mata pelajaran
 
         </small>
 
@@ -266,7 +266,7 @@
 
                     <small class="text-muted">
 
-                        Rekap absensi siswa berdasarkan mata pelajaran
+                        Statistik absensi siswa berdasarkan mata pelajaran
 
                     </small>
 
