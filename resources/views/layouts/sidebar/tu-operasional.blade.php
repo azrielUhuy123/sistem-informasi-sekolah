@@ -12,7 +12,7 @@
 
     {{-- DASHBOARD --}}
     <a
-        class="menu-item
+        class="menu-item"
         href="{{ route('tu.dashboard') }}"
     >
 
@@ -51,7 +51,7 @@
     >
 
         <a
-            class="menu-item
+            class="menu-item"
             href="{{ route('tu.tahun.index') }}"
         >
 
@@ -63,7 +63,7 @@
         </a>
 
         <a
-            class="menu-item
+            class="menu-item"
             href="{{ route('tu.penempatan-siswa.naik-kelas.index') }}"
         >
 
@@ -109,7 +109,7 @@
     >
 
         <a
-            class="menu-item
+            class="menu-item"
             href="{{ route('tu.kelas.index') }}"
         >
 
@@ -121,7 +121,7 @@
         </a>
 
         <a
-            class="menu-item
+            class="menu-item"
             href="{{ route('tu.siswa.index') }}"
         >
 
@@ -133,7 +133,7 @@
         </a>
 
         <a
-            class="menu-item
+            class="menu-item"
             href="{{ route('tu.guru.index') }}"
         >
 
@@ -145,7 +145,7 @@
         </a>
 
         <a
-            class="menu-item
+            class="menu-item"
             href="{{ route('tu.jadwal.index') }}"
         >
 
@@ -157,7 +157,7 @@
         </a>
 
         <a
-            class="menu-item
+            class="menu-item"
             href="{{ route('tu.mapel.index') }}"
         >
 
@@ -169,7 +169,7 @@
         </a>
 
         <a
-            class="menu-item
+            class="menu-item"
             href="{{ route('tu.ruangan.index') }}"
         >
 
@@ -181,7 +181,7 @@
         </a>
 
         <a
-            class="menu-item
+            class="menu-item"
             href="{{ route('tu.ekskul.index') }}"
         >
 
@@ -226,7 +226,7 @@
 
         {{-- DOKUMEN SEKOLAH --}}
             <a
-                class="menu-item
+                class="menu-item"
                 href="{{ route('tu.dokumen.sekolah') }}"
             >
 
@@ -239,7 +239,7 @@
 
             {{-- DOKUMEN SISWA --}}
             <a
-                class="menu-item
+                class="menu-item"
                 href="{{ route('tu.dokumen.siswa') }}">
 
                 <div class="menu-left">
@@ -251,7 +251,7 @@
 
             {{-- PENGAJUAN SURAT  --}}
             <a
-                class="menu-item
+                class="menu-item"
                 href="{{ route('tu.pengajuan-surat.index') }}">
 
                 <div class="menu-left">
@@ -263,7 +263,7 @@
 
             {{-- DATA KEPEGAWAIAN --}}
             <a
-                class="menu-item
+                class="menu-item"
                 href="{{ route('tu.datakepegawaian.index') }}">
 
                 <div class="menu-left">
@@ -274,7 +274,7 @@
             </a>
 
             <a
-            class="menu-item
+            class="menu-item"
             href="{{ route('tu.nomor-surat.index') }}">
 
             <div class="menu-left">
