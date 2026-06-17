@@ -18,6 +18,9 @@ return Application::configure(basePath: dirname(__DIR__))
                 
             Route::middleware('web')
                 ->group(base_path('routes/superadmin.php'));
+
+            route::middleware('web')
+                ->group(base_path('routes/admin.php'));
             
             Route::middleware('web')
             ->group(base_path('routes/siswa.php'));

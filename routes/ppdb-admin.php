@@ -119,4 +119,14 @@ Route::middleware([
             [PendaftarController::class, 'daftarUlang']
         )->name('daftar-ulang.index');
 
+        Route::get(
+            '/penempatan-kelas',
+            [PendaftarController::class, 'penempatanKelas']
+        )->name('penempatan-kelas.index');
+
+        Route::post(
+            '/penempatan-kelas/{pendaftar}',
+            [PendaftarController::class, 'simpanPenempatanKelas']
+        )->name('penempatan-kelas.simpan');
+
     });

@@ -7,6 +7,7 @@ use App\Models\PpdbPendaftar;
 use App\Models\User;
 use App\Models\Siswa;
 use App\Models\Angkatan;
+use App\Models\Kelas;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
@@ -290,6 +291,55 @@ class PendaftarController extends Controller
         return view(
             'ppdb.pendaftar.daftar-ulang',
             compact('data')
+        );
+    }
+
+    public function penempatanKelas()
+    {
+        $data = PpdbPendaftar::with('siswa')
+            ->whereNotNull('siswa_id')
+            ->latest()
+            ->paginate(20);
+
+        $kelas = Kelas::orderBy('nama_kelas')
+            ->get();
+
+        return view(
+            'ppdb.pendaftar.penempatan-kelas',
+            compact(
+                'data',
+                'kelas'
+            )
+        );
+    }
+
+    public function simpanPenempatanKelas(
+        Request $request,
+        PpdbPendaftar $pendaftar
+    )
+    {
+        $request->validate([
+            'kelas_id' => 'required|exists:kelas,id'
+        ]);
+
+        if (!$pendaftar->siswa) {
+
+            return back()->with(
+                'error',
+                'Data siswa tidak ditemukan'
+            );
+        }
+
+        $pendaftar->siswa->update([
+
+            'kelas_id'
+                => $request->kelas_id
+
+        ]);
+
+        return back()->with(
+            'success',
+            'Penempatan kelas berhasil'
         );
     }
 

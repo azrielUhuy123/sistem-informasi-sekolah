@@ -322,4 +322,17 @@
 
     </div>
 
+    {{-- AKUN --}}
+    <a
+        class="menu-item"
+        href="{{ route('tu.akun.index') }}"
+    >
+
+        <div class="menu-left">
+            <i class="bi bi-speedometer2"></i>
+            <span>Kelola Akun</span>
+        </div>
+
+    </a>
+
 </div>

@@ -29,6 +29,7 @@ use App\Http\Controllers\Tu\PengajuanSuratController;
 use App\Http\Controllers\TU\NomorSuratTuController;
 use App\Http\Controllers\Tu\EkskulController;
 use App\Http\Controllers\Tu\BeritaController;
+use App\Http\Controllers\Tu\AkunController;
 
 /*
 |--------------------------------------------------------------------------
@@ -398,5 +399,30 @@ Route::post(
         Route::post('angkatan/{angkatan}/toggle',
             [AngkatanController::class, 'toggle'])
             ->name('angkatan.toggle');
+
+        Route::prefix('akun')
+        ->name('akun.')
+        ->group(function () {
+
+            Route::get(
+                '/',
+                [AkunController::class,'index']
+            )->name('index');
+
+            Route::get(
+                '/{user}',
+                [AkunController::class,'show']
+            )->name('show');
+
+            Route::post(
+                '/{user}/reset-password',
+                [AkunController::class,'resetPassword']
+            )->name('reset-password');
+
+            Route::post(
+                '/{user}/toggle-status',
+                [AkunController::class,'toggleStatus']
+            )->name('toggle-status');
+        });
 
     });

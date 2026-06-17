@@ -55,6 +55,7 @@ Route::middleware('auth')->group(function () {
 |--------------------------------------------------------------------------
 */
 require __DIR__.'/superadmin.php';
+require __DIR__.'/admin.php';
 require __DIR__.'/tu.php';
 require __DIR__.'/guru.php';
 require __DIR__.'/siswa.php';

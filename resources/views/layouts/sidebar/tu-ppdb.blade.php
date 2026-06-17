@@ -174,6 +174,27 @@
 
         </a>
 
+        
+        <a
+            class="menu-item
+            {{ request()->is('tu.ppdb/penempatan-kelas*') ? 'active' : '' }}"
+            href="{{ route('tu.ppdb.penempatan-kelas.index') }}"
+        >
+
+            <div class="menu-left">
+
+                <i class="bi bi-arrow-repeat"></i>
+
+                <span>
+
+                    Penempatan Kelas
+
+                </span>
+
+            </div>
+
+        </a>
+
 
     </div>
 
