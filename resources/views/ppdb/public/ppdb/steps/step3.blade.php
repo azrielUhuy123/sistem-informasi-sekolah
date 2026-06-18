@@ -36,11 +36,11 @@
         <div class="col-md-6 mb-3">
             <label>Penghasilan Ayah</label>
             <select name="penghasilan_ayah" class="form-select">
-                <option value="<500 Ribu">< 500 Ribu</option>
-                <option value="500 Ribu - 999 Ribu">500 Ribu - 999 Ribu</option>
-                <option value="1 Juta - 2 Juta">1 Juta - 2 Juta</option>
-                <option value="2 Juta - 4 Juta">2 Juta - 4 Juta</option>
-                <option value="> 5 Juta">> 5 Juta</option>
+                <option value="<500.000">&lt; 500.000</option>
+                <option value="500.000-999.999">500.000 - 999.999</option>
+                <option value="1.000.000-2.000.000">1.000.000 - 2.000.000</option>
+                <option value="2.000.000-4.999.999">2.000.000 - 4.999.999</option>
+                <option value=">5.000.000">&gt; 5.000.000</option>
             </select>
         </div>
     </div>
@@ -82,11 +82,11 @@
         <div class="col-md-6 mb-3">
             <label>Penghasilan Ibu</label>
             <select name="penghasilan_ibu" class="form-select">
-                <option value="<500 Ribu">< 500 Ribu</option>
-                <option value="500 Ribu - 999 Ribu">500 Ribu - 999 Ribu</option>
-                <option value="1 Juta - 2 Juta">1 Juta - 2 Juta</option>
-                <option value="2 Juta - 4 Juta">2 Juta - 4 Juta</option>
-                <option value="> 5 Juta">> 5 Juta</option>
+                <option value="<500.000">&lt; 500.000</option>
+                <option value="500.000-999.999">500.000 - 999.999</option>
+                <option value="1.000.000-2.000.000">1.000.000 - 2.000.000</option>
+                <option value="2.000.000-4.999.999">2.000.000 - 4.999.999</option>
+                <option value=">5.000.000">&gt; 5.000.000</option>
             </select>
         </div>
     </div>

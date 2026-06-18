@@ -4,7 +4,7 @@
     <div class="row">
         <div class="col-12 mb-3">
             <label>Alamat Lengkap</label>
-            <textarea name="alamat" class="form-control" rows="3" required></textarea>
+            <textarea name="alamat" class="form-control" rows="3" placeholder="Jl. Mawar No. 15, Perumahan ABC" required></textarea>
         </div>
     </div>
 

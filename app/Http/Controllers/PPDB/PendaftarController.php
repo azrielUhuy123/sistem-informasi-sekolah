@@ -130,10 +130,7 @@ class PendaftarController extends Controller
                 'name'
                     => $pendaftar->nama,
 
-                'email' => $pendaftar->nik .
-                        '.' .
-                        $pendaftar->id .
-                        '@siswa.local',
+                'username' => $nis,    
 
                 'password' => Hash::make($password),
 
@@ -144,6 +141,8 @@ class PendaftarController extends Controller
 
                 'approval_status'
                     => 'approved',
+
+                'approved_at' => now(),
             ]);
 
             $siswa = Siswa::create([
