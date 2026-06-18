@@ -67,4 +67,12 @@ class DataKepegawaian extends Model
         'gaji_pokok' => 'decimal:2',
         'tahun_sertifikasi' => 'integer',
     ];
+
+    public function guru()
+    {
+        return $this->hasOne(
+            Guru::class,
+            'data_kepegawaian_id'
+        );
+    }
 }

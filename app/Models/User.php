@@ -21,6 +21,7 @@ class User extends Authenticatable
     protected $fillable = [
         'name',
         'email',
+        'username',
         'password',
         'role',
         'is_active',
@@ -78,7 +79,7 @@ class User extends Authenticatable
             UserRole::ADMIN      => '/admin/dashboard',
             UserRole::TU         => '/tu/dashboard',
             UserRole::GURU       => '/guru/dashboard',
-            UserRole::MURID      => '/murid/dashboard',
+            UserRole::MURID      => '/siswa/dashboard',
             default              => '/dashboard',
         };
     }

@@ -201,18 +201,19 @@
             @csrf
  
             {{-- WARNING LOGIN GAGAL --}}
-            @if ($errors->has('email'))
+            @if ($errors->has('username'))
                 <div class="input-error" style="margin-bottom:16px">
                     Username atau kata sandi salah
                 </div>
             @endif
-            <!-- Email -->
+            <!-- Username -->
+            
             <input
-                type="email"
-                name="email"
+                type="text"
+                name="username"
                 class="login-input"
                 placeholder="Masukkan NIS/NIP/Username"
-                value="{{ old('email') }}"
+                value="{{ old('username') }}"
                 required
                 autofocus
             >

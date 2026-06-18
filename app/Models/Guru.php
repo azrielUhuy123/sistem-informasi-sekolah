@@ -55,4 +55,11 @@ class Guru extends Model
             PembinaEkskul::class
         );
     }
+    public function pegawai()
+    {
+        return $this->belongsTo(
+            DataKepegawaian::class,
+            'data_kepegawaian_id'
+        );
+    }
 }
