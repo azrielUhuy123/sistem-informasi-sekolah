@@ -6,7 +6,7 @@ use App\Http\Controllers\Siswa\NilaiController;
 use App\Http\Controllers\Siswa\AbsensiController;
 use App\Http\Controllers\Siswa\NomorSuratSiswaController;
 use App\Http\Controllers\Siswa\DownloadDokumenController;
-use App\Http\Controllers\Siswa\ProfileController;
+use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\Siswa\JadwalController;
 use App\Http\Controllers\Siswa\EkskulController;
 use App\Http\Controllers\Elearning\ElearningKomentarController;
@@ -42,11 +42,6 @@ Route::prefix('siswa')
             '/profile',
             [ProfileController::class, 'index']
         )->name('profile');
-
-        Route::get(
-            '/ekskul',
-            [EkskulController::class, 'index']
-        )->name('ekskul.index');
 
         Route::get(
             '/ekskul',

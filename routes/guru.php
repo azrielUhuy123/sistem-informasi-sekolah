@@ -15,7 +15,6 @@ use App\Http\Controllers\Guru\PerkembanganSiswaController;
 use App\Http\Controllers\Guru\KenaikanKelasGuruController;
 use App\Http\Controllers\Guru\RaportController;
 use App\Http\Controllers\Guru\DashboardWaliKelasController;
-use App\Http\Controllers\Guru\ProfileController;
 use App\Http\Controllers\Guru\EkskulController;
 use App\Http\Controllers\Guru\EkskulAnggotaController;
 use App\Http\Controllers\Guru\Ekskul\AbsensiEkskulController;
@@ -26,6 +25,7 @@ use App\Http\Controllers\Guru\Ekskul\StatusValidasiEkskulController;
 use App\Http\Controllers\Guru\ElearningController;
 use App\Http\Controllers\Elearning\ElearningKomentarController;
 use App\Http\Controllers\Elearning\ElearningKomentarReplyController;
+use App\Http\Controllers\ProfileController;
 use Illuminate\Support\Facades\Session;
 
 Route::prefix('guru')

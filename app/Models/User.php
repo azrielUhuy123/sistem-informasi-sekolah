@@ -28,6 +28,8 @@ class User extends Authenticatable
         'approval_status',
         'approved_at',
         'approved_by',
+        'telepon',
+        'alamat',
     ];
 
     /**

@@ -71,4 +71,11 @@ class Siswa extends Model
             'ekskul_siswa'
         );
     }
+    public function ppdb()
+    {
+        return $this->hasOne(
+            \App\Models\PpdbPendaftar::class,
+            'siswa_id'
+        );
+    }
 }
