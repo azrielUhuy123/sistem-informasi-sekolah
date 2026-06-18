@@ -17,12 +17,26 @@ class PengampuMapel extends Model
 
     public function guru()
     {
-        return $this->belongsTo(Guru::class);
+        return $this->belongsTo(
+            Guru::class,
+            'guru_id'
+        );
     }
 
     public function kelas()
     {
-        return $this->belongsTo(Kelas::class);
+        return $this->belongsTo(
+            Kelas::class,
+            'kelas_id'
+        );
+    }
+
+    public function forums()
+    {
+        return $this->hasMany(
+            Elearning::class,
+            'pengampu_id'
+        );
     }
 
     public function mapel()

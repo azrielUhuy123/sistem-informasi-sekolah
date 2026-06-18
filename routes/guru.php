@@ -25,6 +25,7 @@ use App\Http\Controllers\Guru\Ekskul\JadwalEkskulController;
 use App\Http\Controllers\Guru\Ekskul\StatusValidasiEkskulController;
 use App\Http\Controllers\Guru\ElearningController;
 use App\Http\Controllers\Guru\ElearningKomentarController;
+use App\Http\Controllers\Guru\ElearningKomentarReplyController;
 use Illuminate\Support\Facades\Session;
 
 Route::prefix('guru')
@@ -231,6 +232,13 @@ Route::prefix('guru')
             '/e-learning/{elearning}/komentar',
             [ElearningKomentarController::class, 'store']
         )->name('e-learning.komentar.store');
+
+        Route::post(
+            '/e-learning-komentar/{komentar}/reply',
+            [ElearningKomentarReplyController::class, 'store']
+        )->name(
+            'e-learning.reply.store'
+        );
 
         Route::get(
             '/nilai',

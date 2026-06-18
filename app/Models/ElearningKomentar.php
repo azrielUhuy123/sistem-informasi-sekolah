@@ -23,4 +23,19 @@ class ElearningKomentar extends Model
     {
         return $this->belongsTo(Elearning::class);
     }
+
+    public function replies()
+    {
+        return $this->hasMany(
+            ElearningKomentarReply::class,
+            'komentar_id'
+        );
+    }
+    public function lampiran()
+    {
+        return $this->hasMany(
+            ElearningKomentarLampiran::class,
+            'komentar_id'
+        );
+    }
 }

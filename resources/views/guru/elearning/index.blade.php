@@ -56,7 +56,23 @@
 
                             <span class="badge bg-primary">
 
-                                {{ $forum->mapel?->nama_mapel ?? 'Tanpa Mapel' }}
+                                @if($forum->pengampu_id)
+
+                                    <span class="badge bg-primary">
+
+                                        {{ $forum->mapel?->nama_mapel }}
+
+                                    </span>
+
+                                @else
+
+                                    <span class="badge bg-success">
+
+                                        Wali Kelas
+
+                                    </span>
+
+                                @endif
 
                             </span>
 

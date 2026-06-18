@@ -8,6 +8,9 @@ use Illuminate\Http\Request;
 use App\Models\Kelas;
 use App\Models\MataPelajaran;
 use App\Models\ElearningLampiran;
+use App\Models\PengampuMapel;
+use App\Models\WaliKelas;
+use app\Models\User;
 use Illuminate\Support\Facades\Storage;
 
 class ElearningController extends Controller
@@ -17,14 +20,68 @@ class ElearningController extends Controller
      */
     public function index()
     {
+        $guru = auth()->user()->guru;
+
+        /*
+        |--------------------------------------------------------------------------
+        | KELAS WALI
+        |--------------------------------------------------------------------------
+        */
+        $waliKelasIds = \App\Models\WaliKelas::where(
+                'guru_id',
+                $guru->id
+            )
+            ->where(
+                'tahun_ajaran_id',
+                current_tahun_id()
+            )
+            ->pluck('id');
+
+        /*
+        |--------------------------------------------------------------------------
+        | PENGAMPU MAPEL
+        |--------------------------------------------------------------------------
+        */
+        $pengampuIds = \App\Models\PengampuMapel::where(
+                'guru_id',
+                $guru->id
+            )
+            ->where(
+                'tahun_ajaran_id',
+                current_tahun_id()
+            )
+            ->pluck('id');
+
+        /*
+        |--------------------------------------------------------------------------
+        | FORUM YANG BOLEH DILIHAT
+        |--------------------------------------------------------------------------
+        */
         $forums = Elearning::with([
-            'guru',
-            'kelas',
-            'mapel',
-            'lampiran'
-        ])
-        ->latest()
-        ->paginate(10);
+                'guru',
+                'kelas',
+                'mapel',
+                'lampiran',
+                'pengampu',
+                'waliKelas'
+            ])
+            ->where(function ($query) use (
+                $waliKelasIds,
+                $pengampuIds
+            ) {
+
+                $query->whereIn(
+                    'wali_kelas_id',
+                    $waliKelasIds
+                );
+
+                $query->orWhereIn(
+                    'pengampu_id',
+                    $pengampuIds
+                );
+            })
+            ->latest()
+            ->paginate(10);
 
         return view(
             'guru.elearning.index',
@@ -37,15 +94,35 @@ class ElearningController extends Controller
      */
     public function create()
     {
-        $kelas = Kelas::orderBy('nama_kelas')->get();
+        $guru = auth()->user()->guru;
 
-        $mapel = MataPelajaran::orderBy('nama_mapel')->get();
+        $pengampu = PengampuMapel::with([
+            'kelas',
+            'mapel'
+        ])
+        ->where('guru_id', $guru->id)
+        ->where('tahun_ajaran_id', current_tahun_id())
+        ->get();
+
+        $waliKelas = WaliKelas::with('kelas')
+            ->where('guru_id', $guru->id)
+            ->where('tahun_ajaran_id', current_tahun_id())
+            ->first();
+
+        $mapelWali = collect();
+
+        if ($waliKelas) {
+
+            $mapelWali = $guru->mapels;
+
+        }
 
         return view(
             'guru.elearning.create',
             compact(
-                'kelas',
-                'mapel'
+                'pengampu',
+                'waliKelas',
+                'mapelWali'
             )
         );
     }
@@ -59,30 +136,91 @@ class ElearningController extends Controller
 
             'judul'     => 'required|string|max:255',
 
-            'kelas_id'  => 'required|exists:kelas,id',
-
-            'mapel_id'  => 'required|exists:mata_pelajaran,id',
+            'target'    => 'required',
 
             'deadline'  => 'nullable|date',
 
             'konten'    => 'nullable',
 
             'lampiran.*' => 'nullable|file|max:20480'
+
         ]);
+
+        $guru = auth()->user()->guru;
+
+        $kelasId = null;
+        $mapelId = null;
+        $pengampuId = null;
+        $waliKelasId = null;
+
+        /*
+        |--------------------------------------------------------------------------
+        | FORUM WALI KELAS
+        |--------------------------------------------------------------------------
+        */
+        if (str_starts_with($request->target, 'wali_')) {
+
+            $mapelId = str_replace(
+                'wali_',
+                '',
+                $request->target
+            );
+
+            $wali = WaliKelas::with('kelas')
+                ->where('guru_id', $guru->id)
+                ->where('tahun_ajaran_id', current_tahun_id())
+                ->firstOrFail();
+
+            $waliKelasId = $wali->id;
+
+            $kelasId = $wali->kelas_id;
+        }
+
+                /*
+        |--------------------------------------------------------------------------
+        | FORUM PENGAmpu
+        |--------------------------------------------------------------------------
+        */
+        elseif (str_starts_with($request->target, 'pengampu_')) {
+
+            $pengampuId = str_replace(
+                'pengampu_',
+                '',
+                $request->target
+            );
+
+            $pengampu = PengampuMapel::where(
+                'id',
+                $pengampuId
+            )
+            ->where(
+                'guru_id',
+                $guru->id
+            )
+            ->firstOrFail();
+
+            $kelasId = $pengampu->kelas_id;
+
+            $mapelId = $pengampu->mapel_id;
+        }
 
         $forum = Elearning::create([
 
-            'guru_id' => auth()->user()->guru->id,
+            'guru_id'       => $guru->id,
 
-            'kelas_id' => $request->kelas_id,
+            'pengampu_id'   => $pengampuId,
 
-            'mapel_id' => $request->mapel_id,
+            'wali_kelas_id' => $waliKelasId,
 
-            'judul' => $request->judul,
+            'kelas_id'      => $kelasId,
 
-            'konten' => $request->konten,
+            'mapel_id' => $mapelId,
 
-            'deadline' => $request->deadline
+            'judul'         => $request->judul,
+
+            'konten'        => $request->konten,
+
+            'deadline'      => $request->deadline
 
         ]);
 
@@ -102,6 +240,7 @@ class ElearningController extends Controller
                     'nama_file' => $file->getClientOriginalName(),
 
                     'path' => $path
+
                 ]);
             }
         }
@@ -142,20 +281,63 @@ class ElearningController extends Controller
      * Display the specified resource.
      */
     public function show($e_learning)
-{
-    $elearning = Elearning::with([
-        'guru',
-        'kelas',
-        'mapel',
-        'lampiran',
-        'komentar.user'
-    ])->findOrFail($e_learning);
+    {
+        $guru = auth()->user()->guru;
 
-    return view(
-        'guru.elearning.show',
-        compact('elearning')
-    );
-}
+        $waliKelasIds = \App\Models\WaliKelas::where(
+                'guru_id',
+                $guru->id
+            )
+            ->where(
+                'tahun_ajaran_id',
+                current_tahun_id()
+            )
+            ->pluck('id');
+
+        $pengampuIds = \App\Models\PengampuMapel::where(
+                'guru_id',
+                $guru->id
+            )
+            ->where(
+                'tahun_ajaran_id',
+                current_tahun_id()
+            )
+            ->pluck('id');
+
+        $elearning = Elearning::with([
+
+                'guru',
+                'kelas',
+                'mapel',
+                'lampiran',
+
+                'komentar.user',
+                'komentar.replies.user',
+                'komentar.replies.lampiran',
+
+            ])
+            ->where(function ($query) use (
+                $waliKelasIds,
+                $pengampuIds
+            ) {
+
+                $query->whereIn(
+                    'wali_kelas_id',
+                    $waliKelasIds
+                );
+
+                $query->orWhereIn(
+                    'pengampu_id',
+                    $pengampuIds
+                );
+            })
+            ->findOrFail($e_learning);
+
+        return view(
+            'guru.elearning.show',
+            compact('elearning')
+        );
+    }
 
     /**
      * Show the form for editing the specified resource.

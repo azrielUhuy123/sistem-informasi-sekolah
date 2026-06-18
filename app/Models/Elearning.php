@@ -8,6 +8,8 @@ class Elearning extends Model
 {
     protected $fillable = [
         'guru_id',
+        'pengampu_id',
+        'wali_kelas_id',
         'kelas_id',
         'mapel_id',
         'judul',
@@ -43,6 +45,22 @@ class Elearning extends Model
     {
         return $this->hasMany(
             ElearningKomentar::class
+        );
+    }
+
+    public function pengampu()
+    {
+        return $this->belongsTo(
+            PengampuMapel::class,
+            'pengampu_id'
+        );
+    }
+
+    public function waliKelas()
+    {
+        return $this->belongsTo(
+            WaliKelas::class,
+            'wali_kelas_id'
         );
     }
 }

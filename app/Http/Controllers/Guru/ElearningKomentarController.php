@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Guru;
 use App\Http\Controllers\Controller;
 use App\Models\Elearning;
 use App\Models\ElearningKomentar;
+use App\Models\ElearningKomentarLampiran;
 use Illuminate\Http\Request;
 
 class ElearningKomentarController extends Controller
@@ -15,10 +16,20 @@ class ElearningKomentarController extends Controller
     )
     {
         $request->validate([
-            'isi' => 'required|string'
+            'isi'         => 'nullable|string',
+            'lampiran.*'  => 'nullable|file|max:20480'
         ]);
 
-        ElearningKomentar::create([
+        if (
+            blank($request->isi)
+            && !$request->hasFile('lampiran')
+        ) {
+            return back()->withErrors([
+                'isi' => 'Komentar atau lampiran wajib diisi.'
+            ]);
+        }
+
+        $komentar = ElearningKomentar::create([
 
             'elearning_id' => $elearning,
 
@@ -28,10 +39,30 @@ class ElearningKomentarController extends Controller
 
         ]);
 
-        return back()
-            ->with(
-                'success',
-                'Komentar berhasil ditambahkan'
-            );
+        if ($request->hasFile('lampiran')) {
+
+            foreach ($request->file('lampiran') as $file) {
+
+                $path = $file->store(
+                    'elearning/komentar',
+                    'public'
+                );
+
+                ElearningKomentarLampiran::create([
+
+                    'komentar_id' => $komentar->id,
+
+                    'nama_file' => $file->getClientOriginalName(),
+
+                    'path' => $path
+
+                ]);
+            }
+        }
+
+        return back()->with(
+            'success',
+            'Komentar berhasil ditambahkan'
+        );
     }
 }

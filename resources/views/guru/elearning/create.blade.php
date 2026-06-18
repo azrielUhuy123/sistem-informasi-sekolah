@@ -6,7 +6,6 @@
 
 <div class="container-fluid py-4">
 
-```
 <div class="row justify-content-center">
 
     <div class="col-lg-10">
@@ -90,67 +89,64 @@
 
                     <div class="row">
 
-                        <div class="col-md-6 mb-3">
+                        <div class="mb-3">
 
-                            <label class="form-label fw-semibold">
+                            <label class="form-label">
 
-                                Kelas
-
-                            </label>
-
-                            <select
-                                name="kelas_id"
-                                class="form-select"
-                                required>
-
-                                <option value="">
-                                    Pilih Kelas
-                                </option>
-
-                                @foreach($kelas as $item)
-
-                                    <option
-                                        value="{{ $item->id }}"
-                                        @selected(old('kelas_id') == $item->id)>
-
-                                        {{ $item->nama_kelas }}
-
-                                    </option>
-
-                                @endforeach
-
-                            </select>
-
-                        </div>
-
-                        <div class="col-md-6 mb-3">
-
-                            <label class="form-label fw-semibold">
-
-                                Mata Pelajaran
+                                Target Forum
 
                             </label>
 
                             <select
-                                name="mapel_id"
-                                class="form-select"
-                                required>
+                                name="target"
+                                id="target"
+                                class="form-select">
 
                                 <option value="">
-                                    Pilih Mata Pelajaran
+                                    Pilih Target
                                 </option>
 
-                                @foreach($mapel as $item)
+                                @if($waliKelas)
 
-                                    <option
-                                        value="{{ $item->id }}"
-                                        @selected(old('mapel_id') == $item->id)>
+                                    <optgroup label="Forum Wali Kelas">
 
-                                        {{ $item->nama_mapel }}
+                                        @foreach($mapelWali as $mapel)
 
-                                    </option>
+                                            <option
+                                                value="wali_{{ $mapel->id }}">
 
-                                @endforeach
+                                                {{ $mapel->nama_mapel }}
+                                                -
+                                                {{ $waliKelas->kelas->nama_kelas }}
+
+                                            </option>
+
+                                        @endforeach
+
+                                    </optgroup>
+
+                                @endif
+
+                                @if($pengampu->count())
+
+                                    <optgroup label="Forum Guru Bidang">
+
+                                        @foreach($pengampu as $item)
+
+                                            <option
+                                                value="pengampu_{{ $item->id }}">
+
+                                                {{ $item->mapel->nama_mapel }}
+                                                -
+                                                {{ $item->kelas->nama_kelas }}
+
+                                            </option>
+
+                                        @endforeach
+
+                                    </optgroup>
+
+                                @endif
 
                             </select>
 
@@ -235,7 +231,7 @@
     </div>
 
 </div>
-```
+
 
 </div>
 
