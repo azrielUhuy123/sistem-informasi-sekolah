@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Http\Controllers\Guru;
+namespace App\Http\Controllers\Elearning;
 
 use App\Http\Controllers\Controller;
 use App\Models\Elearning;

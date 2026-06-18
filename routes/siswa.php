@@ -9,6 +9,9 @@ use App\Http\Controllers\Siswa\DownloadDokumenController;
 use App\Http\Controllers\Siswa\ProfileController;
 use App\Http\Controllers\Siswa\JadwalController;
 use App\Http\Controllers\Siswa\EkskulController;
+use App\Http\Controllers\Elearning\ElearningKomentarController;
+use App\Http\Controllers\Siswa\ElearningController;
+use app\Http\Controllers\Elearning\ElearningKomentarReplyController;
 
 Route::prefix('siswa')
     ->name('siswa.')
@@ -88,5 +91,31 @@ Route::prefix('siswa')
             '/nomor-surat/generate',
             [NomorSuratSiswaController::class, 'generate']
         )->name('nomor-surat.generate');
+
+        Route::prefix('e-learning')
+            ->name('e-learning.')
+            ->group(function () {
+
+                Route::get(
+                    '/',
+                    [\App\Http\Controllers\Siswa\ElearningController::class, 'index']
+                )->name('index');
+
+                Route::get(
+                    '/{elearning}',
+                    [\App\Http\Controllers\Siswa\ElearningController::class, 'show']
+                )->name('show');
+
+            });
+            
+            Route::post(
+                '/e-learning/{elearning}/komentar',
+                [\App\Http\Controllers\Elearning\ElearningKomentarController::class, 'store']
+            )->name('e-learning.komentar.store');
+
+            Route::post(
+                '/e-learning-komentar/{komentar}/reply',
+                [\App\Http\Controllers\Elearning\ElearningKomentarReplyController::class, 'store']
+            )->name('e-learning.reply.store');
 
     });

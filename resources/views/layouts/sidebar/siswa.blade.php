@@ -99,6 +99,19 @@
 
         </a>
 
+        <a
+            class="menu-item
+            {{ request()->is('siswa/e-learning*') ? 'active' : '' }}"
+            href="{{ route('siswa.e-learning.index') }}"
+        >
+
+            <div class="menu-left">
+                <i class="bi bi-mortarboard"></i>
+                <span>E-learning</span>
+            </div>
+
+        </a>
+
     </div>
     {{-- ARSIP & DOKUMEN --}}
     <button

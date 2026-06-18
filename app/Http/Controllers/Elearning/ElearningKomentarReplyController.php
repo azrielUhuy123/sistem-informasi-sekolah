@@ -1,22 +1,18 @@
 <?php
 
-namespace App\Http\Controllers\Guru;
+namespace App\Http\Controllers\Elearning;
 
 use App\Http\Controllers\Controller;
 use App\Models\ElearningKomentarReply;
 use App\Models\ElearningKomentar;
 use App\Models\ElearningKomentarLampiran;
-use App\Models\User;
-use App\Models\Elearning;
-use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Storage;
 use Illuminate\Http\Request;
 
 class ElearningKomentarReplyController extends Controller
 {
     public function store(
         Request $request,
-        $komentar
+        ElearningKomentar $komentar
     )
     {
         $request->validate([
@@ -35,7 +31,7 @@ class ElearningKomentarReplyController extends Controller
 
         $reply = ElearningKomentarReply::create([
 
-            'komentar_id' => $komentar,
+            'komentar_id' => $komentar->id,
 
             'reply_to_reply_id' =>
                 $request->reply_to_reply_id,
@@ -52,6 +48,37 @@ class ElearningKomentarReplyController extends Controller
 
         ]);
 
-        return back();
+        /*
+        |--------------------------------------------------------------------------
+        | Upload Lampiran
+        |--------------------------------------------------------------------------
+        */
+
+        if ($request->hasFile('lampiran')) {
+
+            foreach ($request->file('lampiran') as $file) {
+
+                $path = $file->store(
+                    'elearning/reply',
+                    'public'
+                );
+
+                ElearningKomentarLampiran::create([
+
+                    'reply_id' => $reply->id,
+
+                    'nama_file' =>
+                        $file->getClientOriginalName(),
+
+                    'path' => $path
+
+                ]);
+            }
+        }
+
+        return back()->with(
+            'success',
+            'Balasan berhasil dikirim.'
+        );
     }
 }

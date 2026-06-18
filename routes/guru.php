@@ -24,8 +24,8 @@ use App\Http\Controllers\Guru\Ekskul\CatatanPembinaanController;
 use App\Http\Controllers\Guru\Ekskul\JadwalEkskulController;
 use App\Http\Controllers\Guru\Ekskul\StatusValidasiEkskulController;
 use App\Http\Controllers\Guru\ElearningController;
-use App\Http\Controllers\Guru\ElearningKomentarController;
-use App\Http\Controllers\Guru\ElearningKomentarReplyController;
+use App\Http\Controllers\Elearning\ElearningKomentarController;
+use App\Http\Controllers\Elearning\ElearningKomentarReplyController;
 use Illuminate\Support\Facades\Session;
 
 Route::prefix('guru')
@@ -230,12 +230,12 @@ Route::prefix('guru')
 
         Route::post(
             '/e-learning/{elearning}/komentar',
-            [ElearningKomentarController::class, 'store']
+            [\App\Http\Controllers\Elearning\ElearningKomentarController::class, 'store']
         )->name('e-learning.komentar.store');
 
         Route::post(
             '/e-learning-komentar/{komentar}/reply',
-            [ElearningKomentarReplyController::class, 'store']
+            [\App\Http\Controllers\Elearning\ElearningKomentarReplyController::class, 'store']
         )->name(
             'e-learning.reply.store'
         );
