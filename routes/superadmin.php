@@ -53,6 +53,16 @@ Route::middleware(['auth', 'role:superadmin'])
 
         Route::get('/users/rejected', [UserApprovalController::class, 'rejected'])
             ->name('users.rejected');
+        
+        Route::post(
+            '/users/{user}/block',
+            [UserApprovalController::class, 'block']
+        )->name('users.block');
+
+        Route::post(
+            '/users/{user}/unblock',
+            [UserApprovalController::class, 'unblock']
+        )->name('users.unblock');
 
         Route::get(
             '/monitoring-jadwal',

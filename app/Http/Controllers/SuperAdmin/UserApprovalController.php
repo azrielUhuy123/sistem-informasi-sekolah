@@ -69,4 +69,35 @@ class UserApprovalController extends Controller
             ->route('superadmin.users.pending')
             ->with('success', 'User approved successfully.');
     }
+    
+    public function reject(User $user)
+    {
+        $user->update([
+            'approval_status' => 'rejected'
+        ]);
+
+        return back()
+            ->with('success', 'User berhasil diblokir.');
+    }
+
+    public function block(User $user)
+    {
+        $user->update([
+            'is_active' => false
+        ]);
+
+        return back()
+            ->with('success', 'User berhasil diblokir.');
+    }
+
+    public function unblock(User $user)
+    {
+        $user->update([
+            'is_active' => true
+        ]);
+
+        return back()
+            ->with('success', 'User berhasil diaktifkan kembali.');
+    }
+
 }

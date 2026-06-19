@@ -286,7 +286,7 @@
 
             <div class="menu-left">
                 <i class="bi bi-check-circle"></i>
-                <span>Disetujui</span>
+                <span>Aktif</span>
             </div>
 
         </a>

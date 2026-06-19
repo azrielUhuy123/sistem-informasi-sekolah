@@ -55,6 +55,45 @@ class LoginRequest extends FormRequest
             ]);
         }
 
+        $user = Auth::user();
+
+        if ($user->approval_status === 'pending') {
+
+            Auth::logout();
+
+            throw ValidationException::withMessages([
+                'username' => 'Akun masih menunggu persetujuan Kepala Sekolah.',
+            ]);
+        }
+
+        if ($user->approval_status === 'rejected') {
+
+            Auth::logout();
+
+            throw ValidationException::withMessages([
+                'username' => 'Akun Anda ditolak oleh Kepala Sekolah.',
+            ]);
+        }
+
+        if ($user->approval_status === 'draft') {
+
+            Auth::logout();
+
+            throw ValidationException::withMessages([
+                'username' => 'Akun belum dikirim untuk persetujuan.',
+            ]);
+        }
+
+        // User approved tetapi diblokir
+        if (! $user->is_active) {
+
+            Auth::logout();
+
+            throw ValidationException::withMessages([
+                'username' => 'Akun Anda sedang dinonaktifkan.',
+            ]);
+        }
+
         RateLimiter::clear($this->throttleKey());
     }
 
