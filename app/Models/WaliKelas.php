@@ -10,7 +10,9 @@ class WaliKelas extends Model
 
     protected $fillable = [
         'kelas_id',
-        'guru_id'
+        'guru_id',
+        'tahun_ajaran_id',
+
     ];
 
     // RELASI
