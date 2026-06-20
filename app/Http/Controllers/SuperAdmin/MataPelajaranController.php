@@ -84,7 +84,7 @@ class MataPelajaranController extends Controller
      */
     public function show($id)
     {
-        $mapel = MataPelajaran::withTrashed()->findOrFail($id);
+        $mapel = MataPelajaran::findOrFail($id);
 
         return view('superadmin.mapel.detail', compact('mapel'));
     }
@@ -94,7 +94,7 @@ class MataPelajaranController extends Controller
      */
     public function edit($id)
     {
-        $mapel = MataPelajaran::withTrashed()->findOrFail($id);
+        $mapel = MataPelajaran::findOrFail($id);
 
         return view('superadmin.mapel.edit', compact('mapel'));
     }
@@ -105,7 +105,7 @@ class MataPelajaranController extends Controller
     
     public function update(Request $request, $id)
     {
-        $mapel = MataPelajaran::withTrashed()->findOrFail($id);
+        $mapel = MataPelajaran::findOrFail($id);
 
         $data = $request->validate([
             'nama_mapel' => 'required|string|max:255',

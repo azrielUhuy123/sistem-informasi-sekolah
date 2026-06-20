@@ -21,6 +21,7 @@ use App\Http\Controllers\SuperAdmin\MataPelajaranController;
 use App\Http\Controllers\Superadmin\PembinaEkskulController;
 use App\Http\Controllers\Superadmin\MonitoringEkskulController;
 use App\Http\Controllers\Superadmin\JadwalFinalEkskulController;
+use App\Http\Controllers\SuperAdmin\SiswaController;
 
 Route::middleware(['auth', 'role:superadmin'])
     ->prefix('superadmin')
@@ -275,5 +276,15 @@ Route::post(
             '/jadwal-final-ekskul',
             [JadwalFinalEkskulController::class, 'index']
         )->name('jadwal-final-ekskul.index');
+
+        Route::get(
+            '/siswa',
+            [SiswaController::class, 'index']
+        )->name('siswa.index');
+
+        Route::get(
+            '/siswa/{siswa}',
+            [SiswaController::class, 'show']
+        )->name('siswa.show');
 
     });

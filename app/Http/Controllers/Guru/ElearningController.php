@@ -201,7 +201,7 @@ class ElearningController extends Controller
 
             $kelasId = $pengampu->kelas_id;
 
-            $mapelId = $pengampu->mapel_id;
+            $mapelId = $pengampu->mata_pelajaran_id;
         }
 
         $forum = Elearning::create([

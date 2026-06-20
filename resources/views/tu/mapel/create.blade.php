@@ -22,11 +22,6 @@
                 <input type="text" name="nama_mapel" class="form-control" required>
             </div>
 
-            <div class="mb-3">
-                <label>KKM</label>
-                <input type="number" name="kkm" class="form-control" required value="70">
-            </div>
-
             <div class="d-flex gap-2">
                 <button class="btn btn-primary">Simpan</button>
                 <a href="{{ route('tu.mapel.index') }}" class="btn btn-secondary">Kembali</a>

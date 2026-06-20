@@ -22,6 +22,7 @@
                         <th>Status Akademik</th>
                         <th>Mata Pelajaran</th>
                         <th>Kelas</th>
+                        <th width="100">Aksi</th>
                     </tr>
                 </thead>
 
@@ -80,7 +81,7 @@
 
                                 @else
 
-                                    @foreach($guru->mapels as $mapel)
+                                    @forelse($guru->mapels as $mapel)
 
                                         <span class="badge bg-light text-dark border">
 
@@ -88,12 +89,19 @@
 
                                         </span>
 
-                                    @endforeach
+                                    @empty
+
+                                        <span class="text-muted">
+                                            Belum ada mapel
+                                        </span>
+
+                                    @endforelse
 
                                 @endif
 
                             </td>
-                                                        <td>
+
+                            <td>
 
                                 @if($guru->waliKelas)
 
@@ -107,6 +115,12 @@
 
                             </td>
 
+                            <td>
+                                <a href="{{ route('superadmin.guru.show', $guru) }}"
+                                class="btn btn-sm btn-info">
+                                    Detail
+                                </a>
+                            </td>
                         </tr>
 
                     @endforeach

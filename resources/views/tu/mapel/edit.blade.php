@@ -23,11 +23,6 @@
                 <input type="text" name="nama_mapel" class="form-control" value="{{ $mapel->nama_mapel }}" required>
             </div>
 
-            <div class="mb-3">
-                <label>KKM</label>
-                <input type="number" name="kkm" class="form-control" value="{{ $mapel->kkm }}" required>
-            </div>
-
             <button class="btn btn-primary">Update</button>
         </form>
 

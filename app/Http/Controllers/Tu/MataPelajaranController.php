@@ -45,7 +45,6 @@ class MataPelajaranController extends Controller
                 'id' => $first->id,
                 'nama_mapel' => $first->nama_mapel,
                 'kode_mapel' => $first->kode_mapel,
-                'kkm' => $first->kkm,
                 'fase' => $items->pluck('fase')->join(', '),
                 'count_fase' => $items->count(),
             ];
@@ -69,7 +68,6 @@ class MataPelajaranController extends Controller
         $data = $request->validate([
             'nama_mapel' => 'required|string|max:255',
             'kode_mapel' => 'nullable|string|max:100',
-            'kkm'        => 'nullable|integer|min:0|max:100',
         ]);
 
         MataPelajaran::create($data);
@@ -84,7 +82,7 @@ class MataPelajaranController extends Controller
      */
     public function show($id)
     {
-        $mapel = MataPelajaran::withTrashed()->findOrFail($id);
+        $mapel = MataPelajaran::findOrFail($id);
 
         return view('tu.mapel.detail', compact('mapel'));
     }
@@ -94,7 +92,7 @@ class MataPelajaranController extends Controller
      */
     public function edit($id)
     {
-        $mapel = MataPelajaran::withTrashed()->findOrFail($id);
+        $mapel = MataPelajaran::findOrFail($id);
 
         return view('tu.mapel.edit', compact('mapel'));
     }
@@ -105,12 +103,11 @@ class MataPelajaranController extends Controller
     
     public function update(Request $request, $id)
     {
-        $mapel = MataPelajaran::withTrashed()->findOrFail($id);
+        $mapel = MataPelajaran::findOrFail($id);
 
         $data = $request->validate([
             'nama_mapel' => 'required|string|max:255',
             'kode_mapel' => 'nullable|string|max:100',
-            'kkm'        => 'nullable|integer|min:0|max:100',
         ]);
 
         $mapel->update($data);

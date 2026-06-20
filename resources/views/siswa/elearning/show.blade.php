@@ -20,127 +20,118 @@
 
         <div class="card-body p-4">
 
-            {{-- HEADER --}}
-            <div class="mb-4">
+            {{-- HEADER MATERI --}}
+            <div class="forum-header-sticky">
 
-                <span class="badge bg-primary mb-2">
+    <h2 class="forum-title">
+        {{ $forum->judul }}
+    </h2>
 
-                    {{ $forum->mapel?->nama_mapel }}
+</div>
 
-                </span>
+            {{-- CARD GURU --}}
+            <div class="teacher-card">
 
-                <h2 class="fw-bold mb-2">
+                <div class="teacher-card-header">
 
-                    {{ $forum->judul }}
+                    <div class="d-flex align-items-center">
 
-                </h2>
+                        <img
+                            src="https://ui-avatars.com/api/?name={{ urlencode($forum->guru?->nama ?? 'Guru') }}"
+                            class="teacher-avatar">
 
-                <div class="text-muted">
+                        <div class="ms-3">
 
-                    <i class="bi bi-person me-1"></i>
+                            <h5 class="mb-1 fw-bold">
 
-                    {{ $forum->guru?->nama }}
+                                {{ $forum->guru?->nama }}
 
-                    &nbsp; • &nbsp;
+                                @if($forum->mapel)
 
-                    <i class="bi bi-people me-1"></i>
+                                    <span class="text-muted fw-normal">
 
-                    {{ $forum->kelas?->nama_kelas }}
+                                        - {{ $forum->mapel->nama_mapel }}
 
-                    &nbsp; • &nbsp;
+                                    </span>
 
-                    <i class="bi bi-clock me-1"></i>
+                                @endif
 
-                    {{ $forum->created_at->diffForHumans() }}
+                            </h5>
+
+                            <div>
+
+                                <i class="bi bi-mortarboard"></i>
+
+                                {{ $forum->kelas?->nama_kelas }}
+                                <i></i>  -
+
+                                <i class="bi bi-clock-history"></i>
+
+                                Diposting
+
+                                {{ $forum->created_at->translatedFormat('d M Y H:i') }}
+
+                            </div>
+
+                        </div>
+
+                    </div>
 
                 </div>
 
-            </div>
-
-            {{-- DEADLINE --}}
-            @if($forum->deadline)
-
-                <div class="alert alert-warning">
-
-                    <strong>Deadline:</strong>
-
-                    {{ $forum->deadline->format('d M Y H:i') }}
-
-                </div>
-
-            @endif
-
-            {{-- MATERI --}}
-            <div class="mb-5">
-
-                <h5 class="fw-bold mb-3">
-
-                    <i class="bi bi-journal-text me-2"></i>
-
-                    Materi Pembelajaran
-
-                </h5>
-
-                <hr>
-
-                <div class="materi-content">
+                <div class="teacher-card-body">
 
                     {!! $forum->konten !!}
 
                 </div>
 
-            </div>
+                @if($forum->lampiran->count())
 
-            {{-- LAMPIRAN --}}
-            <div class="mb-5">
+                    <div class="teacher-card-files">
 
-                <h5 class="fw-bold mb-3">
+                        <h6 class="fw-bold mb-3">
 
-                    <i class="bi bi-paperclip me-2"></i>
+                            Lampiran Materi
 
-                    Lampiran
+                        </h6>
 
-                </h5>
+                        @foreach($forum->lampiran as $file)
 
-                <hr>
+                            <a
+                                href="{{ asset('storage/'.$file->path) }}"
+                                target="_blank"
+                                class="teacher-file-item">
 
-                @forelse($forum->lampiran as $file)
+                                <div>
 
-                    <a
-                        href="{{ asset('storage/'.$file->path) }}"
-                        target="_blank"
-                        class="attachment-item">
+                                    <i class="bi bi-file-earmark-arrow-down me-2"></i>
 
-                        <i class="bi bi-file-earmark-arrow-down"></i>
+                                    {{ $file->nama_file }}
 
-                        {{ $file->nama_file }}
+                                </div>
 
-                    </a>
+                                <i class="bi bi-download"></i>
 
-                @empty
+                            </a>
 
-                    <div class="text-muted">
-
-                        Tidak ada lampiran.
+                        @endforeach
 
                     </div>
 
-                @endforelse
+                @endif
 
             </div>
 
             {{-- DISKUSI --}}
-            <div>
+            <div class="forum-discussion">
 
-                <div class="d-flex justify-content-between align-items-center mb-3">
+                <div class="discussion-header">
 
-                    <h5 class="fw-bold mb-0">
-
-                        <i class="bi bi-chat-dots me-2"></i>
+                    <h4 class="fw-bold mb-0">
 
                         Diskusi Forum
 
-                    </h5>
+                    </h4>
 
                     <span class="badge bg-secondary">
 
@@ -162,65 +153,75 @@
 
                 @endif
 
-                <div class="card border-0 bg-light mb-4">
+                {{-- FORM KOMENTAR --}}
+                <div class="discussion-form-card">
 
-                    <div class="card-body">
+                    <form
+                        method="POST"
+                        enctype="multipart/form-data"
+                        action="{{ route('siswa.e-learning.komentar.store', $forum->id) }}">
 
-                        <form
-                            method="POST"
-                            action="{{ route(
-                                'siswa.e-learning.komentar.store',
-                                $forum->id
-                            ) }}">
+                        @csrf
 
-                            @csrf
+                        <textarea
+                            name="isi"
+                            rows="4"
+                            class="form-control mb-3"
+                            placeholder="Tulis tanggapan atau diskusi..."></textarea>
 
-                            <div class="mb-3">
+                        <input
+                            type="file"
+                            name="lampiran[]"
+                            multiple
+                            class="form-control mb-3">
 
-                                <textarea
-                                    name="isi"
-                                    rows="3"
-                                    class="form-control"
-                                    placeholder="Tulis komentar..."></textarea>
+                        <div class="text-end">
 
-                            </div>
+                            <button
+                                type="submit"
+                                class="btn btn-primary">
 
-                            <div class="d-flex gap-2">
-                                <button
-                                    type="submit"
-                                    class="btn btn-primary btn-sm">
+                                <i class="bi bi-send me-1"></i>
 
-                                    Kirim Balasan
+                                Kirim Komentar
 
-                                </button>
+                            </button>
 
-                            </div>
+                        </div>
 
-                        </form>
-
-                    </div>
+                    </form>
 
                 </div>
 
                 @forelse($forum->komentar as $komentar)
 
-                    <div class="comment-card">
+                    <div class="discussion-item">
 
-                        <div class="comment-avatar">
+                        <div class="discussion-avatar">
 
                             {{ strtoupper(substr($komentar->user->name ?? 'U',0,1)) }}
 
                         </div>
 
-                        <div class="flex-grow-1">
+                        <div class="discussion-content">
 
                             <div class="d-flex justify-content-between">
 
-                                <strong>
+                                <div>
 
-                                    {{ $komentar->user->name ?? 'User' }}
+                                    <strong>
 
-                                </strong>
+                                        {{ $komentar->user->name }}
+
+                                    </strong>
+
+                                    <span class="badge bg-light text-dark border ms-1">
+
+                                        {{ strtoupper($komentar->user->role) }}
+
+                                    </span>
+
+                                </div>
 
                                 <small class="text-muted">
 
@@ -235,6 +236,29 @@
                                 {!! nl2br(e($komentar->isi)) !!}
 
                             </div>
+
+                            @if($komentar->lampiran->count())
+
+                                <div class="mt-2">
+
+                                    @foreach($komentar->lampiran as $lampiran)
+
+                                        <a
+                                            href="{{ asset('storage/'.$lampiran->path) }}"
+                                            target="_blank"
+                                            class="attachment-item">
+
+                                            <i class="bi bi-paperclip"></i>
+
+                                            {{ $lampiran->nama_file }}
+
+                                        </a>
+
+                                    @endforeach
+
+                                </div>
+
+                            @endif
 
                             <div class="mt-2">
 
@@ -334,7 +358,7 @@
                             {{-- LIST REPLIES --}}
                             @foreach($komentar->replies as $reply)
 
-                                <div class="reply-box">
+                                <div class="reply-modern">
 
                                     <div class="d-flex justify-content-between">
 
@@ -350,7 +374,7 @@
 
                                     @if($reply->reply_to_name)
 
-                                        <div class="reply-preview">
+                                        <div class="reply-target">
 
                                             <small class="text-muted">
 
@@ -530,63 +554,265 @@
 
 <style>
 
-.materi-content img{
+/* =========================
+   HEADER MATERI
+========================= */
+
+.forum-header-sticky{
+    position:sticky;
+    top:0;
+    z-index:100;
+
+    background:rgba(255,255,255,.75);
+
+    backdrop-filter:blur(12px);
+    -webkit-backdrop-filter:blur(12px);
+
+    border-bottom:1px solid #e5e7eb;
+
+    padding:18px 30px;
+}
+
+.forum-title{
+    margin:0;
+    font-size:32px;
+    font-weight:700;
+}
+
+.forum-meta{
+    display:flex;
+    gap:20px;
+    flex-wrap:wrap;
+    color:#6c757d;
+    font-size:.95rem;
+}
+
+.forum-meta i{
+    margin-right:6px;
+}
+
+/* =========================
+   CARD GURU
+========================= */
+
+.teacher-card{
+    background:#fff;
+    border:1px solid #edf0f5;
+    border-radius:18px;
+    overflow:hidden;
+    margin-bottom:30px;
+}
+
+.teacher-card-header{
+    padding:25px 30px;
+    border-bottom:1px solid #edf0f5;
+}
+
+.teacher-avatar{
+    width:70px;
+    height:70px;
+    border-radius:50%;
+    object-fit:cover;
+    border:3px solid #f3f4f6;
+}
+
+.teacher-card-body{
+    padding:30px;
+    line-height:1.9;
+    font-size:15px;
+}
+
+.teacher-card-body img{
     max-width:100%;
     height:auto;
-    border-radius:12px;
+    border-radius:14px;
+    margin:10px 0;
 }
 
-.attachment-item{
+.teacher-card-body table{
+    width:100%;
+}
+
+.teacher-card-files{
+    padding:30px;
+    border-top:1px solid #edf0f5;
+}
+
+.teacher-file-item{
     display:flex;
+    justify-content:space-between;
     align-items:center;
-    gap:10px;
-    padding:12px 15px;
-    border:1px solid #e9ecef;
-    border-radius:12px;
     text-decoration:none;
     color:#212529;
+    padding:14px 18px;
+    border:1px solid #e9ecef;
+    border-radius:14px;
     margin-bottom:10px;
+    transition:.2s;
 }
 
-.attachment-item:hover{
-    background:#f8f9fa;
+.teacher-file-item:hover{
+    background:#f8fafc;
 }
 
-.comment-card{
+/* =========================
+   DISKUSI
+========================= */
+
+.forum-discussion{
+    margin-top:30px;
+}
+
+.discussion-header{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    margin-bottom:20px;
+}
+
+.discussion-form-card{
+    background:#fff;
+    border:1px solid #edf0f5;
+    border-radius:18px;
+    padding:20px;
+    margin-bottom:25px;
+}
+
+.discussion-item{
     display:flex;
     gap:15px;
-    padding:18px;
-    border:1px solid #ececec;
-    border-radius:16px;
-    margin-bottom:15px;
+    background:#fff;
+    border:1px solid #edf0f5;
+    border-radius:18px;
+    padding:20px;
+    margin-bottom:18px;
 }
 
-.comment-avatar{
-    width:45px;
-    height:45px;
+.discussion-avatar{
+    width:48px;
+    height:48px;
     border-radius:50%;
     background:#0d6efd;
     color:#fff;
+    font-weight:700;
     display:flex;
     align-items:center;
     justify-content:center;
-    font-weight:700;
     flex-shrink:0;
 }
 
-.reply-box{
-    margin-top:12px;
-    margin-left:25px;
-    padding-left:15px;
-    border-left:3px solid #dee2e6;
+.discussion-content{
+    flex:1;
 }
 
-.reply-preview{
+.discussion-content strong{
+    font-size:15px;
+}
+
+.discussion-content .badge{
+    font-size:11px;
+}
+
+.discussion-content .text-muted{
+    font-size:13px;
+}
+
+/* =========================
+   FILE KOMENTAR
+========================= */
+
+.attachment-item{
+    display:inline-flex;
+    align-items:center;
+    gap:8px;
+    padding:7px 12px;
+    border-radius:30px;
     background:#f8f9fa;
-    border-left:4px solid #0d6efd;
-    padding:10px;
-    border-radius:8px;
+    border:1px solid #e9ecef;
+    text-decoration:none;
+    color:#495057;
+    margin-right:6px;
+    margin-top:5px;
+    font-size:13px;
+}
+
+/* =========================
+   REPLY
+========================= */
+
+.reply-modern{
+    margin-top:15px;
+    margin-left:40px;
+    padding:15px;
+    background:#f8fafc;
+    border-radius:14px;
+    border:1px solid #edf0f5;
+}
+
+.reply-target{
+    display:inline-block;
+    padding:5px 10px;
+    background:#eef4ff;
+    border-radius:10px;
+    color:#0d6efd;
+    font-size:13px;
+    margin-top:8px;
     margin-bottom:8px;
+}
+
+.reply-form-container{
+    margin-left:40px;
+}
+
+/* =========================
+   FORM
+========================= */
+
+.form-control{
+    border-radius:12px;
+}
+
+.btn{
+    border-radius:10px;
+}
+
+/* =========================
+   MOBILE
+========================= */
+
+@media(max-width:768px){
+
+    .forum-title{
+        font-size:1.5rem;
+    }
+
+    .forum-meta{
+        flex-direction:column;
+        gap:8px;
+    }
+
+    .teacher-card-header,
+    .teacher-card-body,
+    .teacher-card-files{
+        padding:20px;
+    }
+
+    .discussion-item{
+        padding:15px;
+    }
+
+    .reply-modern{
+        margin-left:10px;
+    }
+
+    .reply-form-container{
+        margin-left:10px;
+    }
+
+    .teacher-avatar{
+        width:55px;
+        height:55px;
+    }
 }
 
 </style>

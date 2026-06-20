@@ -16,14 +16,42 @@
 
     </a>
 
-    <div class="card border-0 shadow-sm">
+        <div class="card border-0 shadow-sm forum-card">
 
-        <div class="card-body p-4">
+            <div class="card-body p-0">
 
-            {{-- HEADER FORUM --}}
-            <div class="d-flex justify-content-between align-items-start flex-wrap">
+                {{-- HEADER GURU --}}
+                <div class="forum-header">
 
-                <div>
+                    <div class="d-flex align-items-start">
+
+                        <img
+                            src="https://ui-avatars.com/api/?name={{ urlencode($elearning->guru?->nama ?? 'Guru') }}"
+                            class="guru-avatar">
+
+                        <div class="ms-3">
+
+                            <h5 class="mb-1 fw-bold">
+
+                                {{ $elearning->guru?->nama }}
+
+                            </h5>
+
+                            <div class="text-muted small">
+
+                                Diposting
+                                {{ $elearning->created_at->translatedFormat('d F Y H:i') }}
+
+                            </div>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+                {{-- JUDUL FORUM --}}
+                <div class="forum-title-area">
 
                     <span class="badge bg-primary mb-3">
 
@@ -31,159 +59,96 @@
 
                     </span>
 
-                    <h2 class="fw-bold mb-2">
+                    <h2 class="forum-title">
 
                         {{ $elearning->judul }}
 
                     </h2>
 
-                </div>
+                    <div class="forum-meta">
 
-            </div>
+                        <span>
 
-            <div class="row g-3 mb-4">
+                            <i class="bi bi-mortarboard"></i>
 
-                <div class="col-lg-4">
+                            {{ $elearning->kelas?->nama_kelas }}
 
-                    <div class="border rounded p-3 h-100">
+                        </span>
 
-                        <div class="text-muted small mb-1">
+                        @if($elearning->deadline)
 
-                            Kelas
+                            <span>
 
-                        </div>
+                                <i class="bi bi-clock"></i>
 
-                        <div class="fw-semibold">
-
-                            {{ $elearning->kelas?->nama_kelas ?? '-' }}
-
-                        </div>
-
-                    </div>
-
-                </div>
-
-                <div class="col-lg-4">
-
-                    <div class="border rounded p-3 h-100">
-
-                        <div class="text-muted small mb-1">
-
-                            Guru
-
-                        </div>
-
-                        <div class="fw-semibold">
-
-                            {{ $elearning->guru?->nama ?? '-' }}
-
-                        </div>
-
-                    </div>
-
-                </div>
-
-                <div class="col-lg-4">
-
-                    <div class="border rounded p-3 h-100">
-
-                        <div class="text-muted small mb-1">
-
-                            Deadline
-
-                        </div>
-
-                        <div class="fw-semibold">
-
-                            @if($elearning->deadline)
-
+                                Deadline:
                                 {{ $elearning->deadline->format('d M Y H:i') }}
 
-                            @else
+                            </span>
 
-                                -
-
-                            @endif
-
-                        </div>
+                        @endif
 
                     </div>
 
                 </div>
 
-            </div>
-
-            {{-- MATERI --}}
-            <div class="mb-5">
-
-                <h5 class="fw-bold mb-3">
-
-                    <i class="bi bi-journal-text me-2"></i>
-
-                    Materi Pembelajaran
-
-                </h5>
-
-                <hr>
-
-                <div class="materi-content">
+                {{-- ISI MATERI --}}
+                <div class="forum-content">
 
                     {!! $elearning->konten !!}
 
                 </div>
 
-            </div>
+                {{-- LAMPIRAN --}}
+                @if($elearning->lampiran->count())
 
-            {{-- LAMPIRAN --}}
-            <div class="mb-5">
+                    <div class="forum-files">
 
-                <h5 class="fw-bold mb-3">
+                        <h5 class="fw-bold mb-3">
 
-                    <i class="bi bi-paperclip me-2"></i>
+                            Lampiran Materi
 
-                    Lampiran Materi
+                        </h5>
 
-                </h5>
+                        @foreach($elearning->lampiran as $file)
 
-                <hr>
+                            <a
+                                href="{{ asset('storage/'.$file->path) }}"
+                                target="_blank"
+                                class="forum-file-item">
 
-                @forelse($elearning->lampiran as $file)
+                                <div>
 
-                    <a
-                        href="{{ asset('storage/' . $file->path) }}"
-                        target="_blank"
-                        class="attachment-item">
+                                    <i class="bi bi-file-earmark-arrow-down me-2"></i>
 
-                        <i class="bi bi-file-earmark-arrow-down"></i>
+                                    {{ $file->nama_file }}
 
-                        {{ $file->nama_file }}
+                                </div>
 
-                    </a>
+                                <i class="bi bi-download"></i>
 
-                @empty
+                            </a>
 
-                    <div class="text-muted">
-
-                        Belum ada lampiran.
+                        @endforeach
 
                     </div>
 
-                @endforelse
+                @endif
 
             </div>
 
+        </div>
+
             {{-- DISKUSI --}}
-            <div>
+            <div class="forum-discussion mt-4">
 
-                <div class="d-flex justify-content-between align-items-center mb-3">
+                <div class="forum-section-header">
 
-                    <h5 class="fw-bold mb-0">
-
-                        <i class="bi bi-chat-dots me-2"></i>
+                    <h4 class="mb-0 fw-bold">
 
                         Diskusi Forum
 
-                    </h5>
+                    </h4>
 
                     <span class="badge bg-secondary">
 
@@ -193,86 +158,76 @@
 
                 </div>
 
-                <hr>
+                {{-- FORM KOMENTAR --}}
+                <div class="discussion-form-card">
 
-                @if(session('success'))
+                    <form
+                        method="POST"
+                        enctype="multipart/form-data"
+                        action="{{ route('guru.e-learning.komentar.store', $elearning->id) }}">
 
-                    <div class="alert alert-success">
+                        @csrf
 
-                        {{ session('success') }}
+                        <textarea
+                            name="isi"
+                            rows="4"
+                            class="form-control mb-3"
+                            placeholder="Tulis tanggapan atau diskusi..."></textarea>
 
-                    </div>
+                        <input
+                            type="file"
+                            name="lampiran[]"
+                            multiple
+                            class="form-control mb-3">
 
-                @endif
+                        <div class="text-end">
 
-                <div class="card border-0 bg-light mb-4">
+                            <button
+                                type="submit"
+                                class="btn btn-primary">
 
-                    <div class="card-body">
+                                <i class="bi bi-send me-1"></i>
 
-                        <form
-                            method="POST"
-                            enctype="multipart/form-data"
-                            action="{{ route('guru.e-learning.komentar.store', $elearning->id) }}">
+                                Kirim Komentar
 
-                            @csrf
-
-                            <div class="mb-3">
-
-                                <textarea
-                                    name="isi"
-                                    rows="3"
-                                    class="form-control"
-                                    placeholder="Tulis komentar atau tanggapan..."></textarea>
-
-                                <input
-                                    type="file"
-                                    name="lampiran[]"
-                                    multiple
-                                    class="form-control mt-2">
-
-                            </div>
-
-                            <div class="text-end">
-
-                                <button
-                                    type="submit"
-                                    class="btn btn-primary">
-
-                                    <i class="bi bi-send me-1"></i>
-
-                                    Kirim Komentar
-
-                                </button>
-
-                            </div>
-
-                        </form>
-
-                    </div>
-
-                </div>
-
-                
-
-                @forelse($elearning->komentar as $komentar)
-
-                    <div class="comment-card">
-
-                        <div class="comment-avatar">
-
-                            {{ strtoupper(substr($komentar->user->name ?? 'U', 0, 1)) }}
+                            </button>
 
                         </div>
 
-                        <div class="flex-grow-1">
+                    </form>
 
-                            <div class="d-flex justify-content-between">
+                </div>
 
-                                <strong>
+                {{-- LIST KOMENTAR --}}
+                @forelse($elearning->komentar as $komentar)
 
-                                    {{ $komentar->user->name ?? 'User' }}
+                    <div class="discussion-item">
 
-                                </strong>
+                        <div class="discussion-avatar">
+
+                            {{ strtoupper(substr($komentar->user->name ?? 'U',0,1)) }}
+
+                        </div>
+
+                        <div class="discussion-content">
+
+                            <div class="discussion-header">
+
+                                <div>
+
+                                    <strong>
+
+                                        {{ $komentar->user->name }}
+
+                                    </strong>
+
+                                    <span class="badge bg-light text-dark border ms-1">
+
+                                        {{ strtoupper($komentar->user->role) }}
+
+                                    </span>
+
+                                </div>
 
                                 <small class="text-muted">
 
@@ -282,54 +237,51 @@
 
                             </div>
 
-                            <div class="mt-2">
+                            <div class="discussion-body">
 
                                 {!! nl2br(e($komentar->isi)) !!}
 
-                                @if($komentar->lampiran->count())
-
-                                    <div class="mt-2">
-
-                                        @foreach($komentar->lampiran as $file)
-
-                                            <a
-                                                href="{{ asset('storage/'.$file->path) }}"
-                                                target="_blank"
-                                                class="attachment-item">
-
-                                                <i class="bi bi-paperclip"></i>
-
-                                                {{ $file->nama_file }}
-
-                                            </a>
-
-                                        @endforeach
-
-                                    </div>
-
-                                @endif
-
                             </div>
 
-                            <div class="mt-3">
+                            @if($komentar->lampiran->count())
 
-                                <div class="comment-actions">
+                                <div class="mt-3">
 
-                                    <button
-                                        type="button"
-                                        class="action-btn"
-                                        onclick="document.getElementById('reply-{{ $komentar->id }}').classList.toggle('d-none')">
+                                    @foreach($komentar->lampiran as $file)
 
-                                        <i class="bi bi-reply"></i>
+                                        <a
+                                            href="{{ asset('storage/'.$file->path) }}"
+                                            target="_blank"
+                                            class="forum-file-mini">
 
-                                        Balas
+                                            <i class="bi bi-paperclip"></i>
 
-                                    </button>
+                                            {{ $file->nama_file }}
+
+                                        </a>
+
+                                    @endforeach
 
                                 </div>
 
+                            @endif
+
+                            <div class="mt-3">
+
+                                <button
+                                    type="button"
+                                    class="btn btn-sm btn-light"
+                                    onclick="document.getElementById('reply-{{ $komentar->id }}').classList.toggle('d-none')">
+
+                                    <i class="bi bi-reply"></i>
+
+                                    Balas
+
+                                </button>
+
                             </div>
 
+                            {{-- FORM REPLY --}}
                             <div
                                 id="reply-{{ $komentar->id }}"
                                 class="d-none mt-3">
@@ -337,10 +289,7 @@
                                 <form
                                     method="POST"
                                     enctype="multipart/form-data"
-                                    action="{{ route(
-                                        'guru.e-learning.reply.store',
-                                        $komentar->id
-                                    ) }}">
+                                    action="{{ route('guru.e-learning.reply.store',$komentar->id) }}">
 
                                     @csrf
 
@@ -354,44 +303,20 @@
                                         name="reply_preview"
                                         value="{{ Str::limit(strip_tags($komentar->isi),100) }}">
 
-                                    <div
-                                        class="reply-preview-box">
-
-                                        <small class="text-muted">
-
-                                            Membalas
-                                            <strong>
-
-                                                {{ $komentar->user->name }}
-
-                                            </strong>
-
-                                        </small>
-
-                                        <div class="small text-dark">
-
-                                            {{ Str::limit(
-                                                strip_tags($komentar->isi),
-                                                100
-                                            ) }}
-
-                                        </div>
-
-                                    </div>
-
                                     <textarea
                                         name="isi"
                                         rows="2"
-                                        class="form-control mb-2"></textarea>
-                                    
+                                        class="form-control mb-2"
+                                        placeholder="Tulis balasan..."></textarea>
+
                                     <input
                                         type="file"
                                         name="lampiran[]"
                                         multiple
-                                        class="form-control mt-2">
+                                        class="form-control mb-2">
 
                                     <button
-                                        class="btn btn-sm btn-primary">
+                                        class="btn btn-primary btn-sm">
 
                                         Kirim Balasan
 
@@ -401,81 +326,57 @@
 
                             </div>
 
+                            {{-- LIST REPLY --}}
                             @foreach($komentar->replies as $reply)
 
-                            @if($reply->reply_preview)
+                                <div class="reply-modern">
 
-                            <div class="reply-context">
+                                    <div class="reply-modern-avatar">
 
-                                <small class="text-muted">
-
-                                    Membalas komentar:
-
-                                </small>
-
-                                <div class="small">
-
-                                    {{ $reply->reply_preview }}
-
-                                </div>
-
-                            </div>
-
-                            @endif
-
-                            <div class="reply-card">
-
-                                <div class="reply-avatar">
-
-                                    {{ strtoupper(substr($reply->user->name ?? 'U',0,1)) }}
-
-                                </div>  
-
-                                <div class="flex-grow-1">
-
-                                    <div class="d-flex justify-content-between">
-
-                                        <strong>
-
-                                            {{ $reply->user->name }}
-
-                                        </strong>
-
-                                        <small class="text-muted"> 
-                                            {{ $reply->created_at->diffForHumans() }}
-
-                                        </small>
+                                        {{ strtoupper(substr($reply->user->name ?? 'U',0,1)) }}
 
                                     </div>
 
-                                    <div>
+                                    <div class="reply-modern-content">
 
-                                       @if($reply->reply_to_name)
+                                        <div class="d-flex justify-content-between">
 
-                                        <div class="reply-context">
+                                            <strong>
+
+                                                {{ $reply->user->name }}
+
+                                            </strong>
 
                                             <small class="text-muted">
 
-                                                Membalas
-                                                {{ $reply->reply_to_name }}
+                                                {{ $reply->created_at->diffForHumans() }}
 
                                             </small>
 
-                                            <div class="small">
+                                        </div>
 
-                                                {{ $reply->reply_preview }}
+                                        @if($reply->reply_to_name)
+
+                                            <div class="reply-target">
+
+                                                Membalas
+
+                                                <strong>
+
+                                                    {{ $reply->reply_to_name }}
+
+                                                </strong>
 
                                             </div>
 
-                                        </div>
-
                                         @endif
 
-                                    </div>
+                                        <div class="mt-1">
 
-                                    <div class="mt-1">
+                                            {!! nl2br(e($reply->isi)) !!}
 
-                                        {!! nl2br(e($reply->isi)) !!}
+                                        </div>
+
                                         @if($reply->lampiran->count())
 
                                             <div class="mt-2">
@@ -485,7 +386,7 @@
                                                     <a
                                                         href="{{ asset('storage/'.$file->path) }}"
                                                         target="_blank"
-                                                        class="attachment-item">
+                                                        class="forum-file-mini">
 
                                                         <i class="bi bi-paperclip"></i>
 
@@ -499,94 +400,9 @@
 
                                         @endif
 
-                                        <div class="mt-2">
-
-                                            <button
-                                                type="button"
-                                                class="action-btn"
-                                                onclick="document.getElementById('reply-reply-{{ $reply->id }}').classList.toggle('d-none')">
-
-                                                <i class="bi bi-reply"></i>
-
-                                                Balas
-
-                                            </button>
-
-                                        </div>
-
-                                        <div
-                                            id="reply-reply-{{ $reply->id }}"
-                                            class="d-none mt-3">
-
-                                            <form
-                                                method="POST"
-                                                enctype="multipart/form-data"
-                                                action="{{ route(
-                                                    'guru.e-learning.reply.store',
-                                                    $komentar->id
-                                                ) }}">
-
-                                                @csrf
-
-                                                <input
-                                                    type="hidden"
-                                                    name="reply_to_reply_id"
-                                                    value="{{ $reply->id }}">
-
-                                                <input
-                                                    type="hidden"
-                                                    name="reply_to_name"
-                                                    value="{{ $reply->user->name }}">
-
-                                                <input
-                                                    type="hidden"
-                                                    name="reply_preview"
-                                                    value="{{ \Illuminate\Support\Str::limit(strip_tags($reply->isi),100) }}">
-
-                                                <div class="reply-preview-box">
-
-                                                    <small>
-
-                                                        Membalas
-                                                        {{ $reply->user->name }}
-
-                                                    </small>
-
-                                                    <div>
-
-                                                        {{ \Illuminate\Support\Str::limit(strip_tags($reply->isi),100) }}
-
-                                                    </div>
-
-                                                </div>
-
-                                                <textarea
-                                                    name="isi"
-                                                    rows="2"
-                                                    class="form-control mb-2"></textarea>
-
-                                                <input
-                                                    type="file"
-                                                    name="lampiran[]"
-                                                    multiple
-                                                    class="form-control mb-2">
-
-                                                <button
-                                                    class="btn btn-sm btn-primary">
-
-                                                    Kirim Balasan
-
-                                                </button>
-
-                                            </form>
-
-                                        </div>
-
                                     </div>
 
                                 </div>
-
-                            </div>
 
                             @endforeach
 
@@ -600,19 +416,13 @@
 
                         <i
                             class="bi bi-chat-square-text text-muted"
-                            style="font-size:60px"></i>
+                            style="font-size:70px"></i>
 
-                        <h6 class="mt-3">
+                        <h5 class="mt-3">
 
-                            Belum ada diskusi
+                            Belum Ada Diskusi
 
-                        </h6>
-
-                        <p class="text-muted mb-0">
-
-                            Komentar akan muncul di sini setelah fitur diskusi diaktifkan.
-
-                        </p>
+                        </h5>
 
                     </div>
 
@@ -620,113 +430,263 @@
 
             </div>
 
-        </div>
-
-    </div>
-
-</div>
-
 <style>
 
-.materi-content img{
-    max-width:100%;
-    height:auto;
-    border-radius:12px;
+.forum-card{
+    overflow:hidden;
+    border-radius:18px;
 }
 
-.attachment-item{
+/* =========================
+   HEADER GURU
+========================= */
+
+.forum-header{
+    padding:25px 30px;
+    background:#fff;
+    border-bottom:1px solid #edf0f5;
+}
+
+.guru-avatar{
+    width:65px;
+    height:65px;
+    border-radius:50%;
+    object-fit:cover;
+    border:3px solid #f1f3f5;
+}
+
+/* =========================
+   JUDUL FORUM
+========================= */
+
+.forum-title-area{
+    padding:30px;
+    border-bottom:1px solid #edf0f5;
+}
+
+.forum-title{
+    font-size:2rem;
+    font-weight:700;
+    margin-bottom:15px;
+    line-height:1.3;
+}
+
+.forum-meta{
     display:flex;
+    gap:20px;
+    flex-wrap:wrap;
+    color:#6c757d;
+    font-size:.95rem;
+}
+
+/* =========================
+   KONTEN
+========================= */
+
+.forum-content{
+    padding:30px;
+    line-height:1.9;
+    font-size:15px;
+}
+
+.forum-content img{
+    max-width:100%;
+    border-radius:14px;
+    margin-top:10px;
+    margin-bottom:10px;
+}
+
+.forum-content table{
+    width:100%;
+}
+
+/* =========================
+   FILE MATERI
+========================= */
+
+.forum-files{
+    padding:30px;
+    border-top:1px solid #edf0f5;
+}
+
+.forum-file-item{
+    display:flex;
+    justify-content:space-between;
     align-items:center;
-    gap:10px;
-    padding:12px 15px;
+    padding:15px 18px;
+    margin-bottom:10px;
+    border-radius:14px;
     border:1px solid #e9ecef;
-    border-radius:12px;
     text-decoration:none;
     color:#212529;
-    margin-bottom:10px;
     transition:.2s;
 }
 
-.attachment-item:hover{
-    background:#f8f9fa;
+.forum-file-item:hover{
+    background:#f8fafc;
 }
 
-.comment-card{
+.forum-file-mini{
+    display:inline-flex;
+    align-items:center;
+    gap:6px;
+    padding:6px 12px;
+    margin-right:8px;
+    margin-top:5px;
+    border-radius:20px;
+    background:#f8f9fa;
+    text-decoration:none;
+    color:#495057;
+    border:1px solid #e9ecef;
+    font-size:.85rem;
+}
+
+/* =========================
+   DISKUSI
+========================= */
+
+.forum-discussion{
+    margin-top:25px;
+}
+
+.forum-section-header{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    margin-bottom:20px;
+}
+
+.discussion-form-card{
+    background:#fff;
+    border-radius:18px;
+    padding:20px;
+    border:1px solid #edf0f5;
+    margin-bottom:25px;
+}
+
+.discussion-item{
     display:flex;
     gap:15px;
-    padding:18px;
-    border:1px solid #ececec;
-    border-radius:16px;
-    margin-bottom:15px;
+    background:#fff;
+    border-radius:18px;
+    padding:20px;
+    border:1px solid #edf0f5;
+    margin-bottom:18px;
 }
 
-.comment-avatar{
-    width:45px;
-    height:45px;
+.discussion-avatar{
+    width:48px;
+    height:48px;
     border-radius:50%;
     background:#0d6efd;
     color:#fff;
-    display:flex;
-    align-items:center;
-    justify-content:center;
     font-weight:700;
-    flex-shrink:0;
-}
-.reply-card{
-    display:flex;
-    gap:12px;
-    margin-top:15px;
-    margin-left:55px;
-    padding:12px;
-    border-radius:12px;
-    background:#f8f9fa;
-}
-
-.reply-avatar{
-    width:35px;
-    height:35px;
-    border-radius:50%;
-    background:#6c757d;
-    color:#fff;
     display:flex;
     align-items:center;
     justify-content:center;
-    font-size:12px;
-    font-weight:600;
     flex-shrink:0;
 }
 
-.comment-actions{
-    margin-top:10px;
+.discussion-content{
+    flex:1;
 }
 
-.action-btn{
-    border:none;
-    background:none;
-    color:#6c757d;
-    font-size:.9rem;
-    font-weight:500;
-    padding:0;
-}
-
-.action-btn:hover{
-    color:#0d6efd;
-}
-
-.reply-preview-box{
-    background:#f8f9fa;
-    border-left:4px solid #0d6efd;
-    padding:10px 12px;
-    border-radius:8px;
+.discussion-header{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
     margin-bottom:10px;
 }
 
-.reply-context{
-    background:#f8f9fa;
-    border-left:3px solid #adb5bd;
-    padding:8px 10px;
-    border-radius:8px;
+.discussion-body{
+    line-height:1.8;
+    color:#212529;
+}
+
+/* =========================
+   REPLY
+========================= */
+
+.reply-modern{
+    display:flex;
+    gap:12px;
+    margin-top:15px;
+    margin-left:35px;
+    padding:14px;
+    background:#f8fafc;
+    border-radius:14px;
+    border:1px solid #edf0f5;
+}
+
+.reply-modern-avatar{
+    width:38px;
+    height:38px;
+    border-radius:50%;
+    background:#6c757d;
+    color:#fff;
+    font-size:13px;
+    font-weight:700;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    flex-shrink:0;
+}
+
+.reply-modern-content{
+    flex:1;
+}
+
+.reply-target{
+    display:inline-block;
+    margin-top:6px;
     margin-bottom:8px;
+    padding:4px 10px;
+    background:#eef4ff;
+    border-radius:10px;
+    font-size:.85rem;
+    color:#0d6efd;
+}
+
+/* =========================
+   FORM
+========================= */
+
+.form-control{
+    border-radius:12px;
+}
+
+.btn{
+    border-radius:10px;
+}
+
+/* =========================
+   MOBILE
+========================= */
+
+@media(max-width:768px){
+
+    .forum-title{
+        font-size:1.5rem;
+    }
+
+    .forum-title-area,
+    .forum-content,
+    .forum-files{
+        padding:20px;
+    }
+
+    .discussion-item{
+        padding:15px;
+    }
+
+    .reply-modern{
+        margin-left:10px;
+    }
+
+    .forum-meta{
+        flex-direction:column;
+        gap:8px;
+    }
 }
 
 </style>

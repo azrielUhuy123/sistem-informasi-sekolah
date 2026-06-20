@@ -70,6 +70,18 @@
         </a>
 
         <a
+            class="menu-item {{ request()->is('superadmin/siswa*') ? 'active' : '' }}"
+            href="{{ route('superadmin.siswa.index') }}"
+        >
+
+            <div class="menu-left">
+                <i class="bi bi-mortarboard"></i>
+                <span>Siswa</span>
+            </div>
+
+        </a>
+
+        <a
             class="menu-item {{ request()->is('superadmin/pengampu-mapel*') ? 'active' : '' }}"
             href="{{ route('superadmin.pengampu-mapel.index') }}"
         >

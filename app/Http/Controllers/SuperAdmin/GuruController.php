@@ -21,4 +21,18 @@ class GuruController extends Controller
             compact('gurus')
         );
     }
+
+    public function show(Guru $guru)
+    {
+        $guru->load([
+            'user',
+            'waliKelas.kelas',
+            'mapels'
+        ]);
+
+        return view(
+            'superadmin.guru.show',
+            compact('guru')
+        );
+    }
 }

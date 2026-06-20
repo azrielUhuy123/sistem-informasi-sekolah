@@ -33,7 +33,6 @@
                         <th width="60">No</th>
                         <th width="100" class="test-start">Kode</th>
                         <th width="200" class="test-start">Nama Mata Pelajaran</th>
-                        <th width="200" class="test-start">KKM</th>
                         <th width="200" class="test-start">Aksi</th>
                     </tr>
                 </thead>
@@ -56,7 +55,6 @@
                                 ({{ $row->fase }})
                             </small></td>
 
-                            <td>{{ $row->kkm ?? '-' }}</td>
 
                             {{-- AKSI --}}
                             <td>
