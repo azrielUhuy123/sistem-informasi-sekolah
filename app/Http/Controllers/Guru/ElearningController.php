@@ -93,39 +93,41 @@ class ElearningController extends Controller
      * Show the form for creating a new resource.
      */
     public function create()
-    {
-        $guru = auth()->user()->guru;
+{
+    $guru = auth()->user()->guru;
 
-        $pengampu = PengampuMapel::with([
-            'kelas',
-            'mapel'
-        ])
+    $pengampu = PengampuMapel::with([
+        'kelas',
+        'mapel'
+    ])
+    ->where('guru_id', $guru->id)
+    ->where('tahun_ajaran_id', current_tahun_id())
+    ->get();
+
+    $waliKelas = WaliKelas::with('kelas')
         ->where('guru_id', $guru->id)
         ->where('tahun_ajaran_id', current_tahun_id())
-        ->get();
+        ->first();
 
-        $waliKelas = WaliKelas::with('kelas')
-            ->where('guru_id', $guru->id)
-            ->where('tahun_ajaran_id', current_tahun_id())
-            ->first();
+    $mapelWali = collect();
 
-        $mapelWali = collect();
+    if ($waliKelas) {
 
-        if ($waliKelas) {
+        $mapelWali = MataPelajaran::orderBy(
+            'nama_mapel'
+        )->get();
 
-            $mapelWali = $guru->mapels;
-
-        }
-
-        return view(
-            'guru.elearning.create',
-            compact(
-                'pengampu',
-                'waliKelas',
-                'mapelWali'
-            )
-        );
     }
+
+    return view(
+        'guru.elearning.create',
+        compact(
+            'pengampu',
+            'waliKelas',
+            'mapelWali'
+        )
+    );
+}
 
     /**
      * Store a newly created resource in storage.
@@ -160,20 +162,20 @@ class ElearningController extends Controller
         */
         if (str_starts_with($request->target, 'wali_')) {
 
-            $mapelId = str_replace(
+            $waliKelasId = str_replace(
                 'wali_',
                 '',
                 $request->target
             );
 
             $wali = WaliKelas::with('kelas')
+                ->where('id', $waliKelasId)
                 ->where('guru_id', $guru->id)
-                ->where('tahun_ajaran_id', current_tahun_id())
                 ->firstOrFail();
 
-            $waliKelasId = $wali->id;
-
             $kelasId = $wali->kelas_id;
+
+            $mapelId = null;
         }
 
                 /*

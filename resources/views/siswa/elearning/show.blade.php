@@ -4,30 +4,31 @@
 
 @section('content')
 
-<div class="container-fluid py-4">
 
-    <a
-        href="{{ route('siswa.e-learning.index') }}"
-        class="btn btn-light mb-4">
+<div class="forum-wrapper">
 
-        <i class="bi bi-arrow-left me-1"></i>
+    {{-- HEADER FORUM --}}
+    <div class="forum-header-sticky">
 
-        Kembali
+        <div class="forum-top-header">
 
-    </a>
+            <a
+                href="{{ route('siswa.e-learning.index') }}"
+                class="btn-back-forum">
 
-    <div class="card border-0 shadow-sm">
+                <i class="bi bi-arrow-left"></i>
 
-        <div class="card-body p-4">
+                BACK
 
-            {{-- HEADER MATERI --}}
-            <div class="forum-header-sticky">
+            </a>
 
-    <h2 class="forum-title">
-        {{ $forum->judul }}
-    </h2>
+            <h2 class="forum-title">
+                {{ $forum->judul }}
+            </h2>
 
-</div>
+        </div>
+
+    </div>
 
             {{-- CARD GURU --}}
             <div class="teacher-card">
@@ -557,34 +558,135 @@
 /* =========================
    HEADER MATERI
 ========================= */
+/* =========================
+   STICKY HEADER MENTARI STYLE
+========================= */
 
+.forum-header-sticky{
+
+    position: sticky;
+    top: 0;
+    z-index: 9999;
+
+    background: rgba(255,255,255,.35);
+
+    backdrop-filter: blur(32px) saturate(180%);
+    -webkit-backdrop-filter: blur(32px) saturate(180%);
+
+    border: 1px solid rgba(255,255,255,.3);
+
+    box-shadow:
+        0 8px 32px rgba(0,0,0,.08);
+
+}
+
+.forum-header-sticky::after{
+
+    content:'';
+
+    position:absolute;
+    inset:0;
+
+    background:
+        linear-gradient(
+            135deg,
+            rgba(255,255,255,.35),
+            rgba(255,255,255,.05)
+        );
+
+    pointer-events:none;
+}
+.forum-header-sticky::before{
+    content:'';
+
+    position:absolute;
+    inset:0;
+
+    background:
+        linear-gradient(
+            180deg,
+            rgba(255,255,255,.65),
+            rgba(255,255,255,.25)
+        );
+
+    pointer-events:none;
+}
 .forum-header-sticky{
     position:sticky;
     top:0;
-    z-index:100;
+    z-index:9999;
+
+    margin-bottom:20px;
+}
+
+.forum-top-header{
+
+    position:relative;
+
+    display:flex;
+    align-items:center;
+    justify-content:center;
+
+    min-height:72px;
 
     background:rgba(255,255,255,.75);
 
-    backdrop-filter:blur(12px);
-    -webkit-backdrop-filter:blur(12px);
+    backdrop-filter:blur(25px);
+    -webkit-backdrop-filter:blur(25px);
 
     border-bottom:1px solid #e5e7eb;
 
-    padding:18px 30px;
+    box-shadow:
+        0 10px 30px rgba(0,0,0,.08);
+}
+
+.btn-back-forum{
+    position:absolute;
+    left:24px;
+
+    display:flex;
+    align-items:center;
+    gap:8px;
+
+    padding:10px 18px;
+
+    border:1px solid #ef4444;
+    border-radius:12px;
+
+    background:white;
+
+    color:#ef4444;
+    text-decoration:none;
+
+    font-size:14px;
+    font-weight:600;
+
+    transition:.2s;
+}
+
+.btn-back-forum:hover{
+    background:#ef4444;
+    color:white;
 }
 
 .forum-title{
     margin:0;
-    font-size:32px;
+
+    font-size:2.2rem;
     font-weight:700;
+
+    color:#1f2937;
+
+    text-align:center;
 }
 
 .forum-meta{
     display:flex;
     gap:20px;
     flex-wrap:wrap;
-    color:#6c757d;
-    font-size:.95rem;
+
+    color:#6b7280;
+    font-size:.9rem;
 }
 
 .forum-meta i{

@@ -93,12 +93,17 @@ Route::prefix('siswa')
 
                 Route::get(
                     '/',
-                    [\App\Http\Controllers\Siswa\ElearningController::class, 'index']
+                    [ElearningController::class, 'index']
                 )->name('index');
 
                 Route::get(
+                    '/mapel/{mapel}',
+                    [ElearningController::class, 'mapel']
+                )->name('mapel');
+
+                Route::get(
                     '/{elearning}',
-                    [\App\Http\Controllers\Siswa\ElearningController::class, 'show']
+                    [ElearningController::class, 'show']
                 )->name('show');
 
             });
@@ -112,5 +117,7 @@ Route::prefix('siswa')
                 '/e-learning-komentar/{komentar}/reply',
                 [\App\Http\Controllers\Elearning\ElearningKomentarReplyController::class, 'store']
             )->name('e-learning.reply.store');
+
+           
 
     });

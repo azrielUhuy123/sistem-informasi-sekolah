@@ -106,24 +106,24 @@
                                     Pilih Target
                                 </option>
 
-                                @if($waliKelas)
+                               @if($waliKelas)
 
-                                    <optgroup label="Forum Wali Kelas">
+                                <optgroup label="Forum Wali Kelas">
 
-                                        @foreach($mapelWali as $mapel)
+                                    @foreach($mapelWali as $mapel)
 
-                                            <option
-                                                value="wali_{{ $mapel->id }}">
+                                        <option
+                                            value="wali_{{ $mapel->id }}">
 
-                                                {{ $mapel->nama_mapel }}
-                                                -
-                                                {{ $waliKelas->kelas->nama_kelas }}
+                                            {{ $waliKelas->kelas->nama_kelas }}
+                                            -
+                                            {{ $mapel->nama_mapel }}
 
-                                            </option>
+                                        </option>
 
-                                        @endforeach
+                                    @endforeach
 
-                                    </optgroup>
+                                </optgroup>
 
                                 @endif
 
