@@ -59,7 +59,7 @@
         <p>
 
             Wali Kelas:
-            {{ $waliKelas->guru->nama }}
+            {{ $waliKelas->guru->pegawai->nama }}
 
         </p>
 
@@ -157,7 +157,7 @@
                 Wali Kelas
                 <br><br><br><br>
 
-                {{ $waliKelas->guru->nama }}
+                {{ $waliKelas->guru->pegawai->nama }}
 
             </td>
 

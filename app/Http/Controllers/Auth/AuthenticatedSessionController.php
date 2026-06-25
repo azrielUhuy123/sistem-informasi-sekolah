@@ -35,7 +35,7 @@ class AuthenticatedSessionController extends Controller
             Auth::logout();
 
             return back()->withErrors([
-                'email' => 'Akun belum disetujui oleh Kepala Sekolah.',
+                'username' => 'Akun belum disetujui oleh Kepala Sekolah.',
             ]);
         }
 
@@ -44,7 +44,7 @@ class AuthenticatedSessionController extends Controller
             Auth::logout();
 
             return back()->withErrors([
-                'email' => 'Akun dinonaktifkan.',
+                'username' => 'Akun dinonaktifkan.',
             ]);
         }
 

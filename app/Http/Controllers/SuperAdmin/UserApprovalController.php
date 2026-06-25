@@ -4,6 +4,7 @@ namespace App\Http\Controllers\SuperAdmin;
 
 use App\Http\Controllers\Controller;
 use App\Models\User;
+use App\Models\Guru;
 use Illuminate\Http\Request;
 
 class UserApprovalController extends Controller
@@ -13,11 +14,13 @@ class UserApprovalController extends Controller
      */
     public function pending()
     {
-        $users = User::where(
-            'approval_status',
-            'pending'
-        )
-        ->orderBy('created_at', 'asc')
+        $users = User::with([
+            'pegawai',
+            'guru',
+            'siswa'
+        ])
+        ->where('approval_status','pending')
+        ->latest()
         ->paginate(10);
 
         return view(
@@ -62,22 +65,38 @@ class UserApprovalController extends Controller
     {
         $user->update([
             'approval_status' => 'approved',
-            'approved_at' => now()
+            'approved_at'      => now(),
+            'approved_by'      => auth()->id(),
+            'is_active'        => true,
         ]);
+
+        if (
+            $user->role === 'guru' &&
+            $user->pegawai &&
+            !$user->guru
+        ) {
+
+            Guru::create([
+                'user_id' => $user->id,
+                'data_kepegawaian_id' => $user->pegawai->id,
+            ]);
+
+        }
 
         return redirect()
             ->route('superadmin.users.pending')
-            ->with('success', 'User approved successfully.');
+            ->with('success', 'Akun berhasil diapprove.');
     }
     
     public function reject(User $user)
     {
         $user->update([
-            'approval_status' => 'rejected'
+            'approval_status' => 'rejected',
+            'is_active'       => false,
         ]);
 
         return back()
-            ->with('success', 'User berhasil diblokir.');
+            ->with('success', 'Akun berhasil ditolak.');
     }
 
     public function block(User $user)

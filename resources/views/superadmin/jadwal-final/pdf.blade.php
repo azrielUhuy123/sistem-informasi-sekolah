@@ -101,7 +101,7 @@
 
                                 <br>
 
-                                {{ $jadwal->guru->nama }}
+                                {{ $jadwal->guru->pegawai->nama }}
 
                             @else
 

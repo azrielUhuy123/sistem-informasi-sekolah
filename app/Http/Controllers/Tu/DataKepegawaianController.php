@@ -4,6 +4,11 @@ namespace App\Http\Controllers\Tu;
 
 use App\Http\Controllers\Controller;
 use App\Models\DataKepegawaian;
+use App\Models\User;
+use App\Models\Guru;
+use Illuminate\Support\Facades\Hash;
+use Carbon\Carbon;
+use App\Enums\UserRole;
 use Illuminate\Http\Request;
 
 class DataKepegawaianController extends Controller
@@ -193,5 +198,80 @@ class DataKepegawaianController extends Controller
         return response()->json([
             'success' => true
         ]);
+    }
+    public function createAccount(DataKepegawaian $pegawai)
+    {
+        if ($pegawai->approval_status !== 'approved') {
+
+            return back()->with(
+                'error',
+                'Pegawai belum disetujui.'
+            );
+
+        }
+
+        if ($pegawai->user) {
+
+            return back()->with(
+                'error',
+                'Pegawai sudah memiliki akun.'
+            );
+
+        }
+
+        $jabatan = strtolower($pegawai->jabatan);
+
+        $role = match (true) {
+
+            str_contains($jabatan, 'kepala sekolah')
+                => UserRole::SUPERADMIN,
+
+            str_contains($jabatan, 'operator')
+                => UserRole::TU,
+
+            str_contains($jabatan, 'guru')
+                => UserRole::GURU,
+
+            default => null,
+
+        };
+
+        if (!$role) {
+
+            return back()->with(
+                'error',
+                'Role tidak dikenali.'
+            );
+
+        }
+
+        $password = Carbon::parse(
+            $pegawai->tanggal_lahir
+        )->format('Ymd');
+
+        User::create([
+
+            'pegawai_id' => $pegawai->id,
+
+            'name' => $pegawai->nama,
+
+            'email' => 'pegawai'.$pegawai->id.'@internal.local',
+
+            'username' => $pegawai->nip,
+
+            'password' => Hash::make($password),
+
+            'role' => $role,
+
+            'approval_status' => 'pending',
+
+            'is_active' => false,
+
+        ]);
+
+        return back()->with(
+            'success',
+            'Permintaan akun berhasil dikirim ke Kepala Sekolah.'
+        );
     }
 }

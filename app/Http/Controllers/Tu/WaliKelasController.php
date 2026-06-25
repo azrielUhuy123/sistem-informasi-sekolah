@@ -28,7 +28,9 @@ class WaliKelasController extends Controller
      */
     public function create()
     {
-        $guru = Guru::orderBy('nama')->get();
+        $guru = Guru::with('pegawai')
+    ->get()
+    ->sortBy('pegawai.nama');
         $kelas = Kelas::orderBy('nama_kelas')->get();
         $tahun = TahunAjaran::orderBy('tahun', 'desc')
                     ->orderBy('semester', 'desc')

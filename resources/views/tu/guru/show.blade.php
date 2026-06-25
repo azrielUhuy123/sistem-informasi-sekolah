@@ -27,12 +27,12 @@
     @else
         <div class="rounded-circle bg-secondary text-white d-flex align-items-center justify-content-center"
              style="width:120px;height:120px;font-size:28px;">
-            {{ strtoupper(substr($guru->nama,0,2)) }}
+            {{ strtoupper(substr($guru->pegawai->nama,0,2)) }}
         </div>
     @endif
 
     <div>
-        <h5 class="mb-0 fw-bold">{{ $guru->nama }}</h5>
+        <h5 class="mb-0 fw-bold">{{ $guru->pegawai->nama }}</h5>
         <small class="text-muted">NIP {{ $guru->nip ?? '-' }}</small><br>
         <small class="text-muted">{{ $guru->email ?? '-' }}</small>
     </div>

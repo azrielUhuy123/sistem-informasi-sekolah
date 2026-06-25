@@ -12,7 +12,9 @@ class PembinaEkskulController extends Controller
 {
     public function index()
     {
-        $guru = Guru::orderBy('nama')->get();
+        $guru = Guru::with('pegawai')
+    ->get()
+    ->sortBy('pegawai.nama');
 
         $ekskul = Ekskul::orderBy('nama')->get();
 

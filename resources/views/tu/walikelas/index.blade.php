@@ -29,7 +29,7 @@
 @forelse($wali as $w)
 <tr>
     <td>{{ $w->kelas->nama_kelas ?? '-' }}</td>
-    <td>{{ $w->guru->nama ?? '-' }}</td>
+    <td>{{ $w->guru->pegawai->nama ?? '-' }}</td>
     <td>
     @if($w->tahun)
         {{ $w->tahun->tahun }} ({{ $w->tahun->semester }})

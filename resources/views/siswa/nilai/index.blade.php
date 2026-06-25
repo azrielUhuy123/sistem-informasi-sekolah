@@ -142,7 +142,7 @@
                                     {{-- GURU --}}
                                     <td>
 
-                                        {{ $n->guru->nama ?? '-' }}
+                                        {{ $n->guru->pegawai->nama ?? '-' }}
 
                                     </td>
 

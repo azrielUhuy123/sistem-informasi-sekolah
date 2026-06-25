@@ -2,7 +2,7 @@
 <html>
 <head>
     <meta charset="utf-8">
-    <title>Jadwal Guru {{ $guru->nama }}</title>
+    <title>Jadwal Guru {{ $guru->pegawai->nama }}</title>
     <style>
         body { font-family: sans-serif; }
         table {
@@ -32,7 +32,7 @@
 <body>
 
 <h2>Jadwal Mengajar Guru</h2>
-<p><strong>{{ $guru->nama }}</strong></p>
+<p><strong>{{ $guru->pegawai->nama }}</strong></p>
 
 <table>
     <thead>

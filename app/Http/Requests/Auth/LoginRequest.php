@@ -8,6 +8,9 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\RateLimiter;
 use Illuminate\Support\Str;
 use Illuminate\Validation\ValidationException;
+use App\Models\DataKepegawaian;
+use App\Models\Siswa;
+use Illuminate\Support\Facades\Hash;
 
 class LoginRequest extends FormRequest
 {
@@ -41,60 +44,116 @@ class LoginRequest extends FormRequest
     {
         $this->ensureIsNotRateLimited();
 
-        if (! Auth::attempt(
-            [
-                'username' => $this->username,
-                'password' => $this->password,
-            ],
-            $this->boolean('remember')
-        )) {
-            RateLimiter::hit($this->throttleKey());
+        $credential = trim($this->input('username'));
+
+        $user = null;
+
+        /*
+        |--------------------------------------------------------------------------
+        | LOGIN PEGAWAI (NIP)
+        |--------------------------------------------------------------------------
+        */
+
+        $pegawai = DataKepegawaian::with('user')
+            ->where('nip', $credential)
+            ->first();
+
+        if ($pegawai && $pegawai->user) {
+
+            $user = $pegawai->user;
+
+        }
+
+        /*
+        |--------------------------------------------------------------------------
+        | LOGIN SISWA (NIS)
+        |--------------------------------------------------------------------------
+        */
+
+        if (!$user) {
+
+            $siswa = Siswa::with('user')
+                ->where('nis', $credential)
+                ->first();
+
+            if ($siswa && $siswa->user) {
+
+                $user = $siswa->user;
+
+            }
+
+        }
+
+        /*
+        |--------------------------------------------------------------------------
+        | USER TIDAK DITEMUKAN
+        |--------------------------------------------------------------------------
+        */
+
+        if (
+            !$user ||
+            !Hash::check(
+                $this->password,
+                $user->password
+            )
+        ) {
+
+            RateLimiter::hit(
+                $this->throttleKey()
+            );
 
             throw ValidationException::withMessages([
                 'username' => trans('auth.failed'),
             ]);
+
         }
 
-        $user = Auth::user();
+        /*
+        |--------------------------------------------------------------------------
+        | STATUS APPROVAL
+        |--------------------------------------------------------------------------
+        */
 
         if ($user->approval_status === 'pending') {
-
-            Auth::logout();
 
             throw ValidationException::withMessages([
                 'username' => 'Akun masih menunggu persetujuan Kepala Sekolah.',
             ]);
+
         }
 
         if ($user->approval_status === 'rejected') {
 
-            Auth::logout();
-
             throw ValidationException::withMessages([
                 'username' => 'Akun Anda ditolak oleh Kepala Sekolah.',
             ]);
+
         }
 
         if ($user->approval_status === 'draft') {
 
-            Auth::logout();
-
             throw ValidationException::withMessages([
                 'username' => 'Akun belum dikirim untuk persetujuan.',
             ]);
+
         }
 
-        // User approved tetapi diblokir
-        if (! $user->is_active) {
-
-            Auth::logout();
+        if (!$user->is_active) {
 
             throw ValidationException::withMessages([
-                'username' => 'Akun Anda sedang dinonaktifkan.',
+                'username' => 'Akun sedang dinonaktifkan.',
             ]);
+
         }
 
-        RateLimiter::clear($this->throttleKey());
+        Auth::login(
+            $user,
+            $this->boolean('remember')
+        );
+
+        RateLimiter::clear(
+            $this->throttleKey()
+        );
     }
 
     /**

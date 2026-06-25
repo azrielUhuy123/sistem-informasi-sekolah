@@ -48,7 +48,7 @@
         <tr>
             <td>{{ $j->hari }}</td>
             <td>{{ $j->mapel }}</td>
-            <td>{{ $j->guru->nama }}</td>
+            <td>{{ $j->guru->pegawai->nama }}</td>
             <td>{{ $j->jam_mulai }}</td>
             <td>{{ $j->jam_selesai }}</td>
         </tr>

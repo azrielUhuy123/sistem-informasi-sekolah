@@ -33,7 +33,7 @@
                         <tr>
 
                             <td>
-                                {{ $guru->nama }}
+                                {{ $guru->pegawai->nama }}
                             </td>
 
                             <td>

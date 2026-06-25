@@ -13,14 +13,8 @@ class Guru extends Model
     protected $table = 'guru';
 
     protected $fillable = [
-        'nama',
-        'nip',
-        'jenis_kelamin',
-        'mapel_id',
-        'email',
-        'telepon',
-        'alamat',
-        'foto',
+        'user_id',
+        'data_kepegawaian_id',
     ];
 
     /**
@@ -41,10 +35,7 @@ class Guru extends Model
     {
         return $this->hasOne(WaliKelas::class);
     }
-    public function user()
-    {
-        return $this->belongsTo(\App\Models\User::class);
-    }
+
     public function pengampuMapel()
     {
         return $this->hasMany(PengampuMapel::class);
@@ -61,5 +52,31 @@ class Guru extends Model
             DataKepegawaian::class,
             'data_kepegawaian_id'
         );
+    }
+
+    public function user()
+    {
+        return $this->belongsTo(
+            User::class
+        );
+    }
+    public function getNamaAttribute()
+    {
+        return $this->pegawai?->nama;
+    }
+
+    public function getNipAttribute()
+    {
+        return $this->pegawai?->nip;
+    }
+
+    public function getJenisKelaminAttribute()
+    {
+        return $this->pegawai?->jenis_kelamin;
+    }
+
+    public function getFotoAttribute()
+    {
+        return $this->pegawai?->foto;
     }
 }

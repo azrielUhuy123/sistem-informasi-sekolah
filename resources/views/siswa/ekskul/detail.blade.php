@@ -64,7 +64,7 @@
 
                             <td>
 
-                                {{ $ekskul->pembina->guru->nama ?? '-' }}
+                                {{ $ekskul->pembina->guru->pegawai->nama ?? '-' }}
 
                             </td>
 

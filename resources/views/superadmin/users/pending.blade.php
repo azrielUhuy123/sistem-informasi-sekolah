@@ -24,7 +24,7 @@
                 <thead>
                     <tr>
                         <th>Nama</th>
-                        <th>Email</th>
+                        <th>Username</th>
                         <th>Role</th>
                         <th width="220">Aksi</th>
                     </tr>
@@ -37,16 +37,16 @@
                         <tr>
 
                             <td>
-                                {{ $user->name }}
+                                {{ $user->pegawai?->nama ?? '-' }}
                             </td>
 
                             <td>
-                                {{ $user->email }}
+                                {{ $user->username }}
                             </td>
 
                             <td>
                                 <x-status-badge type="warning">
-                                    {{ $user->role }}
+                                    {{ $user->role_name }}
                                 </x-layouts.components.status-badge>
                             </td>
 

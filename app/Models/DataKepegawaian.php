@@ -75,4 +75,11 @@ class DataKepegawaian extends Model
             'data_kepegawaian_id'
         );
     }
+    public function user()
+    {
+        return $this->hasOne(
+            User::class,
+            'pegawai_id'
+        );
+    }
 }

@@ -222,7 +222,7 @@
                                                 </div>
 
                                                 <small>
-                                                    {{ $item->guru->nama ?? '-' }}
+                                                    {{ $item->guru->pegawai->nama ?? '-' }}
                                                 </small>
 
                                                 
@@ -334,7 +334,7 @@
                                 </td>
 
                                 <td>
-                                    {{ $item->guru->nama ?? '-' }}
+                                    {{ $item->guru->pegawai->nama ?? '-' }}
                                 </td>
 
                                 <td>

@@ -52,22 +52,23 @@
 
 @endif
 
-<div class="card shadow-sm border-0">
+<div class="card">
 
-    <div class="card-body p-0">
+    <div class="card-body">
 
-        <table class="table align-middle mb-0">
+        <table class="table align-middle">
 
-            <thead class="border-bottom">
+            <thead>
 
-                <tr class="text-muted small">
+                <tr>
 
-                    <th width="50">No</th>
+                    <th>No</th>
                     <th>Nama Pegawai</th>
                     <th>NIP</th>
                     <th>Status</th>
+                    <th>Akun</th>
                     <th>Pesan</th>
-                    <th width="200" class="text-center">Aksi</th>
+                    <th>Aksi</th>
 
                 </tr>
 
@@ -77,13 +78,13 @@
 
                 @forelse($data as $row)
 
-                    <tr class="border-bottom">
+                    <tr>
 
                         <td>
                             {{ $loop->iteration }}
                         </td>
 
-                        <td class="fw-semibold">
+                        <td>
                             {{ $row->nama }}
                         </td>
 
@@ -95,21 +96,57 @@
 
                             @if($row->approval_status == 'approved')
 
-                                <span class="badge bg-success">
-                                    Valid
+                                <span class="badge bg-success-subtle text-success-emphasis border border-success-subtle">
+                                    <i class="bi bi-check-circle me-1"></i> Valid
                                 </span>
 
                             @elseif($row->approval_status == 'rejected')
 
-                                <span class="badge bg-danger">
-                                    Ditolak
+                                <span class="badge bg-danger-subtle text-danger-emphasis border border-danger-subtle">
+                                    <i class="bi bi-x-circle me-1"></i> Ditolak
                                 </span>
 
                             @else
 
-                                <span class="badge bg-warning text-dark">
-                                    Validasi
+                                <span class="badge bg-warning-subtle text-warning-emphasis border border-warning-subtle">
+                                    <i class="bi bi-hourglass-split me-1"></i> Validasi
                                 </span>
+
+                            @endif
+
+                        </td>
+
+                        {{-- AKUN --}}
+                        <td>
+
+                            @if($row->approval_status == 'approved')
+
+                                @if(!$row->user)
+
+                                    <form
+                                        action="{{ route('tu.datakepegawaian.create-account', $row->id) }}"
+                                        method="POST"
+                                        class="d-inline">
+
+                                        @csrf
+
+                                        <button class="btn btn-outline-success btn-sm">
+                                            <i class="bi bi-person-plus me-1"></i> Tambah Akun
+                                        </button>
+
+                                    </form>
+
+                                @else
+
+                                    <span class="badge bg-success-subtle text-success-emphasis border border-success-subtle">
+                                        <i class="bi bi-person-check me-1"></i> Sudah Ada Akun
+                                    </span>
+
+                                @endif
+
+                            @else
+
+                                <span class="text-muted small">-</span>
 
                             @endif
 
@@ -142,37 +179,53 @@
                         </td>
 
                         {{-- AKSI --}}
-                        <td class="text-center">
+                        <td>
 
-                            <a href="{{ route('tu.datakepegawaian.show', $row->id) }}"
-                               class="btn btn-sm btn-info text-white px-2">
+                            <div class="dropdown">
 
-                                Detail
+                                <button class="btn btn-sm btn-outline-secondary dropdown-toggle"
+                                        type="button"
+                                        data-bs-toggle="dropdown"
+                                        aria-expanded="false">
 
-                            </a>
-
-                            <a href="{{ route('tu.datakepegawaian.edit', $row->id) }}"
-                               class="btn btn-sm btn-warning px-2">
-
-                                Edit
-
-                            </a>
-
-                            <form action="{{ route('tu.datakepegawaian.destroy', $row->id) }}"
-                                  method="POST"
-                                  class="d-inline"
-                                  onsubmit="return confirm('Hapus data ini?')">
-
-                                @csrf
-                                @method('DELETE')
-
-                                <button class="btn btn-sm btn-danger px-2">
-
-                                    Hapus
+                                    <i class="bi bi-gear-fill"></i>
 
                                 </button>
 
-                            </form>
+                                <ul class="dropdown-menu dropdown-menu-end shadow-sm border-0">
+
+                                    <li>
+                                        <a class="dropdown-item" href="{{ route('tu.datakepegawaian.show', $row->id) }}">
+                                            <i class="bi bi-eye me-2"></i> Detail
+                                        </a>
+                                    </li>
+
+                                    <li>
+                                        <a class="dropdown-item" href="{{ route('tu.datakepegawaian.edit', $row->id) }}">
+                                            <i class="bi bi-pencil-square me-2"></i> Edit
+                                        </a>
+                                    </li>
+
+                                    <li><hr class="dropdown-divider"></li>
+
+                                    <li>
+                                        <form action="{{ route('tu.datakepegawaian.destroy', $row->id) }}"
+                                              method="POST"
+                                              onsubmit="return confirm('Hapus data ini?')">
+
+                                            @csrf
+                                            @method('DELETE')
+
+                                            <button type="submit" class="dropdown-item text-danger">
+                                                <i class="bi bi-trash me-2"></i> Hapus
+                                            </button>
+
+                                        </form>
+                                    </li>
+
+                                </ul>
+
+                            </div>
 
                         </td>
 
@@ -182,7 +235,7 @@
 
                     <tr>
 
-                        <td colspan="6"
+                        <td colspan="7"
                             class="text-center text-muted py-4">
 
                             Belum ada data pegawai

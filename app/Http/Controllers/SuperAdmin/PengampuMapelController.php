@@ -16,7 +16,9 @@ class PengampuMapelController extends Controller
      */
     public function index()
     {
-        $guru = Guru::orderBy('nama')->get();
+        $guru = Guru::with('pegawai')
+    ->get()
+    ->sortBy('pegawai.nama');
 
         $kelas = Kelas::orderBy('nama_kelas')->get();
 

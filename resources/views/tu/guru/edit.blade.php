@@ -50,7 +50,7 @@
                             type="text"
                             name="nama"
                             class="form-control"
-                            value="{{ $guru->nama }}"
+                            value="{{ $guru->pegawai->nama }}"
                             required
                         >
 

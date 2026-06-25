@@ -51,7 +51,7 @@
                                 <div class="small text-muted">
 
                                     Pembina:
-                                    {{ $j->guru->nama }}
+                                    {{ $j->guru->pegawai->nama }}
 
                                 </div>
 

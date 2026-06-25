@@ -72,7 +72,7 @@
                             <tr>
 
                                 <td>
-                                    {{ $item->guru->nama }}
+                                    {{ $item->guru->pegawai->nama }}
                                 </td>
 
                                 <td>

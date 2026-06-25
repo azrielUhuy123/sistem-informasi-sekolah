@@ -306,6 +306,16 @@ Route::middleware([
         Route::patch('/datakepegawaian/{id}/read-message',[DataKepegawaianController::class, 'readMessage'])
             ->name('datakepegawaian.read-message');
 
+        Route::post(
+            '/datakepegawaian/{pegawai}/request-account',
+            [DataKepegawaianController::class, 'requestAccount']
+        )->name('datakepegawaian.request-account');
+
+        Route::post(
+            '/datakepegawaian/{pegawai}/create-account',
+            [DataKepegawaianController::class,'createAccount']
+        )->name('datakepegawaian.create-account');
+
         Route::get('/pengajuan-surat',[PengajuanSuratController::class, 'index'])
             ->name('pengajuan-surat.index');
 

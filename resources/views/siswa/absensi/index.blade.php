@@ -323,7 +323,7 @@
 
                                 <td>
 
-                                    {{ $a->jadwal->guru->nama ?? '-' }}
+                                    {{ $a->jadwal->guru->pegawai->nama ?? '-' }}
 
                                 </td>
 

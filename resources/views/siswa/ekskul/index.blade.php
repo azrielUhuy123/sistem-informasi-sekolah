@@ -92,7 +92,7 @@
 
                                 <td>
 
-                                    {{ $item->ekskul->pembina->guru->nama ?? '-' }}
+                                    {{ $item->ekskul->pembina->guru->pegawai->nama ?? '-' }}
 
                                 </td>
 

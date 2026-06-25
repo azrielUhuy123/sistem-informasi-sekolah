@@ -27,7 +27,7 @@
                 <div class="col-md-3 text-center">
 
                     <img
-                        src="https://ui-avatars.com/api/?name={{ urlencode($guru->nama) }}"
+                        src="https://ui-avatars.com/api/?name={{ urlencode($guru->pegawai->nama) }}"
                         class="rounded-circle border"
                         width="140"
                         height="140"
@@ -46,7 +46,7 @@
                             </label>
 
                             <h5 class="fw-semibold">
-                                {{ $guru->nama }}
+                                {{ $guru->pegawai->nama }}
                             </h5>
 
                         </div>

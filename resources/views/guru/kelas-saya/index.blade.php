@@ -17,7 +17,7 @@
         <small class="text-muted">
 
             Wali Kelas:
-            {{ $waliKelas->guru->nama }}
+            {{ $waliKelas->guru->pegawai->nama }}
 
         </small>
 

@@ -203,7 +203,7 @@
             {{-- WARNING LOGIN GAGAL --}}
             @if ($errors->has('username'))
                 <div class="input-error" style="margin-bottom:16px">
-                    Username atau kata sandi salah
+                    NIP/NIS atau kata sandi salah
                 </div>
             @endif
             <!-- Username -->
@@ -212,7 +212,7 @@
                 type="text"
                 name="username"
                 class="login-input"
-                placeholder="Masukkan NIS/NIP/Username"
+                placeholder="Masukkan NIS atau NIP"
                 value="{{ old('username') }}"
                 required
                 autofocus

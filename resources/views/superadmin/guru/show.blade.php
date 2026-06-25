@@ -20,7 +20,7 @@
 
                             <img
                                 src="{{ asset('foto-guru/' . $guru->foto) }}"
-                                alt="{{ $guru->nama }}"
+                                alt="{{ $guru->pegawai->nama }}"
                                 class="rounded-circle border shadow-sm"
                                 width="90"
                                 height="90"
@@ -32,7 +32,7 @@
                                 class="rounded-circle bg-secondary text-white d-flex align-items-center justify-content-center"
                                 style="width:90px;height:90px;font-size:32px;">
 
-                                {{ strtoupper(substr($guru->nama, 0, 2)) }}
+                                {{ strtoupper(substr($guru->pegawai->nama, 0, 2)) }}
 
                             </div>
 
@@ -41,7 +41,7 @@
                         <div class="ms-3">
 
                             <h4 class="mb-1">
-                                {{ $guru->nama }}
+                                {{ $guru->pegawai->nama }}
                             </h4>
 
                             <div class="text-muted">

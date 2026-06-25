@@ -201,7 +201,7 @@
 
                                                                         <small class="text-muted d-block mt-1">
 
-                                                                            {{ $jadwal->guru->nama }}
+                                                                            {{ $jadwal->guru->pegawai->nama }}
 
                                                                         </small>
 

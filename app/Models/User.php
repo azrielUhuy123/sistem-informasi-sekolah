@@ -19,17 +19,21 @@ class User extends Authenticatable
      * @var list<string>
      */
     protected $fillable = [
-        'name',
-        'email',
+
+        'pegawai_id',
+        'siswa_id',
+
         'username',
         'password',
+
         'role',
-        'is_active',
+
         'approval_status',
         'approved_at',
         'approved_by',
-        'telepon',
-        'alamat',
+
+        'is_active',
+
     ];
 
     /**
@@ -106,11 +110,42 @@ class User extends Authenticatable
         return $this->hasOne(\App\Models\Guru::class);
     }
 
+    public function pegawai()
+    {
+        return $this->belongsTo(
+            DataKepegawaian::class,
+            'pegawai_id'
+        );
+    }
+
     public function siswa()
     {
-        return $this->hasOne(
-            \App\Models\Siswa::class,
-            'user_id'
+        return $this->belongsTo(
+            Siswa::class,
+            'siswa_id'
         );
+    }  
+    public function getNameAttribute()
+    {
+        return $this->pegawai?->nama
+            ?? $this->siswa?->nama;
+    }
+
+    public function getEmailAttribute()
+    {
+        return $this->pegawai?->email
+            ?? $this->siswa?->email;
+    }
+
+    public function getTeleponAttribute()
+    {
+        return $this->pegawai?->telepon
+            ?? $this->siswa?->telepon;
+    }
+
+    public function getAlamatAttribute()
+    {
+        return $this->pegawai?->alamat
+            ?? $this->siswa?->alamat;
     }
 }

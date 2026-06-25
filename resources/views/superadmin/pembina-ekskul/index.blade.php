@@ -158,7 +158,7 @@
 
                                 <td>
 
-                                    {{ $p->guru->nama }}
+                                    {{ $p->guru->pegawai->nama }}
 
                                 </td>
 
