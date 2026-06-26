@@ -101,7 +101,6 @@
                request()->is('tu/guru*') ||
                request()->is('tu/jadwal*') ||
                request()->is('tu/mapel*') ||
-               request()->is('tu/ruangan*') ||
                request()->is('tu/walikelas*')
                ? 'show'
                : '' }}"
@@ -168,17 +167,6 @@
 
         </a>
 
-        <a
-            class="menu-item"
-            href="{{ route('tu.ruangan.index') }}"
-        >
-
-            <div class="menu-left">
-                <i class="bi bi-door-closed"></i>
-                <span>Ruangan</span>
-            </div>
-
-        </a>
 
         <a
             class="menu-item"

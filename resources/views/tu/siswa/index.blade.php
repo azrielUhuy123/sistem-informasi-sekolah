@@ -170,24 +170,24 @@
     {{-- =========================
        TABEL SISWA
     ========================= --}}
-    <div class="card">
+    <div class="card border-0 shadow-sm">
         <div class="card-body">
 
-            <table class="table table-hover table-sm align-middle">
+            <table class="table align-middle">
 
-                <thead class="table-light">
+                <thead>
                     <tr>
-                        <th width="40">
+                        <th>
                             <input type="checkbox" id="selectAll">
                         </th>
-                        <th width="60">#</th>
+                        <th>No</th>
                         <th>Nama</th>
-                        <th width="120">NIS</th>
-                        <th width="120">NISN</th>
-                        <th width="120">Rombel</th>
-                        <th width="120">Angkatan</th>
-                        <th width="100">Status</th>
-                        <th width="160">Aksi</th>
+                        <th>NIS</th>
+                        <th>NISN</th>
+                        <th>Rombel</th>
+                        <th>Angkatan</th>
+                        <th>Status</th>
+                        <th>Aksi</th>
                     </tr>
                 </thead>
 
@@ -224,11 +224,15 @@
                             <td>
                                 @if($row->trashed())
 
-                                <span class="badge bg-secondary">Nonaktif</span>
+                                <span class="badge bg-danger-subtle text-danger-emphasis border border-danger-subtle">
+                                    <i class="bi bi-x-circle me-1"></i> Nonaktif
+                                </span>
 
                                 @else
 
-                                <span class="badge bg-success">Aktif</span>
+                                <span class="badge bg-success-subtle text-success-emphasis border border-success-subtle">
+                                    <i class="bi bi-check-circle me-1"></i> Aktif
+                                </span>
 
                                 @endif
                             </td>
@@ -236,15 +240,34 @@
                             {{-- AKSI --}}
                             <td>
 
-                                <a href="{{ route('tu.siswa.show', $row->id) }}"
-                                   class="btn btn-sm btn-info">
-                                    Detail
-                                </a>
+                                <div class="dropdown">
 
-                                <a href="{{ route('tu.siswa.edit', $row->id) }}"
-                                   class="btn btn-sm btn-warning">
-                                    Edit
-                                </a>
+                                    <button class="btn btn-sm btn-outline-secondary dropdown-toggle"
+                                            type="button"
+                                            data-bs-toggle="dropdown"
+                                            aria-expanded="false">
+
+                                        <i class="bi bi-gear-fill"></i>
+
+                                    </button>
+
+                                    <ul class="dropdown-menu dropdown-menu-end shadow-sm border-0">
+
+                                        <li>
+                                            <a class="dropdown-item" href="{{ route('tu.siswa.show', $row->id) }}">
+                                                <i class="bi bi-eye me-2"></i> Detail
+                                            </a>
+                                        </li>
+
+                                        <li>
+                                            <a class="dropdown-item" href="{{ route('tu.siswa.edit', $row->id) }}">
+                                                <i class="bi bi-pencil-square me-2"></i> Edit
+                                            </a>
+                                        </li>
+
+                                    </ul>
+
+                                </div>
 
                                 
 

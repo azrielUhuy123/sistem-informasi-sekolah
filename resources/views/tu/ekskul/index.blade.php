@@ -4,14 +4,14 @@
 
 @section('content')
 
-<div class="container-fluid py-4">
+<div class="container-fluid">
 
     {{-- HEADER --}}
     <div class="d-flex justify-content-between align-items-center mb-4">
 
         <div>
 
-            <h3 class="fw-bold mb-1">
+            <h3 class="fw-bold mb-0">
 
                 Manajemen Ekskul
 
@@ -43,17 +43,15 @@
 
         <div class="card-body">
 
-            <div class="table-responsive">
-
                 <table
                     class="table align-middle"
                 >
 
-                    <thead class="table-light">
+                    <thead>
 
                         <tr>
 
-                            <th width="70">
+                            <th>
 
                                 No
 
@@ -95,7 +93,7 @@
 
                             </th>
 
-                            <th width="180">
+                            <th>
 
                                 Aksi
 
@@ -163,18 +161,14 @@
 
                                     @if($e->status == 'aktif')
 
-                                        <span class="badge bg-success">
-
-                                            Aktif
-
+                                        <span class="badge bg-success-subtle text-success-emphasis border border-success-subtle">
+                                            <i class="bi bi-check-circle me-1"></i> Aktif
                                         </span>
 
                                     @else
 
-                                        <span class="badge bg-secondary">
-
-                                            Nonaktif
-
+                                        <span class="badge bg-danger-subtle text-danger-emphasis border border-danger-subtle">
+                                            <i class="bi bi-x-circle me-1"></i> Nonaktif
                                         </span>
 
                                     @endif
@@ -183,37 +177,43 @@
 
                                 <td>
 
-                                    <div class="d-flex gap-2">
+                                    <div class="dropdown">
 
-                                        {{-- EDIT --}}
-                                        <a
-                                            href="{{ route('tu.ekskul.edit', $e->id) }}"
-                                            class="btn btn-sm btn-warning"
-                                        >
+                                        <button class="btn btn-sm btn-outline-secondary dropdown-toggle"
+                                                type="button"
+                                                data-bs-toggle="dropdown"
+                                                aria-expanded="false">
 
-                                            Edit
+                                            <i class="bi bi-gear-fill"></i>
 
-                                        </a>
+                                        </button>
 
-                                        {{-- DELETE --}}
-                                        <form
-                                            action="{{ route('tu.ekskul.destroy', $e->id) }}"
-                                            method="POST"
-                                            onsubmit="return confirm('Hapus ekskul ini?')"
-                                        >
+                                        <ul class="dropdown-menu dropdown-menu-end shadow-sm border-0">
 
-                                            @csrf
-                                            @method('DELETE')
+                                            <li>
+                                                <a class="dropdown-item" href="{{ route('tu.ekskul.edit', $e->id) }}">
+                                                    <i class="bi bi-pencil-square me-2"></i> Edit
+                                                </a>
+                                            </li>
 
-                                            <button
-                                                class="btn btn-sm btn-danger"
-                                            >
+                                            <li><hr class="dropdown-divider"></li>
 
-                                                Hapus
+                                            <li>
+                                                <form action="{{ route('tu.ekskul.destroy', $e->id) }}"
+                                                    method="POST"
+                                                    onsubmit="return confirm('Hapus data ini?')">
 
-                                            </button>
+                                                    @csrf
+                                                    @method('DELETE')
 
-                                        </form>
+                                                    <button type="submit" class="dropdown-item text-danger">
+                                                        <i class="bi bi-trash me-2"></i> Hapus
+                                                    </button>
+
+                                                </form>
+                                            </li>
+
+                                        </ul>
 
                                     </div>
 
@@ -241,8 +241,6 @@
                     </tbody>
 
                 </table>
-
-            </div>
 
         </div>
 

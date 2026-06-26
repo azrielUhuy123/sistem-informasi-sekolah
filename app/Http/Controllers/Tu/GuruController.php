@@ -12,21 +12,25 @@ use Illuminate\Support\Facades\Hash;
 
 class GuruController extends Controller
 {
-    public function index(Request $request)
+    public function index()
     {
-        $guru = Guru::with('mapels')->paginate(10);
+        $gurus = Guru::with([
+            'waliKelas.kelas',
+            'mapels'
+        ])
+        ->latest()
+        ->get();
 
-        return view('tu.guru.index', compact('guru'));
+        return view(
+            'tu.guru.index',
+            compact('gurus')
+        );
     }
 
-    public function create()
+    public function show($id)
     {
-        // ambil mapel unik biar tidak double fase
-        $mapel = MataPelajaran::all()
-            ->unique('kode_mapel')
-            ->values();
-
-        return view('tu.guru.create', compact('mapel'));
+        $pegawai = Guru::findOrFail($id);
+        return view('tu.guru.show', compact('pegawai'));
     }
 
     public function store(Request $request)
@@ -138,13 +142,6 @@ class GuruController extends Controller
 
         return redirect()->route('tu.guru.index')
             ->with('success', 'Data guru berhasil diupdate');
-    }
-
-    public function show($id)
-    {
-        $guru = Guru::with('mapels')->findOrFail($id);
-
-        return view('tu.guru.show', compact('guru'));
     }
 
     public function destroy($id)

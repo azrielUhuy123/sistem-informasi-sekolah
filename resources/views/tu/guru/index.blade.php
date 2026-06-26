@@ -1,105 +1,136 @@
 @extends('layouts.app')
 
-@section('title', 'Manajemen Data Guru')
+@section('title', 'Guru & Wali Kelas')
 
 @section('content')
 
-<div class="container-fluid">
+<div class="container-fluid py-3">
 
-    {{-- HEADER --}}
-    <div class="d-flex justify-content-between align-items-center mb-3">
-        <div>
-            <h4 class="fw-bold mb-0">Manajemen Data Guru</h4>
-            <small class="text-muted">Kelola data guru</small>
-        </div>
+    <h4 class="fw-bold mb-4">
+        Guru & Wali Kelas
+    </h4>
 
-        <a href="{{ route('tu.guru.create') }}" class="btn btn-primary btn-sm">
-            + Tambah
-        </a>
-    </div>
+    <div class="card shadow-sm border-0">
 
-    {{-- TABEL --}}
-    <div class="card">
         <div class="card-body">
 
-            <table class="table table-hover table-sm align-middle">
+            <table class="table align-middle">
 
-                <thead class="table-light">
+                <thead>
                     <tr>
-                        <th width="40">
-                            <input type="checkbox" id="selectAll">
-                        </th>
-                        <th width="150">No</th>
                         <th>Nama Guru</th>
-                        <th width="300" class="text-start">NIP</th>
-                        <th width="250" class="text-start">Aksi</th>
+                        <th>Status Akademik</th>
+                        <th>Mata Pelajaran</th>
+                        <th>Kelas</th>
+                        <th width="100">Aksi</th>
                     </tr>
                 </thead>
 
                 <tbody>
 
-                    @forelse ($guru as $row)
+                    @foreach($gurus as $guru)
 
                         <tr>
+
                             <td>
-                                <input type="checkbox" class="row-checkbox">
+                                {{ $guru->pegawai->nama }}
                             </td>
 
-                            <td>{{ $loop->iteration }}</td>
-
-                            <td>{{ $row->nama }}</td>
-
-                            <td>{{ $row->nip }}</td>
-
-                            {{-- AKSI --}}
                             <td>
 
-                                <a href="{{ route('tu.guru.show', $row->id) }}"
-                                   class="btn btn-sm btn-info">
+                                @if($guru->waliKelas)
+
+                                    <span class="badge bg-primary">
+                                        Wali Kelas
+                                    </span>
+
+                                @else
+
+                                    <span class="badge bg-secondary">
+                                        Guru Bidang
+                                    </span>
+
+                                @endif
+
+                            </td>
+
+                            <td>
+
+                                @if($guru->waliKelas)
+
+                                    @php
+
+                                        $mapelInti = [
+                                            'Bahasa Indonesia',
+                                            'Matematika',
+                                            'Pendidikan Pancasila',
+                                            'Ilmu Pengetahuan Alam dan Sosial',
+                                        ];
+
+                                    @endphp
+
+                                    @foreach($mapelInti as $mapel)
+
+                                        <span class="badge bg-light text-dark border">
+
+                                            {{ $mapel }}
+
+                                        </span>
+
+                                    @endforeach
+
+                                @else
+
+                                    @forelse($guru->mapels as $mapel)
+
+                                        <span class="badge bg-light text-dark border">
+
+                                            {{ $mapel->nama_mapel }}
+
+                                        </span>
+
+                                    @empty
+
+                                        <span class="text-muted">
+                                            Belum ada mapel
+                                        </span>
+
+                                    @endforelse
+
+                                @endif
+
+                            </td>
+
+                            <td>
+
+                                @if($guru->waliKelas)
+
+                                    {{ $guru->waliKelas->kelas->nama_kelas }}
+
+                                @else
+
+                                    -
+
+                                @endif
+
+                            </td>
+
+                            <td>
+                                <a href="{{ route('tu.guru.show', $guru) }}"
+                                class="btn btn-sm btn-dark">
                                     Detail
                                 </a>
-
-                                <a href="{{ route('tu.guru.edit', $row->id) }}"
-                                   class="btn btn-sm btn-warning">
-                                    Edit
-                                </a>
-
-                                <form action="{{ route('tu.guru.destroy', $row->id) }}"
-                                      method="POST"
-                                      class="d-inline"
-                                      onsubmit="return confirm('Yakin hapus data?')">
-                                    @csrf
-                                    @method('DELETE')
-
-                                    <button class="btn btn-sm btn-danger">
-                                        Hapus
-                                    </button>
-                                </form>
-
-                            </td>
-
-                        </tr>
-
-                    @empty
-
-                        <tr>
-                            <td colspan="5" class="text-center text-muted">
-                                Tidak ada data guru
                             </td>
                         </tr>
 
-                    @endforelse
+                    @endforeach
 
                 </tbody>
 
             </table>
 
-            {{-- PAGINATION --}}
-            <div class="mt-3">
-                {{ $guru->links() }}
-            </div>
-
         </div>
+
     </div>
 
 </div>

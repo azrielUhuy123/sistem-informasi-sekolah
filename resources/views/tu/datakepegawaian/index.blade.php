@@ -11,7 +11,7 @@
     <div class="d-flex gap-2">
 
         <a href="{{ route('tu.datakepegawaian.create') }}"
-           class="btn btn-primary">
+           class="btn btn-dark">
 
             + Tambah Pegawai
 
@@ -52,7 +52,7 @@
 
 @endif
 
-<div class="card">
+<div class="card border-0 shadow-sm">
 
     <div class="card-body">
 
