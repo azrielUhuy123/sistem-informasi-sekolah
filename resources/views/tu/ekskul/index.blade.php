@@ -38,6 +38,30 @@
 
     </div>
 
+    {{-- ALERT SUCCESS --}}
+    @if(session('success'))
+
+        <div class="alert alert-success border-0 shadow-sm">
+
+            <i class="bi bi-check-circle-fill me-2"></i>
+            {{ session('success') }}
+
+        </div>
+
+    @endif
+
+    {{-- ALERT ERROR --}}
+    @if(session('error'))
+
+        <div class="alert alert-danger border-0 shadow-sm">
+
+            <i class="bi bi-exclamation-circle-fill me-2"></i>
+            {{ session('error') }}
+
+        </div>
+
+    @endif
+
     {{-- TABLE --}}
     <div class="card border-0 shadow-sm">
 
@@ -117,17 +141,17 @@
 
                                 <td>
 
-                                    <div class="fw-semibold">
+                                    <div class="badge bg-primary">
 
                                         {{ $e->nama }}
 
                                     </div>
 
-                                    <small class="text-muted">
+                                    <div class="badge bg-light text-dark border">
 
                                         {{ Str::limit($e->deskripsi, 50) }}
 
-                                    </small>
+                                    </div>
 
                                 </td>
 
@@ -138,8 +162,11 @@
                                 </td>
 
                                 <td>
+                                    <span class="badge bg-light text-dark border">
 
-                                    {{ $e->hari ?? '-' }}
+                                        {{ $e->hari ?? '-' }}
+
+                                    </span>
 
                                 </td>
 

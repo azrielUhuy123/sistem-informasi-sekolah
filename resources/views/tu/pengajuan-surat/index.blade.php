@@ -6,37 +6,92 @@
 
 <div class="container-fluid">
 
+    {{-- HEADER --}}
+
     <div class="d-flex justify-content-between align-items-center mb-4">
-
         <div>
+            <h4 class="fw-bold mb-0">Pengajuan Surat</h4>
+            <small class="text-muted">Kelola pengajuan Surat atau Laporan untuk divalidasi kepala sekolah</small>
+        </div>
 
-            <h4 class="fw-bold mb-1">
-                Pengajuan Surat
-            </h4>
+        <a href="{{ route('tu.pengajuan-surat.create') }}" 
+           class="btn btn-dark">
+            <i class="bi bi-plus-lg me-1"></i>
+            Tambah Pengajuan
+        </a>
+    </div>
 
-            <p class="text-muted mb-0">
-                Kelola pengajuan Surat atau Laporan untuk divalidasi kepala sekolah
-            </p>
+    {{-- ALERT SUCCESS --}}
+    @if(session('success'))
+
+        <div class="alert alert-success border-0 shadow-sm">
+
+            <i class="bi bi-check-circle-fill me-2"></i>
+            {{ session('success') }}
 
         </div>
 
-        <a href="{{ route('tu.pengajuan-surat.create') }}"
-           class="btn btn-primary rounded-3">
+    @endif
 
-            <i class="bi bi-plus-circle"></i>
-            Buat Pengajuan
+    {{-- ALERT ERROR --}}
+    @if(session('error'))
 
-        </a>
+        <div class="alert alert-danger border-0 shadow-sm">
 
-    </div>
+            <i class="bi bi-exclamation-circle-fill me-2"></i>
+            {{ session('error') }}
 
-    <div class="card border-0 shadow-sm rounded-4">
+        </div>
+
+    @endif
+
+    {{-- CARD --}}
+
+    <div class="card border-0 shadow-sm">
+
+        {{-- TOP BAR --}}
+        <div
+            class="card-header bg-light border-0 p-4"
+        >
+
+            <div
+                class="d-flex justify-content-between align-items-center flex-wrap gap-3"
+            >
+
+                <div>
+
+                    <h5 class="fw-semibold mb-1">
+                        Daftar Pengajuan Surat
+                    </h5>
+
+                    <span class="text-muted small">
+                        Total:
+                        {{ $pengajuan->count() }}
+                        pengajuan   
+                    </span>
+
+                </div>
+
+                <div style="max-width: 280px; width:100%;">
+
+                    <input
+                        type="text"
+                        id="searchInput"
+                        class="form-control rounded-3"
+                        placeholder="Cari dokumen..."
+                    >
+
+                </div>
+
+            </div>
+
+        </div>
 
         <div class="card-body">
 
             <table class="table align-middle">
 
-                <thead class="table-light">
+                <thead>
 
                     <tr>
 
@@ -50,7 +105,7 @@
 
                 </thead>
 
-                <tbody>
+                <tbody id="tablePengajuan">
 
                     @forelse($pengajuan as $row)
 
@@ -65,33 +120,29 @@
                             </td>
 
                             <td>
-                                {{ $row->kategori_surat }}
+                                <span class="badge bg-light text-dark border">
+                                    {{ $row->kategori_surat }}
+                                </span>
                             </td>
 
                             <td>
 
                                 @if($row->status == 'draft')
 
-                                    <span class="badge bg-secondary">
-
-                                        Draft
-
+                                    <span class="badge bg-warning-subtle text-warning-emphasis border border-warning-subtle">
+                                        <i class="bi bi-hourglass-split me-1"></i> Validasi
                                     </span>
 
                                 @elseif($row->status == 'disetujui')
 
-                                    <span class="badge bg-success">
-
-                                        Valid
-
+                                    <span class="badge bg-success-subtle text-success-emphasis border border-success-subtle">
+                                        <i class="bi bi-check-circle me-1"></i> Valid
                                     </span>
 
                                 @else
 
-                                    <span class="badge bg-danger">
-
-                                        Ditolak
-
+                                    <span class="badge bg-danger-subtle text-danger-emphasis border border-danger-subtle">
+                                        <i class="bi bi-x-circle me-1"></i> Ditolak
                                     </span>
 
                                 @endif
@@ -99,35 +150,49 @@
                             </td>
 
                             <td>
-                                <div class="d-flex gap-2">
+                                <div class="dropdown">
 
-                                    {{-- DETAIL --}}
-                                    <a href="{{ route('tu.pengajuan-surat.show', $row->id) }}"
-                                    class="btn btn-primary btn-sm rounded-3">
-                                        Detail
-                                    </a>
+                                    <button class="btn btn-sm btn-outline-secondary dropdown-toggle"
+                                            type="button"
+                                            data-bs-toggle="dropdown"
+                                            aria-expanded="false">
 
-                                    {{-- EDIT --}}
-                                    <a href="{{ route('tu.pengajuan-surat.edit', $row->id) }}"
-                                    class="btn btn-warning btn-sm rounded-3">
-                                        Edit
-                                    </a>
+                                        <i class="bi bi-gear-fill"></i>
 
-                                    {{-- DELETE --}}
-                                    <form action="{{ route('tu.pengajuan-surat.destroy', $row->id) }}"
-                                        method="POST"
-                                        onsubmit="return confirm('Yakin ingin menghapus ajuan ini?')">
+                                    </button>
 
-                                        @csrf
-                                        @method('DELETE')
+                                    <ul class="dropdown-menu dropdown-menu-end shadow-sm border-0">
 
-                                        <button class="btn btn-danger btn-sm rounded-3">
+                                        <li>
+                                            <a class="dropdown-item" href="{{ route('tu.pengajuan-surat.show', $row->id) }}">
+                                                <i class="bi bi-eye me-2"></i> Detail
+                                            </a>
+                                        </li>
 
-                                            Hapus
+                                        <li>
+                                            <a class="dropdown-item" href="{{ route('tu.pengajuan-surat.edit', $row->id) }}">
+                                                <i class="bi bi-pencil-square me-2"></i> Edit
+                                            </a>
+                                        </li>
 
-                                        </button>
+                                        <li><hr class="dropdown-divider"></li>
 
-                                    </form>
+                                        <li>
+                                            <form action="{{ route('tu.pengajuan-surat.destroy', $row->id) }}"
+                                                method="POST"
+                                                onsubmit="return confirm('Hapus data ini?')">
+
+                                                @csrf
+                                                @method('DELETE')
+
+                                                <button type="submit" class="dropdown-item text-danger">
+                                                    <i class="bi bi-trash me-2"></i> Hapus
+                                                </button>
+
+                                            </form>
+                                        </li>
+
+                                    </ul>
 
                                 </div>
 
@@ -159,5 +224,34 @@
     </div>
 
 </div>
+{{-- SEARCH --}}
+<script>
 
+    const searchInput =
+        document.getElementById('searchInput');
+
+    searchInput.addEventListener('keyup', function () {
+
+        const keyword =
+            this.value.toLowerCase();
+
+        const rows =
+            document.querySelectorAll(
+                '#tablePengajuan tr'
+            );
+
+        rows.forEach(row => {
+
+            const text =
+                row.innerText.toLowerCase();
+
+            row.style.display =
+                text.includes(keyword)
+                ? ''
+                : 'none';
+
+        });
+    });
+
+</script>
 @endsection

@@ -8,25 +8,16 @@
 
     {{-- HEADER --}}
     <div class="d-flex justify-content-between align-items-center mb-4">
-
         <div>
-            <h3 class="fw-bold mb-1">
-                Template Dokumen Sekolah
-            </h3>
-
-            <p class="text-muted mb-0">
-                Kelola Template dokumen internal sekolah yang dapat diakses oleh guru dan kepsek
-            </p>
+            <h4 class="fw-bold mb-0">Manajemen Dokumen Sekolah</h4>
+            <small class="text-muted">Kelola Template dokumen internal sekolah yang dapat diakses oleh guru dan kepsek</small>
         </div>
 
-        <a href="{{ route('tu.dokumen.create', 'sekolah') }}"
-           class="btn btn-primary shadow-sm">
-
-            <i class="bi bi-plus-circle me-1"></i>
+        <a href="{{ route('tu.dokumen.create', 'sekolah') }}" 
+           class="btn btn-dark">
+            <i class="bi bi-plus-lg me-1"></i>
             Tambah Surat
-
         </a>
-
     </div>
 
     {{-- ALERT SUCCESS --}}
@@ -54,31 +45,71 @@
     @endif
 
     {{-- CARD --}}
-    <div class="card border-0 shadow-sm rounded-4">
+    <div class="card border-0 shadow-sm">
 
-        <div class="card-body p-0">
+        {{-- TOP BAR --}}
+        <div
+            class="card-header bg-light border-0 p-4"
+        >
 
-            <div class="table-responsive">
+            <div
+                class="d-flex justify-content-between align-items-center flex-wrap gap-3"
+            >
 
-                <table class="table align-middle mb-0">
+                <div>
 
-                    <thead class="bg-dark text-white">
+                    <h5 class="fw-semibold mb-1">
+                        Daftar Dokumen
+                    </h5>
+
+                    <span class="text-muted small">
+                        Total:
+                        {{ $dokumen->count() }}
+                        dokumen
+                    </span>
+
+                </div>
+
+                <div style="max-width: 280px; width:100%;">
+
+                    <input
+                        type="text"
+                        id="searchInput"
+                        class="form-control rounded-3"
+                        placeholder="Cari dokumen..."
+                    >
+
+                </div>
+
+            </div>
+
+        </div>
+
+        <div class="card-body">
+
+                <table class="table align-middle">
+
+                    <thead>
 
                         <tr>
 
-                            <th width="6%" class="ps-4 py-3">
+                            <th>
                                 No
                             </th>
 
-                            <th class="py-3">
+                            <th>
                                 Nama Dokumen
                             </th>
 
-                            <th class="py-3">
+                            <th>
                                 Kategori
                             </th>
 
-                            <th width="18%" class="text-center py-3">
+                            <th>
+                                Preview
+                            </th>
+
+                            <th>
                                 Aksi
                             </th>
 
@@ -86,31 +117,27 @@
 
                     </thead>
 
-                    <tbody>
+                    <tbody id="tableDokumen">
 
                         @forelse($dokumen as $row)
 
                             <tr>
 
                                 {{-- NOMOR --}}
-                                <td class="ps-4 fw-semibold text-muted">
+                                <td>
                                     {{ $loop->iteration }}
                                 </td>
 
                                 {{-- NAMA SURAT --}}
                                 
                                 <td>
-
-                                    <div class="fw-semibold text-dark">
-                                        {{ $row->nama_surat }}
-                                    </div>
-
+                                    {{ $row->nama_surat }}
                                 </td>
 
                                 {{-- KATEGORI --}}
-                                <td class="align-middle">
+                                <td>
 
-                                    <span class="badge bg-light text-dark border px-3 py-2 rounded-pill">
+                                    <span class="badge bg-light text-dark border">
 
                                         {{ $row->kategori_surat }}
 
@@ -118,47 +145,84 @@
 
                                 </td>
 
+                                {{-- PREVIEW --}}   
+
+                                <td>
+
+                                    @if(
+                                        pathinfo(
+                                            $row->file,
+                                            PATHINFO_EXTENSION
+                                        ) === 'pdf'
+                                    )
+
+                                        <a
+                                            href="{{ asset('uploads/dokumen/' . $row->file) }}"
+                                            target="_blank"
+                                            class="btn btn-light border rounded-3 btn-sm px-3"
+                                        >
+
+                                            <i class="bi bi-eye"></i>
+
+                                        </a>
+
+                                    @else
+
+                                        <span class="text-muted small">
+                                            Preview hanya untuk PDF
+                                        </span>
+
+                                    @endif
+
+                                </td>
+
                                 {{-- AKSI --}}
-                                <td class="text-center">
+                                <td>
 
-                                    <div class="d-flex justify-content-center gap-2">
+                                    <div class="dropdown">
 
-                                        {{-- DOWNLOAD --}}
-                                        <a href="{{ asset('uploads/dokumen/' . $row->file) }}"
-                                           download
-                                           class="btn btn-sm btn-success shadow-sm"
-                                           title="Download">
+                                        <button class="btn btn-sm btn-outline-secondary dropdown-toggle"
+                                                type="button"
+                                                data-bs-toggle="dropdown"
+                                                aria-expanded="false">
 
-                                            <i class="bi bi-download"></i>
+                                            <i class="bi bi-gear-fill"></i>
 
-                                        </a>
+                                        </button>
 
-                                        {{-- EDIT --}}
-                                        <a href="{{ route('tu.dokumen.edit', $row->id) }}"
-                                           class="btn btn-sm btn-warning shadow-sm"
-                                           title="Edit">
+                                        <ul class="dropdown-menu dropdown-menu-end shadow-sm border-0">
 
-                                            <i class="bi bi-pencil-square"></i>
+                                            <li>
+                                                <a class="dropdown-item" href="{{ asset('uploads/dokumen/' . $row->file) }}" download>
+                                                    <i class="bi bi-download me-2"></i> Download
+                                                </a>
+                                            </li>
 
-                                        </a>
+                                            
+                                            
+                                            <li>
+                                                <a class="dropdown-item" href="{{ route('tu.dokumen.edit', $row->id) }}">
+                                                    <i class="bi bi-pencil-square me-2"></i> Edit
+                                                </a>
+                                            </li>
+                                            <li><hr class="dropdown-divider"></li>
 
-                                        {{-- DELETE --}}
-                                        <form action="{{ route('tu.dokumen.destroy', $row->id) }}"
-                                              method="POST"
-                                              onsubmit="return confirm('Hapus dokumen ini?')">
+                                            <li>
+                                                <form action="{{ route('tu.dokumen.destroy', $row->id) }}"
+                                                    method="POST"
+                                                    onsubmit="return confirm('Hapus data ini?')">
 
-                                            @csrf
-                                            @method('DELETE')
+                                                    @csrf
+                                                    @method('DELETE')
 
-                                            <button type="submit"
-                                                    class="btn btn-sm btn-danger shadow-sm"
-                                                    title="Hapus">
+                                                    <button type="submit" class="dropdown-item text-danger">
+                                                        <i class="bi bi-trash me-2"></i> Hapus
+                                                    </button>
 
-                                                <i class="bi bi-trash"></i>
+                                                </form>
+                                            </li>
 
-                                            </button>
-
-                                        </form>
+                                        </ul>
 
                                     </div>
 
@@ -170,7 +234,7 @@
 
                             <tr>
 
-                                <td colspan="4"
+                                <td colspan="5"
                                     class="text-center py-5">
 
                                     <div class="d-flex flex-column align-items-center">
@@ -198,12 +262,40 @@
 
                 </table>
 
-            </div>
-
         </div>
 
     </div>
 
 </div>
+{{-- SEARCH --}}
+<script>
+
+    const searchInput =
+        document.getElementById('searchInput');
+
+    searchInput.addEventListener('keyup', function () {
+
+        const keyword =
+            this.value.toLowerCase();
+
+        const rows =
+            document.querySelectorAll(
+                '#tableDokumen tr'
+            );
+
+        rows.forEach(row => {
+
+            const text =
+                row.innerText.toLowerCase();
+
+            row.style.display =
+                text.includes(keyword)
+                ? ''
+                : 'none';
+
+        });
+    });
+
+</script>
 
 @endsection

@@ -168,8 +168,19 @@ class DokumenController extends Controller
         $dokumen->kategori_surat = $request->kategori_surat;
 
         $dokumen->save();
+        
+        if ($dokumen->jenis_dokumen == 'sekolah') {
 
-        return redirect()->back()
-            ->with('success', 'Dokumen berhasil diperbarui');
+            return redirect()
+                ->route('tu.dokumen.sekolah')
+                ->with('success', 'Dokumen sekolah berhasil diperbarui');
+
+        } else {
+
+            return redirect()
+                ->route('tu.dokumen.siswa')
+                ->with('success', 'Dokumen siswa berhasil diperbarui');
+
+        }
     }
 }

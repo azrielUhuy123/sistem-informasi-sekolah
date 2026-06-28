@@ -4,6 +4,8 @@ namespace App\Http\Controllers\TU;
 
 use App\Http\Controllers\Controller;
 use App\Models\NomorSurat;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 
 class NomorSuratTuController extends Controller
 {
@@ -16,7 +18,7 @@ class NomorSuratTuController extends Controller
     {
         $nomorSurat = NomorSurat::where(
                 'user_id',
-                auth()->id()
+                Auth::id()
             )
             ->latest()
             ->get();
@@ -98,9 +100,9 @@ class NomorSuratTuController extends Controller
         */
         NomorSurat::create([
 
-            'user_id' => auth()->id(),
+            'user_id' => Auth::id(),
 
-            'pengirim' => auth()->user()->role,
+            'pengirim' => Auth::user()->role,
 
             'nomor_surat' => $nomorSurat,
 

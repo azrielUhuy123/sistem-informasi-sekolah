@@ -6,7 +6,7 @@
 
 <div class="d-flex justify-content-between align-items-center mb-4">
 
-    <h1>Data Kepegawaian</h1>
+    <h4 class="fw-bold mb-0">Data Kepegawaian</h4>
 
     <div class="d-flex gap-2">
 
@@ -42,17 +42,69 @@
 
 </div>
 
-@if(session('success'))
+{{-- ALERT SUCCESS --}}
+    @if(session('success'))
 
-    <div class="alert alert-success">
+        <div class="alert alert-success border-0 shadow-sm">
 
-        {{ session('success') }}
+            <i class="bi bi-check-circle-fill me-2"></i>
+            {{ session('success') }}
 
-    </div>
+        </div>
 
-@endif
+    @endif
+
+    {{-- ALERT ERROR --}}
+    @if(session('error'))
+
+        <div class="alert alert-danger border-0 shadow-sm">
+
+            <i class="bi bi-exclamation-circle-fill me-2"></i>
+            {{ session('error') }}
+
+        </div>
+
+    @endif
 
 <div class="card border-0 shadow-sm">
+
+    {{-- TOP BAR --}}
+        <div
+            class="card-header bg-light border-0 p-4"
+        >
+
+            <div
+                class="d-flex justify-content-between align-items-center flex-wrap gap-3"
+            >
+
+                <div>
+
+                    <h5 class="fw-semibold mb-1">
+                        Daftar Pegawai
+                    </h5>
+
+                    <span class="text-muted small">
+                        Total:
+                        {{ $data->count() }}
+                        pegawai
+                    </span>
+
+                </div>
+
+                <div style="max-width: 280px; width:100%;">
+
+                    <input
+                        type="text"
+                        id="searchInput"
+                        class="form-control rounded-3"
+                        placeholder="Cari pegawai..."
+                    >
+
+                </div>
+
+            </div>
+
+        </div>
 
     <div class="card-body">
 
@@ -74,7 +126,7 @@
 
             </thead>
 
-            <tbody>
+            <tbody id="tablePegawai">
 
                 @forelse($data as $row)
 
@@ -527,5 +579,37 @@ document.addEventListener('DOMContentLoaded', function () {
 });
 
 </script>
+
+{{-- SEARCH --}}
+<script>
+
+    const searchInput =
+        document.getElementById('searchInput');
+
+    searchInput.addEventListener('keyup', function () {
+
+        const keyword =
+            this.value.toLowerCase();
+
+        const rows =
+            document.querySelectorAll(
+                '#tablePegawai tr'
+            );
+
+        rows.forEach(row => {
+
+            const text =
+                row.innerText.toLowerCase();
+
+            row.style.display =
+                text.includes(keyword)
+                ? ''
+                : 'none';
+
+        });
+    });
+
+</script>
+
 
 @endpush

@@ -62,18 +62,6 @@
 
         </a>
 
-        <a
-            class="menu-item"
-            href="{{ route('tu.penempatan-siswa.naik-kelas.index') }}"
-        >
-
-            <div class="menu-left">
-                <i class="bi bi-arrow-up-circle"></i>
-                <span>Naik Kelas</span>
-            </div>
-
-        </a>
-
     </div>
 
     {{-- MANAJEMEN SEKOLAH --}}
@@ -99,7 +87,7 @@
             {{ request()->is('tu/kelas*') ||
                request()->is('tu/siswa*') ||
                request()->is('tu/guru*') ||
-               request()->is('tu/jadwal*') ||
+               request()->is('tu/jadwal-final*') ||
                request()->is('tu/mapel*') ||
                request()->is('tu/walikelas*')
                ? 'show'
@@ -143,17 +131,6 @@
 
         </a>
 
-        <a
-            class="menu-item"
-            href="{{ route('tu.jadwal.index') }}"
-        >
-
-            <div class="menu-left">
-                <i class="bi bi-calendar-week"></i>
-                <span>Jadwal</span>
-            </div>
-
-        </a>
 
         <a
             class="menu-item"
@@ -166,7 +143,6 @@
             </div>
 
         </a>
-
 
         <a
             class="menu-item"
@@ -182,6 +158,23 @@
             </div>
 
         </a>
+        
+        <a
+            class="menu-item"
+            href="{{ route('tu.jadwal-final.index') }}"
+        >
+
+            <div class="menu-left">
+                <i class="bi bi-calendar-week"></i>
+                <span>Jadwal</span>
+            </div>
+
+        </a>
+
+        
+
+
+        
 
     </div>
 

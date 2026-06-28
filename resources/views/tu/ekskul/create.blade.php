@@ -79,7 +79,7 @@
                                     value="{{ $g->id }}"
                                 >
 
-                                    {{ $g->nama }}
+                                    {{ $g->pegawai->nama }}
 
                                 </option>
 

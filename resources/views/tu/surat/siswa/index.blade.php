@@ -7,33 +7,19 @@
 <div class="container-fluid">
 
     {{-- HEADER --}}
-    <div
-        class="d-flex justify-content-between align-items-center mb-4"
-    >
-
+    <div class="d-flex justify-content-between align-items-center mb-4">
         <div>
-
-            <h2 class="fw-bold mb-1">
-                Dokumen Siswa
-            </h2>
-
-            <p class="text-muted mb-0">
-                Kelola seluruh dokumen siswa dengan mudah
-            </p>
-
+            <h4 class="fw-bold mb-0">Manajemen Dokumen Siswa</h4>
+            <small class="text-muted">Kelola seluruh dokumen siswa dengan mudah</small>
         </div>
 
-        <a
-            href="{{ route('tu.dokumen.create', 'siswa') }}"
-            class="btn btn-primary rounded-3 px-4 py-2 shadow-sm"
-        >
-
-            <i class="bi bi-plus-circle me-1"></i>
-            Tambah Dokumen
-
+        <a href="{{ route('tu.dokumen.create', 'siswa') }}" 
+           class="btn btn-dark">
+            <i class="bi bi-plus-lg me-1"></i>
+            Tambah Surat
         </a>
-
     </div>
+    
 
     {{-- ALERT SUCCESS --}}
     @if(session('success'))
@@ -67,12 +53,12 @@
 
     {{-- CARD --}}
     <div
-        class="card border-0 shadow-sm rounded-4 overflow-hidden"
+        class="card border-0 shadow-sm"
     >
 
         {{-- TOP BAR --}}
         <div
-            class="card-header bg-white border-0 p-4"
+            class="card-header bg-light border-0 p-4"
         >
 
             <div
@@ -109,50 +95,33 @@
         </div>
 
         {{-- TABLE --}}
-        <div class="table-responsive">
+        <div class="card-body">
 
             <table
-                class="table align-middle mb-0"
+                class="table align-middle"
             >
 
-                <thead
-                    style="
-                        background:#f8fafc;
-                    "
-                >
+                <thead>
 
                     <tr>
 
-                        <th
-                            class="py-3 px-4 text-muted fw-semibold"
-                            width="70"
-                        >
+                        <th>
                             No
                         </th>
 
-                        <th
-                            class="py-3 text-muted fw-semibold"
-                        >
-                            Nama Surat
+                        <th>
+                            Nama Dokumen
                         </th>
 
-                        <th
-                            class="py-3 text-muted fw-semibold"
-                        >
+                        <th>
                             Kategori
                         </th>
 
-                        <th
-                            class="py-3 text-muted fw-semibold text-center"
-                            width="140"
-                        >
+                        <th>
                             Preview
                         </th>
 
-                        <th
-                            class="py-3 text-muted fw-semibold text-center"
-                            width="220"
-                        >
+                        <th>
                             Aksi
                         </th>
 
@@ -166,29 +135,19 @@
 
                         <tr>
 
-                            <td class="px-4">
+                            <td>
 
                                 {{ $loop->iteration }}
 
                             </td>
 
-                            <td>
-
-                                <div
-                                    class="fw-semibold"
-                                >
-
-                                    {{ $row->nama_surat }}
-
-                                </div>
-
+                            <td>  
+                                {{ $row->nama_surat }}
                             </td>
 
                             <td>
 
-                                <span
-                                    class="badge rounded-pill bg-light text-dark border px-3 py-2"
-                                >
+                                <span class="badge bg-light text-dark border">
 
                                     {{ $row->kategori_surat }}
 
@@ -196,7 +155,7 @@
 
                             </td>
 
-                            <td class="text-center">
+                            <td>
 
                                 @if(
                                     pathinfo(
@@ -218,56 +177,55 @@
                                 @else
 
                                     <span class="text-muted small">
-                                        -
+                                        Preview hanya untuk PDF
                                     </span>
 
                                 @endif
 
                             </td>
 
-                            <td class="text-center">
+                            <td>
 
-                                <div
-                                    class="d-flex justify-content-center gap-2"
-                                >
+                                <div class="dropdown">
 
-                                    {{-- DOWNLOAD --}}
-                                    <a
-                                        href="{{ asset('uploads/dokumen/' . $row->file) }}"
-                                        download
-                                        class="btn btn-success btn-sm rounded-3 px-3"
-                                    >
+                                        <button class="btn btn-sm btn-outline-secondary dropdown-toggle"
+                                                type="button"
+                                                data-bs-toggle="dropdown"
+                                                aria-expanded="false">
 
-                                        <i class="bi bi-download"></i>
-
-                                    </a>
-
-                                    {{-- DELETE --}}
-                                    <form
-                                        action="{{ route('tu.dokumen.destroy', $row->id) }}"
-                                        method="POST"
-                                        onsubmit="
-                                            return confirm(
-                                                'Hapus dokumen ini?'
-                                            )
-                                        "
-                                    >
-
-                                        @csrf
-                                        @method('DELETE')
-
-                                        <button
-                                            type="submit"
-                                            class="btn btn-danger btn-sm rounded-3 px-3"
-                                        >
-
-                                            <i class="bi bi-trash"></i>
+                                            <i class="bi bi-gear-fill"></i>
 
                                         </button>
 
-                                    </form>
+                                        <ul class="dropdown-menu dropdown-menu-end shadow-sm border-0">
 
-                                </div>
+                                            <li>
+                                                <a class="dropdown-item" href="{{ asset('uploads/dokumen/' . $row->file) }}" download>
+                                                    <i class="bi bi-download me-2"></i> Download
+                                                </a>
+                                            </li>
+
+                                            
+                                            <li><hr class="dropdown-divider"></li>
+
+                                            <li>
+                                                <form action="{{ route('tu.dokumen.destroy', $row->id) }}"
+                                                    method="POST"
+                                                    onsubmit="return confirm('Hapus data ini?')">
+
+                                                    @csrf
+                                                    @method('DELETE')
+
+                                                    <button type="submit" class="dropdown-item text-danger">
+                                                        <i class="bi bi-trash me-2"></i> Hapus
+                                                    </button>
+
+                                                </form>
+                                            </li>
+
+                                        </ul>
+
+                                    </div>
 
                             </td>
 

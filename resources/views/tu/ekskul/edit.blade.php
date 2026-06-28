@@ -76,7 +76,7 @@
                                     {{ $ekskul->guru_id == $g->id ? 'selected' : '' }}
                                 >
 
-                                    {{ $g->nama }}
+                                    {{ $g->pegawai->nama }}
 
                                 </option>
 

@@ -20,6 +20,30 @@
             Tambah Mapel
         </a>
     </div>
+    
+    {{-- ALERT SUCCESS --}}
+    @if(session('success'))
+
+        <div class="alert alert-success border-0 shadow-sm">
+
+            <i class="bi bi-check-circle-fill me-2"></i>
+            {{ session('success') }}
+
+        </div>
+
+    @endif
+
+    {{-- ALERT ERROR --}}
+    @if(session('error'))
+
+        <div class="alert alert-danger border-0 shadow-sm">
+
+            <i class="bi bi-exclamation-circle-fill me-2"></i>
+            {{ session('error') }}
+
+        </div>
+
+    @endif
 
     {{-- CARD --}}
     <div class="card border-0 shadow-sm">
@@ -44,10 +68,16 @@
 
                             <td>{{ $loop->iteration }}</td>
 
-                            <td>{{ $row->kode_mapel ?? '-' }}</td>
+                            <td>
+                                <span class="badge bg-primary">
+                                    {{ $row->kode_mapel ?? '-' }}
+                                </span>
+                            </td>
 
                             <td>
-                                {{ $row->nama_mapel }}
+                                    <span class="badge bg-light text-dark border">
+                                        {{ $row->nama_mapel }}
+                                    </span>     
                             </td>
                             <td>
                                 <div class="dropdown">

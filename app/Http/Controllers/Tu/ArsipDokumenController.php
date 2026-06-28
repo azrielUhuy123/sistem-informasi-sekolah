@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\ArsipDokumen;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
+use Barryvdh\DomPDF\Facade\Pdf;
 
 class ArsipDokumenController extends Controller
 {
@@ -78,7 +79,8 @@ class ArsipDokumenController extends Controller
     public function download($id)
     {
         $doc = ArsipDokumen::findOrFail($id);
-        return Storage::disk('public')->download($doc->file_path);
+        $path = Storage::disk('public')->path($doc->file_path);
+        return response()->download($path);
     }
 
     /**

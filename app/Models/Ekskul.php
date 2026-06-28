@@ -9,6 +9,7 @@ class Ekskul extends Model
     protected $fillable = [
 
         'nama',
+        'guru_id',
         'deskripsi',
         'hari',
         'jam_mulai',

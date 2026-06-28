@@ -24,8 +24,8 @@ class EkskulController extends Controller
     public function create()
     {
         $guru = Guru::with('pegawai')
-    ->get()
-    ->sortBy('pegawai.nama');
+            ->get()
+            ->sortBy('pegawai.nama');
             
 
         return view(
@@ -49,8 +49,8 @@ class EkskulController extends Controller
     public function edit(Ekskul $ekskul)
     {
         $guru = Guru::with('pegawai')
-    ->get()
-    ->sortBy('pegawai.nama');
+            ->get()
+            ->sortBy('pegawai.nama');
            
 
         return view(

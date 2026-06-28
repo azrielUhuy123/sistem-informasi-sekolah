@@ -18,6 +18,7 @@
 
                 <thead>
                     <tr>
+                        <th>No</th>
                         <th>Nama Guru</th>
                         <th>Status Akademik</th>
                         <th>Mata Pelajaran</th>
@@ -31,6 +32,8 @@
                     @foreach($gurus as $guru)
 
                         <tr>
+                            <td>{{ $loop->iteration }}</td>
+
 
                             <td>
                                 {{ $guru->pegawai->nama }}

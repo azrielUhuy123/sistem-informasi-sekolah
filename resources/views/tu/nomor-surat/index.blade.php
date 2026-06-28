@@ -6,60 +6,57 @@
 
 <div class="container-fluid">
 
+    {{-- HEADER --}}
+
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h4 class="fw-bold mb-0">Nomor Surat</h4>
+            <small class="text-muted">Kelola nomor surat sekolah</small>
+        </div>
+        <form action="{{ route('tu.nomor-surat.generate') }}" method="POST">
+            @csrf
+
+            <button class="btn btn-dark">
+                <i class="bi bi-plus-lg me-1"></i>Generate Nomor
+            </button>
+        </form>
+    </div>
+
     {{-- ALERT SUCCESS --}}
     @if(session('success'))
 
-        <div class="alert alert-success alert-dismissible fade show rounded-4 border-0 shadow-sm mb-4"
-             role="alert">
+        <div class="alert alert-success border-0 shadow-sm">
 
             <i class="bi bi-check-circle-fill me-2"></i>
-
             {{ session('success') }}
-
-            <button type="button"
-                    class="btn-close"
-                    data-bs-dismiss="alert">
-            </button>
 
         </div>
 
     @endif
 
-    <div class="d-flex justify-content-between align-items-center mb-4">
+    {{-- ALERT ERROR --}}
+    @if(session('error'))
 
-        <div>
+        <div class="alert alert-danger border-0 shadow-sm">
 
-            <h4 class="fw-bold mb-1">
-                Daftar Nomor Surat
-            </h4>
-
-            <p class="text-muted mb-0">
-                Riwayat nomor surat sekolah
-            </p>
+            <i class="bi bi-exclamation-circle-fill me-2"></i>
+            {{ session('error') }}
 
         </div>
 
-        {{-- BUTTON GENERATE NOMOR --}}
-        <form
-            action="{{ route('tu.nomor-surat.generate') }}" method="POST">
+    @endif
 
-            @csrf
+    {{-- CARD --}}
 
-            <button type="submit" class="btn btn-primary rounded-3">
-                <i class="bi bi-plus-circle"></i>
-                    Tambah
-            </button>
-        </form>
 
-    </div>
+    <div class="card border-0 shadow-sm">
 
-    <div class="card border-0 shadow-sm rounded-4">
 
         <div class="card-body">
 
             <table class="table align-middle">
 
-                <thead class="table-light">
+                <thead>
 
                     <tr>
 
@@ -92,10 +89,8 @@
 
                             <td>
 
-                                <span class="badge bg-success">
-
-                                    Digunakan
-
+                                <span class="badge bg-success-subtle text-success-emphasis border border-success-subtle">
+                                    <i class="bi bi-check-circle me-1"></i> Digunakan
                                 </span>
 
                             </td>
