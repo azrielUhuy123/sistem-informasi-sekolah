@@ -4,106 +4,132 @@
 
 @section('content')
 
-<div class="container-fluid py-4">
+<div class="container-fluid">
 
-    <div class="card border-0 shadow-sm">
+    {{-- HEADER --}}
 
-        <div class="card-header bg-white">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h4 class="fw-bold mb-0">Manajemen Akun</h4>
+            <small class="text-muted">Kelola akun pengguna sistem</small>
+        </div>
 
-            <h5 class="mb-0">
+    </div>
 
-                Kelola Akun
+    {{-- ALERT SUCCESS --}}
+    @if(session('success'))
 
-            </h5>
+        <div class="alert alert-success border-0 shadow-sm">
+
+            <i class="bi bi-check-circle-fill me-2"></i>
+            {{ session('success') }}
 
         </div>
 
-        <div class="card-body">
+    @endif
 
-            <form
-                method="GET"
-                class="row g-3 mb-4"
+    {{-- ALERT ERROR --}}
+    @if(session('error'))
+
+        <div class="alert alert-danger border-0 shadow-sm">
+
+            <i class="bi bi-exclamation-circle-fill me-2"></i>
+            {{ session('error') }}
+
+        </div>
+
+    @endif
+
+    {{-- CARD --}}
+
+    <div class="card border-0 shadow-sm">
+        {{-- TOP BAR --}}
+        <div
+            class="card-header bg-light border-0 p-4"
+        >
+
+            <div
+                class="d-flex justify-content-between align-items-center flex-wrap gap-3"
             >
 
-                <div class="col-md-3">
+                <div>
 
-                    <select
-                        name="role"
-                        class="form-select"
+                    <h5 class="fw-semibold mb-1">
+                        Daftar Pengguna Sistem
+                    </h5>
+
+                    <span class="text-muted small">
+                        Total:
+                        {{ $data->count() }}
+                        pengguna   
+                    </span>
+
+                </div>
+                
+
+                {{-- Filter + Search --}}
+                <div class="d-flex flex-column align-items-end gap-2">
+
+                    <form action="{{ route('tu.akun.index') }}" method="GET" class="d-flex gap-2 flex-wrap">
+
+                        <select
+                            name="role"
+                            class="form-select rounded-3"
+                            style="width: 160px;"
+                        >
+                            <option value="">Semua Role</option>
+                            <option value="guru" @selected(request('role') == 'guru')>
+                                Guru
+                            </option>
+                            <option value="siswa" @selected(request('role') == 'siswa')>
+                                Siswa
+                            </option>
+                        </select>
+
+                        <select
+                            name="status"
+                            class="form-select rounded-3"
+                            style="width: 160px;"
+                        >
+                            <option value="">Semua Status</option>
+                            <option value="1" @selected(request('status') === '1')>
+                                Aktif
+                            </option>
+                            <option value="0" @selected(request('status') === '0')>
+                                Nonaktif
+                            </option>
+                        </select>
+
+                        <button class="btn btn-primary rounded-3" type="submit">
+                            Filter
+                        </button>
+
+                    </form>
+
+                    <input
+                        type="text"
+                        id="searchInput"
+                        class="form-control rounded-3"
+                        placeholder="Cari pengguna..."
+                        style="width: 320px;"
                     >
-
-                        <option value="">
-                            Semua Role
-                        </option>
-
-                        <option
-                            value="guru"
-                            @selected(request('role') == 'guru')
-                        >
-                            Guru
-                        </option>
-
-                        <option
-                            value="siswa"
-                            @selected(request('role') == 'siswa')
-                        >
-                            Siswa
-                        </option>
-
-                    </select>
 
                 </div>
 
-                <div class="col-md-3">
+            </div>
 
-                    <select
-                        name="status"
-                        class="form-select"
-                    >
+        </div>
 
-                        <option value="">
-                            Semua Status
-                        </option>
 
-                        <option
-                            value="1"
-                            @selected(request('status') === '1')
-                        >
-                            Aktif
-                        </option>
+        <div class="card-body">
 
-                        <option
-                            value="0"
-                            @selected(request('status') === '0')
-                        >
-                            Nonaktif
-                        </option>
-
-                    </select>
-
-                </div>
-
-                <div class="col-md-3">
-
-                    <button
-                        class="btn btn-primary"
-                    >
-
-                        Filter
-
-                    </button>
-
-                </div>
-
-            </form>
-
-            <div class="table-responsive">
-
-                <table class="table table-hover">
+                <table class="table align-middle">
 
                     <thead>
 
                         <tr>
+
+                            <th>No</th>
 
                             <th>Nama</th>
 
@@ -113,7 +139,7 @@
 
                             <th>Status</th>
 
-                            <th width="250">
+                            <th>
                                 Aksi
                             </th>
 
@@ -121,11 +147,15 @@
 
                     </thead>
 
-                    <tbody>
+                    <tbody id="tablePengguna">
 
                         @forelse($data as $item)
 
                             <tr>
+
+                                <td>
+
+                                    {{ $loop->iteration }}  
 
                                 <td>
 
@@ -140,27 +170,25 @@
                                 </td>
 
                                 <td>
+                                    <span class="badge bg-light text-dark border">
 
-                                    {{ strtoupper($item->role) }}
+                                        {{ strtoupper($item->role) }}
 
+                                    </span>
                                 </td>
 
                                 <td>
 
                                     @if($item->is_active)
 
-                                        <span class="badge bg-success">
-
-                                            Aktif
-
+                                        <span class="badge bg-success-subtle text-success-emphasis border border-success-subtle">
+                                            <i class="bi bi-check-circle me-1"></i> Aktif
                                         </span>
 
                                     @else
 
-                                        <span class="badge bg-danger">
-
-                                            Nonaktif
-
+                                        <span class="badge bg-danger-subtle text-danger-emphasis border border-danger-subtle">
+                                            <i class="bi bi-x-circle me-1"></i> Nonaktif
                                         </span>
 
                                     @endif
@@ -168,53 +196,57 @@
                                 </td>
 
                                 <td>
+                                    <div class="dropdown">
 
-                                    <div class="d-flex gap-2">
+                                        <button class="btn btn-sm btn-outline-secondary dropdown-toggle"
+                                                type="button"
+                                                data-bs-toggle="dropdown"
+                                                aria-expanded="false">
 
-                                        <a
-                                            href="{{ route('tu.akun.show',$item) }}"
-                                            class="btn btn-info btn-sm"
-                                        >
+                                            <i class="bi bi-gear-fill"></i>
 
-                                            Detail
+                                        </button>
 
-                                        </a>
+                                        <ul class="dropdown-menu dropdown-menu-end shadow-sm border-0">
 
-                                        <form
-                                            method="POST"
-                                            action="{{ route('tu.akun.reset-password',$item) }}"
-                                        >
-                                            @csrf
-
-                                            <button
-                                                class="btn btn-warning btn-sm"
+                                            <li>
+                                                <a class="dropdown-item" href="{{ route('tu.akun.show',$item) }}">
+                                                    <i class="bi bi-eye me-2"></i> Detail
+                                                </a>
+                                            </li>
+                                            <form
+                                                method="POST"
+                                                action="{{ route('tu.akun.reset-password',$item) }}"
                                             >
+                                                @csrf
+                                                <button type="submit" class="dropdown-item">
+                                                    <i class="bi bi-key me-2"></i>Reset Password
+                                                </button>
 
-                                                Reset Password
+                                            </form>
 
-                                            </button>
+                                            <li><hr class="dropdown-divider"></li>
 
-                                        </form>
+                                            <li>
+                                                <form
+                                                    method="POST"
+                                                    action="{{ route('tu.akun.toggle-status',$item) }}"
+                                                >
+                                                    @csrf
+                                                    <button type="submit" class="dropdown-item text-danger">
+                                                        <i class="bi bi-person-x me-2"></i>
+                                                        {{ $item->is_active
+                                                            ? 'Nonaktifkan'
+                                                            : 'Aktifkan' }}
+                                                    </button>
+                                                </form>
+                                                
+                                            </li>
 
-                                        <form
-                                            method="POST"
-                                            action="{{ route('tu.akun.toggle-status',$item) }}"
-                                        >
-                                            @csrf
-
-                                            <button
-                                                class="btn btn-secondary btn-sm"
-                                            >
-
-                                                {{ $item->is_active
-                                                    ? 'Nonaktifkan'
-                                                    : 'Aktifkan' }}
-
-                                            </button>
-
-                                        </form>
+                                        </ul>
 
                                     </div>
+
 
                                 </td>
 
@@ -250,5 +282,34 @@
     </div>
 
 </div>
+{{-- SEARCH --}}
+<script>
 
+    const searchInput =
+        document.getElementById('searchInput');
+
+    searchInput.addEventListener('keyup', function () {
+
+        const keyword =
+            this.value.toLowerCase();
+
+        const rows =
+            document.querySelectorAll(
+                '#tablePengguna tr'
+            );
+
+        rows.forEach(row => {
+
+            const text =
+                row.innerText.toLowerCase();
+
+            row.style.display =
+                text.includes(keyword)
+                ? ''
+                : 'none';
+
+        });
+    });
+
+</script>
 @endsection
