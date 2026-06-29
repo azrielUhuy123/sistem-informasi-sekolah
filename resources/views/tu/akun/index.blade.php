@@ -7,14 +7,20 @@
 <div class="container-fluid">
 
     {{-- HEADER --}}
-
-    <div class="d-flex justify-content-between align-items-center mb-4">
-        <div>
-            <h4 class="fw-bold mb-0">Manajemen Akun</h4>
-            <small class="text-muted">Kelola akun pengguna sistem</small>
+    <div class="card border-0 shadow-sm rounded-4 overflow-hidden mb-4">
+        <div class="card-body p-4 p-lg-5 text-white" style="background: linear-gradient(135deg, #0f4c81 0%, #2563eb 100%);">
+            <div class="d-flex flex-column flex-lg-row justify-content-between align-items-lg-center gap-3">
+                <div>
+                    <h3 class="fw-bold mb-2">Manajemen Akun</h3>
+                    <p class="mb-0 opacity-75">Kelola akun pengguna sistem</p>
+                </div>
+                <div class="badge bg-white text-primary px-3 py-2 fs-6">
+                    <i class="bi bi-shield-check me-2"></i> Sistem Terhubung
+                </div>
+            </div>
         </div>
-
     </div>
+
 
     {{-- ALERT SUCCESS --}}
     @if(session('success'))
