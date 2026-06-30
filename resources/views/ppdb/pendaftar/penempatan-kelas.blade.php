@@ -108,7 +108,7 @@
 
                 </thead>
 
-                <tbody id="tablePenempatan">
+                <tbody id="tablePenempatanKelas">
 
                     @foreach($data as $item)
 
@@ -127,7 +127,7 @@
                             </td>
 
                             <td>
-                                {{ $item->siswa?->kelas?->nama_kelas ?? '-' }}
+                                {{ $item->siswa?->penempatanAktif?->kelas?->nama_kelas ?? '-' }}
                             </td>
 
                             <td>
@@ -168,7 +168,7 @@
                                         </select>
 
                                         <button
-                                            class="btn btn-primary"
+                                            class="btn btn-dark btn-sm"
                                         >
 
                                             Simpan
@@ -209,7 +209,7 @@
 
         const rows =
             document.querySelectorAll(
-                '#tableTerima tr'
+                '#tablePenempatanKelas tr'
             );
 
         rows.forEach(row => {

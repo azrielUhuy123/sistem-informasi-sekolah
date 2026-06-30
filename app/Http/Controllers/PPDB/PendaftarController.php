@@ -8,6 +8,8 @@ use App\Models\User;
 use App\Models\Siswa;
 use App\Models\Angkatan;
 use App\Models\Kelas;
+use App\Models\TahunAjaran;
+use App\Models\PenempatanSiswa;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
@@ -295,7 +297,9 @@ class PendaftarController extends Controller
 
     public function penempatanKelas()
     {
-        $data = PpdbPendaftar::with('siswa')
+        $data = PpdbPendaftar::with([
+            'siswa.penempatanAktif.kelas'
+            ])
             ->whereNotNull('siswa_id')
             ->latest()
             ->paginate(20);
@@ -312,29 +316,29 @@ class PendaftarController extends Controller
         );
     }
 
-    public function simpanPenempatanKelas(
-        Request $request,
-        PpdbPendaftar $pendaftar
-    )
+    public function simpanPenempatanKelas(Request $request, PpdbPendaftar $pendaftar)
     {
         $request->validate([
             'kelas_id' => 'required|exists:kelas,id'
         ]);
 
         if (!$pendaftar->siswa) {
-
-            return back()->with(
-                'error',
-                'Data siswa tidak ditemukan'
-            );
+            return back()->with('error', 'Data siswa tidak ditemukan');
         }
 
-        $pendaftar->siswa->update([
+        $tahunAktif = TahunAjaran::aktif();
 
-            'kelas_id'
-                => $request->kelas_id
-
-        ]);
+        PenempatanSiswa::updateOrCreate(
+            [
+                'siswa_id' => $pendaftar->siswa->id,
+                'tahun_ajaran_id' => $tahunAktif->id,
+            ],
+            [
+                'kelas_id' => $request->kelas_id,
+                'tanggal_masuk' => now(),
+                'tanggal_keluar' => null,
+            ]
+        );
 
         return back()->with(
             'success',

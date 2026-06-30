@@ -23,6 +23,44 @@
 
 
     <div class="card shadow-sm border-0">
+        {{-- TOP BAR --}}
+
+        <div
+            class="card-header bg-light border-0 p-4"
+        >
+
+            <div
+                class="d-flex justify-content-between align-items-center flex-wrap gap-3"
+            >
+
+                <div>
+
+                    <h5 class="fw-semibold mb-1">
+                        Daftar Guru & Wali Kelas
+                    </h5>
+
+                    <span class="text-muted small">
+                        Total:
+                        {{ $gurus->count() }}
+                        Guru & Wali Kelas  
+                    </span>
+
+                </div>
+
+                <div style="max-width: 280px; width:100%;">
+
+                    <input
+                        type="text"
+                        id="searchInput"
+                        class="form-control rounded-3"
+                        placeholder="Cari guru..."
+                    >
+
+                </div>
+
+            </div>
+
+        </div>
 
         <div class="card-body">
 
@@ -39,7 +77,7 @@
                     </tr>
                 </thead>
 
-                <tbody>
+                <tbody id="tableGuru">
 
                     @foreach($gurus as $guru)
 
@@ -175,5 +213,34 @@
     </div>
 
 </div>
+{{-- SEARCH --}}
+<script>
 
+    const searchInput =
+        document.getElementById('searchInput');
+
+    searchInput.addEventListener('keyup', function () {
+
+        const keyword =
+            this.value.toLowerCase();
+
+        const rows =
+            document.querySelectorAll(
+                '#tableGuru tr'
+            );
+
+        rows.forEach(row => {
+
+            const text =
+                row.innerText.toLowerCase();
+
+            row.style.display =
+                text.includes(keyword)
+                ? ''
+                : 'none';
+
+        });
+    });
+
+</script>
 @endsection

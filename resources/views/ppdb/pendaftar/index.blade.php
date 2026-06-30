@@ -127,10 +127,9 @@
 
                         <td>
 
-                            <a
-                                    href="{{ route('tu.ppdb.pendaftar.show',$item) }}"
-                                    class="btn btn-light border rounded-3 btn-sm"
-                                > <i class="bi bi-eye"></i>
+                            <a href="{{ route('tu.ppdb.pendaftar.show', $item) }}"
+                                class="btn btn-sm btn-dark">
+                                    Detail
                             </a>
 
                         </td>
@@ -150,5 +149,34 @@
     </div>
 
 </div>
+{{-- SEARCH --}}
+<script>
 
+    const searchInput =
+        document.getElementById('searchInput');
+
+    searchInput.addEventListener('keyup', function () {
+
+        const keyword =
+            this.value.toLowerCase();
+
+        const rows =
+            document.querySelectorAll(
+                '#tablePPDB tr'
+            );
+
+        rows.forEach(row => {
+
+            const text =
+                row.innerText.toLowerCase();
+
+            row.style.display =
+                text.includes(keyword)
+                ? ''
+                : 'none';
+
+        });
+    });
+
+</script>
 @endsection

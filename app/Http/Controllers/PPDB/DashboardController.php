@@ -27,6 +27,8 @@ class DashboardController extends Controller
             'ditolak'
         )->count();
 
+
+
         $setting = PpdbSetting::first();
 
         $kuota = PpdbSetting::latest()->first()?->kuota ?? 0;
@@ -35,6 +37,12 @@ class DashboardController extends Controller
             0,
             $kuota - $diterima
         );
+
+        $terisi = $diterima;
+
+        $persentase = $kuota > 0
+            ? round(($terisi / $kuota) * 100)
+            : 0;
 
         $statusPpdb = $setting?->status;
         return view(
@@ -46,6 +54,7 @@ class DashboardController extends Controller
                 'ditolak',
                 'kuota',
                 'sisaKuota',
+                'persentase',
                 'statusPpdb'
             )
         );

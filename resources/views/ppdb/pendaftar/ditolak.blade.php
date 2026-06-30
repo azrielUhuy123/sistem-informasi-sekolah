@@ -128,10 +128,9 @@
 
                             <td>
 
-                                <a
-                                    href="{{ route('tu.ppdb.pendaftar.show',$item) }}"
-                                    class="btn btn-light border rounded-3 btn-sm"
-                                > <i class="bi bi-eye"></i>
+                                <a href="{{ route('tu.ppdb.pendaftar.show', $item) }}"
+                                    class="btn btn-sm btn-dark">
+                                        Detail
                                 </a>
 
                             </td>
