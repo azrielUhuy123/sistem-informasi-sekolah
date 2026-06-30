@@ -20,7 +20,7 @@
 
     <div class="topbar-right">
 
-        <button id="darkToggle" class="btn">🌙</button>
+        
 
         <div class="dropdown">
             <a

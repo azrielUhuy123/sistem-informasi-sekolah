@@ -190,11 +190,11 @@
 
                                 @else
 
-                                    @forelse($guru->mapels as $mapel)
+                                    @foreach($guru->pengampuMapel as $pengampu)
 
                                         <span class="badge bg-light text-dark border">
 
-                                            {{ $mapel->nama_mapel }}
+                                            {{ $pengampu->mapel->nama_mapel }}
 
                                         </span>
 

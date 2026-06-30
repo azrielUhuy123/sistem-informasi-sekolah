@@ -10,8 +10,9 @@ class GuruController extends Controller
     public function index()
     {
         $gurus = Guru::with([
+            'pegawai',
             'waliKelas.kelas',
-            'mapels'
+            'pengampuMapel.mapel',
         ])
         ->latest()
         ->get();
@@ -25,9 +26,10 @@ class GuruController extends Controller
     public function show(Guru $guru)
     {
         $guru->load([
+            'pegawai',
             'user',
             'waliKelas.kelas',
-            'mapels'
+            'pengampuMapel.mapel',
         ]);
 
         return view(

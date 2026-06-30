@@ -55,13 +55,13 @@
 
                                 @if($guru->waliKelas)
 
-                                    <span class="badge bg-primary">
+                                    <span class="badge bg-light text-info-emphasis border border-info">
                                         Wali Kelas
                                     </span>
 
                                 @else
 
-                                    <span class="badge bg-secondary">
+                                    <span class="badge bg-light text-warning-emphasis border border-warning">
                                         Guru Bidang
                                     </span>
 
@@ -96,11 +96,11 @@
 
                                 @else
 
-                                    @forelse($guru->mapels as $mapel)
+                                    @forelse($guru->pengampuMapel as $pengampu)
 
                                         <span class="badge bg-light text-dark border">
 
-                                            {{ $mapel->nama_mapel }}
+                                            {{ $pengampu->mapel->nama_mapel }}
 
                                         </span>
 
@@ -117,16 +117,42 @@
                             </td>
 
                             <td>
+                                @php
+                                    $kelasWali = $guru->waliKelas?->kelas;
 
-                                @if($guru->waliKelas)
+                                    $kelasMengajar = $guru->pengampuMapel
+                                        ->pluck('kelas')
+                                        ->filter()
+                                        ->unique('id');
+                                @endphp
 
-                                    {{ $guru->waliKelas->kelas->nama_kelas }}
+                                {{-- Kelas Wali --}}
 
-                                @else
+                                @if($kelasWali)
 
-                                    -
-
+                                    <span class="badge bg-light text-dark border">
+                                        {{ $kelasWali->nama_kelas }}
+                                    </span>
                                 @endif
+
+                                {{-- Kelas Mengajar --}}
+                                
+                                @foreach($kelasMengajar as $kelas)
+
+                                    @if(!$kelasWali || $kelas->id != $kelasWali->id)
+                                        <span class="badge bg-light text-dark border">
+                                            {{ $kelas->nama_kelas }}
+                                        </span>
+                                    @endif
+
+                                @endforeach
+
+                                @if($kelasMengajar->isEmpty() && !$kelasWali)
+                                    <span class="text-muted">-</span>
+                                @endif
+
+
+                                
 
                             </td>
 

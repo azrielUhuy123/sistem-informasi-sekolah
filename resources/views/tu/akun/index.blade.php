@@ -163,6 +163,8 @@
 
                                     {{ $loop->iteration }}  
 
+                                </td>
+
                                 <td>
 
                                     {{ $item->name }}
@@ -220,16 +222,29 @@
                                                     <i class="bi bi-eye me-2"></i> Detail
                                                 </a>
                                             </li>
-                                            <form
-                                                method="POST"
-                                                action="{{ route('tu.akun.reset-password',$item) }}"
-                                            >
-                                                @csrf
-                                                <button type="submit" class="dropdown-item">
-                                                    <i class="bi bi-key me-2"></i>Reset Password
-                                                </button>
+                                            @if(in_array($item->role, ['guru', 'tu', 'siswa', 'superadmin']))
 
-                                            </form>
+                                                <form
+                                                    method="POST"
+                                                    action="{{ route('tu.akun.reset-password', $item) }}"
+                                                >
+
+                                                    @csrf
+
+                                                    <button
+                                                        type="submit"
+                                                        class="dropdown-item"
+                                                        onclick="return confirm('Reset password akun ini?')"
+                                                    >
+
+                                                        <i class="bi bi-key me-2"></i>
+                                                        Reset Password
+
+                                                    </button>
+
+                                                </form>
+
+                                            @endif
 
                                             <li><hr class="dropdown-divider"></li>
 

@@ -12,12 +12,13 @@ use App\Models\PengajuanJadwal;
 use App\Models\PengampuMapel;
 use App\Models\WaliKelas;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 
 class JadwalSayaController extends Controller
 {
     public function index(Request $request)
     {
-        $guru = auth()->user()->guru;
+        $guru = Auth::user()->guru;
 
         abort_unless($guru, 403, 'Akun guru belum terhubung.');
 
@@ -135,7 +136,7 @@ class JadwalSayaController extends Controller
 
     public function pilihSlot(Request $request)
     {
-        $guru = auth()->user()->guru;
+        $guru = Auth::user()->guru;
 
         abort_unless($guru, 403, 'Akun guru belum terhubung.');
 
@@ -217,7 +218,7 @@ class JadwalSayaController extends Controller
 
     public function hapusSlot($id)
     {
-        $guru = auth()->user()->guru;
+        $guru = Auth::user()->guru;
 
         abort_unless($guru, 403, 'Akun guru belum terhubung.');
 
@@ -243,7 +244,7 @@ class JadwalSayaController extends Controller
 
     public function submitJadwal(Request $request)
     {
-        $guru = auth()->user()->guru;
+        $guru = Auth::user()->guru;
 
         abort_unless($guru, 403, 'Akun guru belum terhubung.');
 
@@ -364,14 +365,14 @@ class JadwalSayaController extends Controller
         $waliKelasId = WaliKelas::where('guru_id', $guruId)
             ->where('tahun_ajaran_id', current_tahun_id())
             ->value('kelas_id');
+            
+        // Jika guru adalah wali kelas dari kelas tersebut,
+        // maka boleh mengatur mapel inti.
+        if ((int)$waliKelasId === (int)$kelasId) {
 
-        if ((int) $waliKelasId === (int) $kelasId) {
-            return \App\Models\Guru::findOrFail($guruId)
-                ->mapels()
-                ->whereKey($mapelId)
-                ->exists();
+            return true;
         }
-
+         // Selain wali kelas, harus menjadi guru pengampu.
         return PengampuMapel::where('guru_id', $guruId)
             ->where('kelas_id', $kelasId)
             ->where('mata_pelajaran_id', $mapelId)

@@ -7,12 +7,13 @@ use App\Models\AbsensiSiswa;
 use App\Models\NilaiSiswa;
 use App\Models\PerkembanganSiswa;
 use App\Models\WaliKelas;
+use Illuminate\Support\Facades\Auth;
 
 class DashboardWaliKelasController extends Controller
 {
     public function index()
     {
-        $guru = auth()->user()->guru;
+        $guru = Auth::user()->guru;
 
         /*
         |--------------------------------------------------------------------------

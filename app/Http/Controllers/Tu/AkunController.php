@@ -49,52 +49,41 @@ class AkunController extends Controller
         );
     }
 
-    public function resetPassword(
-        User $user
-    )
+    public function resetPassword(User $user)
     {
         $tanggalLahir = null;
 
-        if (
-            $user->role == 'siswa'
-            && $user->siswa
-        ) {
-            $tanggalLahir =
-                $user->siswa->tanggal_lahir;
+        if ($user->role == 'guru' || $user->role == 'tu' || $user->role == 'superadmin') {
+
+            $tanggalLahir = optional($user->pegawai)->tanggal_lahir;
+
         }
 
-        if (
-            $user->role == 'guru'
-            && $user->guru
-        ) {
-            $tanggalLahir =
-                $user->guru->tanggal_lahir;
+        if ($user->role == 'siswa') {
+
+            $tanggalLahir = optional($user->siswa)->tanggal_lahir;
+
         }
 
         if (!$tanggalLahir) {
 
             return back()->with(
                 'error',
-                'Tanggal lahir tidak ditemukan'
+                'Tanggal lahir tidak ditemukan.'
             );
+
         }
 
-        $password = \Carbon\Carbon::parse(
-            $tanggalLahir
-        )->format('dmY');
+        $password = \Carbon\Carbon::parse($tanggalLahir)
+            ->format('dmY');
 
         $user->update([
-
-            'password'
-                => Hash::make(
-                    $password
-                )
-
+            'password' => Hash::make($password)
         ]);
 
         return back()->with(
             'success',
-            'Password berhasil direset'
+            'Password berhasil direset.'
         );
     }
 
