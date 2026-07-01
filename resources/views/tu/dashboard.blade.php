@@ -173,7 +173,7 @@
                         <li class="list-group-item px-0 py-3">
                             <div class="d-flex justify-content-between align-items-center">
                                 <span class="text-muted">Peran akun</span>
-                                <span class="fw-semibold">Tata Usaha</span>
+                                <span class="fw-semibold">Operator</span>
                             </div>
                         </li>
                     </ul>

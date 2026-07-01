@@ -6,132 +6,163 @@
 
 <div class="container-fluid">
 
-    <!-- 🔶 HEADER -->
-    <div class="d-flex justify-content-between align-items-center mb-4">
-        <div>
-            <h4 class="mb-1">Tahun Ajaran</h4>
-            <small class="text-muted">Manajemen siklus akademik sistem</small>
+    {{-- HEADER --}}
+    <div class="card border-0 shadow-sm rounded-4 overflow-hidden mb-4">
+        <div class="card-body p-4 p-lg-5 text-white" style="background: linear-gradient(135deg, #0f4c81 0%, #2563eb 100%);">
+            <div class="d-flex flex-column flex-lg-row justify-content-between align-items-lg-center gap-3">
+                <div>
+                    <h3 class="fw-bold mb-2">Manajemen Tahun Ajaran</h3>
+                    <p class="mb-0 opacity-75">Kelola siklus akademik sistem</p>
+                </div>
+                <div class="badge bg-white text-primary px-3 py-2 fs-6">
+                    <i class="bi bi-shield-check me-2"></i> Sistem Terhubung
+                </div>
+            </div>
         </div>
+    </div>
+    <div class="d-flex justify-content-end align-items-center mb-4">
 
-        <a href="{{ route('tu.tahun.create') }}" class="btn btn-primary">
-            + Tambah Tahun
+        <a href="{{ route('tu.tahun.create') }}" 
+           class="btn btn-dark">
+            <i class="bi bi-plus-lg me-1"></i>
+            Tambah Tahun Ajaran
         </a>
     </div>
 
+    {{-- ALERT SUCCESS --}}
+    @if(session('success'))
+
+        <div class="alert alert-success border-0 shadow-sm">
+
+            <i class="bi bi-check-circle-fill me-2"></i>
+            {{ session('success') }}
+
+        </div>
+
+    @endif
+
+    {{-- ALERT ERROR --}}
+    @if(session('error'))
+
+        <div class="alert alert-danger border-0 shadow-sm">
+
+            <i class="bi bi-exclamation-circle-fill me-2"></i>
+            {{ session('error') }}
+
+        </div>
+
+    @endif
+
+
     <!-- 🔷 STATUS SISTEM -->
-    <div class="card mb-4 shadow-sm border-0">
-        <div class="card-body">
+    <div class="card shadow-sm border-0 rounded-0 mb-4">
+        <div class="card-header bg-light border-0 p-4">
+            <div class="d-flex justify-content-between align-items-center flex-wrap gap-3">
+                <div>
+                    <h5 class="fw-semibold mb-1">Status Sistem</h5>
+                    <span class="text-muted small">Informasi tahun ajaran aktif saat ini</span>
+                </div>
+            </div>
+        </div>
 
-            <div class="text-muted small">STATUS SISTEM</div>
-
+        <div class="card-body p-4">
             @if($tahunAktif)
+                @php
+                    $statusBadgeClass = match($tahunAktif->status) {
+                        'aktif' => 'bg-success',
+                        'draft' => 'bg-dark',
+                        'selesai' => 'bg-secondary',
+                        default => 'bg-light text-dark',
+                    };
 
-                <h4 class="mb-1">
-                    {{ $tahunAktif->tahun }}
-                    <span class="badge bg-info text-dark">
-                        {{ $tahunAktif->semester }}
-                    </span>
-                </h4>
+                    $statusLabel = match($tahunAktif->status) {
+                        'aktif' => 'Aktif',
+                        'draft' => 'Draft',
+                        'selesai' => 'Selesai',
+                        default => 'Tidak Aktif',
+                    };
 
-                {{-- ===============================
-                     🔵 GANJIL AKTIF
-                =============================== --}}
+                    $statusSubtitle = match(true) {
+                        $tahunAktif->status === 'aktif' && $tahunAktif->semester === 'Ganjil' => 'Semester ganjil sedang berjalan',
+                        $tahunAktif->status === 'aktif' && $tahunAktif->semester === 'Genap' => 'Semester genap sedang berjalan',
+                        $tahunAktif->status === 'draft' => 'Belum aktif untuk operasional',
+                        $tahunAktif->status === 'selesai' => 'Tahun ajaran telah selesai',
+                        default => 'Status tidak diketahui',
+                    };
+                @endphp
+
+                <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-2">
+                    <div class="d-flex align-items-center flex-wrap gap-2">
+                        <h3 class="fw-semibold mb-0">{{ $tahunAktif->tahun }}</h3>
+                        <span class="badge bg-success-subtle text-success-emphasis border border-success-subtle">
+                            {{ $tahunAktif->semester }}
+                        </span>
+                        <span class="badge {{ $statusBadgeClass }}">{{ $statusLabel }}</span>
+                    </div>
+                    <div class="small text-muted">{{ $statusSubtitle }}</div>
+                </div>
+
                 @if($tahunAktif->status === 'aktif' && $tahunAktif->semester === 'Ganjil')
-
-                    <span class="badge bg-success">AKTIF</span>
-                    <div class="text-muted small mb-3">
-                        Mode: Semester Ganjil
+                    <div class="mt-3">
+                        <form method="POST"
+                              action="{{ route('tu.tahun.lanjutSemester') }}"
+                              onsubmit="return confirm('Lanjut ke semester genap?')">
+                            @csrf
+                            <button class="btn btn-dark">
+                                <i class="bi bi-arrow-right-circle me-1"></i>
+                                Lanjut ke Semester Genap
+                            </button>
+                        </form>
                     </div>
-
-                    <form method="POST"
-                          action="{{ route('tu.tahun.lanjutSemester') }}"
-                          onsubmit="return confirm('Lanjut ke semester genap?')">
-                        @csrf
-                        <button class="btn btn-warning">
-                            Lanjut ke Semester Genap
-                        </button>
-                    </form>
-
-                {{-- ===============================
-                     🟢 GENAP AKTIF
-                =============================== --}}
                 @elseif($tahunAktif->status === 'aktif' && $tahunAktif->semester === 'Genap')
-
-                    <span class="badge bg-success">AKTIF</span>
-                    <div class="text-muted small mb-3">
-                        Mode: Operasional (Akhir Tahun)
-                    </div>
-
-                    <div class="d-flex gap-2 flex-wrap">
-
-                        <a href="{{ route('tu.penempatan-siswa.naik-kelas.index') }}"
-                           class="btn btn-primary">
-                            Naik Kelas
-                        </a>
+                    <div class="mt-3 d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3">
+                        <div>
+                            <div class="fw-semibold text-success">Operasional aktif</div>
+                            <div class="small text-muted">Mode: Akhir Tahun</div>
+                        </div>
 
                         <form method="POST"
                               action="{{ route('tu.tahun.tutup') }}"
                               onsubmit="return confirm('Tutup tahun ajaran ini?')">
                             @csrf
                             <button class="btn btn-danger">
+                                <i class="bi bi-door-closed me-1"></i>
                                 Tutup Tahun Ajaran
                             </button>
                         </form>
-
                     </div>
-
-                {{-- ===============================
-                     ⚫ DRAFT
-                =============================== --}}
                 @elseif($tahunAktif->status === 'draft')
-
-                    <span class="badge bg-dark">DRAFT</span>
-                    <div class="text-muted small mb-3">
-                        Belum aktif
+                    <div class="mt-3 p-3 rounded-3 bg-light text-muted small">
+                        Belum aktif untuk dipakai pada operasional sistem.
                     </div>
-
-                {{-- ===============================
-                     ⚪ SELESAI
-                =============================== --}}
                 @elseif($tahunAktif->status === 'selesai')
-
-                    <span class="badge bg-secondary">SELESAI</span>
-                    <div class="text-muted small mb-3">
-                        Arsip (read-only)
+                    <div class="mt-3 p-3 rounded-3 bg-secondary-subtle text-secondary-emphasis small">
+                        Arsip tahun ajaran, tidak dapat diubah pada mode operasional.
                     </div>
-
                 @endif
-
             @else
-                <div class="text-danger mb-2">
-                    Tidak ada tahun ajaran aktif
+                <div class="d-flex align-items-center gap-3 p-3 rounded-3 bg-danger-subtle">
+                    <i class="bi bi-exclamation-triangle-fill text-danger fs-4"></i>
+                    <div>
+                        <div class="fw-semibold text-danger">Tidak ada tahun ajaran aktif</div>
+                        <div class="small text-muted">Silakan aktifkan salah satu tahun ajaran yang tersedia.</div>
+                    </div>
                 </div>
             @endif
-
-            {{-- ALERT --}}
-            @if(session('success'))
-                <div class="alert alert-success mt-2">
-                    {{ session('success') }}
-                </div>
-            @endif
-
-            @if(session('error'))
-                <div class="alert alert-danger mt-2">
-                    {{ session('error') }}
-                </div>
-            @endif
-
         </div>
     </div>
 
     <!-- 🔷 AKTIVASI TAHUN -->
     @if(!$tahunAktif || $tahunAktif->status === 'selesai')
 
-    <div class="card mb-4 shadow-sm border-0">
+    <div class="card mb-4 border-0 rounded-0 shadow-sm">
         <div class="card-body">
 
             <div class="text-muted small mb-2">
                 Aktifkan Tahun Ajaran
+                <p class="small mb-0 fst-italic text-danger">
+                    *Harap tambahkan tahun ajaran terlebih dahulu untuk mengaktifkannya.
+                </p>
             </div>
 
             <form method="POST" action="" id="formAktifkan">
@@ -139,7 +170,7 @@
 
                 <div class="d-flex gap-2">
 
-                    <select name="tahun_id" class="form-select" required>
+                    <select name="tahun_id" class="form-select rounded border border-secondary-subtle" required>
                         @foreach($tahun as $row)
                             @if($row->status === 'draft')
                                 <option value="{{ $row->id }}">
@@ -163,55 +194,77 @@
 
     <!-- 🔷 TABLE -->
     <div class="card shadow-sm border-0">
-        <div class="card-body">
+        {{-- TOP BAR --}}
+            <div
+                class="card-header bg-light border-0 p-4"
+            >
 
-            <div class="d-flex justify-content-between align-items-center mb-3">
-                <h6 class="mb-0">Riwayat Tahun Ajaran</h6>
+                <div
+                    class="d-flex justify-content-between align-items-center flex-wrap gap-3"
+                >
 
-                <form method="GET" class="d-flex gap-2">
-                    <input type="text" name="q" class="form-control form-control-sm"
-                           placeholder="Cari tahun..." value="{{ request('q') }}">
+                    <div>
 
-                    <button class="btn btn-sm btn-outline-secondary">
-                        Cari
-                    </button>
-                </form>
+                        <h5 class="fw-semibold mb-1">
+                            Daftar Tahun Ajaran
+                        </h5>
+
+                        <span class="text-muted small">
+                            Total:
+                            {{ $tahun->count() }}
+                            tahun
+                        </span>
+
+                    </div>
+
+                    <div style="max-width: 280px; width:100%;">
+
+                        <input
+                            type="text"
+                            id="searchInput"
+                            class="form-control rounded-3"
+                            placeholder="Cari tahun ajaran..."
+                        >
+
+                    </div>
+
+                </div>
+
             </div>
+        <div class="card-body">
+                <table class="table align-middle">
 
-            <div class="table-responsive">
-                <table class="table table-hover align-middle">
-
-                    <thead class="table-light">
+                    <thead>
                         <tr>
                             <th>Tahun</th>
                             <th>Semester</th>
                             <th>Status</th>
-                            <th width="120">Aksi</th>
+                            <th>Aksi</th>
                         </tr>
                     </thead>
 
-                    <tbody>
+                    <tbody id="tableTahun">
                         @forelse($tahun as $row)
                             <tr>
-                                <td class="fw-semibold">{{ $row->tahun }}</td>
+                                <td>{{ $row->tahun }}</td>
 
                                 <td>
-                                    <span class="badge bg-light text-dark">
+                                    <span class="badge bg-light text-dark border">
                                         {{ $row->semester }}
                                     </span>
                                 </td>
 
                                 <td>
                                     {!! match($row->status) {
-                                        'aktif'   => '<span class="badge bg-success">Aktif</span>',
-                                        'draft'   => '<span class="badge bg-dark">Draft</span>',
-                                        'selesai' => '<span class="badge bg-secondary">Selesai</span>',
+                                        'aktif'   => '<span class="badge bg-success-subtle text-success-emphasis border border-success-subtle"><i class="bi bi-check-circle me-1"></i>Aktif</span>',
+                                        'draft'   => '<span class="badge bg-warning-subtle text-warning-emphasis border border-warning-subtle"><i class="bi bi-archive me-1"></i>Draft</span>',
+                                        'selesai' => '<span class="badge bg-secondary-subtle text-secondary-emphasis border border-secondary-subtle"><i class="bi bi-check-circle me-1"></i>Selesai</span>',
                                     } !!}
                                 </td>
 
                                 <td>
                                     <a href="{{ route('tu.tahun.detail', $row->id) }}"
-                                       class="btn btn-sm btn-outline-secondary">
+                                       class="btn btn-sm btn-dark">
                                         Detail
                                     </a>
                                 </td>
@@ -248,5 +301,34 @@ if (form) {
     });
 }
 </script>
+{{-- SEARCH --}}
+<script>
 
+    const searchInput =
+        document.getElementById('searchInput');
+
+    searchInput.addEventListener('keyup', function () {
+
+        const keyword =
+            this.value.toLowerCase();
+
+        const rows =
+            document.querySelectorAll(
+                '#tableTahun tr'
+            );
+
+        rows.forEach(row => {
+
+            const text =
+                row.innerText.toLowerCase();
+
+            row.style.display =
+                text.includes(keyword)
+                ? ''
+                : 'none';
+
+        });
+    });
+
+</script>
 @endsection
