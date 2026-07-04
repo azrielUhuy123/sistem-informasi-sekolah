@@ -93,41 +93,51 @@ class ElearningController extends Controller
      * Show the form for creating a new resource.
      */
     public function create()
-{
-    $guru = auth()->user()->guru;
+    {
+        $guru = auth()->user()->guru;
 
-    $pengampu = PengampuMapel::with([
-        'kelas',
-        'mapel'
-    ])
-    ->where('guru_id', $guru->id)
-    ->where('tahun_ajaran_id', current_tahun_id())
-    ->get();
+        /*
+        |--------------------------------------------------------------------------
+        | Guru Bidang
+        |--------------------------------------------------------------------------
+        */
 
-    $waliKelas = WaliKelas::with('kelas')
+        $pengampu = PengampuMapel::with([
+            'kelas',
+            'mapel'
+        ])
         ->where('guru_id', $guru->id)
         ->where('tahun_ajaran_id', current_tahun_id())
-        ->first();
+        ->get();
 
-    $mapelWali = collect();
+        /*
+        |--------------------------------------------------------------------------
+        | Wali Kelas
+        |--------------------------------------------------------------------------
+        */
 
-    if ($waliKelas) {
+        $waliKelas = WaliKelas::with('kelas')
+            ->where('guru_id', $guru->id)
+            ->where('tahun_ajaran_id', current_tahun_id())
+            ->first();
 
-        $mapelWali = MataPelajaran::orderBy(
-            'nama_mapel'
-        )->get();
+        $mapelWali = collect();
 
+        if ($waliKelas) {
+
+            $mapelWali = $this->getMapelWali();
+
+        }
+
+        return view(
+            'guru.elearning.create',
+            compact(
+                'pengampu',
+                'waliKelas',
+                'mapelWali'
+            )
+        );
     }
-
-    return view(
-        'guru.elearning.create',
-        compact(
-            'pengampu',
-            'waliKelas',
-            'mapelWali'
-        )
-    );
-}
 
     /**
      * Store a newly created resource in storage.
@@ -162,20 +172,25 @@ class ElearningController extends Controller
         */
         if (str_starts_with($request->target, 'wali_')) {
 
-            $waliKelasId = str_replace(
+            $mapelId = str_replace(
                 'wali_',
                 '',
                 $request->target
             );
 
-            $wali = WaliKelas::with('kelas')
-                ->where('id', $waliKelasId)
-                ->where('guru_id', $guru->id)
-                ->firstOrFail();
+            $wali = WaliKelas::where(
+                'guru_id',
+                $guru->id
+            )
+            ->where(
+                'tahun_ajaran_id',
+                current_tahun_id()
+            )
+            ->firstOrFail();
+
+            $waliKelasId = $wali->id;
 
             $kelasId = $wali->kelas_id;
-
-            $mapelId = null;
         }
 
                 /*
@@ -253,6 +268,21 @@ class ElearningController extends Controller
                 'success',
                 'Forum berhasil dibuat'
             );
+    }
+
+    private function getMapelWali()
+    {
+        return MataPelajaran::whereIn(
+            'nama_mapel',
+            [
+                'Bahasa Indonesia',
+                'Matematika',
+                'Pendidikan Pancasila',
+                'Ilmu Pengetahuan Alam dan Sosial',
+            ]
+        )
+        ->orderBy('nama_mapel')
+        ->get();
     }
 
     public function uploadImage(Request $request)
@@ -364,4 +394,6 @@ class ElearningController extends Controller
     {
         //
     }
+
+    
 }

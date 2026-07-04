@@ -6,16 +6,103 @@
 
 <div class="container-fluid py-4">
 
-    <div class="d-flex justify-content-between align-items-center mb-4">
+    {{-- ==========================================================
+    HERO
+    ========================================================== --}}
 
-        <div>
-            <h3 class="fw-bold mb-1">
-                E-Learning
-            </h3>
+    <div class="elearning-hero mb-5">
 
-            <p class="text-muted mb-0">
-                Forum pembelajaran dan tugas siswa
-            </p>
+        <div class="row align-items-center">
+
+            <div class="col-lg-8">
+
+                <div class="d-flex align-items-center">
+
+                    <div class="hero-icon">
+
+                        <i class="bi bi-mortarboard-fill"></i>
+
+                    </div>
+
+                    <div class="ms-4">
+
+                        <div class="hero-label">
+
+                            E-LEARNING
+
+                        </div>
+
+                        <h1 class="hero-title">
+
+                            Selamat Datang 👋
+
+                        </h1>
+
+                        <p class="hero-subtitle">
+
+                            Jelajahi seluruh mata pelajaran, forum diskusi,
+                            materi, dan tugas yang diberikan guru.
+
+                        </p>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+            <div class="col-lg-4">
+
+                <div class="hero-stat">
+
+                    <div class="hero-box">
+
+                        <i class="bi bi-book-half"></i>
+
+                        <div>
+
+                            <h3>
+
+                                {{ $mapels->count() }}
+
+                            </h3>
+
+                            <span>
+
+                                Mata Pelajaran
+
+                            </span>
+
+                        </div>
+
+                    </div>
+
+                    <div class="hero-box">
+
+                        <i class="bi bi-chat-dots-fill"></i>
+
+                        <div>
+
+                            <h3>
+
+                                {{ $mapels->flatten()->count() }}
+
+                            </h3>
+
+                            <span>
+
+                                Total Forum
+
+                            </span>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </div>
+
         </div>
 
     </div>
@@ -41,60 +128,109 @@
                 $guru  = $items->first()->guru;
             @endphp
 
-            <div class="col-xl-3 col-lg-4 col-md-6 mb-4">
+            @php
+
+            $colors = [
+                'blue',
+                'green',
+                'orange',
+                'purple',
+                'cyan',
+                'pink'
+            ];
+
+            $icons = [
+                'bi-book',
+                'bi-calculator',
+                'bi-globe2',
+                'bi-palette',
+                'bi-bank',
+                'bi-journal-bookmark',
+                'bi-laptop',
+                'bi-lightbulb'
+            ];
+
+            $color = $colors[$loop->index % count($colors)];
+            $icon  = $icons[$loop->index % count($icons)];
+
+            @endphp
+
+            <div class="col-xl-4 col-lg-6 col-md-6 mb-4">
 
                 <a
-                    href="{{ route('siswa.e-learning.mapel', $mapelId) }}"
+                    href="{{ route('siswa.e-learning.mapel',$mapelId) }}"
                     class="text-decoration-none">
 
-                    <div class="course-card">
+                    <div class="course-modern {{ $color }}">
 
-                        <div class="course-badge">
+                        {{-- HEADER --}}
+                        <div class="course-header">
 
-                            {{ $items->count() }}
-                            Forum
+                            <span class="course-badge">
+
+                                {{ $items->count() }} Forum
+
+                            </span>
+
+                            <div class="course-kelas">
+
+                                <div class="kelas-label">
+
+                                    <i class="bi bi-mortarboard-fill"></i>
+
+                                    <small>Kelas</small>
+
+                                </div>
+
+                                <strong>
+
+                                    {{ $items->first()?->kelas?->nama_kelas }}
+
+                                </strong>
+
+                            </div>
 
                         </div>
 
-                        <h5 class="course-title">
+                        {{-- TITLE --}}
+                        <h4 class="course-title">
 
-                            {{ $mapel?->nama_mapel ?? 'Tanpa Mapel' }}
+                            {{ $mapel?->nama_mapel }}
 
-                        </h5>
+                        </h4>
 
-                        <div class="course-info">
+                        {{-- GURU --}}
+                        <div class="teacher-row">
+
+                            <div class="teacher-avatar">
+
+                                <i class="bi bi-person-fill"></i>
+
+                            </div>
 
                             <div>
 
-                                <span class="text-muted">
-                                    Guru
-                                </span>
+                                <div class="teacher-name">
 
-                                <br>
+                                    {{ $guru?->nama }}
 
-                                {{ $guru?->nama ?? '-' }}
+                                </div>
 
-                            </div>
-
-                            <div class="mt-3">
-
-                                <span class="text-muted">
-                                    Kelas
-                                </span>
-
-                                <br>
-
-                                {{ $items->first()?->kelas?->nama_kelas }}
+                                <small>Guru Mata Pelajaran</small>
 
                             </div>
 
                         </div>
 
-                        <div class="course-arrow">
 
-                            <i class="bi bi-arrow-right"></i>
+                        {{-- BUTTON --}}
+                        <button class="btn-course">
 
-                        </div>
+                            Buka Mata Pelajaran
+
+                            <i class="bi bi-arrow-right ms-2"></i>
+
+                        </button>
 
                     </div>
 
@@ -132,88 +268,84 @@
 
 <style>
 
-.course-card{
+/*==================================================
+HERO
+==================================================*/
+
+.elearning-hero{
+
+    background:
+        linear-gradient(
+            135deg,
+            #2563eb,
+            #4f46e5,
+            #7c3aed
+        );
+
+    border-radius:28px;
+
+    padding:42px;
+
+    color:white;
 
     position:relative;
 
-    height:320px;
-
-    background:#fff;
-
-    border-radius:24px;
-
-    padding:28px;
-
-    border:1px solid #e5e7eb;
-
     overflow:hidden;
 
-    transition:.25s;
-
     box-shadow:
-        0 4px 20px rgba(0,0,0,.06);
+        0 18px 40px rgba(37,99,235,.25);
+
 }
 
-.course-card:hover{
+.elearning-hero::before{
 
-    transform:translateY(-5px);
-
-    box-shadow:
-        0 15px 40px rgba(0,0,0,.12);
-}
-
-.course-title{
-
-    font-size:1.5rem;
-
-    font-weight:700;
-
-    color:#0d47a1;
-
-    margin-top:15px;
-
-    margin-bottom:20px;
-}
-
-.course-info{
-
-    color:#374151;
-
-    font-size:.95rem;
-}
-
-.course-badge{
-
-    display:inline-block;
-
-    padding:6px 12px;
-
-    border-radius:999px;
-
-    background:#eff6ff;
-
-    color:#2563eb;
-
-    font-size:.8rem;
-
-    font-weight:600;
-}
-
-.course-arrow{
+    content:"";
 
     position:absolute;
 
-    right:24px;
+    width:320px;
 
-    bottom:24px;
-
-    width:52px;
-
-    height:52px;
+    height:320px;
 
     border-radius:50%;
 
-    border:3px solid #374151;
+    background:rgba(255,255,255,.08);
+
+    right:-120px;
+
+    top:-120px;
+
+}
+
+.elearning-hero::after{
+
+    content:"";
+
+    position:absolute;
+
+    width:220px;
+
+    height:220px;
+
+    border-radius:50%;
+
+    background:rgba(255,255,255,.05);
+
+    left:-80px;
+
+    bottom:-80px;
+
+}
+
+.hero-icon{
+
+    width:90px;
+
+    height:90px;
+
+    border-radius:22px;
+
+    background:rgba(255,255,255,.15);
 
     display:flex;
 
@@ -221,20 +353,434 @@
 
     justify-content:center;
 
-    font-size:24px;
+    font-size:40px;
 
-    color:#374151;
+    backdrop-filter:blur(10px);
 
-    transition:.25s;
 }
 
-.course-card:hover .course-arrow{
+.hero-label{
 
-    background:#2563eb;
+    text-transform:uppercase;
+
+    letter-spacing:3px;
+
+    font-size:18px;
+
+    opacity:.85;
+
+}
+
+.hero-title{
+
+    font-size:42px;
+
+    font-weight:800;
+
+    margin:8px 0;
+
+}
+
+.hero-subtitle{
+
+    font-size:16px;
+
+    opacity:.92;
+
+    max-width:600px;
+
+}
+
+.hero-stat{
+
+    display:flex;
+
+    flex-direction:column;
+
+    gap:18px;
+
+}
+
+.hero-box{
+
+    background:rgba(255,255,255,.14);
+
+    backdrop-filter:blur(12px);
+
+    border-radius:18px;
+
+    padding:18px;
+
+    display:flex;
+
+    align-items:center;
+
+    gap:18px;
+
+}
+
+.hero-box i{
+
+    font-size:26px;
+
+}
+
+.hero-box h3{
+
+    margin:0;
+
+    font-size:30px;
+
+    font-weight:700;
+
+}
+
+.hero-box span{
+
+    opacity:.9;
+
+}
+
+/*==================================================
+COURSE CARD MODERN
+==================================================*/
+
+.course-modern{
+
+    background:#fff;
+
+    border-radius:24px;
+
+    padding:26px;
+
+    height:100%;
+
+    border-top:5px solid #2563eb;
+
+    box-shadow:0 10px 28px rgba(15,23,42,.06);
+
+    transition:.35s;
+
+    display:flex;
+
+    flex-direction:column;
+
+}
+
+.course-modern:hover{
+
+    transform:translateY(-8px);
+
+    box-shadow:0 18px 42px rgba(37,99,235,.18);
+
+}
+
+/*========== WARNA ==========*/
+
+.course-modern.blue{
+
+    border-color:#2563eb;
+
+}
+
+.course-modern.green{
+
+    border-color:#22c55e;
+
+}
+
+.course-modern.orange{
+
+    border-color:#f97316;
+
+}
+
+.course-modern.purple{
+
+    border-color:#8b5cf6;
+
+}
+
+.course-modern.cyan{
+
+    border-color:#06b6d4;
+
+}
+
+.course-modern.pink{
+
+    border-color:#ec4899;
+
+}
+
+/*========== HEADER ==========*/
+
+.course-header{
+
+    display:flex;
+
+    justify-content:space-between;
+
+    align-items:center;
+
+    margin-bottom:20px;
+
+}
+
+.course-header i{
+
+    font-size:34px;
+
+    opacity:.18;
+
+}
+
+/*========== BADGE ==========*/
+
+.course-badge{
+
+    padding:8px 16px;
+
+    border-radius:999px;
+
+    border:2px solid currentColor;
+
+    font-size:13px;
+
+    font-weight:700;
+
+}
+
+/*========== TITLE ==========*/
+
+.course-title{
+
+    font-size:28px;
+
+    font-weight:700;
+
+    color:#0f172a;
+
+    line-height:1.35;
+
+    margin-bottom:28px;
+
+}
+
+/*========== GURU ==========*/
+
+.teacher-row{
+
+    display:flex;
+
+    align-items:center;
+
+    gap:14px;
+
+    margin-bottom:22px;
+
+}
+
+.teacher-avatar{
+
+    width:54px;
+
+    height:54px;
+
+    border-radius:50%;
+
+    display:flex;
+
+    justify-content:center;
+
+    align-items:center;
 
     color:white;
 
-    border-color:#2563eb;
+    font-size:24px;
+
+}
+
+.teacher-name{
+
+    font-weight:700;
+
+}
+
+.teacher-row small{
+
+    color:#94a3b8;
+
+}
+
+/*========== KELAS ==========*/
+
+.course-kelas{
+
+    display:flex;
+
+    align-items:center;
+
+    gap:8px;
+
+    font-weight:700;
+
+    color:currentColor;
+
+}
+
+.kelas-label{
+
+    display:flex;
+
+    align-items:center;
+
+    gap:6px;
+
+}
+
+.kelas-label i{
+
+    font-size:15px;
+
+    opacity:.9;
+
+}
+
+.kelas-label small{
+
+    font-size:13px;
+
+    font-weight:600;
+
+    text-transform:uppercase;
+
+    letter-spacing:.5px;
+
+    color:currentColor;
+
+    opacity:.75;
+
+}
+
+.course-kelas strong{
+
+    font-size:15px;
+
+    font-weight:800;
+
+    color:currentColor;
+
+    line-height:5;
+
+}
+
+/*========== BUTTON ==========*/
+
+.btn-course{
+
+    margin-top:auto;
+
+    width:100%;
+
+    padding:14px;
+
+    border-radius:14px;
+
+    border:2px solid currentColor;
+
+    background:white;
+
+    font-weight:700;
+
+    transition:.25s;
+
+}
+
+.btn-course:hover{
+
+    color:white;
+
+}
+
+/*========== WARNA ==========*/
+
+.blue{
+
+    color:#2563eb;
+
+}
+
+.green{
+
+    color:#22c55e;
+
+}
+
+.orange{
+
+    color:#f97316;
+
+}
+
+.purple{
+
+    color:#8b5cf6;
+
+}
+
+.cyan{
+
+    color:#06b6d4;
+
+}
+
+.pink{
+
+    color:#ec4899;
+
+}
+
+.blue .teacher-avatar,
+.blue .btn-course:hover{
+
+    background:#2563eb;
+
+}
+
+.green .teacher-avatar,
+.green .btn-course:hover{
+
+    background:#22c55e;
+
+}
+
+.orange .teacher-avatar,
+.orange .btn-course:hover{
+
+    background:#f97316;
+
+}
+
+.purple .teacher-avatar,
+.purple .btn-course:hover{
+
+    background:#8b5cf6;
+
+}
+
+.cyan .teacher-avatar,
+.cyan .btn-course:hover{
+
+    background:#06b6d4;
+
+}
+
+.pink .teacher-avatar,
+.pink .btn-course:hover{
+
+    background:#ec4899;
+
 }
 
 </style>

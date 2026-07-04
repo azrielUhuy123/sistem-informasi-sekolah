@@ -11,22 +11,17 @@ class AkunController extends Controller
 {
     public function index(Request $request)
     {
-        $query = User::query();
+        $query = User::with([
+            'pegawai',
+            'siswa',
+        ]);
 
-        if ($request->role) {
-
-            $query->where(
-                'role',
-                $request->role
-            );
+        if ($request->filled('role')) {
+            $query->where('role', $request->role);
         }
 
-        if ($request->status != '') {
-
-            $query->where(
-                'is_active',
-                $request->status
-            );
+        if ($request->status !== null && $request->status !== '') {
+            $query->where('is_active', $request->status);
         }
 
         $data = $query
@@ -39,10 +34,13 @@ class AkunController extends Controller
         );
     }
 
-    public function show(
-        User $user
-    )
+    public function show(User $user)
     {
+        $user->load([
+            'pegawai',
+            'siswa',
+        ]);
+
         return view(
             'tu.akun.show',
             compact('user')

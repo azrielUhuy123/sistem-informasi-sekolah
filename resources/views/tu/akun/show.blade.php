@@ -158,7 +158,7 @@
 
                         <td>
 
-                            {{ $user->siswa->kelas?->nama_kelas ?? '-' }}
+                            {{ $user->siswa->penempatanAktif?->kelas?->nama_kelas ?? '-' }}
 
                         </td>
 

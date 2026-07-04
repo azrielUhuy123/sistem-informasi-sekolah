@@ -85,119 +85,120 @@ class PendaftarController extends Controller
         );
     }
 
-    public function terima(
-        PpdbPendaftar $pendaftar
-    )
-    {
-        if (
-            !in_array(
-                $pendaftar->status,
-                ['verifikasi']
-            )
-        )
-            {
-                return back()->with(
-                    'error',
-                    'Pendaftar harus diverifikasi terlebih dahulu'
-                );
-            }
-
-        if ($pendaftar->siswa_id) {
-
-            return back()->with(
-                'error',
-                'Pendaftar sudah menjadi siswa'
-            );
-        }
-
-        DB::transaction(function () use ($pendaftar) {
-
-            $angkatan = Angkatan::firstOrCreate(
-                [
-                    'tahun' => now()->year
-                ],
-                [
-                    'keterangan' => 'Angkatan '.now()->year
-                ]
-            );
-
-            $nis = $this->generateNis();
-
-            $password = \Carbon\Carbon::parse(
-                $pendaftar->tanggal_lahir
-                )->format('dmY');
-
-            $user = User::create([
-
-                'name'
-                    => $pendaftar->nama,
-
-                'username' => $nis,    
-
-                'password' => Hash::make($password),
-
-                'role' => UserRole::MURID,
-
-                'is_active'
-                    => true,
-
-                'approval_status'
-                    => 'approved',
-
-                'approved_at' => now(),
-            ]);
-
-            $siswa = Siswa::create([
-
-                'user_id'
-                    => $user->id,
-
-                'angkatan_id'
-                    => $angkatan?->id,
-
-                'nama'
-                    => $pendaftar->nama,
-
-                'nis'
-                    => $nis,
-
-                'nisn'
-                    => null,
-
-                'jenis_kelamin'
-                    => $pendaftar->jenis_kelamin,
-
-                'tanggal_lahir'
-                    => $pendaftar->tanggal_lahir,
-
-                'alamat'
-                    => $pendaftar->alamat,
-
-                'nama_wali'
-                    => optional(
-                        $pendaftar->ayah
-                    )->nama,
-
-                'telepon_wali'
-                    => $pendaftar->hp_ayah,
-            ]);
-
-            $pendaftar->update([
-
-                'status'
-                    => 'diterima',
-
-                'siswa_id'
-                    => $siswa->id,
-            ]);
-        });
-
-
+    public function terima(PpdbPendaftar $pendaftar)
+{
+    if (!in_array($pendaftar->status, ['verifikasi'])) {
         return back()->with(
-            'success',
-            'Pendaftar berhasil diterima'
+            'error',
+            'Pendaftar harus diverifikasi terlebih dahulu'
         );
     }
+
+    if ($pendaftar->siswa_id) {
+        return back()->with(
+            'error',
+            'Pendaftar sudah menjadi siswa'
+        );
+    }
+
+    DB::transaction(function () use ($pendaftar) {
+
+        $angkatan = Angkatan::firstOrCreate(
+            [
+                'tahun' => now()->year
+            ],
+            [
+                'keterangan' => 'Angkatan ' . now()->year
+            ]
+        );
+
+        $nis = $this->generateNis();
+
+        $password = \Carbon\Carbon::parse(
+            $pendaftar->tanggal_lahir
+        )->format('dmY');
+
+        /*
+        |--------------------------------------------------------------------------
+        | Buat Akun User
+        |--------------------------------------------------------------------------
+        */
+
+        $user = User::create([
+
+            'name' => $pendaftar->nama,
+
+            'username' => $nis,
+
+            'password' => Hash::make($password),
+
+            'role' => UserRole::MURID,
+
+            'is_active' => true,
+
+            'approval_status' => 'approved',
+
+            'approved_at' => now(),
+        ]);
+
+        /*
+        |--------------------------------------------------------------------------
+        | Buat Data Siswa
+        |--------------------------------------------------------------------------
+        */
+
+        $siswa = Siswa::create([
+
+            'user_id' => $user->id,
+
+            'angkatan_id' => $angkatan->id,
+
+            'nama' => $pendaftar->nama,
+
+            'nis' => $nis,
+
+            'nisn' => null,
+
+            'jenis_kelamin' => $pendaftar->jenis_kelamin,
+
+            'tanggal_lahir' => $pendaftar->tanggal_lahir,
+
+            'alamat' => $pendaftar->alamat,
+
+            'nama_wali' => optional($pendaftar->ayah)->nama,
+
+            'telepon_wali' => $pendaftar->hp_ayah,
+        ]);
+
+        /*
+        |--------------------------------------------------------------------------
+        | Hubungkan User <-> Siswa
+        |--------------------------------------------------------------------------
+        */
+
+        $user->update([
+            'siswa_id' => $siswa->id,
+        ]);
+
+        /*
+        |--------------------------------------------------------------------------
+        | Update PPDB
+        |--------------------------------------------------------------------------
+        */
+
+        $pendaftar->update([
+
+            'status' => 'diterima',
+
+            'siswa_id' => $siswa->id,
+        ]);
+    });
+
+    return back()->with(
+        'success',
+        'Pendaftar berhasil diterima.'
+    );
+}
 
     public function tolak(
         PpdbPendaftar $pendaftar
