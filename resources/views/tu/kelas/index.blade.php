@@ -54,21 +54,12 @@
                 </div>
 
                 <div class="d-flex flex-column flex-md-row align-items-md-center gap-3">
-                    <div class="d-flex align-items-start gap-2">
-                        <div class="rounded-3 bg-primary-subtle text-primary d-flex align-items-center justify-content-center" style="width: 44px; height: 44px;">
-                            <i class="bi bi-file-earmark-excel fs-5"></i>
-                        </div>
-                        <div>
-                            <h6 class="fw-semibold mb-1">Import Data Siswa</h6>
-                            <p class="small text-muted mb-0">Unggah file Excel/CSV untuk menambahkan data siswa.</p>
-                        </div>
-                    </div>
 
                     <form action="{{ route('tu.siswa.import') }}" method="POST" enctype="multipart/form-data" class="d-flex align-items-center gap-2 flex-wrap">
                         @csrf
-                        <div class="border rounded-3 px-2 d-flex gap-2">
-                            <i class="bi bi-paperclip text-muted"></i>
-                            <input class="form-control form-control-sm border-0 shadow-none" id="formFileSm" type="file" name="file" accept=".xlsx,.xls,.csv" required>
+                        <div class="border rounded-3 px-2 d-flex gap-1">
+                            <i class="bi bi-paperclip text-muted mt-1"></i>
+                            <input class="form-control form-control-sm mt-1" id="formFileSm" type="file" name="file" accept=".xlsx,.xls,.csv" required>
                         </div>
                         <button class="btn btn-dark btn-sm">
                             <i class="bi bi-upload me-1"></i>
@@ -83,6 +74,7 @@
             <table class="table align-middle">
                 <thead>
                     <tr>
+                        <th>No</th>
                         <th>Tingkat</th>
                         <th>Angkatan</th>
                         <th>Jumlah Kelas</th>
@@ -92,6 +84,7 @@
                 <tbody>
                     @forelse ($grupKelas as $grup)
                         <tr>
+                            <td>{{ $loop->iteration }}</td>
                             <td>Kelas {{ $grup->kelasMaster->tingkat }}</td>
 
                             <td>
@@ -107,10 +100,17 @@
                                 </span>
                             </td>
 
-                            <td>
+                            <td class="d-flex gap-2">
                                 <a href="{{ route('tu.kelas.rombel.index', $grup->id) }}"
                                    class="btn btn-sm btn-dark">
                                     Masuk
+                                </a>
+                                <a
+                                    href="{{ route('tu.kelas.export',$grup) }}"
+                                    class="btn btn-success btn-sm"
+                                >
+                                    <i class="bi bi-file-earmark-excel"></i>
+                                    Export
                                 </a>
                             </td>
                         </tr>

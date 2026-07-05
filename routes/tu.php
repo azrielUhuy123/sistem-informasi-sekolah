@@ -347,6 +347,11 @@ Route::post(
     [NomorSuratTuController::class, 'generate']
 )->name('nomor-surat.generate');
 
+Route::get(
+    '/kelas/{kelasGrup}/export',
+    [KelasController::class,'exportExcel']
+)->name('kelas.export');
+
         
         /*
         |--------------------------------------------------------------------------

@@ -13,6 +13,9 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use App\Models\WaliKelas;
 use App\Models\Guru;
+use Maatwebsite\Excel\Facades\Excel;
+use App\Exports\KelasExport;
+
 
 class KelasController extends Controller
 {
@@ -249,7 +252,14 @@ class KelasController extends Controller
         ));
     }
 
-
+public function exportExcel(KelasGrup $kelasGrup)
+{
+    return Excel::download(
+        new KelasExport($kelasGrup),
+        'DATA SISWA KELAS '.$kelasGrup->kelasMaster->tingkat.
+        ' ANGKATAN '.$kelasGrup->angkatan->tahun.'.xlsx'
+    );
+}
 public function storeWali(Request $request, $id)
 {
     $request->validate([
