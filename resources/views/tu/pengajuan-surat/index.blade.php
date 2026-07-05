@@ -98,135 +98,139 @@
 
         <div class="card-body">
 
-            <table class="table align-middle">
+            <div class="table-responsive">
 
-                <thead>
+                <table class="table align-middle">
 
-                    <tr>
-
-                        <th>No</th>
-                        <th>Nama Dokumen</th>
-                        <th>Kategori</th>
-                        <th>Status</th>
-                        <th>Aksi</th>
-
-                    </tr>
-
-                </thead>
-
-                <tbody id="tablePengajuan">
-
-                    @forelse($pengajuan as $row)
+                    <thead>
 
                         <tr>
 
-                            <td>
-                                {{ $loop->iteration }}
-                            </td>
-
-                            <td>
-                                {{ $row->nama_surat }}
-                            </td>
-
-                            <td>
-                                <span class="badge bg-light text-dark border">
-                                    {{ $row->kategori_surat }}
-                                </span>
-                            </td>
-
-                            <td>
-
-                                @if($row->status == 'draft')
-
-                                    <span class="badge bg-warning-subtle text-warning-emphasis border border-warning-subtle">
-                                        <i class="bi bi-hourglass-split me-1"></i> Validasi
-                                    </span>
-
-                                @elseif($row->status == 'disetujui')
-
-                                    <span class="badge bg-success-subtle text-success-emphasis border border-success-subtle">
-                                        <i class="bi bi-check-circle me-1"></i> Valid
-                                    </span>
-
-                                @else
-
-                                    <span class="badge bg-danger-subtle text-danger-emphasis border border-danger-subtle">
-                                        <i class="bi bi-x-circle me-1"></i> Ditolak
-                                    </span>
-
-                                @endif
-
-                            </td>
-
-                            <td>
-                                <div class="dropdown">
-
-                                    <button class="btn btn-sm btn-outline-secondary dropdown-toggle"
-                                            type="button"
-                                            data-bs-toggle="dropdown"
-                                            aria-expanded="false">
-
-                                        <i class="bi bi-gear-fill"></i>
-
-                                    </button>
-
-                                    <ul class="dropdown-menu dropdown-menu-end shadow-sm border-0">
-
-                                        <li>
-                                            <a class="dropdown-item" href="{{ route('tu.pengajuan-surat.show', $row->id) }}">
-                                                <i class="bi bi-eye me-2"></i> Detail
-                                            </a>
-                                        </li>
-
-                                        <li>
-                                            <a class="dropdown-item" href="{{ route('tu.pengajuan-surat.edit', $row->id) }}">
-                                                <i class="bi bi-pencil-square me-2"></i> Edit
-                                            </a>
-                                        </li>
-
-                                        <li><hr class="dropdown-divider"></li>
-
-                                        <li>
-                                            <form action="{{ route('tu.pengajuan-surat.destroy', $row->id) }}"
-                                                method="POST"
-                                                onsubmit="return confirm('Hapus data ini?')">
-
-                                                @csrf
-                                                @method('DELETE')
-
-                                                <button type="submit" class="dropdown-item text-danger">
-                                                    <i class="bi bi-trash me-2"></i> Hapus
-                                                </button>
-
-                                            </form>
-                                        </li>
-
-                                    </ul>
-
-                                </div>
-
-                            </td>
+                            <th>No</th>
+                            <th>Nama Dokumen</th>
+                            <th>Kategori</th>
+                            <th>Status</th>
+                            <th>Aksi</th>
 
                         </tr>
 
-                    @empty
+                    </thead>
 
-                        <tr>
+                    <tbody id="tablePengajuan">
 
-                            <td colspan="5"
-                                class="text-center text-muted py-4">
+                        @forelse($pengajuan as $row)
 
-                                Belum ada pengajuan surat
+                            <tr>
 
-                            </td>
+                                <td>
+                                    {{ $loop->iteration }}
+                                </td>
 
-                        </tr>
+                                <td>
+                                    {{ $row->nama_surat }}
+                                </td>
 
-                    @endforelse
+                                <td>
+                                    <span class="badge bg-light text-dark border">
+                                        {{ $row->kategori_surat }}
+                                    </span>
+                                </td>
 
-                </tbody>
+                                <td>
 
-            </table>
+                                    @if($row->status == 'draft')
+
+                                        <span class="badge bg-warning-subtle text-warning-emphasis border border-warning-subtle">
+                                            <i class="bi bi-hourglass-split me-1"></i> Validasi
+                                        </span>
+
+                                    @elseif($row->status == 'disetujui')
+
+                                        <span class="badge bg-success-subtle text-success-emphasis border border-success-subtle">
+                                            <i class="bi bi-check-circle me-1"></i> Valid
+                                        </span>
+
+                                    @else
+
+                                        <span class="badge bg-danger-subtle text-danger-emphasis border border-danger-subtle">
+                                            <i class="bi bi-x-circle me-1"></i> Ditolak
+                                        </span>
+
+                                    @endif
+
+                                </td>
+
+                                <td>
+                                    <div class="dropdown">
+
+                                        <button class="btn btn-sm btn-outline-secondary dropdown-toggle"
+                                                type="button"
+                                                data-bs-toggle="dropdown"
+                                                aria-expanded="false">
+
+                                            <i class="bi bi-gear-fill"></i>
+
+                                        </button>
+
+                                        <ul class="dropdown-menu dropdown-menu-end shadow-sm border-0">
+
+                                            <li>
+                                                <a class="dropdown-item" href="{{ route('tu.pengajuan-surat.show', $row->id) }}">
+                                                    <i class="bi bi-eye me-2"></i> Detail
+                                                </a>
+                                            </li>
+
+                                            <li>
+                                                <a class="dropdown-item" href="{{ route('tu.pengajuan-surat.edit', $row->id) }}">
+                                                    <i class="bi bi-pencil-square me-2"></i> Edit
+                                                </a>
+                                            </li>
+
+                                            <li><hr class="dropdown-divider"></li>
+
+                                            <li>
+                                                <form action="{{ route('tu.pengajuan-surat.destroy', $row->id) }}"
+                                                    method="POST"
+                                                    onsubmit="return confirm('Hapus data ini?')">
+
+                                                    @csrf
+                                                    @method('DELETE')
+
+                                                    <button type="submit" class="dropdown-item text-danger">
+                                                        <i class="bi bi-trash me-2"></i> Hapus
+                                                    </button>
+
+                                                </form>
+                                            </li>
+
+                                        </ul>
+
+                                    </div>
+
+                                </td>
+
+                            </tr>
+
+                        @empty
+
+                            <tr>
+
+                                <td colspan="5"
+                                    class="text-center text-muted py-4">
+
+                                    Belum ada pengajuan surat
+
+                                </td>
+
+                            </tr>
+
+                        @endforelse
+
+                    </tbody>
+
+                </table>
+
+            </div>
 
         </div>
 

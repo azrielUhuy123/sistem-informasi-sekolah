@@ -187,123 +187,130 @@
     <div class="card border-0 shadow-sm">
         <div class="card-body">
 
-            <table class="table align-middle">
+            <div class="table-responsive">
 
-                <thead>
-                    <tr>
-                        <th>
-                            <input type="checkbox" id="selectAll">
-                        </th>
-                        <th>No</th>
-                        <th>Nama</th>
-                        <th>NIS</th>
-                        <th>NISN</th>
-                        <th>Rombel</th>
-                        <th>Angkatan</th>
-                        <th>Status</th>
-                        <th>Aksi</th>
-                    </tr>
-                </thead>
+                <table class="table align-middle">
 
-                <tbody>
-
-                    @forelse ($siswa as $row)
-
+                    <thead>
                         <tr>
-                            <td>
-                                <input type="checkbox" name="ids[]" value="{{ $row->id }}" class="row-checkbox">
-                            </td>
-
-                            <td>{{ $loop->iteration + ($siswa->currentPage()-1)*$siswa->perPage() }}</td>
-
-                            <td>{{ $row->nama }}</td>
-
-                            <td>{{ $row->nis }}</td>
-
-                            <td>{{ $row->nisn ?? '-' }}</td>
-
-                            {{-- ROMBEL --}}
-                            <td>
-                                <span class="badge bg-secondary">
-                                    {{ $row->penempatanAktif?->kelas?->nama_kelas ?? '-' }}
-                                </span>
-                            </td>
-
-                            {{-- ANGKATAN --}}
-                            <td>
-                                {{ $row->penempatanAktif?->kelas?->kelasGrup?->angkatan?->tahun ?? '-' }}
-                            </td>
-
-                            {{-- STATUS --}}
-                            <td>
-                                @if($row->trashed())
-
-                                <span class="badge bg-danger-subtle text-danger-emphasis border border-danger-subtle">
-                                    <i class="bi bi-x-circle me-1"></i> Nonaktif
-                                </span>
-
-                                @else
-
-                                <span class="badge bg-success-subtle text-success-emphasis border border-success-subtle">
-                                    <i class="bi bi-check-circle me-1"></i> Aktif
-                                </span>
-
-                                @endif
-                            </td>
-
-                            {{-- AKSI --}}
-                            <td>
-
-                                <div class="dropdown">
-
-                                    <button class="btn btn-sm btn-outline-secondary dropdown-toggle"
-                                            type="button"
-                                            data-bs-toggle="dropdown"
-                                            aria-expanded="false">
-
-                                        <i class="bi bi-gear-fill"></i>
-
-                                    </button>
-
-                                    <ul class="dropdown-menu dropdown-menu-end shadow-sm border-0">
-
-                                        <li>
-                                            <a class="dropdown-item" href="{{ route('tu.siswa.show', $row->id) }}">
-                                                <i class="bi bi-eye me-2"></i> Detail
-                                            </a>
-                                        </li>
-
-                                        <li>
-                                            <a class="dropdown-item" href="{{ route('tu.siswa.edit', $row->id) }}">
-                                                <i class="bi bi-pencil-square me-2"></i> Edit
-                                            </a>
-                                        </li>
-
-                                    </ul>
-
-                                </div>
-
-                                
-
-                                
-
-                            </td>
-
+                            <th>
+                                <input type="checkbox" id="selectAll">
+                            </th>
+                            <th>No</th>
+                            <th>Nama</th>
+                            <th>NIS</th>
+                            <th>NISN</th>
+                            <th>Rombel</th>
+                            <th>Angkatan</th>
+                            <th>Status</th>
+                            <th>Aksi</th>
                         </tr>
+                    </thead>
 
-                    @empty
+                    <tbody>
 
-                        <tr>
-                            <td colspan="9" class="text-center text-muted">
-                                Tidak ada data siswa
-                            </td>
-                        </tr>
+                        @forelse ($siswa as $row)
 
-                    @endforelse
+                            <tr>
+                                <td>
+                                    <input type="checkbox" name="ids[]" value="{{ $row->id }}" class="row-checkbox">
+                                </td>
 
-                </tbody>
+                                <td>{{ $loop->iteration + ($siswa->currentPage()-1)*$siswa->perPage() }}</td>
 
-            </table>
+                                <td>{{ $row->nama }}</td>
+
+                                <td>{{ $row->nis }}</td>
+
+                                <td>{{ $row->nisn ?? '-' }}</td>
+
+                                {{-- ROMBEL --}}
+                                <td>
+                                    <span class="badge bg-secondary">
+                                        {{ $row->penempatanAktif?->kelas?->nama_kelas ?? '-' }}
+                                    </span>
+                                </td>
+
+                                {{-- ANGKATAN --}}
+                                <td>
+                                    {{ $row->penempatanAktif?->kelas?->kelasGrup?->angkatan?->tahun ?? '-' }}
+                                </td>
+
+                                {{-- STATUS --}}
+                                <td>
+                                    @if($row->trashed())
+
+                                    <span class="badge bg-danger-subtle text-danger-emphasis border border-danger-subtle">
+                                        <i class="bi bi-x-circle me-1"></i> Nonaktif
+                                    </span>
+
+                                    @else
+
+                                    <span class="badge bg-success-subtle text-success-emphasis border border-success-subtle">
+                                        <i class="bi bi-check-circle me-1"></i> Aktif
+                                    </span>
+
+                                    @endif
+                                </td>
+
+                                {{-- AKSI --}}
+                                <td>
+
+                                    <div class="dropdown">
+
+                                        <button class="btn btn-sm btn-outline-secondary dropdown-toggle"
+                                                type="button"
+                                                data-bs-toggle="dropdown"
+                                                aria-expanded="false">
+
+                                            <i class="bi bi-gear-fill"></i>
+
+                                        </button>
+
+                                        <ul class="dropdown-menu dropdown-menu-end shadow-sm border-0">
+
+                                            <li>
+                                                <a class="dropdown-item" href="{{ route('tu.siswa.show', $row->id) }}">
+                                                    <i class="bi bi-eye me-2"></i> Detail
+                                                </a>
+                                            </li>
+
+                                            <li>
+                                                <a class="dropdown-item" href="{{ route('tu.siswa.edit', $row->id) }}">
+                                                    <i class="bi bi-pencil-square me-2"></i> Edit
+                                                </a>
+                                            </li>
+
+                                        </ul>
+
+                                    </div>
+
+                                    
+
+                                    
+
+                                </td>
+
+                            </tr>
+
+                        @empty
+
+                            <tr>
+                                <td colspan="9" class="text-center text-muted">
+                                    Tidak ada data siswa
+                                </td>
+                            </tr>
+
+                        @endforelse
+
+                    </tbody>
+
+                </table>
+
+            </div>
+
+            {{-- =========================
+               PAGINATION
 
             {{-- PAGINATION --}}
             <div class="mt-3">

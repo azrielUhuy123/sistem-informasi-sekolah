@@ -58,93 +58,96 @@
     <div class="card border-0 shadow-sm">
         <div class="card-body">
 
-            <table class="table align-middle">
+            <div class="table-responsive">
 
-                <thead>
-                    <tr>
-                        <th>No</th>
-                        <th>Kode</th>
-                        <th>Nama Mata Pelajaran</th>
-                        <th>Aksi</th>
-                    </tr>
-                </thead>
+                <table class="table align-middle">
 
-                <tbody>
-
-                    @forelse ($mata_pelajaran as $row)
-
+                    <thead>
                         <tr>
-
-                            <td>{{ $loop->iteration }}</td>
-
-                            <td>
-                                <span class="badge bg-primary">
-                                    {{ $row->kode_mapel ?? '-' }}
-                                </span>
-                            </td>
-
-                            <td>
-                                    <span class="badge bg-light text-dark border">
-                                        {{ $row->nama_mapel }}
-                                    </span>     
-                            </td>
-                            <td>
-                                <div class="dropdown">
-
-                                    <button class="btn btn-sm btn-outline-secondary dropdown-toggle"
-                                            type="button"
-                                            data-bs-toggle="dropdown"
-                                            aria-expanded="false">
-
-                                        <i class="bi bi-gear-fill"></i>
-
-                                    </button>
-
-                                    <ul class="dropdown-menu dropdown-menu-end shadow-sm border-0">
-
-                                        <li>
-                                            <a class="dropdown-item" href="{{ route('tu.mapel.edit', $row->id) }}">
-                                                <i class="bi bi-pencil-square me-2"></i> Edit
-                                            </a>
-                                        </li>
-
-                                        <li><hr class="dropdown-divider"></li>
-
-                                        <li>
-                                            <form action="{{ route('tu.mapel.destroy', $row->id) }}"
-                                                method="POST"
-                                                onsubmit="return confirm('Hapus data ini?')">
-
-                                                @csrf
-                                                @method('DELETE')
-
-                                                <button type="submit" class="dropdown-item text-danger">
-                                                    <i class="bi bi-trash me-2"></i> Hapus
-                                                </button>
-
-                                            </form>
-                                        </li>
-
-                                    </ul>
-
-                                </div>
-                            </td>
-
+                            <th>No</th>
+                            <th>Kode</th>
+                            <th>Nama Mata Pelajaran</th>
+                            <th>Aksi</th>
                         </tr>
+                    </thead>
 
-                    @empty
+                    <tbody>
 
-                        <tr>
-                            <td colspan="3" class="text-center text-muted">
-                                Tidak ada data mata pelajaran
-                            </td>
-                        </tr>
+                        @forelse ($mata_pelajaran as $row)
 
-                    @endforelse
+                            <tr>
 
-                </tbody>
+                                <td>{{ $loop->iteration }}</td>
 
-            </table>
+                                <td>
+                                    <span class="badge bg-primary">
+                                        {{ $row->kode_mapel ?? '-' }}
+                                    </span>
+                                </td>
+
+                                <td>
+                                        <span class="badge bg-light text-dark border">
+                                            {{ $row->nama_mapel }}
+                                        </span>     
+                                </td>
+                                <td>
+                                    <div class="dropdown">
+
+                                        <button class="btn btn-sm btn-outline-secondary dropdown-toggle"
+                                                type="button"
+                                                data-bs-toggle="dropdown"
+                                                aria-expanded="false">
+
+                                            <i class="bi bi-gear-fill"></i>
+
+                                        </button>
+
+                                        <ul class="dropdown-menu dropdown-menu-end shadow-sm border-0">
+
+                                            <li>
+                                                <a class="dropdown-item" href="{{ route('tu.mapel.edit', $row->id) }}">
+                                                    <i class="bi bi-pencil-square me-2"></i> Edit
+                                                </a>
+                                            </li>
+
+                                            <li><hr class="dropdown-divider"></li>
+
+                                            <li>
+                                                <form action="{{ route('tu.mapel.destroy', $row->id) }}"
+                                                    method="POST"
+                                                    onsubmit="return confirm('Hapus data ini?')">
+
+                                                    @csrf
+                                                    @method('DELETE')
+
+                                                    <button type="submit" class="dropdown-item text-danger">
+                                                        <i class="bi bi-trash me-2"></i> Hapus
+                                                    </button>
+
+                                                </form>
+                                            </li>
+
+                                        </ul>
+
+                                    </div>
+                                </td>
+
+                            </tr>
+
+                        @empty
+
+                            <tr>
+                                <td colspan="3" class="text-center text-muted">
+                                    Tidak ada data mata pelajaran
+                                </td>
+                            </tr>
+
+                        @endforelse
+
+                    </tbody>
+
+                </table>
+            </div>
 
         </div>
     </div>

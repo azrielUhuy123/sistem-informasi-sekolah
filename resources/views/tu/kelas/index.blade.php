@@ -71,58 +71,60 @@
         </div>
 
         <div class="card-body">
-            <table class="table align-middle">
-                <thead>
-                    <tr>
-                        <th>No</th>
-                        <th>Tingkat</th>
-                        <th>Angkatan</th>
-                        <th>Jumlah Kelas</th>
-                        <th>Aksi</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    @forelse ($grupKelas as $grup)
+            <div class="table-responsive">
+                <table class="table align-middle">
+                    <thead>
                         <tr>
-                            <td>{{ $loop->iteration }}</td>
-                            <td>Kelas {{ $grup->kelasMaster->tingkat }}</td>
-
-                            <td>
-                                {{ $grup->angkatan->tahun }}
-                                <span class="text-muted">
-                                    ({{ $grup->angkatan->keterangan }})
-                                </span>
-                            </td>
-
-                            <td>
-                                <span class="badge bg-secondary-subtle text-secondary-emphasis border border-secondary-subtle">
-                                    {{ $grup->jumlah_kelas }} Kelas
-                                </span>
-                            </td>
-
-                            <td class="d-flex gap-2">
-                                <a href="{{ route('tu.kelas.rombel.index', $grup->id) }}"
-                                   class="btn btn-sm btn-dark">
-                                    Masuk
-                                </a>
-                                <a
-                                    href="{{ route('tu.kelas.export',$grup) }}"
-                                    class="btn btn-success btn-sm"
-                                >
-                                    <i class="bi bi-file-earmark-excel"></i>
-                                    Export
-                                </a>
-                            </td>
+                            <th>No</th>
+                            <th>Tingkat</th>
+                            <th>Angkatan</th>
+                            <th>Jumlah Kelas</th>
+                            <th>Aksi</th>
                         </tr>
-                    @empty
-                        <tr>
-                            <td colspan="4" class="text-center text-muted py-4">
-                                Belum ada data kelas
-                            </td>
-                        </tr>
-                    @endforelse
-                </tbody>
-            </table>
+                    </thead>
+                    <tbody>
+                        @forelse ($grupKelas as $grup)
+                            <tr>
+                                <td>{{ $loop->iteration }}</td>
+                                <td>Kelas {{ $grup->kelasMaster->tingkat }}</td>
+
+                                <td>
+                                    {{ $grup->angkatan->tahun }}
+                                    <span class="text-muted">
+                                        ({{ $grup->angkatan->keterangan }})
+                                    </span>
+                                </td>
+
+                                <td>
+                                    <span class="badge bg-secondary-subtle text-secondary-emphasis border border-secondary-subtle">
+                                        {{ $grup->jumlah_kelas }} Kelas
+                                    </span>
+                                </td>
+
+                                <td class="d-flex gap-2">
+                                    <a href="{{ route('tu.kelas.rombel.index', $grup->id) }}"
+                                    class="btn btn-sm btn-dark">
+                                        Masuk
+                                    </a>
+                                    <a
+                                        href="{{ route('tu.kelas.export',$grup) }}"
+                                        class="btn btn-success btn-sm"
+                                    >
+                                        <i class="bi bi-file-earmark-excel"></i>
+                                        Export
+                                    </a>
+                                </td>
+                            </tr>
+                        @empty
+                            <tr>
+                                <td colspan="4" class="text-center text-muted py-4">
+                                    Belum ada data kelas
+                                </td>
+                            </tr>
+                        @endforelse
+                    </tbody>
+                </table>
+            </div>
         </div>
     </div>
 </div>

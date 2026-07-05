@@ -64,6 +64,8 @@
 
         <div class="card-body">
 
+            <div class="table-responsive">
+
                 <table
                     class="table align-middle"
                 >
@@ -265,6 +267,8 @@
                     </tbody>
 
                 </table>
+            
+            </div>
 
         </div>
 

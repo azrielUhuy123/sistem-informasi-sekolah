@@ -61,70 +61,72 @@
 
     <div class="card border-0 shadow-sm">
 
-
         <div class="card-body">
 
-            <table class="table align-middle">
+            <div class="table-responsive">
 
-                <thead>
+                <table class="table align-middle">
 
-                    <tr>
-
-                        <th>No</th>
-                        <th>Nomor Surat</th>
-                        <th>Tanggal Pengajuan</th>
-                        <th>Status</th>
-
-                    </tr>
-
-                </thead>
-
-                <tbody>
-
-                    @forelse($nomorSurat as $row)
+                    <thead>
 
                         <tr>
 
-                            <td>
-                                {{ $loop->iteration }}
-                            </td>
-
-                            <td>
-                                {{ $row->nomor_surat }}
-                            </td>
-
-                            <td>
-                                {{ $row->created_at->translatedFormat('d F Y') }}
-                            </td>
-
-                            <td>
-
-                                <span class="badge bg-success-subtle text-success-emphasis border border-success-subtle">
-                                    <i class="bi bi-check-circle me-1"></i> Digunakan
-                                </span>
-
-                            </td>
+                            <th>No</th>
+                            <th>Nomor Surat</th>
+                            <th>Tanggal Pengajuan</th>
+                            <th>Status</th>
 
                         </tr>
 
-                    @empty
+                    </thead>
 
-                        <tr>
+                    <tbody>
 
-                            <td colspan="5"
-                                class="text-center text-muted py-4">
+                        @forelse($nomorSurat as $row)
 
-                                Belum ada nomor surat
+                            <tr>
 
-                            </td>
+                                <td>
+                                    {{ $loop->iteration }}
+                                </td>
 
-                        </tr>
+                                <td>
+                                    {{ $row->nomor_surat }}
+                                </td>
 
-                    @endforelse
+                                <td>
+                                    {{ $row->created_at->translatedFormat('d F Y') }}
+                                </td>
 
-                </tbody>
+                                <td>
 
-            </table>
+                                    <span class="badge bg-success-subtle text-success-emphasis border border-success-subtle">
+                                        <i class="bi bi-check-circle me-1"></i> Digunakan
+                                    </span>
+
+                                </td>
+
+                            </tr>
+
+                        @empty
+
+                            <tr>
+
+                                <td colspan="5"
+                                    class="text-center text-muted py-4">
+
+                                    Belum ada nomor surat
+
+                                </td>
+
+                            </tr>
+
+                        @endforelse
+
+                    </tbody>
+
+                </table>
+            </div>
 
         </div>
 

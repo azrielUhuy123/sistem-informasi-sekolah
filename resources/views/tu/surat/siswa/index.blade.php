@@ -105,166 +105,167 @@
 
         {{-- TABLE --}}
         <div class="card-body">
+            <div class="table-responsive">
+                <table
+                    class="table align-middle"
+                >
 
-            <table
-                class="table align-middle"
-            >
-
-                <thead>
-
-                    <tr>
-
-                        <th>
-                            No
-                        </th>
-
-                        <th>
-                            Nama Dokumen
-                        </th>
-
-                        <th>
-                            Kategori
-                        </th>
-
-                        <th>
-                            Preview
-                        </th>
-
-                        <th>
-                            Aksi
-                        </th>
-
-                    </tr>
-
-                </thead>
-
-                <tbody id="tableDokumen">
-
-                    @forelse($dokumen as $row)
+                    <thead>
 
                         <tr>
 
-                            <td>
+                            <th>
+                                No
+                            </th>
 
-                                {{ $loop->iteration }}
+                            <th>
+                                Nama Dokumen
+                            </th>
 
-                            </td>
+                            <th>
+                                Kategori
+                            </th>
 
-                            <td>  
-                                {{ $row->nama_surat }}
-                            </td>
+                            <th>
+                                Preview
+                            </th>
 
-                            <td>
+                            <th>
+                                Aksi
+                            </th>
 
-                                <span class="badge bg-light text-dark border">
+                        </tr>
 
-                                    {{ $row->kategori_surat }}
+                    </thead>
 
-                                </span>
+                    <tbody id="tableDokumen">
 
-                            </td>
+                        @forelse($dokumen as $row)
 
-                            <td>
+                            <tr>
 
-                                @if(
-                                    pathinfo(
-                                        $row->file,
-                                        PATHINFO_EXTENSION
-                                    ) === 'pdf'
-                                )
+                                <td>
 
-                                    <a
-                                        href="{{ asset('uploads/dokumen/' . $row->file) }}"
-                                        target="_blank"
-                                        class="btn btn-light border rounded-3 btn-sm px-3"
-                                    >
+                                    {{ $loop->iteration }}
 
-                                        <i class="bi bi-eye"></i>
+                                </td>
 
-                                    </a>
+                                <td>  
+                                    {{ $row->nama_surat }}
+                                </td>
 
-                                @else
+                                <td>
 
-                                    <span class="text-muted small">
-                                        Preview hanya untuk PDF
+                                    <span class="badge bg-light text-dark border">
+
+                                        {{ $row->kategori_surat }}
+
                                     </span>
 
-                                @endif
+                                </td>
 
-                            </td>
+                                <td>
 
-                            <td>
+                                    @if(
+                                        pathinfo(
+                                            $row->file,
+                                            PATHINFO_EXTENSION
+                                        ) === 'pdf'
+                                    )
 
-                                <div class="dropdown">
+                                        <a
+                                            href="{{ asset('uploads/dokumen/' . $row->file) }}"
+                                            target="_blank"
+                                            class="btn btn-light border rounded-3 btn-sm px-3"
+                                        >
 
-                                        <button class="btn btn-sm btn-outline-secondary dropdown-toggle"
-                                                type="button"
-                                                data-bs-toggle="dropdown"
-                                                aria-expanded="false">
+                                            <i class="bi bi-eye"></i>
 
-                                            <i class="bi bi-gear-fill"></i>
+                                        </a>
 
-                                        </button>
+                                    @else
 
-                                        <ul class="dropdown-menu dropdown-menu-end shadow-sm border-0">
+                                        <span class="text-muted small">
+                                            Preview hanya untuk PDF
+                                        </span>
 
-                                            <li>
-                                                <a class="dropdown-item" href="{{ asset('uploads/dokumen/' . $row->file) }}" download>
-                                                    <i class="bi bi-download me-2"></i> Download
-                                                </a>
-                                            </li>
+                                    @endif
 
-                                            
-                                            <li><hr class="dropdown-divider"></li>
+                                </td>
 
-                                            <li>
-                                                <form action="{{ route('tu.dokumen.destroy', $row->id) }}"
-                                                    method="POST"
-                                                    onsubmit="return confirm('Hapus data ini?')">
+                                <td>
 
-                                                    @csrf
-                                                    @method('DELETE')
+                                    <div class="dropdown">
 
-                                                    <button type="submit" class="dropdown-item text-danger">
-                                                        <i class="bi bi-trash me-2"></i> Hapus
-                                                    </button>
+                                            <button class="btn btn-sm btn-outline-secondary dropdown-toggle"
+                                                    type="button"
+                                                    data-bs-toggle="dropdown"
+                                                    aria-expanded="false">
 
-                                                </form>
-                                            </li>
+                                                <i class="bi bi-gear-fill"></i>
 
-                                        </ul>
+                                            </button>
 
-                                    </div>
+                                            <ul class="dropdown-menu dropdown-menu-end shadow-sm border-0">
 
-                            </td>
+                                                <li>
+                                                    <a class="dropdown-item" href="{{ asset('uploads/dokumen/' . $row->file) }}" download>
+                                                        <i class="bi bi-download me-2"></i> Download
+                                                    </a>
+                                                </li>
 
-                        </tr>
+                                                
+                                                <li><hr class="dropdown-divider"></li>
 
-                    @empty
+                                                <li>
+                                                    <form action="{{ route('tu.dokumen.destroy', $row->id) }}"
+                                                        method="POST"
+                                                        onsubmit="return confirm('Hapus data ini?')">
 
-                        <tr>
+                                                        @csrf
+                                                        @method('DELETE')
 
-                            <td
-                                colspan="5"
-                                class="text-center py-5 text-muted"
-                            >
+                                                        <button type="submit" class="dropdown-item text-danger">
+                                                            <i class="bi bi-trash me-2"></i> Hapus
+                                                        </button>
 
-                                <i
-                                    class="bi bi-folder2-open d-block mb-2"
-                                    style="font-size:40px;"
-                                ></i>
+                                                    </form>
+                                                </li>
 
-                                Tidak ada dokumen siswa
+                                            </ul>
 
-                            </td>
+                                        </div>
 
-                        </tr>
+                                </td>
 
-                    @endforelse
+                            </tr>
 
-                </tbody>
+                        @empty
 
-            </table>
+                            <tr>
+
+                                <td
+                                    colspan="5"
+                                    class="text-center py-5 text-muted"
+                                >
+
+                                    <i
+                                        class="bi bi-folder2-open d-block mb-2"
+                                        style="font-size:40px;"
+                                    ></i>
+
+                                    Tidak ada dokumen siswa
+
+                                </td>
+
+                            </tr>
+
+                        @endforelse
+
+                    </tbody>
+
+                </table>
+            </div>
 
         </div>
 

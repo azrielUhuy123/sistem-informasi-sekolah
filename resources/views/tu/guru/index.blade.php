@@ -64,149 +64,153 @@
 
         <div class="card-body">
 
-            <table class="table align-middle">
+            <div class="table-responsive">
 
-                <thead>
-                    <tr>
-                        <th>No</th>
-                        <th>Nama Guru</th>
-                        <th>Status Akademik</th>
-                        <th>Mata Pelajaran</th>
-                        <th>Kelas</th>
-                        <th width="100">Aksi</th>
-                    </tr>
-                </thead>
+                <table class="table align-middle">
 
-                <tbody id="tableGuru">
-
-                    @foreach($gurus as $guru)
-
+                    <thead>
                         <tr>
-                            <td>{{ $loop->iteration }}</td>
+                            <th>No</th>
+                            <th>Nama Guru</th>
+                            <th>Status Akademik</th>
+                            <th>Mata Pelajaran</th>
+                            <th>Kelas</th>
+                            <th width="100">Aksi</th>
+                        </tr>
+                    </thead>
+
+                    <tbody id="tableGuru">
+
+                        @foreach($gurus as $guru)
+
+                            <tr>
+                                <td>{{ $loop->iteration }}</td>
 
 
-                            <td>
-                                {{ $guru->pegawai->nama }}
-                            </td>
+                                <td>
+                                    {{ $guru->pegawai->nama }}
+                                </td>
 
-                            <td>
+                                <td>
 
-                                @if($guru->waliKelas)
+                                    @if($guru->waliKelas)
 
-                                    <span class="badge bg-light text-info-emphasis border border-info">
-                                        Wali Kelas
-                                    </span>
+                                        <span class="badge bg-light text-info-emphasis border border-info">
+                                            Wali Kelas
+                                        </span>
 
-                                @else
+                                    @else
 
-                                    <span class="badge bg-light text-warning-emphasis border border-warning">
-                                        Guru Bidang
-                                    </span>
+                                        <span class="badge bg-light text-warning-emphasis border border-warning">
+                                            Guru Bidang
+                                        </span>
 
-                                @endif
+                                    @endif
 
-                            </td>
+                                </td>
 
-                            <td>
+                                <td>
 
-                                @if($guru->waliKelas)
+                                    @if($guru->waliKelas)
 
+                                        @php
+
+                                            $mapelInti = [
+                                                'Bahasa Indonesia',
+                                                'Matematika',
+                                                'Pendidikan Pancasila',
+                                                'Ilmu Pengetahuan Alam dan Sosial',
+                                            ];
+
+                                        @endphp
+
+                                        @foreach($mapelInti as $mapel)
+
+                                            <span class="badge bg-light text-dark border">
+
+                                                {{ $mapel }}
+
+                                            </span>
+
+                                        @endforeach
+
+                                    @else
+
+                                        @forelse($guru->pengampuMapel as $pengampu)
+
+                                            <span class="badge bg-light text-dark border">
+
+                                                {{ $pengampu->mapel->nama_mapel }}
+
+                                            </span>
+
+                                        @empty
+
+                                            <span class="text-muted">
+                                                Belum ada mapel
+                                            </span>
+
+                                        @endforelse
+
+                                    @endif
+
+                                </td>
+
+                                <td>
                                     @php
+                                        $kelasWali = $guru->waliKelas?->kelas;
 
-                                        $mapelInti = [
-                                            'Bahasa Indonesia',
-                                            'Matematika',
-                                            'Pendidikan Pancasila',
-                                            'Ilmu Pengetahuan Alam dan Sosial',
-                                        ];
-
+                                        $kelasMengajar = $guru->pengampuMapel
+                                            ->pluck('kelas')
+                                            ->filter()
+                                            ->unique('id');
                                     @endphp
 
-                                    @foreach($mapelInti as $mapel)
+                                    {{-- Kelas Wali --}}
+
+                                    @if($kelasWali)
 
                                         <span class="badge bg-light text-dark border">
-
-                                            {{ $mapel }}
-
-                                        </span>
-
-                                    @endforeach
-
-                                @else
-
-                                    @forelse($guru->pengampuMapel as $pengampu)
-
-                                        <span class="badge bg-light text-dark border">
-
-                                            {{ $pengampu->mapel->nama_mapel }}
-
-                                        </span>
-
-                                    @empty
-
-                                        <span class="text-muted">
-                                            Belum ada mapel
-                                        </span>
-
-                                    @endforelse
-
-                                @endif
-
-                            </td>
-
-                            <td>
-                                @php
-                                    $kelasWali = $guru->waliKelas?->kelas;
-
-                                    $kelasMengajar = $guru->pengampuMapel
-                                        ->pluck('kelas')
-                                        ->filter()
-                                        ->unique('id');
-                                @endphp
-
-                                {{-- Kelas Wali --}}
-
-                                @if($kelasWali)
-
-                                    <span class="badge bg-light text-dark border">
-                                        {{ $kelasWali->nama_kelas }}
-                                    </span>
-                                @endif
-
-                                {{-- Kelas Mengajar --}}
-                                
-                                @foreach($kelasMengajar as $kelas)
-
-                                    @if(!$kelasWali || $kelas->id != $kelasWali->id)
-                                        <span class="badge bg-light text-dark border">
-                                            {{ $kelas->nama_kelas }}
+                                            {{ $kelasWali->nama_kelas }}
                                         </span>
                                     @endif
 
-                                @endforeach
+                                    {{-- Kelas Mengajar --}}
+                                    
+                                    @foreach($kelasMengajar as $kelas)
 
-                                @if($kelasMengajar->isEmpty() && !$kelasWali)
-                                    <span class="text-muted">-</span>
-                                @endif
+                                        @if(!$kelasWali || $kelas->id != $kelasWali->id)
+                                            <span class="badge bg-light text-dark border">
+                                                {{ $kelas->nama_kelas }}
+                                            </span>
+                                        @endif
+
+                                    @endforeach
+
+                                    @if($kelasMengajar->isEmpty() && !$kelasWali)
+                                        <span class="text-muted">-</span>
+                                    @endif
 
 
-                                
+                                    
 
-                            </td>
+                                </td>
 
-                            <td>
-                                <a href="{{ route('tu.guru.show', $guru) }}"
-                                class="btn btn-sm btn-dark">
-                                    Detail
-                                </a>
-                            </td>
-                        </tr>
+                                <td>
+                                    <a href="{{ route('tu.guru.show', $guru) }}"
+                                    class="btn btn-sm btn-dark">
+                                        Detail
+                                    </a>
+                                </td>
+                            </tr>
 
-                    @endforeach
+                        @endforeach
 
-                </tbody>
+                    </tbody>
 
-            </table>
+                </table>
+
+            </div>
 
         </div>
 
