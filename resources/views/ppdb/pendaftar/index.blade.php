@@ -95,9 +95,17 @@
 
                     <tr>
                         <th>No</th>
-                        <th>No Pendaftaran</th>
-                        <th>Nama</th>
-                        <th>Status</th>
+
+                            <th>No Pendaftaran</th>
+
+                            <th>Nama</th>
+
+                            <th>JK</th>
+
+                            <th>NIK</th>
+
+                            <th>Status</th>
+
                         <th>Aksi</th>
                     </tr>
 
@@ -115,6 +123,10 @@
 
                         <td>{{ $item->nama }}</td>
 
+                        <td>{{ $item->jenis_kelamin }}</td>
+
+                        <td>{{ $item->nik }}</td>
+
                         <td>
 
                            <span class="badge bg-light text-dark border">
@@ -124,6 +136,7 @@
                             </span>
 
                         </td>
+
 
                         <td>
 

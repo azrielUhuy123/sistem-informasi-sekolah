@@ -96,11 +96,11 @@
 
                         <th>No</th>
 
-                        <th>NIS</th>
-
                         <th>Nama</th>
 
                         <th>Kelas Saat Ini</th>
+
+                        <th>Tahun Ajaran</th>
 
                         <th>Penempatan</th>
 
@@ -119,16 +119,14 @@
                             </td>
 
                             <td>
-                                {{ $item->siswa?->nis }}
-                            </td>
-
-                            <td>
                                 {{ $item->nama }}
                             </td>
 
                             <td>
                                 {{ $item->siswa?->penempatanAktif?->kelas?->nama_kelas ?? '-' }}
                             </td>
+
+                            <td>{{ $item->siswa->penempatanAktif->tahunAjaran->tahun ?? '-' }}</td>
 
                             <td>
 

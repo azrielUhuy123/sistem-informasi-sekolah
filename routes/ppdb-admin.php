@@ -5,6 +5,7 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\PPDB\DashboardController;
 use App\Http\Controllers\PPDB\PengaturanController;
 use App\Http\Controllers\PPDB\PendaftarController;
+use App\Http\Controllers\PPDB\LaporanController;
 
 Route::middleware([
         'auth',
@@ -61,6 +62,13 @@ Route::middleware([
             '/pendaftar/{pendaftar}',
             [PendaftarController::class, 'show']
         )->name('pendaftar.show');
+
+                        Route::get('/excel', [PendaftarController::class,'excel'])
+                    ->name('excel');
+
+                Route::get('/pdf', [PendaftarController::class,'pdf'])
+                    ->name('pdf');
+
 
         /*
         |--------------------------------------------------------------------------
@@ -129,4 +137,8 @@ Route::middleware([
             [PendaftarController::class, 'simpanPenempatanKelas']
         )->name('penempatan-kelas.simpan');
 
+        Route::post(
+            '/daftar-ulang/{pendaftar}/konfirmasi',
+            [PendaftarController::class, 'konfirmasiDaftarUlang']
+        )->name('daftar-ulang.konfirmasi');
     });

@@ -92,9 +92,13 @@
 
                 <thead>
                     <tr>
+                        <th>No</th>
                         <th>No Pendaftaran</th>
                         <th>Nama</th>
                         <th>Status Daftar Ulang</th>
+                        <th>NIS</th>
+                        <th>Akun</th>
+                        <th>Aksi</th>
                     </tr>
                 </thead>
 
@@ -103,9 +107,77 @@
                     @foreach($data as $item)
 
                     <tr>
+                        <td>{{ $loop->iteration }}</td>
                         <td>{{ $item->no_pendaftaran }}</td>
                         <td>{{ $item->nama }}</td>
-                        <td><span class="badge bg-success-subtle text-success-emphasis border border-success-subtle">{{ $item->status_daftar_ulang }}</span></td>
+                        <td>
+                            @if($item->status_daftar_ulang == 'sudah')
+                                <span class="badge bg-success-subtle text-success-emphasis border border-success-subtle">
+                                    <i class="bi bi-check-circle me-1"></i>
+                                    Sudah
+                                </span>
+                            @else
+                                <span class="badge bg-warning-subtle text-warning-emphasis border border-warning-subtle">
+                                    <i class="bi bi-clock-history me-1"></i>
+                                    Belum
+                                </span>
+                            @endif
+                        </td>
+                        <td>
+                            @if($item->siswa)
+                                {{ $item->siswa->nis }}
+                            @else
+                                -
+                            @endif
+                        </td>
+                        <td>
+                            @if($item->siswa?->user)
+                                <span class="badge bg-success-subtle text-success-emphasis border border-success-subtle">
+                                    <i class="bi bi-person-check me-1"></i>
+                                    Akun Terdaftar
+                                </span>
+                            @else
+                                <span class="badge bg-warning-subtle text-warning-emphasis border border-warning-subtle">
+                                    <i class="bi bi-person-x me-1"></i>
+                                    Akun Belum Terdaftar
+                                </span>
+                            @endif
+                        </td>
+                        <td>
+                            @if($item->status_daftar_ulang != 'sudah')
+
+                            <form
+                                action="{{ route('tu.ppdb.daftar-ulang.konfirmasi',$item) }}"
+                                method="POST"
+                            >
+
+                            @csrf
+
+                            <button
+                                class="btn btn-success btn-sm"
+                                onclick="return confirm('Konfirmasi daftar ulang?')"
+                            >
+
+                            <i class="bi bi-check-circle"></i>
+
+                            Konfirmasi
+
+                            </button>
+
+                            </form>
+
+                            @else
+
+                            <span class="text-success">
+
+                            <i class="bi bi-check-circle-fill"></i>
+
+                            Selesai
+
+                            </span>
+
+                            @endif
+                        </td>
                     </tr>
 
                     @endforeach

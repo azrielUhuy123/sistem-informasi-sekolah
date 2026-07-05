@@ -53,36 +53,40 @@
                     </span>
                 </div>
 
-                <div class="d-flex flex-column flex-md-row align-items-md-end gap-2">
-                    <form action="{{ route('tu.siswa.import') }}" method="POST" enctype="multipart/form-data" class="d-flex align-items-end gap-2 flex-wrap">
-                        @csrf
-                        <div class="mb-3">
-                            <label for="formFileSm" class="form-label small text-muted">Import Excel</label>
-                            <input class="form-control form-control-sm" id="formFileSm" type="file" name="file" accept=".xlsx,.xls,.csv" required>
+                <div class="d-flex flex-column flex-md-row align-items-md-center gap-3">
+                    <div class="d-flex align-items-start gap-2">
+                        <div class="rounded-3 bg-primary-subtle text-primary d-flex align-items-center justify-content-center" style="width: 44px; height: 44px;">
+                            <i class="bi bi-file-earmark-excel fs-5"></i>
                         </div>
-                        <button class="btn btn-primary btn-sm">
-                            <i class="bi bi-file-earmark-excel me-1"></i>
-                            Import Excel
+                        <div>
+                            <h6 class="fw-semibold mb-1">Import Data Siswa</h6>
+                            <p class="small text-muted mb-0">Unggah file Excel/CSV untuk menambahkan data siswa.</p>
+                        </div>
+                    </div>
+
+                    <form action="{{ route('tu.siswa.import') }}" method="POST" enctype="multipart/form-data" class="d-flex align-items-center gap-2 flex-wrap">
+                        @csrf
+                        <div class="border rounded-3 px-2 d-flex gap-2">
+                            <i class="bi bi-paperclip text-muted"></i>
+                            <input class="form-control form-control-sm border-0 shadow-none" id="formFileSm" type="file" name="file" accept=".xlsx,.xls,.csv" required>
+                        </div>
+                        <button class="btn btn-dark btn-sm">
+                            <i class="bi bi-upload me-1"></i>
+                            Import
                         </button>
                     </form>
-
-                    <a href="{{ route('tu.kelas.grup.create') }}"
-                       class="btn btn-dark">
-                        <i class="bi bi-plus-lg me-1"></i>
-                        Tambah Grup
-                    </a>
                 </div>
             </div>
         </div>
 
         <div class="card-body">
             <table class="table align-middle">
-                <thead class="table-light">
+                <thead>
                     <tr>
-                        <th style="width: 20%">Tingkat</th>
+                        <th>Tingkat</th>
                         <th>Angkatan</th>
-                        <th style="width: 20%">Jumlah Kelas</th>
-                        <th style="width: 15%" class="text-center">Aksi</th>
+                        <th>Jumlah Kelas</th>
+                        <th>Aksi</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -103,9 +107,9 @@
                                 </span>
                             </td>
 
-                            <td class="text-center">
+                            <td>
                                 <a href="{{ route('tu.kelas.rombel.index', $grup->id) }}"
-                                   class="btn btn-sm btn-outline-primary">
+                                   class="btn btn-sm btn-dark">
                                     Masuk
                                 </a>
                             </td>
