@@ -51,19 +51,70 @@ class AuthenticatedSessionController extends Controller
         // 5️⃣ SESSION & REDIRECT
         $request->session()->regenerate();
 
-       return match(auth()->user()->role) {
+       if ($user->role === 'guru') {
 
-            'tu' => redirect()->route('tu.dashboard'),
+        $guru = $user->guru;
 
-            'guru' => redirect()->route('guru.dashboard'),
+        $isWaliKelas = \App\Models\WaliKelas::where(
+                'guru_id',
+                $guru->id
+            )
+            ->where(
+                'tahun_ajaran_id',
+                current_tahun_id()
+            )
+            ->exists();
 
-            'superadmin' => redirect()->route('superadmin.dashboard'),
+        $isPembina = \App\Models\PembinaEkskul::where(
+                'guru_id',
+                $guru->id
+            )
+            ->where(
+                'tahun_ajaran_id',
+                current_tahun_id()
+            )
+            ->exists();
 
-            'siswa' => redirect()->route('siswa.dashboard.index'),
+        /*
+        |--------------------------------------------------------------------------
+        | DEFAULT MODE
+        |--------------------------------------------------------------------------
+        */
 
-            default => abort(403),
+        session([
+            'guru_mode' => $isPembina ? 'ekskul' : 'akademik'
+        ]);
 
-        };
+        if ($isPembina) {
+
+            return redirect()->route(
+                'guru.ekskul.dashboard'
+            );
+        }
+
+        if ($isWaliKelas) {
+
+            return redirect()->route(
+                'guru.dashboard-walikelas'
+            );
+        }
+
+        return redirect()->route(
+            'guru.dashboard-gurubidang'
+        );
+    }
+
+    return match ($user->role) {
+
+        'tu' => redirect()->route('tu.dashboard'),
+
+        'superadmin' => redirect()->route('superadmin.dashboard'),
+
+        'siswa' => redirect()->route('siswa.dashboard.index'),
+
+        default => abort(403),
+
+    };
 
 
 

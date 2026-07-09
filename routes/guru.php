@@ -1,7 +1,7 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
-use App\Http\Controllers\Guru\DashboardGuruController;
+use App\Http\Controllers\Guru\DashboardGuruBidangController;
 use App\Http\Controllers\Guru\PengajuanJadwalController;
 use App\Http\Controllers\Guru\JadwalSayaController;
 use App\Http\Controllers\Guru\StatusValidasiController;
@@ -27,32 +27,58 @@ use App\Http\Controllers\Elearning\ElearningKomentarController;
 use App\Http\Controllers\Elearning\ElearningKomentarReplyController;
 use App\Http\Controllers\ProfileController;
 use Illuminate\Support\Facades\Session;
+use App\Models\PembinaEkskul;
+use Illuminate\Support\Facades\Auth;
 
 Route::prefix('guru')
     ->name('guru.')
     ->middleware(['auth', 'role:guru', 'guru.mode'])
     ->group(function () {
 
-        Route::get('/dashboard', [DashboardGuruController::class, 'index'])
-            ->name('dashboard');
+        Route::get(
+            '/dashboard-gurubidang',
+            [DashboardGuruBidangController::class, 'index']
+        )->name('dashboard-gurubidang');
         
         Route::get(
             '/switch-mode/{mode}',
             function ($mode) {
 
-                if (
-                    in_array(
-                        $mode,
-                        ['akademik', 'ekskul']
-                    )
-                ) {
+                $guru = Auth::user()->guru;
+
+                if ($mode === 'akademik') {
 
                     session([
-                        'guru_mode' => $mode
+                        'guru_mode' => 'akademik'
                     ]);
+
+                    return back();
                 }
 
-                return back();
+                if ($mode === 'ekskul') {
+
+                    $isPembina = PembinaEkskul::where(
+                        'guru_id',
+                        $guru->id
+                    )
+                    ->where(
+                        'tahun_ajaran_id',
+                        current_tahun_id()
+                    )
+                    ->exists();
+
+                    if ($isPembina) {
+
+                        session([
+                            'guru_mode' => 'ekskul'
+                        ]);
+
+                    }
+
+                    return back();
+                }
+
+                abort(404);
             }
         )->name('switch-mode');
 

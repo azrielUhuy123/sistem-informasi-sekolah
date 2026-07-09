@@ -6,29 +6,121 @@ use App\Http\Controllers\Controller;
 use App\Models\PembinaEkskul;
 use App\Models\Ekskul;
 use App\Models\EkskulSiswa;
+use App\Models\JurnalEkskul;
+use App\Models\CatatanPembinaanEkskul;
 use App\Models\Siswa;
 use Illuminate\Http\Request;
 
 class EkskulController extends Controller
 {
-    public function dashboard()
+   public function dashboard()
     {
+        /*
+        |--------------------------------------------------------------------------
+        | GURU LOGIN
+        |--------------------------------------------------------------------------
+        */
+
         $guru = auth()->user()->guru;
 
-        $ekskuls = PembinaEkskul::with(
-                'ekskul'
-            )
+        /*
+        |--------------------------------------------------------------------------
+        | EKSKUL YANG DIBINA
+        |--------------------------------------------------------------------------
+        */
+
+        $ekskuls = PembinaEkskul::with('ekskul')
             ->where(
                 'guru_id',
                 $guru->id
             )
+            ->where(
+                'tahun_ajaran_id',
+                current_tahun_id()
+            )
             ->get();
+
+        $ekskulIds = $ekskuls
+            ->pluck('ekskul_id');
+
+        /*
+        |--------------------------------------------------------------------------
+        | STATISTIK
+        |--------------------------------------------------------------------------
+        */
+
+        $totalEkskul = $ekskuls->count();
+
+        $totalAnggota = EkskulSiswa::whereIn(
+                'ekskul_id',
+                $ekskulIds
+            )
+            ->where(
+                'tahun_ajaran_id',
+                current_tahun_id()
+            )
+            ->count();
+
+        $totalJurnal = JurnalEkskul::whereIn(
+                'ekskul_id',
+                $ekskulIds
+            )
+            ->count();
+
+        $totalCatatan = CatatanPembinaanEkskul::whereIn(
+                'ekskul_id',
+                $ekskulIds
+            )
+            ->where(
+                'tahun_ajaran_id',
+                current_tahun_id()
+            )
+            ->count();
+
+        /*
+        |--------------------------------------------------------------------------
+        | DATA TERBARU
+        |--------------------------------------------------------------------------
+        */
+
+        $jurnalTerbaru = JurnalEkskul::with('ekskul')
+            ->whereIn(
+                'ekskul_id',
+                $ekskulIds
+            )
+            ->latest()
+            ->take(5)
+            ->get();
+
+        $catatanTerbaru = CatatanPembinaanEkskul::whereIn(
+                'ekskul_id',
+                $ekskulIds
+            )
+            ->latest()
+            ->take(5)
+            ->get();
+
+        /*
+        |--------------------------------------------------------------------------
+        | VIEW
+        |--------------------------------------------------------------------------
+        */
 
         return view(
             'guru.ekskul.dashboard',
             compact(
+
                 'guru',
-                'ekskuls'
+                'ekskuls',
+
+                'totalEkskul',
+                'totalAnggota',
+                'totalJurnal',
+                'totalCatatan',
+
+                'jurnalTerbaru',
+                'catatanTerbaru'
+
             )
         );
     }

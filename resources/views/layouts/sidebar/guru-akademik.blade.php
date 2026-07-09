@@ -28,14 +28,19 @@
         MAIN GURU
     </div>
 
-    
+    <a
+        class="menu-item
+        {{ request()->is('guru/dashboard*') ? 'active' : '' }}"
+        href="{{ $isWaliKelas
+            ? route('guru.dashboard-walikelas')
+            : route('guru.dashboard-gurubidang') }}"
+    >
 
-    <a class="menu-item {{ request()->is('guru/dashboard-walikelas') ?  : '' }}"
-       href="{{ route('guru.dashboard-walikelas') }}">
         <div class="menu-left">
             <i class="bi bi-speedometer2"></i>
             <span>Dashboard</span>
         </div>
+
     </a>
 
     <a

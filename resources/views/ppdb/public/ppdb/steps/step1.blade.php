@@ -53,10 +53,25 @@
             </select>
         </div>
 
-        <div class="text-end mt-4">
-            <button type="button" class="btn btn-primary" onclick="showStep(2)">
-                Selanjutnya
-            </button>
-        </div>
+            <div class="d-flex justify-content-between mt-4">
+
+                <a
+                    href="{{ route('ppdb.informasi') }}"
+                    class="btn btn-outline-secondary"
+                >
+                    <i class="bi bi-arrow-left me-1"></i>
+                    Kembali
+                </a>
+
+                <button
+                    type="button"
+                    class="btn btn-primary"
+                    onclick="showStep(2)"
+                >
+                    Selanjutnya
+                    <i class="bi bi-arrow-right ms-1"></i>
+                </button>
+
+            </div>
     </div>
 </div>

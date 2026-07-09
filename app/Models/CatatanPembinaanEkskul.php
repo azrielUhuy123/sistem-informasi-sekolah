@@ -3,6 +3,8 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use App\Models\Siswa;
+use App\Models\Ekskul;
 
 class CatatanPembinaanEkskul extends Model
 {
@@ -21,4 +23,18 @@ class CatatanPembinaanEkskul extends Model
         'catatan'
 
     ];
+
+    public function siswa()
+{
+    return $this->belongsTo(
+        Siswa::class
+    );
+}
+
+public function ekskul()
+{
+    return $this->belongsTo(
+        Ekskul::class
+    );
+}
 }
