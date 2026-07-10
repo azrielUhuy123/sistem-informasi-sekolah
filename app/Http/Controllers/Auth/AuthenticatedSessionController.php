@@ -53,55 +53,44 @@ class AuthenticatedSessionController extends Controller
 
        if ($user->role === 'guru') {
 
-        $guru = $user->guru;
+            $guru = $user->guru;
 
-        $isWaliKelas = \App\Models\WaliKelas::where(
-                'guru_id',
-                $guru->id
-            )
-            ->where(
-                'tahun_ajaran_id',
-                current_tahun_id()
-            )
-            ->exists();
+            $isWaliKelas = \App\Models\WaliKelas::where(
+                    'guru_id',
+                    $guru->id
+                )
+                ->where(
+                    'tahun_ajaran_id',
+                    current_tahun_id()
+                )
+                ->exists();
 
-        $isPembina = \App\Models\PembinaEkskul::where(
-                'guru_id',
-                $guru->id
-            )
-            ->where(
-                'tahun_ajaran_id',
-                current_tahun_id()
-            )
-            ->exists();
+            /*
+            |--------------------------------------------------------------------------
+            | DEFAULT MODE SELALU AKADEMIK
+            |--------------------------------------------------------------------------
+            */
 
-        /*
-        |--------------------------------------------------------------------------
-        | DEFAULT MODE
-        |--------------------------------------------------------------------------
-        */
+            session([
+                'guru_mode' => 'akademik'
+            ]);
 
-        session([
-            'guru_mode' => $isPembina ? 'ekskul' : 'akademik'
-        ]);
+            /*
+            |--------------------------------------------------------------------------
+            | REDIRECT DASHBOARD
+            |--------------------------------------------------------------------------
+            */
 
-        if ($isPembina) {
+            if ($isWaliKelas) {
 
-            return redirect()->route(
-                'guru.ekskul.dashboard'
-            );
-        }
-
-        if ($isWaliKelas) {
+                return redirect()->route(
+                    'guru.dashboard-walikelas'
+                );
+            }
 
             return redirect()->route(
-                'guru.dashboard-walikelas'
+                'guru.dashboard-gurubidang'
             );
-        }
-
-        return redirect()->route(
-            'guru.dashboard-gurubidang'
-        );
     }
 
     return match ($user->role) {

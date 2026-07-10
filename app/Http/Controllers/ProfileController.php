@@ -8,6 +8,8 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Redirect;
 use Illuminate\View\View;
+use App\Models\WaliKelas;
+use App\Models\PengampuMapel;
 
 class ProfileController extends Controller
 {
@@ -16,10 +18,56 @@ class ProfileController extends Controller
      */
     public function index()
     {
+        $user = auth()->user();
+
+        $status = '-';
+
+        if ($user->guru) {
+
+            /*
+            |--------------------------------------------------------------------------
+            | CEK WALI KELAS
+            |--------------------------------------------------------------------------
+            */
+
+            $waliKelas = WaliKelas::with('kelas')
+                ->where('guru_id', $user->guru->id)
+                ->where('tahun_ajaran_id', current_tahun_id())
+                ->first();
+
+            if ($waliKelas) {
+
+                $status = 'WALI KELAS ' . strtoupper($waliKelas->kelas->nama_kelas);
+
+            } else {
+
+                /*
+                |--------------------------------------------------------------------------
+                | CEK GURU BIDANG
+                |--------------------------------------------------------------------------
+                */
+
+                $pengampu = PengampuMapel::with('mapel')
+                    ->where('guru_id', $user->guru->id)
+                    ->where('tahun_ajaran_id', current_tahun_id())
+                    ->first();
+
+                if ($pengampu) {
+
+                    $status = 'GURU ' . strtoupper($pengampu->mapel->nama_mapel);
+
+                } else {
+
+                    $status = 'GURU';
+                }
+            }
+        }
+
         return view(
             'profile.index',
             [
-                'user' => auth()->user()
+                'user'   => $user,
+                'status' => $status,
             ]
         );
     }
