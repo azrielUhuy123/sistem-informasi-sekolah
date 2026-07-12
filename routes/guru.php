@@ -369,4 +369,10 @@ Route::prefix('guru')
         )->name(
             'ekskul.jadwal.update'
         );
+
+        Route::get('/profile/detail', [ProfileController::class, 'detail'])
+            ->name('profile.detail');
+
+        Route::put('/profile/detail', [ProfileController::class, 'updateDetail'])
+            ->name('profile.detail.update');
 });

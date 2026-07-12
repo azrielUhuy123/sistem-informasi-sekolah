@@ -46,6 +46,13 @@
 
                     </div>
 
+                    <div class="mt-3">
+                        <a href="{{ route('guru.profile.detail') }}" class="btn btn-primary rounded-pill px-4">
+                            <i class="bi bi-person-lines-fill me-2"></i>
+                            Detail Profil
+                        </a>
+                    </div>
+
                 </div>
 
                 {{-- IDENTITAS --}}
@@ -109,14 +116,14 @@
                         <div class="col-12">
                             <div class="profile-stat">
 
-                                <i class="bi bi-geo-alt-fill"></i>
+                            <i class="bi bi-mortarboard-fill"></i>
 
                                 <div>
-                                    <h3>
-                                        {{ $user->guru->pegawai->tempat_lahir }},
-                                        {{ \Carbon\Carbon::parse($user->guru->pegawai->tanggal_lahir)->translatedFormat('d M Y') }}
-                                    </h3>
-                                    <span>Tempat, Tanggal Lahir</span>
+
+                                    <h3>{{ $status }}</h3>
+
+                                    <span>Tugas</span>
+
                                 </div>
 
                             </div>
@@ -180,14 +187,14 @@
 
                             <div class="profile-stat">
 
-                                <i class="bi bi-mortarboard-fill"></i>
+                                <i class="bi bi-geo-alt-fill"></i>
 
                                 <div>
-
-                                    <h3>{{ $status }}</h3>
-
-                                    <span>Tugas</span>
-
+                                    <h3>
+                                        {{ $user->guru->pegawai->tempat_lahir }},
+                                        {{ \Carbon\Carbon::parse($user->guru->pegawai->tanggal_lahir)->translatedFormat('d M Y') }}
+                                    </h3>
+                                    <span>Tempat, Tanggal Lahir</span>
                                 </div>
 
                             </div>
@@ -231,40 +238,19 @@
 <style>
 
 .profile-header{
-    background: linear-gradient(135deg,#0f4c81 0%,#2563eb 100%);
+    background:#fff;
     border-radius:24px;
     overflow:hidden;
     position:relative;
-    box-shadow:0 15px 40px rgba(37,99,235,.18);
-}
-
-.profile-header::before{
-    content:'';
-    position:absolute;
-    width:320px;
-    height:320px;
-    border-radius:50%;
-    background:rgba(255,255,255,.06);
-    top:-130px;
-    right:-100px;
-}
-
-.profile-header::after{
-    content:'';
-    position:absolute;
-    width:220px;
-    height:220px;
-    border-radius:50%;
-    background:rgba(255,255,255,.04);
-    bottom:-120px;
-    left:-70px;
+    border:1px solid #e5e7eb;
+    box-shadow:0 8px 25px rgba(15,23,42,.06);
 }
 
 .profile-avatar{
     width:170px;
     height:170px;
     border-radius:50%;
-    border:6px solid rgba(255,255,255,.95);
+    border:6px solid rgba(255, 255, 255, 0.95);
     box-shadow:
         0 15px 35px rgba(0,0,0,.25),
         0 0 40px rgba(255,255,255,.18);
@@ -278,10 +264,15 @@
 }
 
 .profile-name{
-    font-size:2rem;
+    font-size:clamp(1.6rem, 2.8vw, 2rem);
     font-weight:700;
-    color:#fff;
+    color:#1e293b;
+    line-height:1.25;
     margin-bottom:.25rem;
+
+    white-space:normal;
+    word-break:break-word;
+    overflow-wrap:anywhere;
 }
 
 .profile-role{
@@ -296,8 +287,8 @@
     gap:.5rem;
     padding:.55rem 1rem;
     border-radius:50px;
-    background:rgba(255,255,255,.18);
-    color:#fff;
+    background:#ecfdf5;
+    color:#16a34a;
     backdrop-filter:blur(12px);
     font-weight:600;
 }
@@ -357,45 +348,60 @@
 }
 
 .profile-stat{
-    background:rgba(255,255,255,.12);
+    background:#fff;
+    border:1px solid #e5e7eb;
     border-radius:18px;
     padding:18px 22px;
+
     display:flex;
-    align-items:center;
+    align-items:flex-start; 
+
     gap:16px;
-    backdrop-filter:blur(14px);
-    border:1px solid rgba(255,255,255,.08);
-    transition:.3s;
+
+    transition:.25s;
+    box-shadow:0 4px 14px rgba(15,23,42,.05);
 }
 
 .profile-stat:hover{
-    background:rgba(255,255,255,.18);
     transform:translateY(-3px);
+    border-color:#2563eb;
+    box-shadow:0 10px 22px rgba(37,99,235,.12);
 }
 
 .profile-stat i{
+    color:#2563eb;
     font-size:26px;
-    color:white;
 }
 
 .profile-stat h3{
-    color:white;
-    font-size:1.15rem;
-    margin:0;
+    color:#1e293b;
+    font-size:1.05rem;
     font-weight:700;
+    margin:0;
 }
 
 .profile-stat span{
-    color:rgba(255,255,255,.75);
-    font-size:.85rem;
+    color:#64748b;
+    font-size:.82rem;
 }
 .profile-stat h3{
-    color:white;
-    font-size:1.1rem;
+    color:#1e293b;
+    font-size:1rem;
     font-weight:700;
     margin:0;
-    white-space:nowrap;
+    line-height:1.45;
+
+    white-space:normal;
+    word-break:break-word;
+    overflow-wrap:anywhere;
 }
+
+.profile-stat > div{
+    flex:1;
+    min-width:0;
+}
+
+
 </style>
 
 @endpush
