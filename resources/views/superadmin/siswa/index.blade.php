@@ -4,40 +4,104 @@
 
 @section('content')
 
-<div class="container-fluid py-3">
+<div class="container-fluid">
 
-    <h4 class="fw-bold mb-4">
-        Data Siswa
-    </h4>
+    {{-- ================= HEADER ================= --}}
+    <div class="card border-0 shadow-sm rounded-4 overflow-hidden mb-4">
 
-    {{-- FILTER --}}
-    <div class="card shadow-sm border-0 mb-3">
+        <div class="card-body p-4 p-lg-5 text-white"
+            style="background:linear-gradient(135deg,#0f4c81 0%,#2563eb 100%);">
+
+            <div class="d-flex flex-column flex-lg-row justify-content-between align-items-lg-center">
+
+                <div>
+
+                    <h2 class="fw-bold mb-2">
+                        Data Siswa
+                    </h2>
+
+                    <p class="mb-0 opacity-75">
+                        Monitoring seluruh data siswa berdasarkan angkatan, rombel dan status akademik.
+                    </p>
+
+                </div>
+
+                <div class="mt-3 mt-lg-0">
+
+                    <div class="bg-white rounded-4 px-4 py-3 text-center shadow-sm">
+
+                        <h3 class="fw-bold text-primary mb-0">
+
+                            {{ $siswa->total() }}
+
+                        </h3>
+
+                        <small class="text-muted">
+
+                            Total Siswa
+
+                        </small>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+
+
+    {{-- ================= FILTER ================= --}}
+    <div class="card border-0 shadow-sm rounded-4 mb-4">
+
+        <div class="card-header bg-white border-0 pt-4 px-4">
+
+            <h5 class="fw-bold mb-1">
+
+                <i class="bi bi-funnel-fill text-primary me-2"></i>
+
+                Filter Data
+
+            </h5>
+
+            <small class="text-muted">
+
+                Gunakan filter untuk mencari data siswa dengan lebih cepat.
+
+            </small>
+
+        </div>
 
         <div class="card-body">
 
             <form method="GET"
                   action="{{ route('superadmin.siswa.index') }}">
 
-                <div class="row g-3 align-items-end">
+                <div class="row g-3">
 
                     {{-- ANGKATAN --}}
-                    <div class="col-md-3">
+                    <div class="col-lg-2">
 
                         <label class="form-label fw-semibold">
                             Angkatan
                         </label>
 
-                        <select name="angkatan"
-                                class="form-select">
+                        <select
+                            name="angkatan"
+                            class="form-select rounded-3">
 
                             <option value="">
-                                Semua Angkatan
+                                Semua
                             </option>
 
-                            @foreach ($angkatan as $a)
+                            @foreach($angkatan as $a)
 
-                                <option value="{{ $a->id }}"
-                                    {{ request('angkatan') == $a->id ? 'selected' : '' }}>
+                                <option
+                                    value="{{ $a->id }}"
+                                    {{ request('angkatan')==$a->id?'selected':'' }}>
 
                                     {{ $a->tahun }}
 
@@ -49,15 +113,18 @@
 
                     </div>
 
-                    {{-- GRUP KELAS --}}
-                    <div class="col-md-2">
+
+
+                    {{-- GRUP --}}
+                    <div class="col-lg-2">
 
                         <label class="form-label fw-semibold">
-                            Grup Kelas
+                            Grup
                         </label>
 
-                        <select name="kelas_grup"
-                                class="form-select">
+                        <select
+                            name="kelas_grup"
+                            class="form-select rounded-3">
 
                             <option value="">
                                 Semua
@@ -65,8 +132,9 @@
 
                             @foreach($kelasGrup as $g)
 
-                                <option value="{{ $g->id }}"
-                                    {{ request('kelas_grup') == $g->id ? 'selected' : '' }}>
+                                <option
+                                    value="{{ $g->id }}"
+                                    {{ request('kelas_grup')==$g->id?'selected':'' }}>
 
                                     Kelas {{ $g->kelasMaster->tingkat }}
 
@@ -78,15 +146,18 @@
 
                     </div>
 
+
+
                     {{-- ROMBEL --}}
-                    <div class="col-md-2">
+                    <div class="col-lg-2">
 
                         <label class="form-label fw-semibold">
                             Rombel
                         </label>
 
-                        <select name="kelas"
-                                class="form-select">
+                        <select
+                            name="kelas"
+                            class="form-select rounded-3">
 
                             <option value="">
                                 Semua
@@ -94,8 +165,9 @@
 
                             @foreach($kelas as $k)
 
-                                <option value="{{ $k->id }}"
-                                    {{ request('kelas') == $k->id ? 'selected' : '' }}>
+                                <option
+                                    value="{{ $k->id }}"
+                                    {{ request('kelas')==$k->id?'selected':'' }}>
 
                                     {{ $k->nama_kelas }}
 
@@ -107,62 +179,86 @@
 
                     </div>
 
+
+
                     {{-- SEARCH --}}
-                    <div class="col-md-3">
+                    <div class="col-lg-3">
 
                         <label class="form-label fw-semibold">
-                            Cari Siswa
+                            Nama / NIS
                         </label>
 
-                        <input type="text"
-                               name="search"
-                               class="form-control"
-                               placeholder="Nama / NIS"
-                               value="{{ request('search') }}">
+                        <input
+                            type="text"
+                            name="search"
+                            value="{{ request('search') }}"
+                            class="form-control rounded-3"
+                            placeholder="Cari siswa...">
 
                     </div>
 
+
+
                     {{-- STATUS --}}
-                    <div class="col-md-2">
+                    <div class="col-lg-2">
 
                         <label class="form-label fw-semibold">
                             Status
                         </label>
 
-                        <select name="status"
-                                class="form-select">
+                        <select
+                            name="status"
+                            class="form-select rounded-3">
 
                             <option value="">
                                 Semua
                             </option>
 
                             <option value="aktif"
-                                {{ request('status') == 'aktif' ? 'selected' : '' }}>
+                                {{ request('status')=='aktif'?'selected':'' }}>
+
                                 Aktif
+
                             </option>
 
                             <option value="nonaktif"
-                                {{ request('status') == 'nonaktif' ? 'selected' : '' }}>
+                                {{ request('status')=='nonaktif'?'selected':'' }}>
+
                                 Nonaktif
+
                             </option>
 
                         </select>
 
                     </div>
 
-                    <div class="col-md-2">
 
-                        <button class="btn btn-primary w-100">
-                            Filter
+
+                    <div class="col-lg-1 d-grid">
+
+                        <label class="form-label">&nbsp;</label>
+
+                        <button
+                            class="btn btn-primary rounded-3">
+
+                            <i class="bi bi-search"></i>
+
                         </button>
 
                     </div>
 
-                    <div class="col-md-2">
 
-                        <a href="{{ route('superadmin.siswa.index') }}"
-                           class="btn btn-secondary w-100">
+
+                    <div class="col-lg-2 d-grid">
+
+                        <a
+                            href="{{ route('superadmin.siswa.index') }}"
+                            class="btn btn-outline-secondary rounded-3">
+
+                            <i class="bi bi-arrow-clockwise me-1"></i>
+
                             Reset
+
                         </a>
 
                     </div>
@@ -175,29 +271,60 @@
 
     </div>
 
-    {{-- TABEL --}}
-    <div class="card shadow-sm border-0">
 
-        <div class="card-body">
 
-            <table class="table table-hover align-middle">
+    {{-- ================= TABLE ================= --}}
+    <div class="card border-0 shadow-sm rounded-4">
 
-                <thead>
+        <div class="card-header bg-white border-0 pt-4 px-4">
 
-                    <tr>
+            <h5 class="fw-bold mb-1">
 
-                        <th width="60">#</th>
-                        <th>Nama</th>
-                        <th width="120">NIS</th>
-                        <th width="120">NISN</th>
-                        <th width="120">Rombel</th>
-                        <th width="120">Angkatan</th>
-                        <th width="100">Status</th>
-                        <th width="100">Aksi</th>
+                <i class="bi bi-mortarboard-fill text-primary me-2"></i>
 
-                    </tr>
+                Data Seluruh Siswa
 
-                </thead>
+            </h5>
+
+            <small class="text-muted">
+
+                Informasi siswa aktif maupun nonaktif.
+
+            </small>
+
+        </div>
+
+        <div class="card-body pt-2">
+
+            <div class="table-responsive">
+
+                <table class="table table-hover align-middle">
+
+                    <thead>
+
+                        <tr>
+
+                            <th>Siswa</th>
+
+                            <th width="130">NIS</th>
+
+                            <th width="130">NISN</th>
+
+                            <th width="120">Rombel</th>
+
+                            <th width="120">Angkatan</th>
+
+                            <th width="120">Status</th>
+
+                            <th width="120" class="text-center">
+
+                                Aksi
+
+                            </th>
+
+                        </tr>
+
+                    </thead>
 
                 <tbody>
 
@@ -205,25 +332,59 @@
 
                         <tr>
 
+                            {{-- SISWA --}}
                             <td>
-                                {{ $loop->iteration + ($siswa->currentPage()-1)*$siswa->perPage() }}
+
+                                <div class="d-flex align-items-center">
+
+                                    <div class="avatar-circle me-3">
+
+                                        {{ strtoupper(substr($row->nama,0,1)) }}
+
+                                    </div>
+
+                                    <div>
+
+                                        <div class="fw-semibold">
+
+                                            {{ $row->nama }}
+
+                                        </div>
+
+                                        <small class="text-muted">
+
+                                            {{ $row->jenis_kelamin == 'L' ? 'Laki-laki' : 'Perempuan' }}
+
+                                        </small>
+
+                                    </div>
+
+                                </div>
+
                             </td>
 
+                            {{-- NIS --}}
                             <td>
-                                {{ $row->nama }}
+
+                                <span class="fw-semibold">
+
+                                    {{ $row->nis }}
+
+                                </span>
+
                             </td>
 
+                            {{-- NISN --}}
                             <td>
-                                {{ $row->nis }}
-                            </td>
 
-                            <td>
                                 {{ $row->nisn ?? '-' }}
+
                             </td>
 
+                            {{-- ROMBEL --}}
                             <td>
 
-                                <span class="badge bg-secondary">
+                                <span class="badge bg-primary-subtle text-primary px-3 py-2">
 
                                     {{ $row->penempatanAktif?->kelas?->nama_kelas ?? '-' }}
 
@@ -231,34 +392,43 @@
 
                             </td>
 
+                            {{-- ANGKATAN --}}
                             <td>
 
                                 {{ $row->penempatanAktif?->kelas?->kelasGrup?->angkatan?->tahun ?? '-' }}
 
                             </td>
 
+                            {{-- STATUS --}}
                             <td>
 
                                 @if($row->trashed())
 
-                                    <span class="badge bg-secondary">
+                                    <span class="badge rounded-pill bg-secondary px-3 py-2">
+
                                         Nonaktif
+
                                     </span>
 
                                 @else
 
-                                    <span class="badge bg-success">
+                                    <span class="badge rounded-pill bg-success px-3 py-2">
+
                                         Aktif
+
                                     </span>
 
                                 @endif
 
                             </td>
 
-                            <td>
+                            {{-- AKSI --}}
+                            <td class="text-center">
 
-                                <a href="{{ route('superadmin.siswa.show', $row->id) }}"
-                                   class="btn btn-sm btn-info">
+                                <a href="{{ route('superadmin.siswa.show',$row->id) }}"
+                                    class="btn btn-primary btn-sm rounded-pill px-3">
+
+                                    <i class="bi bi-eye-fill me-1"></i>
 
                                     Detail
 
@@ -268,20 +438,35 @@
 
                         </tr>
 
-                    @empty
+                        @empty
 
                         <tr>
 
-                            <td colspan="8"
-                                class="text-center text-muted">
+                            <td colspan="7">
 
-                                Tidak ada data siswa
+                                <div class="empty-state">
+
+                                    <i class="bi bi-mortarboard display-4 text-secondary"></i>
+
+                                    <h5 class="mt-3">
+
+                                        Belum Ada Data Siswa
+
+                                    </h5>
+
+                                    <p class="text-muted mb-0">
+
+                                        Data siswa belum tersedia.
+
+                                    </p>
+
+                                </div>
 
                             </td>
 
                         </tr>
 
-                    @endforelse
+                        @endforelse
 
                 </tbody>
 
@@ -298,5 +483,114 @@
     </div>
 
 </div>
+
+<style>
+
+.avatar-circle{
+
+    width:52px;
+    height:52px;
+
+    border-radius:50%;
+
+    background:linear-gradient(135deg,#2563eb,#0f4c81);
+
+    color:white;
+
+    display:flex;
+    align-items:center;
+    justify-content:center;
+
+    font-weight:700;
+    font-size:1.1rem;
+
+    box-shadow:0 6px 18px rgba(37,99,235,.25);
+
+}
+
+.table thead th{
+
+    border:0;
+
+    color:#64748b;
+
+    text-transform:uppercase;
+
+    font-size:.83rem;
+
+    font-weight:700;
+
+    letter-spacing:.5px;
+
+    padding:16px;
+
+}
+
+.table tbody td{
+
+    padding:18px 16px;
+
+    vertical-align:middle;
+
+}
+
+.table-hover tbody tr{
+
+    transition:.25s;
+
+}
+
+.table-hover tbody tr:hover{
+
+    background:#f8fbff;
+
+}
+
+.card{
+
+    transition:.25s;
+
+}
+
+.card:hover{
+
+    box-shadow:0 15px 40px rgba(15,76,129,.08)!important;
+
+}
+
+.badge{
+
+    font-weight:500;
+
+}
+
+.empty-state{
+
+    text-align:center;
+
+    padding:60px 20px;
+
+}
+
+.form-control,
+.form-select{
+
+    border-radius:12px;
+
+}
+
+.btn{
+
+    border-radius:12px;
+
+}
+
+.card-header{
+
+    background:white;
+
+}
+
+</style>
 
 @endsection

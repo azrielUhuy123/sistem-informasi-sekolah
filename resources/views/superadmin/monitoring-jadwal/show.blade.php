@@ -4,18 +4,56 @@
 
 @section('content')
 
-<div class="container-fluid py-3">
+<div class="container-fluid">
 
-    {{-- HEADER --}}
-    <div class="mb-4">
+    {{-- ================= HEADER ================= --}}
+    <div class="card border-0 shadow-sm rounded-4 overflow-hidden mb-4">
 
-        <h4 class="fw-bold mb-0">
-            Monitoring Jadwal
-        </h4>
+        <div class="card-body p-4 p-lg-5 text-white"
+             style="background:linear-gradient(135deg,#0f4c81 0%,#2563eb 100%);">
 
-        <small class="text-muted">
-            Kelas {{ $kelas->nama_kelas }}
-        </small>
+            <div class="d-flex flex-column flex-lg-row justify-content-between align-items-lg-center">
+
+                <div>
+
+                    <h2 class="fw-bold mb-2">
+
+                        Monitoring Jadwal
+
+                    </h2>
+
+                    <p class="mb-0 opacity-75">
+
+                        Monitoring, validasi, persetujuan, dan publikasi jadwal pelajaran kelas
+                        <strong>{{ $kelas->nama_kelas }}</strong>.
+
+                    </p>
+
+                </div>
+
+                <div class="mt-3 mt-lg-0">
+
+                    <div class="bg-white rounded-4 px-4 py-3 text-center">
+
+                        <h2 class="fw-bold text-primary mb-0">
+
+                            {{ $jadwals->count() }}
+
+                        </h2>
+
+                        <small class="text-muted">
+
+                            Total Jadwal
+
+                        </small>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
 
     </div>
 
@@ -26,145 +64,260 @@
         $rejected = $jadwals->where('status', 'rejected')->count();
     @endphp
 
-    <div class="alert alert-info shadow-sm border-0 mb-4">
-        <strong>Total Jadwal:</strong> {{ $jadwals->count() }}
-        <span class="mx-2">|</span>
-        <strong>Submitted:</strong> {{ $submitted }}
-        <span class="mx-2">|</span>
-        <strong>Approved:</strong> {{ $approved }}
-        <span class="mx-2">|</span>
-        <strong>Rejected:</strong> {{ $rejected }}
+    <div class="row g-3 mb-4">
+
+        <div class="col-md-3">
+
+            <div class="card border-0 shadow-sm rounded-4">
+
+                <div class="card-body text-center">
+
+                    <i class="bi bi-hourglass-split text-warning display-6"></i>
+
+                    <h3 class="fw-bold mt-2 mb-0">
+
+                        {{ $submitted }}
+
+                    </h3>
+
+                    <small class="text-muted">
+
+                        Submitted
+
+                    </small>
+
+                </div>
+
+            </div>
+
+        </div>
+
+        <div class="col-md-3">
+
+            <div class="card border-0 shadow-sm rounded-4">
+
+                <div class="card-body text-center">
+
+                    <i class="bi bi-check-circle-fill text-success display-6"></i>
+
+                    <h3 class="fw-bold mt-2 mb-0">
+
+                        {{ $approved }}
+
+                    </h3>
+
+                    <small class="text-muted">
+
+                        Approved
+
+                    </small>
+
+                </div>
+
+            </div>
+
+        </div>
+
+        <div class="col-md-3">
+
+            <div class="card border-0 shadow-sm rounded-4">
+
+                <div class="card-body text-center">
+
+                    <i class="bi bi-x-circle-fill text-danger display-6"></i>
+
+                    <h3 class="fw-bold mt-2 mb-0">
+
+                        {{ $rejected }}
+
+                    </h3>
+
+                    <small class="text-muted">
+
+                        Rejected
+
+                    </small>
+
+                </div>
+
+            </div>
+
+        </div>
+
+        <div class="col-md-3">
+
+            <div class="card border-0 shadow-sm rounded-4">
+
+                <div class="card-body text-center">
+
+                    <i class="bi bi-calendar-check-fill text-primary display-6"></i>
+
+                    <h3 class="fw-bold mt-2 mb-0">
+
+                        {{ $jadwals->count() }}
+
+                    </h3>
+
+                    <small class="text-muted">
+
+                        Total Jadwal
+
+                    </small>
+
+                </div>
+
+            </div>
+
+        </div>
+
     </div>
-    <div class="d-flex gap-2 mb-4">
 
-        <a
-            href="{{ route(
-                'superadmin.monitoring-jadwal.show',
-                [
-                    'kelas' => $kelas->id,
-                    'view' => 'grid'
-                ]
-            ) }}"
-            class="
-                btn
-                {{ $view == 'grid'
-                    ? 'btn-primary'
-                    : 'btn-outline-primary'
-                }}
-            "
-        >
+    {{-- ================= TOOLBAR ================= --}}
+    <div class="card border-0 shadow-sm rounded-4 mb-4">
 
-            Grid View
+        <div class="card-body">
 
-        </a>
+            <div class="d-flex flex-wrap justify-content-between align-items-center gap-3">
 
-        <a
-            href="{{ route(
-                'superadmin.monitoring-jadwal.show',
-                [
-                    'kelas' => $kelas->id,
-                    'view' => 'table'
-                ]
-            ) }}"
-            class="
-                btn
-                {{ $view == 'table'
-                    ? 'btn-primary'
-                    : 'btn-outline-primary'
-                }}
-            "
-        >
+                {{-- LEFT --}}
+                <div class="d-flex flex-wrap gap-2">
 
-            Table View
+                    <a href="{{ route('superadmin.monitoring-jadwal.index') }}"
+                    class="btn btn-light border rounded-pill px-4">
 
-        </a>
+                        <i class="bi bi-arrow-left me-2"></i>
+
+                        Kembali
+
+                    </a>
+
+                    <a
+                        href="{{ route(
+                            'superadmin.monitoring-jadwal.show',
+                            [
+                                'kelas'=>$kelas->id,
+                                'view'=>'grid'
+                            ]
+                        ) }}"
+                        class="btn rounded-pill px-4
+                        {{ $view=='grid'
+                            ? 'btn-primary'
+                            : 'btn-outline-primary'
+                        }}">
+
+                        <i class="bi bi-grid-3x3-gap-fill me-2"></i>
+
+                        Grid View
+
+                    </a>
+
+                    <a
+                        href="{{ route(
+                            'superadmin.monitoring-jadwal.show',
+                            [
+                                'kelas'=>$kelas->id,
+                                'view'=>'table'
+                            ]
+                        ) }}"
+                        class="btn rounded-pill px-4
+                        {{ $view=='table'
+                            ? 'btn-primary'
+                            : 'btn-outline-primary'
+                        }}">
+
+                        <i class="bi bi-table me-2"></i>
+
+                        Table View
+
+                    </a>
+
+                </div>
+
+                {{-- RIGHT --}}
+                <div class="d-flex flex-wrap gap-2">
+
+                    {{-- APPROVE --}}
+                    <form method="POST"
+                        action="{{ route('superadmin.monitoring-jadwal.approve',$kelas->id) }}">
+
+                        @csrf
+
+                        <button
+                            class="btn btn-success rounded-pill px-4"
+                            onclick="return confirm('Approve seluruh jadwal kelas ini?')">
+
+                            <i class="bi bi-check-circle-fill me-2"></i>
+
+                            Approve
+
+                        </button>
+
+                    </form>
+
+                    {{-- REJECT --}}
+                    <button
+                        class="btn btn-danger rounded-pill px-4"
+                        data-bs-toggle="modal"
+                        data-bs-target="#rejectModal">
+
+                        <i class="bi bi-x-circle-fill me-2"></i>
+
+                        Reject
+
+                    </button>
+
+                    {{-- PUBLISH --}}
+                    <form
+                        method="POST"
+                        action="{{ route('superadmin.monitoring-jadwal.publish',$kelas->id) }}">
+
+                        @csrf
+                        @method('PATCH')
+
+                        <button
+                            class="btn btn-primary rounded-pill px-4">
+
+                            <i class="bi bi-send-check-fill me-2"></i>
+
+                            Publish
+
+                        </button>
+
+                    </form>
+
+                </div>
+
+            </div>
+
+        </div>
 
     </div>
 
-    <div class="d-flex gap-2 mb-4">
-
-        {{-- APPROVE --}}
-        <form
-            method="POST"
-            action="{{ route(
-                'superadmin.monitoring-jadwal.approve',
-                $kelas->id
-            ) }}"
-        >
-
-            @csrf
-
-            <button
-                class="btn btn-success"
-                onclick="return confirm(
-                    'Approve seluruh jadwal kelas ini?'
-                )"
-            >
-
-                Approve Jadwal
-
-            </button>
-
-        </form>
-
-        {{-- REJECT --}}
-        <button
-            class="btn btn-danger"
-            data-bs-toggle="modal"
-            data-bs-target="#rejectModal"
-        >
-
-            Reject Jadwal
-
-        </button>
-
-        {{-- PUBLISH --}}
-        <form
-            method="POST"
-            action="{{ route(
-                'superadmin.monitoring-jadwal.publish',
-                $kelas->id
-            ) }}"
-        >
-
-            @csrf
-
-            <button
-                type="submit"
-                class="btn btn-primary"
-            >
-
-                <i class="bi bi-send-check"></i>
-
-                Publish Jadwal
-
-            </button>
-
-        </form>
-    </div>
     {{-- CARD --}}
     @if($view == 'grid')
-    <div class="card shadow-sm border-0">
+    <div class="card border-0 shadow-sm rounded-4 overflow-hidden">
 
         <div class="card-body">
 
             {{-- TABLE --}}
             <div class="table-responsive">
 
-                <table class="table table-bordered align-middle text-center mb-0">
+                <table class="table table-bordered align-middle text-center modern-grid-table mb-0">
 
-                    <thead class="table-light">
+                    <thead>
 
-                        <tr>
+                        <tr class="table-header">
 
-                            <th style="width:120px;">
+                            <th width="160">
                                 Jam
                             </th>
 
-                            @foreach ($haris as $hari)
+                            @foreach($haris as $hari)
 
                                 <th>
-                                    {{ $hari->nama_hari ?? $hari->nama }}
+
+                                    {{ $hari->nama }}
+
                                 </th>
 
                             @endforeach
@@ -180,7 +333,7 @@
                             <tr>
 
                                 {{-- JAM --}}
-                                <td class="bg-light">
+                                <td class="bg-light fw-semibold">
 
                                     <strong>
                                         Jam {{ $jam->jam_ke }}
@@ -212,38 +365,68 @@
 
                                         @if($item)
 
-                                            <div
-                                                class="p-2 rounded text-white position-relative"
-                                                style="background: {{ $bgColor }}; min-height: 92px;"
-                                            >
+                                            <div class="jadwal-card text-white"
+                                                style="background:{{ $bgColor }};">
 
-                                                <div class="fw-bold">
+                                                <div class="fw-bold fs-6 mb-1">
                                                     {{ $item->mapel->nama_mapel ?? '-' }}
                                                 </div>
 
-                                                <small>
+                                                <div class="small opacity-90">
+
+                                                    <i class="bi bi-person-fill me-1"></i>
+
                                                     {{ $item->guru->pegawai->nama ?? '-' }}
-                                                </small>
+
+                                                </div>
 
                                                 
                                                 <br>
 
                                                 @if($conflicts[$item->id] ?? false)
-                                                    <small class="fw-bold">
-                                                        BENTROK
-                                                    </small>
-                                                @else
-                                                    <small>
-                                                        AMAN
-                                                    </small>
-                                                @endif
+
+                                                    <div class="mt-2">
+
+                                                        <span class="badge bg-light text-danger">
+
+                                                            <i class="bi bi-exclamation-triangle-fill me-1"></i>
+
+                                                            Bentrok
+
+                                                        </span>
+
+                                                    </div>
+
+                                                    @else
+
+                                                    <div class="mt-2">
+
+                                                        <span class="badge bg-light text-success">
+
+                                                            <i class="bi bi-check-circle-fill me-1"></i>
+
+                                                            Aman
+
+                                                        </span>
+
+                                                    </div>
+
+                                                    @endif
 
                                             </div>
 
                                         @else
 
-                                            <div class="text-muted small py-4">
-                                                Kosong
+                                            <div class="text-center py-4 text-secondary">
+
+                                                <i class="bi bi-dash-circle display-6"></i>
+
+                                                <div class="small">
+
+                                                    Tidak Ada Jadwal
+
+                                                </div>
+
                                             </div>
 
                                         @endif
@@ -267,30 +450,89 @@
     </div>
     @endif
     
-    {{-- TABLE --}}
-
+    {{-- ================= TABLE VIEW ================= --}}
     @if($view == 'table')
 
-    <div class="card shadow-sm border-0">
+    <div class="card border-0 shadow-sm rounded-4 overflow-hidden">
 
-        <div class="card-body">
+        <div class="card-header bg-white border-0 pt-4 px-4">
+
+            <div class="d-flex justify-content-between align-items-center">
+
+                <div>
+
+                    <h5 class="fw-bold mb-1">
+
+                        <i class="bi bi-table text-primary me-2"></i>
+
+                        Daftar Jadwal Pelajaran
+
+                    </h5>
+
+                    <small class="text-muted">
+
+                        Monitoring seluruh jadwal kelas
+                        <strong>{{ $kelas->nama_kelas }}</strong>
+
+                    </small>
+
+                </div>
+
+                <span class="badge bg-primary rounded-pill px-3 py-2">
+
+                    {{ $jadwals->count() }} Jadwal
+
+                </span>
+
+            </div>
+
+        </div>
+
+        <div class="card-body p-0">
 
             <div class="table-responsive">
 
-                <table
-                    class="table table-striped align-middle"
-                >
+                <table class="table table-hover align-middle mb-0">
 
                     <thead>
 
                         <tr>
 
-                            <th>Hari</th>
-                            <th>Jam</th>
-                            <th>Guru</th>
-                            <th>Mapel</th>
-                            <th>Status</th>
-                            <th>Monitoring</th>
+                            <th width="120">
+
+                                Hari
+
+                            </th>
+
+                            <th width="170">
+
+                                Jam
+
+                            </th>
+
+                            <th>
+
+                                Guru
+
+                            </th>
+
+                            <th>
+
+                                Mata Pelajaran
+
+                            </th>
+
+                            <th width="140">
+
+                                Status
+
+                            </th>
+
+                            <th width="140">
+
+                                Monitoring
+
+                            </th>
 
                         </tr>
 
@@ -298,94 +540,189 @@
 
                     <tbody>
 
-                        @foreach($jadwals as $item)
+                    @forelse($jadwals as $item)
 
-                            <tr>
+                        <tr>
 
-                                <td>
+                            {{-- Hari --}}
+                            <td>
+
+                                <span class="badge bg-light text-dark border px-3 py-2">
+
                                     {{ $item->hari->nama ?? '-' }}
-                                </td>
 
-                                <td>
+                                </span>
 
-                                    Jam
-                                    {{ $item->jamPelajaran->jam_ke }}
+                            </td>
 
-                                    <br>
+                            {{-- Jam --}}
+                            <td>
 
-                                    <small class="text-muted">
+                                <div class="fw-semibold">
 
-                                        {{ substr(
-                                            $item->jamPelajaran->mulai,
-                                            0,
-                                            5
-                                        ) }}
+                                    Jam {{ $item->jamPelajaran->jam_ke }}
 
-                                        -
+                                </div>
 
-                                        {{ substr(
-                                            $item->jamPelajaran->selesai,
-                                            0,
-                                            5
-                                        ) }}
+                                <small class="text-muted">
 
-                                    </small>
+                                    {{ substr($item->jamPelajaran->mulai,0,5) }}
+                                    -
+                                    {{ substr($item->jamPelajaran->selesai,0,5) }}
 
-                                </td>
+                                </small>
 
-                                <td>
-                                    {{ $item->guru->pegawai->nama ?? '-' }}
-                                </td>
+                            </td>
 
-                                <td>
+                            {{-- Guru --}}
+                            <td>
+
+                                <div class="d-flex align-items-center">
+
+                                    <div class="avatar-circle me-3">
+
+                                        {{ strtoupper(substr($item->guru->pegawai->nama ?? 'A',0,1)) }}
+
+                                    </div>
+
+                                    <div>
+
+                                        <div class="fw-semibold">
+
+                                            {{ $item->guru->pegawai->nama ?? '-' }}
+
+                                        </div>
+
+                                    </div>
+
+                                </div>
+
+                            </td>
+
+                            {{-- Mapel --}}
+                            <td>
+
+                                <span class="badge bg-primary-subtle text-primary border px-3 py-2">
+
                                     {{ $item->mapel->nama_mapel ?? '-' }}
-                                </td>
 
-                                <td>
+                                </span>
 
-                                    @if($item->status == 'submitted')
+                            </td>
 
-                                        <span class="badge bg-warning">
-                                            Submitted
-                                        </span>
+                            {{-- Status --}}
+                            <td>
 
-                                    @elseif($item->status == 'approved')
+                                @if($item->status=='submitted')
 
-                                        <span class="badge bg-success">
-                                            Approved
-                                        </span>
+                                    <span class="badge rounded-pill bg-warning px-3 py-2">
 
-                                    @elseif($item->status == 'rejected')
+                                        <i class="bi bi-hourglass-split me-1"></i>
 
-                                        <span class="badge bg-danger">
-                                            Rejected
-                                        </span>
+                                        Submitted
 
-                                    @endif
+                                    </span>
 
-                                </td>
+                                @elseif($item->status=='approved')
 
-                                <td>
+                                    <span class="badge rounded-pill bg-success px-3 py-2">
 
-                                    @if($conflicts[$item->id] ?? false)
+                                        <i class="bi bi-check-circle-fill me-1"></i>
 
-                                        <span class="badge bg-danger">
-                                            Bentrok
-                                        </span>
+                                        Approved
 
-                                    @else
+                                    </span>
 
-                                        <span class="badge bg-success">
-                                            Aman
-                                        </span>
+                                @elseif($item->status=='rejected')
 
-                                    @endif
+                                    <span class="badge rounded-pill bg-danger px-3 py-2">
 
-                                </td>
+                                        <i class="bi bi-x-circle-fill me-1"></i>
 
-                            </tr>
+                                        Rejected
 
-                        @endforeach
+                                    </span>
+
+                                @elseif($item->status=='published')
+
+                                    <span class="badge rounded-pill bg-primary px-3 py-2">
+
+                                        <i class="bi bi-send-check-fill me-1"></i>
+
+                                        Published
+
+                                    </span>
+
+                                @else
+
+                                    <span class="badge rounded-pill bg-secondary px-3 py-2">
+
+                                        Draft
+
+                                    </span>
+
+                                @endif
+
+                            </td>
+
+                            {{-- Monitoring --}}
+                            <td>
+
+                                @if($conflicts[$item->id] ?? false)
+
+                                    <span class="badge rounded-pill bg-danger px-3 py-2">
+
+                                        <i class="bi bi-exclamation-triangle-fill me-1"></i>
+
+                                        Bentrok
+
+                                    </span>
+
+                                @else
+
+                                    <span class="badge rounded-pill bg-success px-3 py-2">
+
+                                        <i class="bi bi-check-circle-fill me-1"></i>
+
+                                        Aman
+
+                                    </span>
+
+                                @endif
+
+                            </td>
+
+                        </tr>
+
+                    @empty
+
+                        <tr>
+
+                            <td colspan="6">
+
+                                <div class="empty-state">
+
+                                    <i class="bi bi-calendar-x display-4 text-secondary"></i>
+
+                                    <h5 class="mt-3">
+
+                                        Belum Ada Jadwal
+
+                                    </h5>
+
+                                    <p class="text-muted mb-0">
+
+                                        Jadwal pelajaran untuk kelas ini belum tersedia.
+
+                                    </p>
+
+                                </div>
+
+                            </td>
+
+                        </tr>
+
+                    @endforelse
 
                     </tbody>
 
@@ -570,17 +907,21 @@
 
                     <button
                         type="button"
-                        class="btn btn-light border"
-                        data-bs-dismiss="modal"
-                    >
+                        class="btn btn-light border rounded-pill px-4"
+                        data-bs-dismiss="modal">
+
                         Batal
+
                     </button>
 
                     <button
                         type="submit"
-                        class="btn btn-danger"
-                    >
+                        class="btn btn-danger rounded-pill px-4">
+
+                        <i class="bi bi-x-circle-fill me-2"></i>
+
                         Reject Jadwal
+
                     </button>
 
                 </div>
@@ -592,4 +933,166 @@
     </div>
 
 </div>
+
+<style>
+
+.avatar-circle{
+
+    width:50px;
+    height:50px;
+    border-radius:50%;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+
+    background:linear-gradient(135deg,#2563eb,#0f4c81);
+
+    color:white;
+    font-weight:700;
+
+    box-shadow:0 6px 18px rgba(37,99,235,.25);
+
+}
+
+.card{
+
+    transition:.25s;
+
+}
+
+.card:hover{
+
+    box-shadow:0 15px 40px rgba(15,76,129,.08)!important;
+
+}
+
+.table thead th{
+
+    border:0;
+    background:#f8fafc;
+
+    color:#64748b;
+
+    text-transform:uppercase;
+
+    letter-spacing:.5px;
+
+    font-size:.82rem;
+
+    font-weight:700;
+
+    padding:16px;
+
+}
+
+.table tbody td{
+
+    padding:18px 16px;
+
+    vertical-align:middle;
+
+}
+
+.table-hover tbody tr{
+
+    transition:.2s;
+
+}
+
+.table-hover tbody tr:hover{
+
+    background:#f8fbff;
+
+}
+
+.modern-grid-table th{
+
+    background:#0f4c81;
+
+    color:#fff;
+
+    font-weight:600;
+
+}
+
+.modern-grid-table td{
+
+    vertical-align:middle;
+
+}
+
+.jadwal-card{
+
+    min-height:105px;
+
+    border-radius:14px;
+
+    padding:14px;
+
+    transition:.25s;
+
+    box-shadow:0 8px 20px rgba(0,0,0,.08);
+
+}
+
+.jadwal-card:hover{
+
+    transform:translateY(-3px);
+
+    box-shadow:0 15px 30px rgba(0,0,0,.15);
+
+}
+
+.badge{
+
+    font-weight:600;
+
+}
+
+.btn{
+
+    transition:.25s;
+
+}
+
+.btn:hover{
+
+    transform:translateY(-2px);
+
+}
+
+.empty-state{
+
+    text-align:center;
+
+    padding:70px 20px;
+
+}
+
+.modal-content{
+
+    border-radius:18px;
+
+}
+
+.modal-header{
+
+    border-bottom:1px solid #eef2f7;
+
+}
+
+.modal-footer{
+
+    border-top:1px solid #eef2f7;
+
+}
+
+.form-control,
+.form-select{
+
+    border-radius:12px;
+
+}
+
+</style>
 @endsection

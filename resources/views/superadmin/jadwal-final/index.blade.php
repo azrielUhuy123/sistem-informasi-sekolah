@@ -10,7 +10,7 @@
 
         <h4 class="fw-bold mb-1">
             Jadwal Final
-        </h4>
+        </h4>   
 
         <small class="text-muted">
             Jadwal resmi yang sudah dipublish
@@ -53,11 +53,11 @@
         </div>
 
         {{-- TAB TINGKAT --}}
+
         <ul
-            class="nav nav-pills mb-4"
-            id="tingkatTab"
-            role="tablist"
-        >
+    class="nav nav-pills mb-4"
+    id="tingkatTab"
+    role="tablist">
 
             @foreach($kelasByTingkat as $tingkat => $listKelas)
 
@@ -88,49 +88,91 @@
 
                 <div
                     class="tab-pane fade {{ $loop->first ? 'show active' : '' }}"
-                    id="tingkat{{ $tingkat }}"
-                >
+                    id="tingkat{{ $tingkat }}">
 
                     <div
-                        class="accordion"
-                        id="accordionTingkat{{ $tingkat }}"
-                    >
+                        class="accordion modern-accordion"
+                        id="accordionTingkat{{ $tingkat }}">
 
                         @foreach($listKelas as $k)
 
-                            <div class="accordion-item border-0 shadow-sm mb-3 rounded overflow-hidden">
+                        @php
 
-                                <h2 class="accordion-header">
+                            $totalJadwal = $k->pengajuanJadwal->count();
 
-                                    <div class="d-flex align-items-center bg-white px-3">
+                        @endphp
 
-                                        {{-- CHECKBOX --}}
-                                        <div class="form-check me-3">
+                        <div class="accordion-item border-0 shadow-sm rounded-4 overflow-hidden mb-4">
 
-                                            <input
-                                                class="form-check-input kelas-checkbox"
-                                                type="checkbox"
-                                                name="kelas_ids[]"
-                                                value="{{ $k->id }}"
-                                            >
+                            <h2 class="accordion-header">
 
-                                        </div>
+                                <div class="d-flex align-items-center px-4 py-3 bg-white">
 
-                                        {{-- ACCORDION BUTTON --}}
-                                        <button
-                                            class="accordion-button collapsed fw-bold shadow-none"
-                                            type="button"
-                                            data-bs-toggle="collapse"
-                                            data-bs-target="#kelas{{ $k->id }}"
-                                        >
+                                    {{-- CHECKBOX --}}
+                                    <div class="form-check me-4">
 
-                                            {{ $k->nama_kelas }}
-
-                                        </button>
+                                        <input
+                                            class="form-check-input kelas-checkbox"
+                                            type="checkbox"
+                                            name="kelas_ids[]"
+                                            value="{{ $k->id }}">
 
                                     </div>
 
-                                </h2>
+                                    {{-- BUTTON --}}
+                                    <button
+                                        class="accordion-button collapsed shadow-none bg-transparent p-0"
+                                        data-bs-toggle="collapse"
+                                        data-bs-target="#kelas{{ $k->id }}"
+                                        type="button">
+
+                                        <div class="w-100">
+
+                                            <div class="d-flex justify-content-between align-items-center flex-wrap">
+
+                                                <div>
+
+                                                    <h5 class="fw-bold mb-1">
+
+                                                        {{ $k->nama_kelas }}
+
+                                                    </h5>
+
+                                                    <small class="text-muted">
+
+                                                        Jadwal resmi kelas {{ $k->nama_kelas }}
+
+                                                    </small>
+
+                                                </div>
+
+                                                <div class="d-flex gap-2">
+
+                                                    <span class="badge bg-success rounded-pill px-3 py-2">
+
+                                                        {{ $totalJadwal }}
+
+                                                        Jadwal
+
+                                                    </span>
+
+                                                    <span class="badge bg-primary rounded-pill px-3 py-2">
+
+                                                        Published
+
+                                                    </span>
+
+                                                </div>
+
+                                            </div>
+
+                                        </div>
+
+                                    </button>
+
+                                </div>
+
+                            </h2>
 
                                 <div
                                     id="kelas{{ $k->id }}"
@@ -244,5 +286,326 @@
     </form>
 
 </div>
+</div>
 
+<style>
+
+/* ================= CARD ================= */
+
+.card{
+    transition:.25s;
+}
+
+.card:hover{
+    box-shadow:0 16px 45px rgba(15,76,129,.08)!important;
+}
+
+/* ================= NAV PILLS ================= */
+
+.nav-pills .nav-link{
+
+    border-radius:999px;
+    font-weight:600;
+    padding:10px 22px;
+    color:#64748b;
+    transition:.25s;
+
+}
+
+.nav-pills .nav-link:hover{
+
+    background:#eef6ff;
+    color:#2563eb;
+
+}
+
+.nav-pills .nav-link.active{
+
+    background:linear-gradient(135deg,#2563eb,#0f4c81);
+    color:#fff;
+
+}
+
+/* ================= ACCORDION ================= */
+
+.modern-accordion .accordion-item{
+
+    border-radius:18px!important;
+    overflow:hidden;
+
+}
+
+.modern-accordion .accordion-button{
+
+    box-shadow:none!important;
+    background:white!important;
+
+}
+
+.modern-accordion .accordion-button:not(.collapsed){
+
+    background:#f8fbff!important;
+
+}
+
+.modern-accordion .accordion-button::after{
+
+    transition:.25s;
+
+}
+
+/* ================= TABLE ================= */
+
+.table{
+
+    margin-bottom:0;
+
+}
+
+.table thead th{
+
+    border:0;
+    background:#f8fafc;
+
+    color:#64748b;
+
+    text-transform:uppercase;
+    letter-spacing:.6px;
+
+    font-size:.82rem;
+    font-weight:700;
+
+    padding:18px;
+
+}
+
+.table tbody td{
+
+    vertical-align:middle;
+    padding:14px;
+
+}
+
+.table-bordered>:not(caption)>*>*{
+
+    border-color:#edf2f7;
+
+}
+
+/* ================= JADWAL CARD ================= */
+
+.schedule-card{
+
+    border-radius:14px;
+
+    background:linear-gradient(
+        135deg,
+        #eff6ff,
+        #ffffff
+    );
+
+    border:1px solid #dbeafe;
+
+    padding:14px;
+
+    transition:.25s;
+
+    height:100%;
+
+}
+
+.schedule-card:hover{
+
+    transform:translateY(-3px);
+
+    box-shadow:0 10px 30px rgba(37,99,235,.15);
+
+}
+
+.schedule-mapel{
+
+    font-weight:700;
+    color:#0f4c81;
+    margin-bottom:10px;
+
+}
+
+.schedule-guru{
+
+    font-size:.92rem;
+    color:#475569;
+
+}
+
+.schedule-time{
+
+    margin-top:10px;
+
+    color:#2563eb;
+
+    font-size:.85rem;
+
+    font-weight:600;
+
+}
+
+/* ================= EMPTY ================= */
+
+.schedule-empty{
+
+    border:2px dashed #d1d5db;
+
+    border-radius:14px;
+
+    color:#94a3b8;
+
+    padding:26px 10px;
+
+    text-align:center;
+
+    transition:.25s;
+
+    font-size:.9rem;
+
+}
+
+.schedule-empty i{
+
+    font-size:1.5rem;
+
+    margin-bottom:6px;
+
+}
+
+.schedule-empty:hover{
+
+    background:#f8fafc;
+
+}
+
+/* ================= BADGE ================= */
+
+.badge{
+
+    font-weight:600;
+    letter-spacing:.3px;
+
+}
+
+/* ================= BUTTON ================= */
+
+.btn{
+
+    transition:.2s;
+
+}
+
+.btn:hover{
+
+    transform:translateY(-2px);
+
+}
+
+.btn-danger{
+
+    background:linear-gradient(135deg,#dc2626,#b91c1c);
+    border:none;
+
+}
+
+.btn-primary{
+
+    background:linear-gradient(135deg,#2563eb,#0f4c81);
+    border:none;
+
+}
+
+.btn-outline-primary:hover{
+
+    background:#2563eb;
+    color:#fff;
+
+}
+
+/* ================= CHECKBOX ================= */
+
+.form-check-input{
+
+    width:20px;
+    height:20px;
+
+    cursor:pointer;
+
+}
+
+.form-check-input:checked{
+
+    background-color:#2563eb;
+    border-color:#2563eb;
+
+}
+
+/* ================= RESPONSIVE ================= */
+
+@media(max-width:992px){
+
+    .schedule-card{
+
+        min-height:auto;
+
+    }
+
+    .table{
+
+        font-size:.9rem;
+
+    }
+
+}
+
+</style>
 @endsection
+
+<script>
+
+const checkboxes = document.querySelectorAll('.kelas-checkbox');
+const countText = document.getElementById('selectedCount');
+const countCard = document.getElementById('selectedCountCard');
+
+function updateCount(){
+
+    const total = document.querySelectorAll('.kelas-checkbox:checked').length;
+
+    countText.innerHTML = total + " Kelas Dipilih";
+
+    countCard.innerHTML = total;
+
+}
+
+document.addEventListener('change',function(e){
+
+    if(e.target.classList.contains('kelas-checkbox')){
+
+        updateCount();
+
+    }
+
+});
+
+document.getElementById('btnSelectAll').onclick=function(){
+
+    checkboxes.forEach(cb=>cb.checked=true);
+
+    updateCount();
+
+}
+
+document.getElementById('btnClearAll').onclick=function(){
+
+    checkboxes.forEach(cb=>cb.checked=false);
+
+    updateCount();
+
+}
+
+</script>

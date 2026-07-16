@@ -118,6 +118,13 @@ Route::prefix('siswa')
                 [\App\Http\Controllers\Elearning\ElearningKomentarReplyController::class, 'store']
             )->name('e-learning.reply.store');
 
-           
+           Route::get('/profile', [ProfileController::class, 'index'])
+                ->name('profile');
+
+            Route::get('/profile/detail', [ProfileController::class, 'detail'])
+                ->name('profile.detail');
+
+            Route::put('/profile/detail', [ProfileController::class, 'updateDetail'])
+                ->name('profile.detail.update');
 
     });

@@ -47,12 +47,6 @@
                                 @endforeach
 
                             </select>
-
-                            <a href="{{ route('tu.angkatan.create') }}"
-                               class="btn btn-outline-primary">
-                                +
-                            </a>
-
                         </div>
                     </div>
 

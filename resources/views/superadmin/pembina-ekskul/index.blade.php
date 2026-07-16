@@ -4,41 +4,92 @@
 
 @section('content')
 
-<div class="container-fluid py-4">
+<div class="container-fluid">
 
-    <div class="mb-4">
+    {{-- ================= HEADER ================= --}}
+    <div class="card border-0 shadow-sm rounded-4 overflow-hidden mb-4">
 
-        <h3 class="fw-bold mb-1">
+        <div class="card-body p-4 p-lg-5 text-white"
+            style="background:linear-gradient(135deg,#0f4c81 0%,#2563eb 100%);">
 
-            Pembina Ekskul
+            <div class="d-flex flex-column flex-lg-row justify-content-between align-items-lg-center">
 
-        </h3>
+                <div>
 
-        <p class="text-muted mb-0">
+                    <h2 class="fw-bold mb-2">
 
-            Assign guru pembina ekstrakurikuler
+                        Pembina Ekstrakurikuler
 
-        </p>
+                    </h2>
+
+                    <p class="mb-0 opacity-75">
+
+                        Kelola penugasan guru sebagai pembina ekstrakurikuler sekolah.
+
+                    </p>
+
+                </div>
+
+                <div class="mt-3 mt-lg-0">
+
+                    <div class="bg-white rounded-4 px-4 py-3 text-center">
+
+                        <h3 class="fw-bold text-primary mb-0">
+
+                            {{ $pembina->count() }}
+
+                        </h3>
+
+                        <small class="text-muted">
+
+                            Total Pembina
+
+                        </small>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
 
     </div>
 
-    {{-- FORM --}}
-    <div class="card border-0 shadow-sm mb-4">
+    {{-- ================= FORM ================= --}}
+    <div class="card border-0 shadow-sm rounded-4 mb-4">
 
-        <div class="card-body">
+        <div class="card-header bg-white border-0 pt-4 px-4">
+
+            <h5 class="fw-bold mb-1">
+
+                <i class="bi bi-person-plus-fill text-primary me-2"></i>
+
+                Penugasan Pembina Ekskul
+
+            </h5>
+
+            <small class="text-muted">
+
+                Pilih guru dan ekstrakurikuler yang akan dibina.
+
+            </small>
+
+        </div>
+
+        <div class="card-body p-4">
 
             <form
                 action="{{ route('superadmin.pembina-ekskul.store') }}"
-                method="POST"
-            >
+                method="POST">
 
                 @csrf
 
-                <div class="row g-3 align-items-end">
+                <div class="row g-4">
 
-                    <div class="col-md-5">
+                    <div class="col-lg-5">
 
-                        <label class="form-label">
+                        <label class="form-label fw-semibold">
 
                             Guru
 
@@ -47,8 +98,7 @@
                         <select
                             name="guru_id"
                             class="form-select"
-                            required
-                        >
+                            required>
 
                             <option value="">
 
@@ -70,19 +120,18 @@
 
                     </div>
 
-                    <div class="col-md-5">
+                    <div class="col-lg-5">
 
-                        <label class="form-label">
+                        <label class="form-label fw-semibold">
 
-                            Ekskul
+                            Ekstrakurikuler
 
                         </label>
 
                         <select
                             name="ekskul_id"
                             class="form-select"
-                            required
-                        >
+                            required>
 
                             <option value="">
 
@@ -104,9 +153,17 @@
 
                     </div>
 
-                    <div class="col-md-2">
+                    <div class="col-lg-2 d-grid">
 
-                        <button class="btn btn-primary w-100">
+                        <label class="form-label opacity-0">
+
+                            Simpan
+
+                        </label>
+
+                        <button class="btn btn-primary rounded-pill">
+
+                            <i class="bi bi-check-circle-fill me-2"></i>
 
                             Simpan
 
@@ -122,23 +179,44 @@
 
     </div>
 
-    {{-- TABLE --}}
-    <div class="card border-0 shadow-sm">
+    {{-- ================= TABLE ================= --}}
+    <div class="card border-0 shadow-sm rounded-4">
 
-        <div class="card-body">
+        <div class="card-header bg-white border-0 pt-4 px-4">
+
+            <div>
+
+                <h5 class="fw-bold mb-1">
+
+                    <i class="bi bi-people-fill text-primary me-2"></i>
+
+                    Data Pembina Ekstrakurikuler
+
+                </h5>
+
+                <small class="text-muted">
+
+                    Daftar guru yang menjadi pembina ekstrakurikuler.
+
+                </small>
+
+            </div>
+
+        </div>
+
+        <div class="card-body pt-2">
 
             <div class="table-responsive">
 
-                <table class="table align-middle">
+                <table class="table table-hover align-middle mb-0">
 
-                    <thead class="table-light">
+                    <thead>
 
                         <tr>
 
-                            <th>No</th>
                             <th>Guru</th>
-                            <th>Ekskul</th>
-                            <th width="120">Aksi</th>
+                            <th>Ekstrakurikuler</th>
+                            <th width="120" class="text-center">Aksi</th>
 
                         </tr>
 
@@ -146,39 +224,66 @@
 
                     <tbody>
 
-                        @forelse($pembina as $i => $p)
+                        @forelse($pembina as $p)
 
                             <tr>
 
                                 <td>
 
-                                    {{ $i + 1 }}
+                                    <div class="d-flex align-items-center">
+
+                                        <div class="avatar-circle me-3">
+
+                                            {{ strtoupper(substr($p->guru->pegawai->nama,0,1)) }}
+
+                                        </div>
+
+                                        <div>
+
+                                            <div class="fw-semibold">
+
+                                                {{ $p->guru->pegawai->nama }}
+
+                                            </div>
+
+                                            <small class="text-muted">
+
+                                                {{ $p->guru->pegawai->nip ?? '-' }}
+
+                                            </small>
+
+                                        </div>
+
+                                    </div>
 
                                 </td>
 
                                 <td>
 
-                                    {{ $p->guru->pegawai->nama }}
+                                    <span class="badge bg-primary-subtle text-primary border px-3 py-2">
+
+                                        <i class="bi bi-trophy-fill me-1"></i>
+
+                                        {{ $p->ekskul->nama }}
+
+                                    </span>
 
                                 </td>
 
-                                <td>
-
-                                    {{ $p->ekskul->nama }}
-
-                                </td>
-
-                                <td>
+                                <td class="text-center">
 
                                     <form
-                                        action="{{ route('superadmin.pembina-ekskul.destroy', $p->id) }}"
+                                        action="{{ route('superadmin.pembina-ekskul.destroy',$p->id) }}"
                                         method="POST"
-                                    >
+                                        onsubmit="return confirm('Hapus pembina ini?')">
 
                                         @csrf
                                         @method('DELETE')
 
-                                        <button class="btn btn-danger btn-sm">
+                                        <button
+                                            class="btn btn-danger rounded-pill btn-sm px-3">
+
+                                            <i class="bi bi-trash3-fill me-1"></i>
 
                                             Hapus
 
@@ -194,12 +299,25 @@
 
                             <tr>
 
-                                <td
-                                    colspan="4"
-                                    class="text-center text-muted py-4"
-                                >
+                                <td colspan="3">
 
-                                    Belum ada pembina ekskul
+                                    <div class="empty-state">
+
+                                        <i class="bi bi-person-x display-4 text-secondary"></i>
+
+                                        <h5 class="mt-3">
+
+                                            Belum Ada Pembina Ekskul
+
+                                        </h5>
+
+                                        <p class="text-muted mb-0">
+
+                                            Belum ada guru yang ditugaskan sebagai pembina ekstrakurikuler.
+
+                                        </p>
+
+                                    </div>
 
                                 </td>
 
@@ -218,5 +336,121 @@
     </div>
 
 </div>
+
+<style>
+
+.avatar-circle{
+
+    width:52px;
+    height:52px;
+    border-radius:50%;
+    background:linear-gradient(135deg,#2563eb,#0f4c81);
+    color:#fff;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    font-weight:700;
+    font-size:1.1rem;
+    box-shadow:0 6px 18px rgba(37,99,235,.25);
+
+}
+
+.table thead th{
+
+    border:0;
+    color:#64748b;
+    text-transform:uppercase;
+    font-size:.82rem;
+    font-weight:700;
+    letter-spacing:.5px;
+    padding:16px;
+
+}
+
+.table tbody td{
+
+    padding:18px 16px;
+    vertical-align:middle;
+
+}
+
+.table-hover tbody tr{
+
+    transition:.25s;
+
+}
+
+.table-hover tbody tr:hover{
+
+    background:#f8fbff;
+
+}
+
+.card{
+
+    transition:.25s;
+
+}
+
+.card:hover{
+
+    box-shadow:0 15px 40px rgba(15,76,129,.08)!important;
+
+}
+
+.badge{
+
+    font-weight:600;
+
+}
+
+.empty-state{
+
+    text-align:center;
+    padding:60px 20px;
+
+}
+
+.form-select{
+
+    border-radius:12px;
+    min-height:48px;
+    border:1px solid #dbe4f0;
+
+}
+
+.form-select:focus{
+
+    border-color:#2563eb;
+    box-shadow:0 0 0 .2rem rgba(37,99,235,.15);
+
+}
+
+.btn-primary{
+
+    border:none;
+    background:linear-gradient(135deg,#2563eb,#0f4c81);
+
+}
+
+.btn-primary:hover{
+
+    background:linear-gradient(135deg,#1d4ed8,#1e40af);
+
+}
+
+.btn-danger{
+
+    transition:.2s;
+
+}
+
+.btn-danger:hover{
+
+    transform:translateY(-2px);
+
+}
+
+</style>
 
 @endsection

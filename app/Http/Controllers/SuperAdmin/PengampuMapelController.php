@@ -53,54 +53,43 @@ class PengampuMapelController extends Controller
     public function store(Request $request)
     {
         $request->validate([
-            'guru_id' => 'required',
-            'kelas_id' => 'required',
-            'mata_pelajaran_id' => 'required',
+
+            'guru_id' => 'required|exists:guru,id',
+
+            'mata_pelajaran_id' => 'required|exists:mata_pelajaran,id',
+
+            'kelas_id' => 'required|array|min:1',
+
+            'kelas_id.*' => 'exists:kelas,id',
+
         ]);
 
-        /**
-         * CEK DUPLIKAT
-         */
-        $sudahAda = PengampuMapel::where(
-                'guru_id',
-                $request->guru_id
-            )
-            ->where(
-                'kelas_id',
-                $request->kelas_id
-            )
-            ->where(
-                'mata_pelajaran_id',
-                $request->mata_pelajaran_id
-            )
-            ->where(
-                'tahun_ajaran_id',
-                current_tahun_id()
-            )
-            ->exists();
+        foreach ($request->kelas_id as $kelasId) {
 
-        if ($sudahAda) {
+            \App\Models\PengampuMapel::firstOrCreate(
 
-            return back()->with(
-                'error',
-                'Pengampu mapel sudah ada.'
+                [
+
+                    'guru_id'            => $request->guru_id,
+
+                    'kelas_id'           => $kelasId,
+
+                    'mata_pelajaran_id'  => $request->mata_pelajaran_id,
+
+                    'tahun_ajaran_id'    => current_tahun_id(),
+
+                ]
+
             );
 
         }
 
-        /**
-         * CREATE
-         */
-        PengampuMapel::create([
-            'guru_id' => $request->guru_id,
-            'kelas_id' => $request->kelas_id,
-            'mata_pelajaran_id' => $request->mata_pelajaran_id,
-            'tahun_ajaran_id' => current_tahun_id(),
-        ]);
-
         return back()->with(
+
             'success',
-            'Pengampu mapel berhasil ditambahkan.'
+
+            'Pengampu mata pelajaran berhasil disimpan.'
+
         );
     }
 

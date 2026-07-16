@@ -1,48 +1,182 @@
 <section>
-    <header>
-        <h2 class="text-lg font-medium text-gray-900">
-            {{ __('Update Password') }}
-        </h2>
 
-        <p class="mt-1 text-sm text-gray-600">
-            {{ __('Ensure your account is using a long, random password to stay secure.') }}
-        </p>
-    </header>
+    <div class="d-flex align-items-center mb-4">
 
-    <form method="post" action="{{ route('password.update') }}" class="mt-6 space-y-6">
+        <div class="section-icon">
+            <i class="bi bi-shield-lock-fill"></i>
+        </div>
+
+        <div class="ms-3">
+
+            <h5 class="fw-bold mb-1">
+                Ubah Password
+            </h5>
+
+            <small class="text-muted">
+                Gunakan password yang kuat agar akun tetap aman.
+            </small>
+
+        </div>
+
+    </div>
+
+    <form method="POST"
+          action="{{ route('password.update') }}">
+
         @csrf
-        @method('put')
+        @method('PUT')
 
-        <div>
-            <x-input-label for="update_password_current_password" :value="__('Current Password')" />
-            <x-text-input id="update_password_current_password" name="current_password" type="password" class="mt-1 block w-full" autocomplete="current-password" />
-            <x-input-error :messages="$errors->updatePassword->get('current_password')" class="mt-2" />
+        <div class="row g-4">
+
+            <div class="col-md-12">
+
+                <label class="form-label fw-semibold">
+                    Password Saat Ini
+                </label>
+
+                <div class="input-group">
+
+                    <span class="input-group-text">
+                        <i class="bi bi-lock-fill"></i>
+                    </span>
+
+                    <input
+                        type="password"
+                        name="current_password"
+                        id="update_password_current_password"
+                        class="form-control"
+                        autocomplete="current-password">
+
+                </div>
+
+                @error('current_password','updatePassword')
+                    <small class="text-danger">{{ $message }}</small>
+                @enderror
+
+            </div>
+
+            <div class="col-md-6">
+
+                <label class="form-label fw-semibold">
+                    Password Baru
+                </label>
+
+                <div class="input-group">
+
+                    <span class="input-group-text">
+                        <i class="bi bi-key-fill"></i>
+                    </span>
+
+                    <input
+                        type="password"
+                        name="password"
+                        id="update_password_password"
+                        class="form-control"
+                        autocomplete="new-password">
+
+                </div>
+
+                @error('password','updatePassword')
+                    <small class="text-danger">{{ $message }}</small>
+                @enderror
+
+            </div>
+
+            <div class="col-md-6">
+
+                <label class="form-label fw-semibold">
+                    Konfirmasi Password Baru
+                </label>
+
+                <div class="input-group">
+
+                    <span class="input-group-text">
+                        <i class="bi bi-check-circle-fill"></i>
+                    </span>
+
+                    <input
+                        type="password"
+                        name="password_confirmation"
+                        id="update_password_password_confirmation"
+                        class="form-control"
+                        autocomplete="new-password">
+
+                </div>
+
+            </div>
+
         </div>
 
-        <div>
-            <x-input-label for="update_password_password" :value="__('New Password')" />
-            <x-text-input id="update_password_password" name="password" type="password" class="mt-1 block w-full" autocomplete="new-password" />
-            <x-input-error :messages="$errors->updatePassword->get('password')" class="mt-2" />
+        <hr class="my-4">
+
+        <div class="d-flex justify-content-between align-items-center">
+
+            <div>
+
+                @if(session('status') === 'password-updated')
+
+                    <span class="badge bg-success rounded-pill px-3 py-2">
+
+                        <i class="bi bi-check-circle-fill me-1"></i>
+
+                        Password berhasil diperbarui
+
+                    </span>
+
+                @endif
+
+            </div>
+
+            <button class="btn btn-primary rounded-pill px-4">
+
+                <i class="bi bi-shield-lock-fill me-2"></i>
+
+                Simpan Password
+
+            </button>
+
         </div>
 
-        <div>
-            <x-input-label for="update_password_password_confirmation" :value="__('Confirm Password')" />
-            <x-text-input id="update_password_password_confirmation" name="password_confirmation" type="password" class="mt-1 block w-full" autocomplete="new-password" />
-            <x-input-error :messages="$errors->updatePassword->get('password_confirmation')" class="mt-2" />
-        </div>
-
-        <div class="flex items-center gap-4">
-            <x-primary-button>{{ __('Save') }}</x-primary-button>
-
-            @if (session('status') === 'password-updated')
-                <p
-                    x-data="{ show: true }"
-                    x-show="show"
-                    x-transition
-                    x-init="setTimeout(() => show = false, 2000)"
-                    class="text-sm text-gray-600"
-                >{{ __('Saved.') }}</p>
-            @endif
-        </div>
     </form>
+
 </section>
+
+<style>
+.section-icon{
+    width:52px;
+    height:52px;
+    border-radius:14px;
+    background:#eff6ff;
+    color:#2563eb;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    font-size:22px;
+}
+
+.input-group-text{
+    background:#f8fafc;
+    border-color:#dee2e6;
+    color:#2563eb;
+}
+
+.form-control{
+    border-color:#dee2e6;
+    padding:.7rem .9rem;
+}
+
+.form-control:focus{
+    border-color:#2563eb;
+    box-shadow:0 0 0 .15rem rgba(37,99,235,.15);
+}
+
+.btn-primary{
+    border-radius:999px;
+    font-weight:600;
+    padding:.65rem 1.5rem;
+}
+
+.badge{
+    font-size:.85rem;
+}
+</style>

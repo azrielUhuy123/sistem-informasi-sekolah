@@ -54,6 +54,11 @@ class SiswaController extends Controller
 
     public function show(Siswa $siswa)
     {
+        $siswa->load([
+            'penempatanAktif.kelas.kelasGrup.angkatan',
+            'ppdb',
+        ]);
+
         return view(
             'superadmin.siswa.show',
             compact('siswa')

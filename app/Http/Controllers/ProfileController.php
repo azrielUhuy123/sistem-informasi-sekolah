@@ -11,6 +11,7 @@ use Illuminate\View\View;
 use App\Models\WaliKelas;
 use App\Models\PengampuMapel;
 use App\Models\DataKepegawaian;
+use App\Models\PpdbPendaftar;
 
 class ProfileController extends Controller
 {
@@ -21,15 +22,35 @@ class ProfileController extends Controller
     {
         $user = auth()->user();
 
+        /*
+        |--------------------------------------------------------------------------
+        | PROFILE SISWA
+        |--------------------------------------------------------------------------
+        */
+        if ($user->siswa) {
+
+            $ppdb = PpdbPendaftar::where('siswa_id', $user->siswa->id)
+                ->first();
+
+            return view(
+                'siswa.profile.index',
+                [
+                    'user'  => $user,
+                    'siswa' => $user->siswa,
+                    'ppdb'  => $ppdb,
+                ]
+            );
+        }
+
+        /*
+        |--------------------------------------------------------------------------
+        | PROFILE GURU
+        |--------------------------------------------------------------------------
+        */
+
         $status = '-';
 
         if ($user->guru) {
-
-            /*
-            |--------------------------------------------------------------------------
-            | CEK WALI KELAS
-            |--------------------------------------------------------------------------
-            */
 
             $waliKelas = WaliKelas::with('kelas')
                 ->where('guru_id', $user->guru->id)
@@ -41,12 +62,6 @@ class ProfileController extends Controller
                 $status = 'WALI KELAS ' . strtoupper($waliKelas->kelas->nama_kelas);
 
             } else {
-
-                /*
-                |--------------------------------------------------------------------------
-                | CEK GURU BIDANG
-                |--------------------------------------------------------------------------
-                */
 
                 $pengampu = PengampuMapel::with('mapel')
                     ->where('guru_id', $user->guru->id)
@@ -74,11 +89,39 @@ class ProfileController extends Controller
     }
 
     /**
-     * Display detail profile guru.
+     * Display detail profile.
      */
     public function detail(): View
     {
         $user = auth()->user();
+
+        /*
+        |--------------------------------------------------------------------------
+        | DETAIL PROFILE SISWA
+        |--------------------------------------------------------------------------
+        */
+        if ($user->siswa) {
+
+            $ppdb = PpdbPendaftar::where(
+                'siswa_id',
+                $user->siswa->id
+            )->first();
+
+            return view(
+                'siswa.profile.detail',
+                [
+                    'user'  => $user,
+                    'siswa' => $user->siswa,
+                    'ppdb'  => $ppdb,
+                ]
+            );
+        }
+
+        /*
+        |--------------------------------------------------------------------------
+        | DETAIL PROFILE GURU
+        |--------------------------------------------------------------------------
+        */
 
         $pegawai = null;
 
@@ -139,6 +182,95 @@ class ProfileController extends Controller
      */
     public function updateDetail(Request $request): RedirectResponse
     {
+        $user = auth()->user();
+
+        /*
+        |--------------------------------------------------------------------------
+        | UPDATE PROFILE SISWA
+        |--------------------------------------------------------------------------
+        */
+        if ($user->siswa) {
+
+            $request->validate([
+                'nama'            => 'required|string|max:255',
+                'email'           => 'nullable|email|max:255',
+
+                'agama'           => 'nullable|string|max:100',
+                'tempat_lahir'    => 'nullable|string|max:255',
+                'tanggal_lahir'   => 'nullable|date',
+                'jenis_kelamin'   => 'nullable|in:L,P',
+
+                'nik'             => 'nullable|string|max:30',
+                'nomor_kk'        => 'nullable|string|max:30',
+                'nomor_akta'      => 'nullable|string|max:50',
+
+                'alamat'          => 'nullable|string',
+                'rt'              => 'nullable|string|max:5',
+                'rw'              => 'nullable|string|max:5',
+                'desa'            => 'nullable|string|max:255',
+                'kecamatan'       => 'nullable|string|max:255',
+                'kabupaten'       => 'nullable|string|max:255',
+                'provinsi'        => 'nullable|string|max:255',
+
+                'telepon_rumah'   => 'nullable|string|max:30',
+                'hp_ayah'         => 'nullable|string|max:30',
+                'hp_ibu'          => 'nullable|string|max:30',
+            ]);
+
+            $ppdb = PpdbPendaftar::where(
+                'siswa_id',
+                $user->siswa->id
+            )->first();
+
+            if (!$ppdb) {
+                return back()->with(
+                    'error',
+                    'Data PPDB tidak ditemukan.'
+                );
+            }
+
+            $user->update([
+                'email' => $request->email,
+            ]);
+
+            $ppdb->update($request->only([
+                'nama',
+                'agama',
+                'tempat_lahir',
+                'tanggal_lahir',
+                'jenis_kelamin',
+
+                'nik',
+                'nomor_kk',
+                'nomor_akta',
+
+                'alamat',
+                'rt',
+                'rw',
+                'desa',
+                'kecamatan',
+                'kabupaten',
+                'provinsi',
+
+                'telepon_rumah',
+                'hp_ayah',
+                'hp_ibu',
+            ]));
+
+            return redirect()
+                ->route('siswa.profile.detail')
+                ->with(
+                    'success',
+                    'Profil berhasil diperbarui.'
+                );
+        }
+
+        /*
+        |--------------------------------------------------------------------------
+        | UPDATE PROFILE GURU
+        |--------------------------------------------------------------------------
+        */
+
         $request->validate([
             'nama'                 => 'required|string|max:255',
             'email'                => 'nullable|email|max:255',
@@ -165,83 +297,87 @@ class ProfileController extends Controller
 
             'sk_berkala_pangkat'   => 'nullable|string|max:255',
             'sk_berkala_no'        => 'nullable|string|max:255',
-            'sk_berkala_tmt'       => 'nullable|date',
+        'sk_berkala_tmt'       => 'nullable|date',
 
-            'mulai_kerja'          => 'nullable|date',
+        'mulai_kerja'          => 'nullable|date',
 
-            'masa_kerja_gol_th'    => 'nullable|integer',
-            'masa_kerja_gol_bln'   => 'nullable|integer',
+        'masa_kerja_gol_th'    => 'nullable|integer',
+        'masa_kerja_gol_bln'   => 'nullable|integer',
 
-            'masa_kerja_total_th'  => 'nullable|integer',
-            'masa_kerja_total_bln' => 'nullable|integer',
+        'masa_kerja_total_th'  => 'nullable|integer',
+        'masa_kerja_total_bln' => 'nullable|integer',
 
-            'jam_mengajar'         => 'nullable|integer',
-            'tugas_tambahan'       => 'nullable|string|max:255',
+        'jam_mengajar'         => 'nullable|integer',
+        'tugas_tambahan'       => 'nullable|string|max:255',
 
-            'nomor_sertifikasi'    => 'nullable|string|max:255',
-            'tahun_sertifikasi'    => 'nullable|digits:4',
+        'nomor_sertifikasi'    => 'nullable|string|max:255',
+        'tahun_sertifikasi'    => 'nullable|digits:4',
 
-            'keterangan'           => 'nullable|string',
-        ]);
+        'keterangan'           => 'nullable|string',
+    ]);
 
-        $user = auth()->user();
-
-        if (!$user->guru || !$user->guru->pegawai) {
-            return back()->with('error', 'Data kepegawaian tidak ditemukan.');
-        }
-
-        $pegawai = $user->guru->pegawai;
-
-        $pegawai->update($request->only([
-            'nama',
-            'nip',
-            'nuptk',
-            'tempat_lahir',
-            'tanggal_lahir',
-
-            'jabatan',
-            'status_kepegawaian',
-            'ijazah_terakhir',
-            'mengajar_kelas',
-            'pengalaman_tahun',
-            'gaji_pokok',
-
-            'agama',
-            'jenis_kelamin',
-            'status_kawin',
-
-            'sk_terakhir_pangkat',
-            'sk_terakhir_no',
-            'sk_terakhir_tmt',
-
-            'sk_berkala_pangkat',
-            'sk_berkala_no',
-            'sk_berkala_tmt',
-
-            'mulai_kerja',
-
-            'masa_kerja_gol_th',
-            'masa_kerja_gol_bln',
-            'masa_kerja_total_th',
-            'masa_kerja_total_bln',
-
-            'jam_mengajar',
-            'tugas_tambahan',
-
-            'nomor_sertifikasi',
-            'tahun_sertifikasi',
-
-            'keterangan',
-        ]));
-
-        $user->update([
-            'email' => $request->email,
-        ]);
-
-        return redirect()
-            ->route('guru.profile.detail')
-            ->with('success', 'Profil berhasil diperbarui.');
+    if (!$user->guru || !$user->guru->pegawai) {
+        return back()->with(
+            'error',
+            'Data kepegawaian tidak ditemukan.'
+        );
     }
+
+    $pegawai = $user->guru->pegawai;
+
+    $pegawai->update($request->only([
+        'nama',
+        'nip',
+        'nuptk',
+        'tempat_lahir',
+        'tanggal_lahir',
+
+        'jabatan',
+        'status_kepegawaian',
+        'ijazah_terakhir',
+        'mengajar_kelas',
+        'pengalaman_tahun',
+        'gaji_pokok',
+
+        'agama',
+        'jenis_kelamin',
+        'status_kawin',
+
+        'sk_terakhir_pangkat',
+        'sk_terakhir_no',
+        'sk_terakhir_tmt',
+
+        'sk_berkala_pangkat',
+        'sk_berkala_no',
+        'sk_berkala_tmt',
+
+        'mulai_kerja',
+
+        'masa_kerja_gol_th',
+        'masa_kerja_gol_bln',
+        'masa_kerja_total_th',
+        'masa_kerja_total_bln',
+
+        'jam_mengajar',
+        'tugas_tambahan',
+
+        'nomor_sertifikasi',
+        'tahun_sertifikasi',
+
+        'keterangan',
+    ]));
+
+    $user->update([
+        'email' => $request->email,
+    ]);
+
+    return redirect()
+        ->route('guru.profile.detail')
+        ->with(
+            'success',
+            'Profil berhasil diperbarui.'
+        );
+}
 
     /**
      * Delete the user's account.

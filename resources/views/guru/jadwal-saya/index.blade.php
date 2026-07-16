@@ -7,7 +7,6 @@
 <div class="container-fluid py-3">
 
     {{-- HEADER --}}
-    {{-- HEADER --}}
     <div class="card border-0 shadow-sm rounded-4 overflow-hidden mb-4">
         <div class="card-body p-4 p-lg-5 text-white" style="background: linear-gradient(135deg, #0f4c81 0%, #2563eb 100%);">
             <div class="d-flex flex-column flex-lg-row justify-content-between align-items-lg-center gap-3">

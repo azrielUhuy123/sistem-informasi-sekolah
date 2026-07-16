@@ -6,25 +6,62 @@ use App\Http\Controllers\Controller;
 use App\Models\PerkembanganSiswa;
 use App\Models\WaliKelas;
 use Illuminate\Http\Request;
+use App\Models\PengampuMapel;
 
 class PerkembanganSiswaController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
         $guru = auth()->user()->guru;
 
-        $waliKelas = WaliKelas::with('kelas')
-            ->where(
-                'guru_id',
-                $guru->id
-            )
-            ->where(
-                'tahun_ajaran_id',
-                current_tahun_id()
-            )
-            ->firstOrFail();
+        /*
+        |--------------------------------------------------------------------------
+        | WALI KELAS
+        |--------------------------------------------------------------------------
+        */
 
-        $kelas = $waliKelas->kelas;
+        $waliKelas = WaliKelas::with('kelas')
+            ->where('guru_id', $guru->id)
+            ->where('tahun_ajaran_id', current_tahun_id())
+            ->first();
+
+        if ($waliKelas) {
+
+            $kelas = $waliKelas->kelas;
+
+        } else {
+
+            /*
+            |--------------------------------------------------------------------------
+            | GURU BIDANG
+            |--------------------------------------------------------------------------
+            */
+
+            $kelasPengampu = PengampuMapel::with('kelas')
+                ->where('guru_id', $guru->id)
+                ->where('tahun_ajaran_id', current_tahun_id())
+                ->get();
+
+            if ($kelasPengampu->isEmpty()) {
+                abort(404, 'Guru belum memiliki kelas yang diampu.');
+            }
+
+            $kelasId = $request->kelas_id;
+
+            if (!$kelasId) {
+                $kelasId = $kelasPengampu->first()->kelas_id;
+            }
+
+            $kelas = $kelasPengampu
+                ->firstWhere('kelas_id', $kelasId)
+                ->kelas;
+        }
+
+        /*
+        |--------------------------------------------------------------------------
+        | SISWA
+        |--------------------------------------------------------------------------
+        */
 
         $penempatan = $kelas
             ->siswaAktif()
@@ -44,12 +81,6 @@ class PerkembanganSiswaController extends Controller
                 ->first();
 
             $p->perkembangan = $perkembangan;
-
-            /*
-            |--------------------------------------------------------------------------
-            | STATUS
-            |--------------------------------------------------------------------------
-            */
 
             $filled = 0;
 
@@ -78,10 +109,11 @@ class PerkembanganSiswaController extends Controller
 
         return view(
             'guru.perkembangan.index',
-            compact(
-                'kelas',
-                'penempatan'
-            )
+            [
+                'kelas'          => $kelas,
+                'penempatan'     => $penempatan,
+                'kelasPengampu'  => $kelasPengampu ?? collect(),
+            ]
         );
     }
 
