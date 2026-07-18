@@ -232,6 +232,7 @@
                 >
 
                     @csrf
+                    @method('PATCH')
 
                     <button
                         type="submit"

@@ -1,6 +1,6 @@
 @extends('layouts.app')
 
-@section('title', 'User Aktif')
+@section('title', 'Approval User')
 
 @section('content')
 <div class="container-fluid py-3">
@@ -8,10 +8,6 @@
     @php
 
         $totalUser = $users->total();
-
-        $aktif = $users->where('is_active', true)->count();
-
-        $blokir = $users->where('is_active', false)->count();
 
     @endphp
 
@@ -35,80 +31,23 @@
 
                     <p class="mb-0 opacity-75">
 
-                        Kelola akun pengguna yang telah disetujui,
-                        aktifkan kembali akun yang diblokir,
-                        serta lakukan monitoring status seluruh pengguna sistem.
+                        Tinjau dan proses akun pengguna baru yang menunggu persetujuan untuk dapat mengakses sistem.
 
                     </p>
 
                 </div>
 
                 <div class="col-lg-5 mt-4 mt-lg-0">
-
-                    <div class="row g-3">
-
-                        <div class="col-4">
-
-                            <div class="bg-white rounded-4 p-3 text-center h-100">
-
-                                <h3 class="fw-bold text-primary mb-1">
-
-                                    {{ $totalUser }}
-
-                                </h3>
-
-                                <small class="text-muted">
-
-                                    Total
-
-                                </small>
-
-                            </div>
-
+                    <div class="d-flex justify-content-lg-end">
+                        <div class="bg-white rounded-4 p-4 text-center" style="min-width: 180px;">
+                            <h2 class="fw-bold text-primary mb-1">
+                                {{ $totalUser }}
+                            </h2>
+                            <small class="text-muted">
+                                Total Pending
+                            </small>
                         </div>
-
-                        <div class="col-4">
-
-                            <div class="bg-white rounded-4 p-3 text-center h-100">
-
-                                <h3 class="fw-bold text-success mb-1">
-
-                                    {{ $aktif }}
-
-                                </h3>
-
-                                <small class="text-muted">
-
-                                    Aktif
-
-                                </small>
-
-                            </div>
-
-                        </div>
-
-                        <div class="col-4">
-
-                            <div class="bg-white rounded-4 p-3 text-center h-100">
-
-                                <h3 class="fw-bold text-danger mb-1">
-
-                                    {{ $blokir }}
-
-                                </h3>
-
-                                <small class="text-muted">
-
-                                    Blokir
-
-                                </small>
-
-                            </div>
-
-                        </div>
-
                     </div>
-
                 </div>
 
             </div>
@@ -128,13 +67,13 @@
 
                     <h5 class="fw-bold mb-1">
 
-                        Daftar User Aktif
+                        Daftar User Menunggu Approval
 
                     </h5>
 
                     <small class="text-muted">
 
-                        Kelola status akun pengguna yang telah memperoleh akses ke sistem.
+                        Tinjau akun pengguna baru dan putuskan untuk menyetujui atau menolak.
 
                     </small>
 
@@ -177,7 +116,7 @@
 
                         <th>
 
-                            Tanggal Approve
+                            Tanggal Registrasi
 
                         </th>
 
@@ -268,27 +207,13 @@
 
                             <td>
 
-                                @if($user->is_active)
+                                <span class="badge bg-warning rounded-pill px-3 py-2 text-dark">
 
-                                    <span class="badge bg-success rounded-pill px-3 py-2">
+                                    <i class="bi bi-hourglass-split me-1"></i>
 
-                                        <i class="bi bi-check-circle-fill me-1"></i>
+                                    Menunggu Approval
 
-                                        Aktif
-
-                                    </span>
-
-                                @else
-
-                                    <span class="badge bg-danger rounded-pill px-3 py-2">
-
-                                        <i class="bi bi-slash-circle-fill me-1"></i>
-
-                                        Diblokir
-
-                                    </span>
-
-                                @endif
+                                </span>
 
                             </td>
 
@@ -296,59 +221,59 @@
 
                                 <i class="bi bi-calendar-event me-2 text-primary"></i>
 
-                                {{ $user->approved_at?->format('d M Y H:i') ?? '-' }}
+                                {{ $user->created_at->format('d M Y H:i') }}
 
                             </td>
 
                             <td class="text-center">
 
-                                @if($user->is_active)
+                                <div class="d-flex justify-content-center gap-2">
 
                                     <form
-                                        action="{{ route('superadmin.users.block',$user) }}"
+                                        action="{{ route('superadmin.users.approve',$user) }}"
                                         method="POST"
-                                        onsubmit="return confirm('Blokir user ini?')"
+                                        onsubmit="return confirm('Approve user ini?')"
                                     >
 
                                         @csrf
+                                        @method('PATCH')
 
                                         <button
-                                            class="btn btn-danger rounded-pill btn-sm px-4"
+                                            class="btn btn-success rounded-pill btn-sm px-4 d-flex align-items-center justify-content-center"
                                             type="submit"
                                         >
 
-                                            <i class="bi bi-lock-fill me-1"></i>
+                                            <i class="bi bi-check-circle-fill me-1"></i>
 
-                                            Blokir
+                                            Approve
 
                                         </button>
 
                                     </form>
 
-                                @else
-
                                     <form
-                                        action="{{ route('superadmin.users.unblock',$user) }}"
+                                        action="{{ route('superadmin.users.reject',$user) }}"
                                         method="POST"
-                                        onsubmit="return confirm('Aktifkan kembali user ini?')"
+                                        onsubmit="return confirm('Tolak user ini?')"
                                     >
 
-                                        @csrf
+                                            @csrf
+                                            @method('PATCH')
 
                                         <button
-                                            class="btn btn-success rounded-pill btn-sm px-4"
+                                            class="btn btn-danger rounded-pill btn-sm px-4 d-flex align-items-center justify-content-center"
                                             type="submit"
                                         >
 
-                                            <i class="bi bi-unlock-fill me-1"></i>
+                                            <i class="bi bi-x-circle-fill me-1"></i>
 
-                                            Aktifkan
+                                            Tolak
 
                                         </button>
 
                                     </form>
 
-                                @endif
+                                </div>
 
                             </td>
 

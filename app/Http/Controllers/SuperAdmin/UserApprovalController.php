@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\User;
 use App\Models\Guru;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 
 class UserApprovalController extends Controller
 {
@@ -66,7 +67,7 @@ class UserApprovalController extends Controller
         $user->update([
             'approval_status' => 'approved',
             'approved_at'      => now(),
-            'approved_by'      => auth()->id(),
+            'approved_by'      => Auth::id(),
             'is_active'        => true,
         ]);
 
