@@ -8,12 +8,13 @@ use Illuminate\Http\Request;
 use App\Models\PembinaEkskul;
 use App\Models\HariSekolah;
 use App\Models\PengajuanJadwalEkskul;
+use Illuminate\Support\Facades\Auth;
 
 class JadwalEkskulController extends Controller
 {
     public function index()
     {
-        $guru = auth()->user()->guru;
+        $guru = Auth::user()->guru;
 
         $pembina = PembinaEkskul::with(
                 'ekskul'
@@ -63,7 +64,7 @@ class JadwalEkskulController extends Controller
 
         ]);
 
-        $guru = auth()->user()->guru;
+        $guru = Auth::user()->guru;
 
         $pembina = PembinaEkskul::where(
                 'guru_id',
@@ -99,7 +100,7 @@ class JadwalEkskulController extends Controller
         PengajuanJadwalEkskul $jadwal
     )
     {
-        $guru = auth()->user()->guru;
+        $guru = Auth::user()->guru;
 
         $hari = HariSekolah::orderBy(
             'id'
@@ -141,7 +142,7 @@ class JadwalEkskulController extends Controller
 
         ]);
 
-        $guru = auth()->user()->guru;
+        $guru = Auth::user()->guru;
 
         /*
         |--------------------------------------------------------------------------
