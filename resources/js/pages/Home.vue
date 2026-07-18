@@ -31,13 +31,6 @@
                         PPDB Online
                     </a>
 
-                    <router-link
-                        to="/informasi"
-                        class="btn-secondary"
-                    >
-                        Profil Sekolah
-                    </router-link>
-
                 </div>
 
             </div>

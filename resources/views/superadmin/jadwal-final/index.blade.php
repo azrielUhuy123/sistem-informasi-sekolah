@@ -6,15 +6,58 @@
 
 <div class="container-fluid py-3">
 
-    <div class="mb-4">
+    {{-- ================= HERO ================= --}}
+    <div class="card border-0 shadow-sm rounded-4 overflow-hidden mb-4">
 
-        <h4 class="fw-bold mb-1">
-            Jadwal Final
-        </h4>   
+        <div
+            class="card-body p-4 p-lg-5 text-white"
+            style="background:linear-gradient(135deg,#0f4c81 0%,#2563eb 100%);"
+        >
 
-        <small class="text-muted">
-            Jadwal resmi yang sudah dipublish
-        </small>
+            <div class="d-flex justify-content-between align-items-center flex-wrap">
+
+                <div>
+
+                    <h2 class="fw-bold mb-2">
+
+                        Jadwal Final
+
+                    </h2>
+
+                    <p class="mb-0 opacity-75">
+
+                        Jadwal resmi yang telah dipublikasikan dan siap diekspor ke PDF.
+
+                    </p>
+
+                </div>
+
+                <div class="mt-3 mt-lg-0">
+
+                    <div class="bg-white rounded-4 px-4 py-3 text-center">
+
+                        <h3
+                            id="selectedCountCard"
+                            class="fw-bold text-primary mb-0"
+                        >
+
+                            0
+
+                        </h3>
+
+                        <small class="text-muted">
+
+                            Kelas Dipilih
+
+                        </small>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
 
     </div>
 
@@ -26,60 +69,119 @@
 
         @csrf
 
-        <div class="d-flex justify-content-between align-items-center mb-4">
+        <div class="card border-0 shadow-sm rounded-4 mb-4">
 
-            <div>
+            <div class="card-body">
 
-                <span
-                    id="selectedCount"
-                    class="fw-semibold"
-                >
+                <div class="row align-items-center">
 
-                    0 kelas dipilih
+                    <div class="col-lg-6">
 
-                </span>
+                        <h5 class="fw-bold mb-1">
+
+                            Pilih Jadwal yang Akan Diekspor
+
+                        </h5>
+
+                        <div
+                            id="selectedCount"
+                            class="text-muted"
+                        >
+
+                            Belum ada kelas dipilih
+
+                        </div>
+
+                    </div>
+
+                    <div class="col-lg-6 text-lg-end mt-3 mt-lg-0">
+
+                        <button
+                            type="button"
+                            class="btn btn-outline-primary rounded-pill me-2"
+                            id="btnSelectAll"
+                        >
+
+                            <i class="bi bi-check2-square me-1"></i>
+
+                            Pilih Semua
+
+                        </button>
+
+                        <button
+                            type="button"
+                            class="btn btn-outline-secondary rounded-pill me-2"
+                            id="btnClearAll"
+                        >
+
+                            <i class="bi bi-x-square me-1"></i>
+
+                            Kosongkan
+
+                        </button>
+
+                        <button
+                            class="btn btn-danger rounded-pill px-4"
+                            type="submit"
+                        >
+
+                            <i class="bi bi-file-earmark-pdf-fill me-2"></i>
+
+                            Export PDF
+
+                        </button>
+
+                    </div>
+
+                </div>
 
             </div>
 
-            <button
-                class="btn btn-danger"
-                type="submit"
-            >
-
-                Export PDF
-
-            </button>
-
         </div>
 
-        {{-- TAB TINGKAT --}}
+        {{-- ================= TAB TINGKAT ================= --}}
+        <div class="card border-0 shadow-sm rounded-4 mb-4">
 
-        <ul
-    class="nav nav-pills mb-4"
-    id="tingkatTab"
-    role="tablist">
+            <div class="card-body py-3">
 
-            @foreach($kelasByTingkat as $tingkat => $listKelas)
+                <ul
+                    class="nav nav-pills justify-content-center gap-2"
+                    id="tingkatTab"
+                    role="tablist"
+                >
 
-                <li class="nav-item me-2">
+                    @foreach($kelasByTingkat as $tingkat => $listKelas)
 
-                    <button
-                        type="button"
-                        class="nav-link {{ $loop->first ? 'active' : '' }}"
-                        data-bs-toggle="pill"
-                        data-bs-target="#tingkat{{ $tingkat }}"
-                        type="button"
-                    >
+                        <li class="nav-item">
 
-                        Kelas {{ $tingkat }}
+                            <button
+                                class="nav-link rounded-pill px-4 py-2 fw-semibold {{ $loop->first ? 'active' : '' }}"
+                                data-bs-toggle="pill"
+                                data-bs-target="#tingkat{{ $tingkat }}"
+                                type="button"
+                            >
 
-                    </button>
+                                <i class="bi bi-mortarboard-fill me-2"></i>
 
-                </li>
+                                Kelas {{ $tingkat }}
 
-            @endforeach
+                                <span class="badge bg-light text-dark ms-2">
 
-        </ul>
+                                    {{ count($listKelas) }}
+
+                                </span>
+
+                            </button>
+
+                        </li>
+
+                    @endforeach
+
+                </ul>
+
+            </div>
+
+        </div>
 
         {{-- CONTENT TAB --}}
         <div class="tab-content">
@@ -102,11 +204,11 @@
 
                         @endphp
 
-                        <div class="accordion-item border-0 shadow-sm rounded-4 overflow-hidden mb-4">
+                        <div class="accordion-item border-0 shadow rounded-4 mb-4 overflow-hidden kelas-card">
 
                             <h2 class="accordion-header">
 
-                                <div class="d-flex align-items-center px-4 py-3 bg-white">
+                                 <div class="d-flex align-items-center justify-content-between bg-white px-4 py-3">
 
                                     {{-- CHECKBOX --}}
                                     <div class="form-check me-4">
@@ -184,13 +286,13 @@
 
                                         <div class="table-responsive">
 
-                                            <table class="table table-bordered align-middle text-center">
+                                            <table class="table table-hover align-middle text-center mb-0">
 
-                                                <thead class="table-light">
+                                                <thead>
 
                                                     <tr>
 
-                                                        <th width="140">
+                                                        <th class="text-center" width="150">
                                                             Jam
                                                         </th>
 
@@ -212,7 +314,7 @@
 
                                                         <tr>
 
-                                                            <td class="fw-semibold">
+                                                            <td class="fw-bold text-primary">
 
                                                                 {{ substr($jamPelajaran->mulai,0,5) }}
                                                                 -
@@ -231,25 +333,51 @@
 
                                                                 @endphp
 
-                                                                <td style="min-width: 180px;">
+                                                                <td style="min-width:220px;">
 
                                                                     @if($jadwal)
 
-                                                                        <div class="fw-semibold">
+                                                                        <div class="schedule-card">
 
-                                                                            {{ $jadwal->mapel->nama_mapel }}
+                                                                            <div class="schedule-mapel">
+
+                                                                                {{ $jadwal->mapel->nama_mapel }}
+
+                                                                            </div>
+
+                                                                            <div class="schedule-guru">
+
+                                                                                <i class="bi bi-person-fill me-1"></i>
+
+                                                                                {{ $jadwal->guru->pegawai->nama }}
+
+                                                                            </div>
+
+                                                                            <div class="schedule-time">
+
+                                                                                <i class="bi bi-clock-fill me-1"></i>
+
+                                                                                {{ substr($jamPelajaran->mulai,0,5) }}
+                                                                                -
+                                                                                {{ substr($jamPelajaran->selesai,0,5) }}
+
+                                                                            </div>
 
                                                                         </div>
 
-                                                                        <small class="text-muted d-block mt-1">
-
-                                                                            {{ $jadwal->guru->pegawai->nama }}
-
-                                                                        </small>
-
                                                                     @else
 
-                                                                        -
+                                                                        <div class="schedule-empty">
+
+                                                                            <i class="bi bi-dash-circle"></i>
+
+                                                                            <div>
+
+                                                                                Belum Ada Jadwal
+
+                                                                            </div>
+
+                                                                        </div>
 
                                                                     @endif
 
@@ -289,6 +417,104 @@
 </div>
 
 <style>
+
+.schedule-card{
+
+    background:linear-gradient(135deg,#eff6ff,#ffffff);
+
+    border:1px solid #dbeafe;
+
+    border-radius:16px;
+
+    padding:16px;
+
+    transition:.25s;
+
+    min-height:120px;
+
+}
+
+.schedule-card:hover{
+
+    transform:translateY(-3px);
+
+    box-shadow:0 14px 35px rgba(37,99,235,.12);
+
+}
+
+.schedule-mapel{
+
+    font-weight:700;
+
+    color:#0f4c81;
+
+    margin-bottom:12px;
+
+}
+
+.schedule-guru{
+
+    color:#475569;
+
+    font-size:.92rem;
+
+}
+
+.schedule-time{
+
+    margin-top:12px;
+
+    color:#2563eb;
+
+    font-size:.86rem;
+
+    font-weight:600;
+
+}
+
+.schedule-empty{
+
+    border:2px dashed #d1d5db;
+
+    border-radius:16px;
+
+    padding:30px 10px;
+
+    color:#94a3b8;
+
+    transition:.25s;
+
+}
+
+.schedule-empty:hover{
+
+    background:#f8fafc;
+
+}
+
+.table thead th{
+
+    background:#f8fafc;
+
+    color:#64748b;
+
+    border:0;
+
+    font-weight:700;
+
+    text-transform:uppercase;
+
+    letter-spacing:.5px;
+
+}
+
+.table tbody td{
+
+    vertical-align:middle;
+
+    border-color:#eef2f7;
+
+}
 
 /* ================= CARD ================= */
 
@@ -545,6 +771,48 @@
 
 }
 
+.kelas-card{
+
+    transition:.25s;
+
+}
+
+.kelas-card:hover{
+
+    transform:translateY(-3px);
+
+    box-shadow:0 18px 45px rgba(37,99,235,.10)!important;
+
+}
+
+.accordion-button::after{
+
+    margin-left:18px;
+
+}
+
+.form-check-input{
+
+    width:22px;
+    height:22px;
+
+    cursor:pointer;
+
+}
+
+.form-check-input:checked{
+
+    background:#2563eb;
+    border-color:#2563eb;
+
+}
+
+.badge{
+
+    font-weight:600;
+
+}
+
 /* ================= RESPONSIVE ================= */
 
 @media(max-width:992px){
@@ -564,7 +832,7 @@
 }
 
 </style>
-@endsection
+
 
 <script>
 
@@ -609,3 +877,4 @@ document.getElementById('btnClearAll').onclick=function(){
 }
 
 </script>
+@endsection

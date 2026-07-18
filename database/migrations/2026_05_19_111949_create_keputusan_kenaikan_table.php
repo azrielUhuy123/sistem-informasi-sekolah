@@ -36,9 +36,27 @@ return new class extends Migration
             $table->text('catatan')
                 ->nullable();
 
-            $table->boolean('approved')
-                ->default(false);
+            $table->enum('approval_status', [
+                'draft',
+                'pending',
+                'rejected',
+                'approved'
+            ])->default('draft');
 
+            $table->foreignId('approved_by')
+                ->nullable()
+                ->constrained('users')
+                ->nullOnDelete();
+
+            $table->text('catatan_kepsek')
+                ->nullable();
+
+            $table->timestamp('submitted_at')
+                ->nullable();
+
+            $table->timestamp('approved_at')
+                ->nullable();
+            
             $table->timestamps();
 
         });

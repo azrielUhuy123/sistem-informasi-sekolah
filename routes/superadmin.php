@@ -22,6 +22,7 @@ use App\Http\Controllers\Superadmin\PembinaEkskulController;
 use App\Http\Controllers\Superadmin\MonitoringEkskulController;
 use App\Http\Controllers\Superadmin\JadwalFinalEkskulController;
 use App\Http\Controllers\SuperAdmin\SiswaController;
+use App\Http\Controllers\SuperAdmin\KenaikanKelasController;
 
 Route::middleware(['auth', 'role:superadmin'])
     ->prefix('superadmin')
@@ -286,5 +287,31 @@ Route::post(
             '/siswa/{siswa}',
             [SiswaController::class, 'show']
         )->name('siswa.show');
+
+        Route::prefix('monitoring-kenaikan-kelas')
+            ->name('monitoring-kenaikan.')
+            ->group(function () {
+
+                Route::get(
+                    '/',
+                    [KenaikanKelasController::class, 'index']
+                )->name('index');
+
+                Route::get(
+                    '/{kelas}',
+                    [KenaikanKelasController::class, 'show']
+                )->name('show');
+
+                Route::patch(
+                    '/{kelas}/reject',
+                    [KenaikanKelasController::class, 'reject']
+                )->name('reject');
+
+                Route::patch(
+                    '/{kelas}/approve',
+                    [KenaikanKelasController::class, 'approve']
+                )->name('approve');
+
+            });
 
     });

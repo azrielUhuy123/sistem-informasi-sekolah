@@ -6,113 +6,89 @@
 
 <div class="container-fluid py-4">
 
-    <div class="mb-4">
+    @php
 
-        <h3 class="fw-bold mb-1">
+        $totalAbsensi = $hadir + $izin + $sakit + $alpa;
 
-            Absensi Ekskul
+        $persentase = $totalAbsensi
+            ? round(($hadir / $totalAbsensi) * 100)
+            : 0;
 
-        </h3>
+    @endphp
 
-        <p class="text-muted mb-0">
+    {{-- ================= HERO ================= --}}
+    <div class="card border-0 shadow-sm rounded-4 overflow-hidden mb-4">
 
-            {{ $ekskul->nama }}
+        <div class="card-body p-4 p-lg-5 text-white"
+             style="background:linear-gradient(135deg,#0f4c81 0%,#2563eb 100%);">
 
-        </p>
+            <div class="row align-items-center">
 
-    </div>
+                <div class="col-lg-8">
 
-    <div class="row g-3 mb-4">
+                    <h2 class="fw-bold mb-2">
 
-        <div class="col-md-3">
+                        Absensi Ekstrakurikuler
 
-            <div class="card border-0 shadow-sm">
+                    </h2>
 
-                <div class="card-body text-center">
+                    <p class="mb-0 opacity-75">
 
-                    <div class="text-muted">
+                        Riwayat kehadiran kegiatan
 
-                        Hadir
+                        <strong>{{ $ekskul->nama }}</strong>
 
-                    </div>
+                        selama mengikuti ekstrakurikuler.
 
-                    <h3 class="fw-bold text-success">
-
-                        {{ $hadir }}
-
-                    </h3>
-
-                </div>
-
-            </div>
-
-        </div>
-
-        <div class="col-md-3">
-
-            <div class="card border-0 shadow-sm">
-
-                <div class="card-body text-center">
-
-                    <div class="text-muted">
-
-                        Izin
-
-                    </div>
-
-                    <h3 class="fw-bold text-primary">
-
-                        {{ $izin }}
-
-                    </h3>
+                    </p>
 
                 </div>
 
-            </div>
+                <div class="col-lg-4 mt-4 mt-lg-0">
 
-        </div>
+                    <div class="row g-3">
 
-        <div class="col-md-3">
+                        <div class="col-6">
 
-            <div class="card border-0 shadow-sm">
+                            <div class="bg-white rounded-4 p-3 text-center">
 
-                <div class="card-body text-center">
+                                <h4 class="fw-bold text-primary mb-1">
 
-                    <div class="text-muted">
+                                    {{ $persentase }}%
 
-                        Sakit
+                                </h4>
+
+                                <small class="text-muted">
+
+                                    Kehadiran
+
+                                </small>
+
+                            </div>
+
+                        </div>
+
+                        <div class="col-6">
+
+                            <div class="bg-white rounded-4 p-3 text-center">
+
+                                <h4 class="fw-bold text-success mb-1">
+
+                                    {{ $totalAbsensi }}
+
+                                </h4>
+
+                                <small class="text-muted">
+
+                                    Total Data
+
+                                </small>
+
+                            </div>
+
+                        </div>
 
                     </div>
-
-                    <h3 class="fw-bold text-warning">
-
-                        {{ $sakit }}
-
-                    </h3>
-
-                </div>
-
-            </div>
-
-        </div>
-
-        <div class="col-md-3">
-
-            <div class="card border-0 shadow-sm">
-
-                <div class="card-body text-center">
-
-                    <div class="text-muted">
-
-                        Alpa
-
-                    </div>
-
-                    <h3 class="fw-bold text-danger">
-
-                        {{ $alpa }}
-
-                    </h3>
 
                 </div>
 
@@ -122,23 +98,171 @@
 
     </div>
 
-    <div class="card border-0 shadow-sm">
+    {{-- ================= SUMMARY ================= --}}
+    <div class="row g-4 mb-4">
 
-        <div class="card-body">
+        <div class="col-md-3">
+
+            <div class="summary-card">
+
+                <div class="summary-icon bg-success-subtle text-success">
+
+                    <i class="bi bi-check-circle-fill"></i>
+
+                </div>
+
+                <small class="text-muted">
+
+                    Hadir
+
+                </small>
+
+                <h3 class="fw-bold text-success mb-0">
+
+                    {{ $hadir }}
+
+                </h3>
+
+            </div>
+
+        </div>
+
+        <div class="col-md-3">
+
+            <div class="summary-card">
+
+                <div class="summary-icon bg-primary-subtle text-primary">
+
+                    <i class="bi bi-calendar-check-fill"></i>
+
+                </div>
+
+                <small class="text-muted">
+
+                    Izin
+
+                </small>
+
+                <h3 class="fw-bold text-primary mb-0">
+
+                    {{ $izin }}
+
+                </h3>
+
+            </div>
+
+        </div>
+
+        <div class="col-md-3">
+
+            <div class="summary-card">
+
+                <div class="summary-icon bg-warning-subtle text-warning">
+
+                    <i class="bi bi-heart-pulse-fill"></i>
+
+                </div>
+
+                <small class="text-muted">
+
+                    Sakit
+
+                </small>
+
+                <h3 class="fw-bold text-warning mb-0">
+
+                    {{ $sakit }}
+
+                </h3>
+
+            </div>
+
+        </div>
+
+        <div class="col-md-3">
+
+            <div class="summary-card">
+
+                <div class="summary-icon bg-danger-subtle text-danger">
+
+                    <i class="bi bi-x-circle-fill"></i>
+
+                </div>
+
+                <small class="text-muted">
+
+                    Alpa
+
+                </small>
+
+                <h3 class="fw-bold text-danger mb-0">
+
+                    {{ $alpa }}
+
+                </h3>
+
+            </div>
+
+        </div>
+
+    </div>
+
+    {{-- ================= TABLE ================= --}}
+    <div class="card border-0 shadow-sm rounded-4">
+
+        <div class="card-header bg-white border-0 py-4 d-flex justify-content-between align-items-center flex-wrap">
+
+            <div>
+
+                <h5 class="fw-bold mb-1">
+
+                    Riwayat Kehadiran
+
+                </h5>
+
+                <small class="text-muted">
+
+                    Daftar seluruh absensi ekstrakurikuler yang telah tercatat.
+
+                </small>
+
+            </div>
+
+            <span class="badge bg-primary rounded-pill px-3 py-2">
+
+                {{ $absensi->total() }} Data
+
+            </span>
+
+        </div>
+
+        <div class="card-body p-0">
 
             <div class="table-responsive">
 
-                <table class="table table-hover align-middle">
+                <table class="table table-hover align-middle mb-0">
 
                     <thead>
 
                         <tr>
 
-                            <th>No</th>
+                            <th width="70" class="text-center">
 
-                            <th>Tanggal</th>
+                                No
 
-                            <th>Status</th>
+                            </th>
+
+                            <th>
+
+                                Tanggal
+
+                            </th>
+
+                            <th width="180">
+
+                                Status
+
+                            </th>
 
                         </tr>
 
@@ -146,108 +270,330 @@
 
                     <tbody>
 
-                        @forelse($absensi as $item)
+    @forelse($absensi as $item)
 
-                            <tr>
+        @php
 
-                                <td>
+            switch($item->status){
 
-                                    {{ $absensi->firstItem() + $loop->index }}
+                case 'hadir':
+                    $badge='success';
+                    $icon='bi-check-circle-fill';
+                    $label='Hadir';
+                    break;
 
-                                </td>
+                case 'izin':
+                    $badge='primary';
+                    $icon='bi-calendar-check-fill';
+                    $label='Izin';
+                    break;
 
-                                <td>
+                case 'sakit':
+                    $badge='warning';
+                    $icon='bi-heart-pulse-fill';
+                    $label='Sakit';
+                    break;
 
-                                    {{ \Carbon\Carbon::parse($item->tanggal)->format('d M Y') }}
+                default:
+                    $badge='danger';
+                    $icon='bi-x-circle-fill';
+                    $label='Alpa';
+                    break;
 
-                                </td>
+            }
 
-                                <td>
+        @endphp
 
-                                    @if($item->status == 'hadir')
+        <tr>
 
-                                        <span class="badge bg-success">
+            <td class="text-center">
 
-                                            Hadir
+                <span class="badge bg-light text-dark rounded-pill px-3 py-2">
 
-                                        </span>
+                    {{ $absensi->firstItem() + $loop->index }}
 
-                                    @elseif($item->status == 'izin')
+                </span>
 
-                                        <span class="badge bg-primary">
+            </td>
 
-                                            Izin
+            <td>
 
-                                        </span>
+                <div class="d-flex align-items-center">
 
-                                    @elseif($item->status == 'sakit')
+                    <div class="date-icon me-3">
 
-                                        <span class="badge bg-warning text-dark">
+                        <i class="bi bi-calendar-event-fill"></i>
 
-                                            Sakit
+                    </div>
 
-                                        </span>
+                    <div>
 
-                                    @else
+                        <div class="fw-bold">
 
-                                        <span class="badge bg-danger">
+                            {{ \Carbon\Carbon::parse($item->tanggal)->translatedFormat('d F Y') }}
 
-                                            Alpa
+                        </div>
 
-                                        </span>
+                        <small class="text-muted">
 
-                                    @endif
+                            Jadwal Ekstrakurikuler
 
-                                </td>
+                        </small>
 
-                            </tr>
+                    </div>
 
-                        @empty
+                </div>
 
-                            <tr>
+            </td>
 
-                                <td
-                                    colspan="3"
-                                    class="text-center text-muted py-4"
-                                >
+            <td>
 
-                                    Belum ada data absensi
+                <span class="badge bg-{{ $badge }} rounded-pill px-3 py-2">
 
-                                </td>
+                    <i class="bi {{ $icon }} me-1"></i>
 
-                            </tr>
+                    {{ $label }}
 
-                        @endforelse
+                </span>
 
-                    </tbody>
+            </td>
 
-                </table>
+        </tr>
 
-            </div>
+    @empty
 
-            <div class="mt-3">
+        <tr>
 
-                {{ $absensi->links() }}
+            <td colspan="3">
 
-            </div>
+                <div class="text-center py-5">
 
-        </div>
+                    <i class="bi bi-calendar-x display-3 text-secondary"></i>
 
-    </div>
+                    <h5 class="fw-bold mt-3">
 
-    <div class="mt-4">
+                        Belum Ada Data Absensi
 
-        <a
-            href="{{ route('siswa.ekskul.index') }}"
-            class="btn btn-light"
-        >
+                    </h5>
 
-            Kembali
+                    <p class="text-muted mb-0">
 
-        </a>
+                        Riwayat absensi ekstrakurikuler akan muncul setelah pembina melakukan pencatatan kehadiran.
 
-    </div>
+                    </p>
+
+                </div>
+
+            </td>
+
+        </tr>
+
+    @endforelse
+
+</tbody>
+
+</table>
 
 </div>
+
+<div class="card-footer bg-white border-0 py-3">
+
+    {{ $absensi->links() }}
+
+</div>
+
+</div>
+
+</div>
+
+<div class="mt-4">
+
+    <a
+        href="{{ route('siswa.ekskul.index') }}"
+        class="btn btn-outline-primary rounded-pill px-4">
+
+        <i class="bi bi-arrow-left me-2"></i>
+
+        Kembali
+
+    </a>
+
+</div>
+
+</div>
+
+<style>
+
+.card{
+
+    transition:.25s;
+
+}
+
+.card:hover{
+
+    box-shadow:0 18px 45px rgba(37,99,235,.08)!important;
+
+}
+
+.summary-card{
+
+    background:#fff;
+
+    border-radius:20px;
+
+    padding:24px;
+
+    box-shadow:0 .125rem .5rem rgba(0,0,0,.05);
+
+    transition:.25s;
+
+    height:100%;
+
+}
+
+.summary-card:hover{
+
+    transform:translateY(-4px);
+
+    box-shadow:0 16px 40px rgba(37,99,235,.10);
+
+}
+
+.summary-icon{
+
+    width:56px;
+
+    height:56px;
+
+    border-radius:16px;
+
+    display:flex;
+
+    align-items:center;
+
+    justify-content:center;
+
+    font-size:1.25rem;
+
+    margin-bottom:16px;
+
+}
+
+.date-icon{
+
+    width:48px;
+
+    height:48px;
+
+    border-radius:16px;
+
+    background:linear-gradient(135deg,#2563eb,#0f4c81);
+
+    color:#fff;
+
+    display:flex;
+
+    align-items:center;
+
+    justify-content:center;
+
+    flex-shrink:0;
+
+    font-size:1.15rem;
+
+}
+
+.table thead th{
+
+    background:#f8fafc;
+
+    color:#64748b;
+
+    text-transform:uppercase;
+
+    font-size:.82rem;
+
+    font-weight:700;
+
+    letter-spacing:.5px;
+
+    border:0;
+
+    padding:18px;
+
+}
+
+.table tbody td{
+
+    padding:18px;
+
+    vertical-align:middle;
+
+    border-color:#eef2f7;
+
+}
+
+.table-hover tbody tr{
+
+    transition:.2s;
+
+}
+
+.table-hover tbody tr:hover{
+
+    background:#f8fbff;
+
+}
+
+.badge{
+
+    font-weight:600;
+
+    letter-spacing:.3px;
+
+}
+
+.btn{
+
+    font-weight:600;
+
+}
+
+.btn:hover{
+
+    transform:translateY(-2px);
+
+}
+
+.pagination{
+
+    margin-bottom:0;
+
+}
+
+@media(max-width:768px){
+
+    .summary-card{
+
+        padding:18px;
+
+    }
+
+    .summary-icon,
+
+    .date-icon{
+
+        width:44px;
+
+        height:44px;
+
+        font-size:1rem;
+
+    }
+
+}
+
+</style>
 
 @endsection

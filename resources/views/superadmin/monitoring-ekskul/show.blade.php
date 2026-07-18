@@ -6,15 +6,37 @@
 
 <div class="container-fluid py-4">
 
-    <div class="mb-4">
+    {{-- ================= HERO ================= --}}
+    <div class="card border-0 shadow-sm rounded-4 overflow-hidden mb-4">
 
-        <h3 class="fw-bold mb-1">
-            Monitoring Jadwal Ekskul
-        </h3>
+        <div
+            class="card-body p-4 p-lg-5 text-white"
+            style="background:linear-gradient(135deg,#0f4c81 0%,#2563eb 100%);"
+        >
 
-        <p class="text-muted mb-0">
-            {{ $ekskul->nama }}
-        </p>
+            <div class="d-flex justify-content-between align-items-center flex-wrap">
+
+                <div>
+
+                    <h2 class="fw-bold mb-2">
+
+                        Monitoring Jadwal Ekskul
+
+                    </h2>
+
+                    <p class="mb-0 opacity-75">
+
+                        Monitoring jadwal kegiatan ekstrakurikuler
+                        <strong>{{ $ekskul->nama }}</strong>,
+                        termasuk proses validasi, approval, dan publikasi jadwal.
+
+                    </p>
+
+                </div>
+
+            </div>
+
+        </div>
 
     </div>
 
@@ -94,12 +116,24 @@
 
     @endif
 
-    <div class="card border-0 shadow-sm">
+    <div class="card border-0 shadow-sm rounded-4">
 
-        <div class="card-body">
+    <div class="card-body">
 
-            {{-- ACTION --}}
-            <div class="d-flex gap-2 mb-4">
+        <div class="d-flex justify-content-between align-items-center flex-wrap mb-4">
+
+            <a
+                href="{{ route('superadmin.monitoring-ekskul.index') }}"
+                class="btn btn-outline-secondary rounded-pill px-4"
+            >
+
+                <i class="bi bi-arrow-left me-2"></i>
+
+                Kembali
+
+            </a>
+
+            <div class="d-flex gap-2">
 
                 {{-- APPROVE --}}
                 <form
@@ -111,11 +145,11 @@
 
                     <button
                         type="submit"
-                        class="btn btn-success"
+                        class="btn btn-success rounded-pill px-4"
                         {{ !$bisaApprove ? 'disabled' : '' }}
                     >
 
-                        <i class="bi bi-check-circle"></i>
+                        <i class="bi bi-check-circle-fill me-2"></i>
 
                         Approve
 
@@ -126,12 +160,12 @@
                 {{-- REJECT --}}
                 <button
                     type="button"
-                    class="btn btn-danger"
+                    class="btn btn-danger rounded-pill px-4"
                     data-bs-toggle="modal"
                     data-bs-target="#modalReject"
                 >
 
-                    <i class="bi bi-x-circle"></i>
+                    <i class="bi bi-x-circle-fill me-2"></i>
 
                     Reject
 
@@ -147,11 +181,11 @@
 
                     <button
                         type="submit"
-                        class="btn btn-primary"
+                        class="btn btn-primary rounded-pill px-4"
                         {{ !$bisaApprove ? 'disabled' : '' }}
                     >
 
-                        <i class="bi bi-send-check"></i>
+                        <i class="bi bi-send-check-fill me-2"></i>
 
                         Publish
 
@@ -160,6 +194,8 @@
                 </form>
 
             </div>
+
+        </div>
 
             {{-- TABLE --}}
             <div class="table-responsive">

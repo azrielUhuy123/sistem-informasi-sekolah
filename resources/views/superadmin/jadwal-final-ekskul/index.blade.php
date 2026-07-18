@@ -4,33 +4,75 @@
 
 @section('content')
 
-<div class="container-fluid py-4">
+<div class="container-fluid py-3">
 
-    <div class="mb-4">
+    {{-- ================= HERO ================= --}}
+    <div class="card border-0 shadow-sm rounded-4 overflow-hidden mb-4">
 
-        <h3 class="fw-bold mb-1">
+        <div
+            class="card-body p-4 p-lg-5 text-white"
+            style="background:linear-gradient(135deg,#0f4c81 0%,#2563eb 100%);"
+        >
 
-            Jadwal Final Ekskul
+            <div class="d-flex justify-content-between align-items-center flex-wrap">
 
-        </h3>
+                <div>
 
-        <p class="text-muted mb-0">
+                    <h2 class="fw-bold mb-2">
 
-            Jadwal ekskul yang telah dipublish
+                        Jadwal Final Ekskul
 
-        </p>
+                    </h2>
+
+                    <p class="mb-0 opacity-75">
+
+                        Jadwal ekstrakurikuler resmi yang telah dipublikasikan dan siap digunakan sebagai acuan kegiatan sekolah.
+
+                    </p>
+
+                </div>
+
+                <div class="mt-4 mt-lg-0">
+
+                    <div class="bg-white rounded-4 px-4 py-3 text-center">
+
+                        <h2 class="fw-bold text-primary mb-0">
+
+                            {{ $hari->count() }}
+
+                        </h2>
+
+                        <small class="text-muted">
+
+                            Hari Aktif
+
+                        </small>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
 
     </div>
 
+    {{-- ================= CONTENT ================= --}}
     <div class="row">
 
         @foreach($hari as $h)
 
-            <div class="col-md-4 mb-4">
+            <div class="col-lg-4 col-md-6 mb-4">
 
-                <div class="card border-0 shadow-sm h-100">
+                <div class="card border-0 shadow-sm rounded-4 h-100 hari-card">
 
-                    <div class="card-header fw-bold">
+                    <div
+                        class="card-header border-0 text-white fw-bold py-3"
+                        style="background:linear-gradient(135deg,#2563eb,#0f4c81);"
+                    >
+
+                        <i class="bi bi-calendar-week-fill me-2"></i>
 
                         {{ $h->nama }}
 
@@ -40,26 +82,57 @@
 
                         @forelse($grid[$h->id] ?? [] as $j)
 
-                            <div class="border rounded p-3 mb-3">
+                            <div class="schedule-card mb-3">
 
-                                <div class="fw-semibold">
+                                <div class="d-flex justify-content-between align-items-start mb-3">
 
-                                    {{ $j->ekskul->nama }}
+                                    <div>
+
+                                        <h6 class="fw-bold text-primary mb-1">
+
+                                            {{ $j->ekskul->nama }}
+
+                                        </h6>
+
+                                        <small class="text-muted">
+
+                                            Ekstrakurikuler
+
+                                        </small>
+
+                                    </div>
+
+                                    <span class="badge bg-success rounded-pill">
+
+                                        Published
+
+                                    </span>
 
                                 </div>
 
-                                <div class="small text-muted">
+                                <div class="info-item">
 
-                                    Pembina:
-                                    {{ $j->guru->pegawai->nama }}
+                                    <i class="bi bi-person-fill"></i>
+
+                                    <span>
+
+                                        {{ $j->guru->pegawai->nama }}
+
+                                    </span>
 
                                 </div>
 
-                                <div class="small">
+                                <div class="info-item">
 
-                                    {{ substr($j->jam_mulai,0,5) }}
-                                    -
-                                    {{ substr($j->jam_selesai,0,5) }}
+                                    <i class="bi bi-clock-fill"></i>
+
+                                    <span>
+
+                                        {{ substr($j->jam_mulai,0,5) }}
+                                        -
+                                        {{ substr($j->jam_selesai,0,5) }}
+
+                                    </span>
 
                                 </div>
 
@@ -67,9 +140,21 @@
 
                         @empty
 
-                            <div class="text-muted">
+                            <div class="empty-state">
 
-                                Tidak ada jadwal
+                                <i class="bi bi-calendar-x display-6 text-secondary"></i>
+
+                                <h6 class="mt-3 mb-1">
+
+                                    Tidak Ada Jadwal
+
+                                </h6>
+
+                                <small class="text-muted">
+
+                                    Belum terdapat jadwal ekstrakurikuler.
+
+                                </small>
 
                             </div>
 
@@ -86,5 +171,113 @@
     </div>
 
 </div>
+
+<style>
+
+.card{
+
+    transition:.25s;
+
+}
+
+.card:hover{
+
+    box-shadow:0 18px 45px rgba(37,99,235,.08)!important;
+
+}
+
+.hari-card{
+
+    overflow:hidden;
+
+}
+
+.schedule-card{
+
+    background:linear-gradient(135deg,#f8fbff,#ffffff);
+
+    border:1px solid #dbeafe;
+
+    border-radius:18px;
+
+    padding:18px;
+
+    transition:.25s;
+
+}
+
+.schedule-card:hover{
+
+    transform:translateY(-3px);
+
+    box-shadow:0 14px 35px rgba(37,99,235,.12);
+
+}
+
+.info-item{
+
+    display:flex;
+
+    align-items:center;
+
+    gap:10px;
+
+    margin-top:10px;
+
+    color:#475569;
+
+    font-size:.92rem;
+
+}
+
+.info-item i{
+
+    color:#2563eb;
+
+    width:20px;
+
+}
+
+.badge{
+
+    font-weight:600;
+
+    letter-spacing:.3px;
+
+}
+
+.empty-state{
+
+    text-align:center;
+
+    padding:40px 20px;
+
+    border:2px dashed #d1d5db;
+
+    border-radius:18px;
+
+    color:#94a3b8;
+
+    transition:.25s;
+
+}
+
+.empty-state:hover{
+
+    background:#f8fafc;
+
+}
+
+@media(max-width:768px){
+
+    .schedule-card{
+
+        padding:15px;
+
+    }
+
+}
+
+</style>
 
 @endsection

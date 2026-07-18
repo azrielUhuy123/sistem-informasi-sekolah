@@ -301,6 +301,11 @@ Route::prefix('guru')
             [KenaikanKelasGuruController::class, 'store']
         )->name('kenaikan.store');
 
+        Route::patch(
+            '/kenaikan-kelas/submit',
+            [KenaikanKelasGuruController::class, 'submit']
+        )->name('kenaikan.submit');
+
         Route::get(
             '/status-validasi',
             [StatusValidasiController::class, 'index']
@@ -375,4 +380,15 @@ Route::prefix('guru')
 
         Route::put('/profile/detail', [ProfileController::class, 'updateDetail'])
             ->name('profile.detail.update');
+
+        Route::patch(
+            'kenaikan-kelas/submit',
+            [KenaikanKelasGuruController::class, 'submit']
+        )->name('kenaikan.submit');
+
+        Route::patch(
+            'kenaikan-kelas/cancel',
+            [KenaikanKelasGuruController::class, 'cancelSubmission']
+        )->name('kenaikan.cancel');
+
 });

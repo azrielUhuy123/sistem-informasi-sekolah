@@ -87,4 +87,8 @@ class Kelas extends Model
     {
         return $this->hasMany(PengampuMapel::class);
     }
+    public function keputusanKenaikan()
+    {
+        return $this->hasMany(KeputusanKenaikan::class);
+    }
 }

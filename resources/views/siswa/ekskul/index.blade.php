@@ -6,35 +6,160 @@
 
 <div class="container-fluid py-4">
 
-    <div class="mb-4">
+    @php
 
-        <h3 class="fw-bold mb-1">
+        $totalEkskul = $ekskul->count();
 
-            Ekskul Saya
+        $aktif = $ekskul->where('status','aktif')->count();
 
-        </h3>
+        $nonAktif = $ekskul->where('status','!=','aktif')->count();
 
-        <p class="text-muted mb-0">
+    @endphp
 
-            Daftar ekstrakurikuler yang sedang saya ikuti
+    {{-- ================= HERO ================= --}}
+    <div class="card border-0 shadow-sm rounded-4 overflow-hidden mb-4">
 
-        </p>
+        <div class="card-body p-4 p-lg-5 text-white"
+            style="background:linear-gradient(135deg,#0f4c81 0%,#2563eb 100%);">
+
+            <div class="row align-items-center">
+
+                <div class="col-lg-8">
+
+                    <h2 class="fw-bold mb-2">
+
+                        Ekstrakurikuler Saya
+
+                    </h2>
+
+                    <p class="mb-0 opacity-75">
+
+                        Lihat seluruh kegiatan ekstrakurikuler yang sedang diikuti,
+                        lengkap dengan pembina, status keanggotaan, dan akses cepat
+                        menuju detail maupun absensi.
+
+                    </p>
+
+                </div>
+
+                <div class="col-lg-4 mt-4 mt-lg-0">
+
+                    <div class="row g-3">
+
+                        <div class="col-4">
+
+                            <div class="bg-white rounded-4 p-3 text-center">
+
+                                <h4 class="fw-bold text-primary mb-1">
+
+                                    {{ $totalEkskul }}
+
+                                </h4>
+
+                                <small class="text-muted">
+
+                                    Ekskul
+
+                                </small>
+
+                            </div>
+
+                        </div>
+
+                        <div class="col-4">
+
+                            <div class="bg-white rounded-4 p-3 text-center">
+
+                                <h4 class="fw-bold text-success mb-1">
+
+                                    {{ $aktif }}
+
+                                </h4>
+
+                                <small class="text-muted">
+
+                                    Aktif
+
+                                </small>
+
+                            </div>
+
+                        </div>
+
+                        <div class="col-4">
+
+                            <div class="bg-white rounded-4 p-3 text-center">
+
+                                <h4 class="fw-bold text-secondary mb-1">
+
+                                    {{ $nonAktif }}
+
+                                </h4>
+
+                                <small class="text-muted">
+
+                                    Nonaktif
+
+                                </small>
+
+                            </div>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
 
     </div>
 
-    <div class="card border-0 shadow-sm">
+    {{-- ================= TABLE ================= --}}
+    <div class="card border-0 shadow-sm rounded-4">
+
+        <div class="card-header bg-white border-0 py-4">
+
+            <div class="d-flex justify-content-between align-items-center flex-wrap">
+
+                <div>
+
+                    <h5 class="fw-bold mb-1">
+
+                        Daftar Ekstrakurikuler
+
+                    </h5>
+
+                    <small class="text-muted">
+
+                        Seluruh kegiatan ekstrakurikuler yang sedang Anda ikuti.
+
+                    </small>
+
+                </div>
+
+                <span class="badge bg-primary rounded-pill px-3 py-2">
+
+                    {{ $totalEkskul }} Ekskul
+
+                </span>
+
+            </div>
+
+        </div>
 
         <div class="card-body">
 
             <div class="table-responsive">
 
-                <table class="table table-hover align-middle">
+                <table class="table table-hover align-middle mb-0">
 
-                    <thead class="table-light">
+                    <thead>
 
                         <tr>
 
-                            <th width="60">
+                            <th width="70" class="text-center">
 
                                 No
 
@@ -42,7 +167,7 @@
 
                             <th>
 
-                                Nama Ekskul
+                                Ekstrakurikuler
 
                             </th>
 
@@ -52,13 +177,13 @@
 
                             </th>
 
-                            <th>
+                            <th width="140">
 
                                 Status
 
                             </th>
 
-                            <th width="180">
+                            <th width="220">
 
                                 Aksi
 
@@ -70,109 +195,296 @@
 
                     <tbody>
 
-                        @forelse($ekskul as $item)
+    @forelse($ekskul as $item)
 
-                            <tr>
+        @php
 
-                                <td>
+            $aktif = $item->status == 'aktif';
 
-                                    {{ $loop->iteration }}
+        @endphp
 
-                                </td>
+        <tr>
 
-                                <td>
+            <td class="text-center">
 
-                                    <div class="fw-semibold">
+                <span class="badge bg-light text-dark rounded-pill px-3 py-2">
 
-                                        {{ $item->ekskul->nama }}
+                    {{ $loop->iteration }}
 
-                                    </div>
+                </span>
 
-                                </td>
+            </td>
 
-                                <td>
+            <td>
 
-                                    {{ $item->ekskul->pembina->guru->pegawai->nama ?? '-' }}
+                <div class="d-flex align-items-center">
 
-                                </td>
+                    <div class="ekskul-icon me-3">
 
-                                <td>
+                        <i class="bi bi-trophy-fill"></i>
 
-                                    @if($item->status == 'aktif')
+                    </div>
 
-                                        <span class="badge bg-success">
+                    <div>
 
-                                            Aktif
+                        <div class="fw-bold">
 
-                                        </span>
+                            {{ $item->ekskul->nama }}
 
-                                    @else
+                        </div>
 
-                                        <span class="badge bg-secondary">
+                        <small class="text-muted">
 
-                                            Tidak Aktif
+                            Ekstrakurikuler
 
-                                        </span>
+                        </small>
 
-                                    @endif
+                    </div>
 
-                                </td>
+                </div>
 
-                                <td>
+            </td>
 
-                                    <div class="d-flex gap-2">
+            <td>
 
-                                        <a
-                                            href="{{ route('siswa.ekskul.show', $item->ekskul_id) }}"
-                                            class="btn btn-info btn-sm"
-                                        >
+                <div class="fw-semibold">
 
-                                            Detail
+                    {{ $item->ekskul->pembina->guru->pegawai->nama ?? '-' }}
 
-                                        </a>
+                </div>
 
-                                        <a
-                                            href="{{ route('siswa.ekskul.absensi', $item->ekskul_id) }}"
-                                            class="btn btn-primary btn-sm"
-                                        >
+                <small class="text-muted">
 
-                                            Absensi
+                    Pembina
 
-                                        </a>
+                </small>
 
-                                    </div>
+            </td>
 
-                                </td>
+            <td>
 
-                            </tr>
+                @if($aktif)
 
-                        @empty
+                    <span class="badge bg-success rounded-pill px-3 py-2">
 
-                            <tr>
+                        <i class="bi bi-check-circle-fill me-1"></i>
 
-                                <td
-                                    colspan="5"
-                                    class="text-center text-muted py-4"
-                                >
+                        Aktif
 
-                                    Anda belum terdaftar pada ekskul manapun
+                    </span>
 
-                                </td>
+                @else
 
-                            </tr>
+                    <span class="badge bg-secondary rounded-pill px-3 py-2">
 
-                        @endforelse
+                        <i class="bi bi-pause-circle-fill me-1"></i>
 
-                    </tbody>
+                        Tidak Aktif
 
-                </table>
+                    </span>
 
-            </div>
+                @endif
 
-        </div>
+            </td>
 
-    </div>
+            <td>
+
+                <div class="d-flex gap-2">
+
+                    <a
+                        href="{{ route('siswa.ekskul.show',$item->ekskul_id) }}"
+                        class="btn btn-outline-primary rounded-pill btn-sm">
+
+                        <i class="bi bi-eye-fill me-1"></i>
+
+                        Detail
+
+                    </a>
+
+                    <a
+                        href="{{ route('siswa.ekskul.absensi',$item->ekskul_id) }}"
+                        class="btn btn-primary rounded-pill btn-sm">
+
+                        <i class="bi bi-calendar-check-fill me-1"></i>
+
+                        Absensi
+
+                    </a>
+
+                </div>
+
+            </td>
+
+        </tr>
+
+    @empty
+
+        <tr>
+
+            <td colspan="5">
+
+                <div class="text-center py-5">
+
+                    <i class="bi bi-trophy display-3 text-secondary"></i>
+
+                    <h5 class="fw-bold mt-3">
+
+                        Belum Mengikuti Ekstrakurikuler
+
+                    </h5>
+
+                    <p class="text-muted mb-0">
+
+                        Anda belum terdaftar pada kegiatan ekstrakurikuler mana pun.
+
+                    </p>
+
+                </div>
+
+            </td>
+
+        </tr>
+
+    @endforelse
+
+</tbody>
+
+</table>
 
 </div>
+
+</div>
+
+</div>
+
+</div>
+
+<style>
+
+.card{
+
+    transition:.25s;
+
+}
+
+.card:hover{
+
+    box-shadow:0 18px 45px rgba(37,99,235,.08)!important;
+
+}
+
+.table thead th{
+
+    background:#f8fafc;
+
+    color:#64748b;
+
+    text-transform:uppercase;
+
+    font-size:.82rem;
+
+    letter-spacing:.5px;
+
+    font-weight:700;
+
+    border:0;
+
+    padding:18px;
+
+}
+
+.table tbody td{
+
+    padding:18px;
+
+    vertical-align:middle;
+
+    border-color:#eef2f7;
+
+}
+
+.table-hover tbody tr{
+
+    transition:.2s;
+
+}
+
+.table-hover tbody tr:hover{
+
+    background:#f8fbff;
+
+}
+
+.ekskul-icon{
+
+    width:50px;
+
+    height:50px;
+
+    border-radius:16px;
+
+    display:flex;
+
+    align-items:center;
+
+    justify-content:center;
+
+    background:linear-gradient(135deg,#2563eb,#0f4c81);
+
+    color:#fff;
+
+    font-size:1.2rem;
+
+    flex-shrink:0;
+
+}
+
+.badge{
+
+    font-weight:600;
+
+    letter-spacing:.3px;
+
+}
+
+.btn{
+
+    font-weight:600;
+
+}
+
+.btn-primary{
+
+    box-shadow:0 8px 20px rgba(37,99,235,.20);
+
+}
+
+.btn-primary:hover{
+
+    transform:translateY(-2px);
+
+}
+
+.btn-outline-primary:hover{
+
+    transform:translateY(-2px);
+
+}
+
+@media(max-width:768px){
+
+    .ekskul-icon{
+
+        width:42px;
+
+        height:42px;
+
+        font-size:1rem;
+
+    }
+
+}
+
+</style>
 
 @endsection

@@ -4,98 +4,217 @@
 
 @section('content')
 
-<div class="container-fluid">
+@php
 
-    {{-- HEADER --}}
+    $totalDokumen = $dokumen->count();
+
+@endphp
+
+<div class="container-fluid py-4">
+
+    {{-- HERO --}}
     <div class="card border-0 shadow-sm rounded-4 overflow-hidden mb-4">
-        <div class="card-body p-4 p-lg-5 text-white" style="background: linear-gradient(135deg, #0f4c81 0%, #2563eb 100%);">
-            <div class="d-flex flex-column flex-lg-row justify-content-between align-items-lg-center gap-3">
-                <div>
-                    <h3 class="fw-bold mb-2">Manajemen Dokumen</h3>
-                    <p class="mb-0 opacity-75">Kelola dokumen resmi sekolah</p>
+
+        <div class="card-body p-4 p-lg-5 text-white"
+             style="background:linear-gradient(135deg,#0f4c81 0%,#2563eb 100%);">
+
+            <div class="row align-items-center">
+
+                <div class="col-lg-8">
+
+                    <h2 class="fw-bold mb-2">
+
+                        Arsip Dokumen
+
+                    </h2>
+
+                    <p class="mb-0 opacity-75">
+
+                        Unduh dan akses seluruh dokumen resmi sekolah sesuai kategori yang tersedia.
+
+                    </p>
+
                 </div>
-                <div class="badge bg-white text-primary px-3 py-2 fs-6">
-                    <i class="bi bi-shield-check me-2"></i> Sistem Terhubung
+
+                <div class="col-lg-4 mt-4 mt-lg-0">
+
+                    <div class="bg-white rounded-4 text-center p-4">
+
+                        <h3 class="fw-bold text-primary mb-1">
+
+                            {{ $totalDokumen }}
+
+                        </h3>
+
+                        <small class="text-muted">
+
+                            Dokumen Tersedia
+
+                        </small>
+
+                    </div>
+
                 </div>
+
             </div>
+
         </div>
+
     </div>
 
-
-    {{-- ALERT SUCCESS --}}
+    {{-- ALERT --}}
     @if(session('success'))
 
-        <div class="alert alert-success border-0 shadow-sm">
+        <div class="alert alert-success border-0 shadow-sm rounded-4">
 
             <i class="bi bi-check-circle-fill me-2"></i>
+
             {{ session('success') }}
 
         </div>
 
     @endif
 
-    {{-- ALERT ERROR --}}
     @if(session('error'))
 
-        <div class="alert alert-danger border-0 shadow-sm">
+        <div class="alert alert-danger border-0 shadow-sm rounded-4">
 
-            <i class="bi bi-exclamation-circle-fill me-2"></i>
+            <i class="bi bi-exclamation-triangle-fill me-2"></i>
+
             {{ session('error') }}
 
         </div>
 
     @endif
 
-    {{-- CARD --}}
-    <div class="card border-0 shadow-sm rounded-4">
+    {{-- FILTER --}}
+    <div class="card border-0 shadow-sm rounded-4 mb-4">
 
-        <div class="card-body p-0">
+        <div class="card-header bg-white border-0 py-3">
 
-            {{-- TOP BAR --}}
-            <div class="d-flex justify-content-end p-3 border-bottom">
-                <form method="GET"
-                    action="{{ route('guru.dokumen.surat') }}">
+            <h5 class="fw-bold mb-0">
 
-                    <select name="kategori"
-                            class="form-select"
+                Filter Dokumen
+
+            </h5>
+
+        </div>
+
+        <div class="card-body">
+
+            <form method="GET"
+                  action="{{ route('guru.dokumen.surat') }}">
+
+                <div class="row align-items-end">
+
+                    <div class="col-md-6">
+
+                        <label class="form-label fw-semibold">
+
+                            Kategori Dokumen
+
+                        </label>
+
+                        <select
+                            name="kategori"
+                            class="form-select rounded-3"
                             onchange="this.form.submit()">
 
-                        <option value="">
-                            Pilih Kategori
-                        </option>
+                            <option value="">
 
-                        @foreach($kategori as $item)
-
-                            <option value="{{ $item->kategori_surat }}"
-                                {{ request('kategori') == $item->kategori_surat ? 'selected' : '' }}>
-
-                                {{ $item->kategori_surat }}
+                                Semua Kategori
 
                             </option>
 
-                        @endforeach
+                            @foreach($kategori as $item)
 
-                    </select>
+                                <option
+                                    value="{{ $item->kategori_surat }}"
+                                    {{ request('kategori') == $item->kategori_surat ? 'selected' : '' }}>
 
-                </form>
+                                    {{ $item->kategori_surat }}
+
+                                </option>
+
+                            @endforeach
+
+                        </select>
+
+                    </div>
+
+                </div>
+
+            </form>
+
+        </div>
+
+    </div>
+
+    {{-- TABLE --}}
+    <div class="card border-0 shadow-sm rounded-4">
+
+        <div class="card-header bg-white border-0 py-4">
+
+            <div class="d-flex justify-content-between align-items-center">
+
+                <div>
+
+                    <h5 class="fw-bold mb-1">
+
+                        Daftar Dokumen
+
+                    </h5>
+
+                    <small class="text-muted">
+
+                        Klik tombol unduh untuk mengunduh dokumen yang dibutuhkan.
+
+                    </small>
+
+                </div>
+
+                <span class="badge bg-primary rounded-pill px-3 py-2">
+
+                    {{ $totalDokumen }} Dokumen
+
+                </span>
 
             </div>
 
-            {{-- TABLE --}}
+        </div>
+
+        <div class="card-body p-0">
+
             <div class="table-responsive">
 
-                <table class="table align-middle mb-0">
+                <table class="table table-hover align-middle mb-0">
 
-                    <thead class="table-light">
+                    <thead>
 
                         <tr>
 
-                            <th class="ps-4">
-                                Nama Dokumen
+                            <th width="70">
+
+                                No
+
                             </th>
 
-                            <th width="15%" class="text-center">
-                                Unduh
+                            <th>
+
+                                Nama Dokumen
+
+                            </th>
+
+                            <th width="220">
+
+                                Kategori
+
+                            </th>
+
+                            <th width="140" class="text-center">
+
+                                Aksi
+
                             </th>
 
                         </tr>
@@ -104,59 +223,237 @@
 
                     <tbody>
 
-                        @forelse($dokumen as $row)
+    @forelse($dokumen as $i => $row)
 
-                            <tr>
+        <tr>
 
-                                {{-- NAMA FILE --}}
-                                <td class="ps-4">
+            <td>
 
-                                    <div class="fw-semibold">
-                                        {{ $row->nama_surat }}
-                                    </div>
+                <span class="badge bg-light text-dark rounded-pill px-3 py-2">
 
-                                </td>
+                    {{ $i + 1 }}
 
-                                {{-- DOWNLOAD --}}
-                                <td class="text-center">
+                </span>
 
-                                    <a href="{{ asset('uploads/dokumen/' . $row->file) }}"
-                                       download
-                                       class="btn btn-success rounded-3">
+            </td>
 
-                                        <i class="bi bi-cloud-arrow-down-fill"></i>
+            <td>
 
-                                    </a>
+                <div class="d-flex align-items-center">
 
-                                </td>
+                    <div class="document-icon me-3">
 
-                            </tr>
+                        <i class="bi bi-file-earmark-text-fill"></i>
 
-                        @empty
+                    </div>
 
-                            <tr>
+                    <div>
 
-                                <td colspan="2"
-                                    class="text-center py-5 text-muted">
+                        <div class="fw-bold">
 
-                                    Belum ada dokumen tersedia
+                            {{ $row->nama_surat }}
 
-                                </td>
+                        </div>
 
-                            </tr>
+                        <small class="text-muted">
 
-                        @endforelse
+                            Dokumen Sekolah
 
-                    </tbody>
+                        </small>
 
-                </table>
+                    </div>
 
-            </div>
+                </div>
 
-        </div>
+            </td>
 
-    </div>
+            <td>
+
+                <span class="badge bg-info-subtle text-info border rounded-pill px-3 py-2">
+
+                    {{ $row->kategori_surat }}
+
+                </span>
+
+            </td>
+
+            <td class="text-center">
+
+                <a
+                    href="{{ asset('uploads/dokumen/' . $row->file) }}"
+                    download
+                    class="btn btn-success rounded-pill px-3">
+
+                    <i class="bi bi-cloud-arrow-down-fill me-1"></i>
+
+                    Unduh
+
+                </a>
+
+            </td>
+
+        </tr>
+
+    @empty
+
+        <tr>
+
+            <td colspan="4">
+
+                <div class="text-center py-5">
+
+                    <i class="bi bi-folder2-open display-3 text-secondary"></i>
+
+                    <h5 class="fw-bold mt-3">
+
+                        Belum Ada Dokumen
+
+                    </h5>
+
+                    <p class="text-muted mb-0">
+
+                        Belum terdapat dokumen yang dapat diunduh.
+
+                    </p>
+
+                </div>
+
+            </td>
+
+        </tr>
+
+    @endforelse
+
+</tbody>
+
+</table>
 
 </div>
+
+</div>
+
+</div>
+
+<style>
+
+.card{
+
+    transition:.25s;
+
+}
+
+.card:hover{
+
+    box-shadow:0 18px 45px rgba(37,99,235,.08)!important;
+
+}
+
+.document-icon{
+
+    width:48px;
+
+    height:48px;
+
+    border-radius:16px;
+
+    background:linear-gradient(135deg,#2563eb,#0f4c81);
+
+    color:#fff;
+
+    display:flex;
+
+    align-items:center;
+
+    justify-content:center;
+
+    font-size:1.2rem;
+
+    flex-shrink:0;
+
+}
+
+.table thead th{
+
+    background:#f8fafc;
+
+    border:0;
+
+    color:#64748b;
+
+    text-transform:uppercase;
+
+    font-size:.82rem;
+
+    letter-spacing:.5px;
+
+    padding:18px;
+
+}
+
+.table tbody td{
+
+    padding:18px;
+
+    vertical-align:middle;
+
+    border-color:#eef2f7;
+
+}
+
+.table-hover tbody tr:hover{
+
+    background:#f8fbff;
+
+}
+
+.form-select{
+
+    border-radius:12px;
+
+}
+
+.form-select:focus{
+
+    border-color:#2563eb;
+
+    box-shadow:0 0 0 .2rem rgba(37,99,235,.15);
+
+}
+
+.badge{
+
+    font-weight:600;
+
+}
+
+.btn{
+
+    font-weight:600;
+
+    transition:.2s;
+
+}
+
+.btn:hover{
+
+    transform:translateY(-2px);
+
+}
+
+@media(max-width:768px){
+
+    .document-icon{
+
+        width:42px;
+
+        height:42px;
+
+        font-size:1rem;
+
+    }
+
+}
+
+</style>
 
 @endsection

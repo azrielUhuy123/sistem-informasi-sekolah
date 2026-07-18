@@ -168,6 +168,18 @@
             </div>
 
         </a>
+
+        <a
+            class="menu-item {{ request()->is('superadmin/monitoring-kenaikan*') ? 'active' : '' }}"
+            href="{{ route('superadmin.monitoring-kenaikan.index') }}"
+        >
+
+            <div class="menu-left">
+                <i class="bi bi-mortarboard"></i>
+                <span>Monitoring Kenaikan Kelas</span>
+            </div>
+
+        </a>
     </div>
 
     {{-- MONITORING EKSKUL --}}

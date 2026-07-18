@@ -4,50 +4,141 @@
 
 @section('content')
 
-<div class="container-fluid py-3">
+@php
 
-    {{-- HEADER --}}
+    $totalSiswa = $penempatan->count();
+
+    $hadir = $penempatan->filter(function($p) use ($jadwal){
+
+        return optional(
+            \App\Models\AbsensiSiswa::where('jadwal_id',$jadwal?->id)
+                ->where('siswa_id',$p->siswa->id)
+                ->where('tanggal',date('Y-m-d'))
+                ->first()
+        )->status == 'hadir';
+
+    })->count();
+
+@endphp
+
+<div class="container-fluid py-4">
+
+    {{-- HERO --}}
     <div class="card border-0 shadow-sm rounded-4 overflow-hidden mb-4">
-        <div class="card-body p-4 p-lg-5 text-white" style="background: linear-gradient(135deg, #0f4c81 0%, #2563eb 100%);">
-            <div class="d-flex flex-column flex-lg-row justify-content-between align-items-lg-center gap-3">
-                <div>
-                    <h3 class="fw-bold mb-2">Manajemen Absensi</h3>
-                    <p class="mb-0 opacity-75">Kelola absensi siswa dalam setiap jadwal pelajaran</p>
+
+        <div class="card-body p-4 p-lg-5 text-white"
+            style="background:linear-gradient(135deg,#0f4c81 0%,#2563eb 100%);">
+
+            <div class="row align-items-center">
+
+                <div class="col-lg-8">
+
+                    <h2 class="fw-bold mb-2">
+
+                        Absensi Siswa
+
+                    </h2>
+
+                    <p class="mb-0 opacity-75">
+
+                        Kelola kehadiran siswa berdasarkan jadwal pembelajaran hari ini.
+
+                    </p>
+
                 </div>
-                <div class="badge bg-white text-primary px-3 py-2 fs-6">
-                    <i class="bi bi-shield-check me-2"></i> Sistem Terhubung
+
+                <div class="col-lg-4 mt-4 mt-lg-0">
+
+                    <div class="row g-3">
+
+                        <div class="col-6">
+
+                            <div class="bg-white rounded-4 text-center p-3">
+
+                                <h4 class="fw-bold text-primary mb-1">
+
+                                    {{ $jadwals->count() }}
+
+                                </h4>
+
+                                <small class="text-muted">
+
+                                    Jadwal
+
+                                </small>
+
+                            </div>
+
+                        </div>
+
+                        <div class="col-6">
+
+                            <div class="bg-white rounded-4 text-center p-3">
+
+                                <h4 class="fw-bold text-success mb-1">
+
+                                    {{ $totalSiswa }}
+
+                                </h4>
+
+                                <small class="text-muted">
+
+                                    Siswa
+
+                                </small>
+
+                            </div>
+
+                        </div>
+
+                    </div>
+
                 </div>
+
             </div>
+
         </div>
+
     </div>
 
+    {{-- ALERT --}}
 
-    {{-- ALERT SUCCESS --}}
     @if(session('success'))
 
-        <div class="alert alert-success border-0 shadow-sm">
+        <div class="alert alert-success border-0 shadow-sm rounded-4">
 
             <i class="bi bi-check-circle-fill me-2"></i>
+
             {{ session('success') }}
 
         </div>
 
     @endif
 
-    {{-- ALERT ERROR --}}
     @if(session('error'))
 
-        <div class="alert alert-danger border-0 shadow-sm">
+        <div class="alert alert-danger border-0 shadow-sm rounded-4">
 
-            <i class="bi bi-exclamation-circle-fill me-2"></i>
+            <i class="bi bi-exclamation-triangle-fill me-2"></i>
+
             {{ session('error') }}
 
         </div>
 
     @endif
 
-    {{-- FILTER JADWAL --}}
-    <div class="card border-0 shadow-sm mb-4">
+    {{-- FILTER --}}
+    <div class="card border-0 shadow-sm rounded-4 mb-4">
+
+        <div class="card-header bg-white border-0 py-3">
+
+            <h5 class="fw-bold mb-0">
+
+                Jadwal Mengajar Hari Ini
+
+            </h5>
+
+        </div>
 
         <div class="card-body">
 
@@ -55,42 +146,30 @@
 
                 <div class="row g-3 align-items-end">
 
-                    {{-- JADWAL --}}
                     <div class="col-lg-7">
 
-                        <label class="form-label">
+                        <label class="form-label fw-semibold">
 
-                            Jadwal Hari Ini
+                            Jadwal
 
                         </label>
 
                         <select
                             name="jadwal_id"
-                            class="form-select"
-                            onchange="this.form.submit()"
-                        >
+                            class="form-select rounded-3"
+                            onchange="this.form.submit()">
 
                             @forelse($jadwals as $j)
 
                                 <option
                                     value="{{ $j->id }}"
-                                    {{
-                                        $jadwalId == $j->id
-                                        ? 'selected'
-                                        : ''
-                                    }}
-                                >
+                                    {{ $jadwalId==$j->id?'selected':'' }}>
 
                                     {{ $j->kelas->nama_kelas }}
-                                    -
+                                    •
                                     {{ $j->mapel->nama_mapel }}
-                                    -
+                                    •
                                     Jam {{ $j->jamPelajaran->jam_ke }}
-                                    (
-                                    {{ substr($j->jamPelajaran->mulai, 0, 5) }}
-                                    -
-                                    {{ substr($j->jamPelajaran->selesai, 0, 5) }}
-                                    )
 
                                 </option>
 
@@ -108,10 +187,9 @@
 
                     </div>
 
-                    {{-- TANGGAL --}}
                     <div class="col-lg-3">
 
-                        <label class="form-label">
+                        <label class="form-label fw-semibold">
 
                             Tanggal
 
@@ -119,25 +197,27 @@
 
                         <input
                             type="date"
-                            class="form-control"
+                            class="form-control rounded-3"
                             value="{{ request('tanggal') ?? date('Y-m-d') }}"
-                            disabled
-                        >
+                            disabled>
 
                     </div>
 
-                    {{-- INFO --}}
                     <div class="col-lg-2">
 
-                        <div class="small text-muted">
+                        <div class="summary-card">
 
-                            Total Jadwal
+                            <h3 class="mb-1">
 
-                        </div>
+                                {{ $jadwals->count() }}
 
-                        <div class="fw-bold fs-5">
+                            </h3>
 
-                            {{ $jadwals->count() }}
+                            <small>
+
+                                Jadwal
+
+                            </small>
 
                         </div>
 
@@ -151,83 +231,61 @@
 
     </div>
 
-    {{-- DETAIL JADWAL --}}
     @if($jadwal)
 
-        <div class="card border-0 shadow-sm mb-4">
+        <div class="row g-3 mb-4">
 
-            <div class="card-body">
+            <div class="col-md-3">
 
-                <div class="row">
+                <div class="info-card">
 
-                    <div class="col-md-3">
+                    <small>Kelas</small>
 
-                        <small class="text-muted d-block">
+                    <h6>{{ $jadwal->kelas->nama_kelas }}</h6>
 
-                            Kelas
+                </div>
 
-                        </small>
+            </div>
 
-                        <div class="fw-semibold">
+            <div class="col-md-3">
 
-                            {{ $jadwal->kelas->nama_kelas }}
+                <div class="info-card">
 
-                        </div>
+                    <small>Mata Pelajaran</small>
 
-                    </div>
+                    <h6>{{ $jadwal->mapel->nama_mapel }}</h6>
 
-                    <div class="col-md-3">
+                </div>
 
-                        <small class="text-muted d-block">
+            </div>
 
-                            Mata Pelajaran
+            <div class="col-md-3">
 
-                        </small>
+                <div class="info-card">
 
-                        <div class="fw-semibold">
+                    <small>Hari</small>
 
-                            {{ $jadwal->mapel->nama_mapel }}
+                    <h6>{{ $jadwal->hari->nama }}</h6>
 
-                        </div>
+                </div>
 
-                    </div>
+            </div>
 
-                    <div class="col-md-3">
+            <div class="col-md-3">
 
-                        <small class="text-muted d-block">
+                <div class="info-card">
 
-                            Hari
+                    <small>Jam</small>
 
-                        </small>
+                    <h6>
 
-                        <div class="fw-semibold">
+                        {{ substr($jadwal->jamPelajaran->mulai,0,5) }}
 
-                            {{ $jadwal->hari->nama }}
+                        -
 
-                        </div>
+                        {{ substr($jadwal->jamPelajaran->selesai,0,5) }}
 
-                    </div>
-
-                    <div class="col-md-3">
-
-                        <small class="text-muted d-block">
-
-                            Jam Pelajaran
-
-                        </small>
-
-                        <div class="fw-semibold">
-
-                            Jam {{ $jadwal->jamPelajaran->jam_ke }}
-                            (
-                            {{ substr($jadwal->jamPelajaran->mulai, 0, 5) }}
-                            -
-                            {{ substr($jadwal->jamPelajaran->selesai, 0, 5) }}
-                            )
-
-                        </div>
-
-                    </div>
+                    </h6>
 
                 </div>
 
@@ -235,38 +293,23 @@
 
         </div>
 
-        {{-- FORM ABSENSI --}}
         <form
             action="{{ route('guru.absensi.store') }}"
-            method="POST"
-        >
+            method="POST">
 
             @csrf
 
-            <input
-                type="hidden"
-                name="jadwal_id"
-                value="{{ $jadwal->id }}"
-            >
+            <input type="hidden" name="jadwal_id" value="{{ $jadwal->id }}">
 
-            <input
-                type="hidden"
-                name="kelas_id"
-                value="{{ $jadwal->kelas_id }}"
-            >
+            <input type="hidden" name="kelas_id" value="{{ $jadwal->kelas_id }}">
 
-            <input
-                type="hidden"
-                name="tanggal"
-                value="{{ date('Y-m-d') }}"
-            >
+            <input type="hidden" name="tanggal" value="{{ date('Y-m-d') }}">
 
-            <div class="card border-0 shadow-sm">
+            <div class="card border-0 shadow-sm rounded-4">
 
-                <div class="card-body">
+                <div class="card-header bg-white border-0 py-4">
 
-                    {{-- HEADER --}}
-                    <div class="d-flex justify-content-between align-items-center flex-wrap gap-3 mb-4">
+                    <div class="d-flex justify-content-between align-items-center flex-wrap gap-3">
 
                         <div>
 
@@ -278,21 +321,18 @@
 
                             <small class="text-muted">
 
-                                Total siswa:
-                                {{ $penempatan->count() }}
+                                {{ $penempatan->count() }} Siswa
 
                             </small>
 
                         </div>
 
-                        {{-- ACTION --}}
-                        <div class="d-flex align-items-center gap-2">
+                        <div class="d-flex gap-2">
 
                             <select
-                                class="form-select"
+                                class="form-select rounded-pill"
                                 id="bulkAction"
-                                style="width: 180px"
-                            >
+                                style="width:180px">
 
                                 <option value="">
 
@@ -300,35 +340,21 @@
 
                                 </option>
 
-                                <option value="hadir">
+                                <option value="hadir">Hadir</option>
 
-                                    Hadir
+                                <option value="izin">Izin</option>
 
-                                </option>
+                                <option value="sakit">Sakit</option>
 
-                                <option value="izin">
-
-                                    Izin
-
-                                </option>
-
-                                <option value="sakit">
-
-                                    Sakit
-
-                                </option>
-
-                                <option value="alpha">
-
-                                    Alpha
-
-                                </option>
+                                <option value="alpha">Alpha</option>
 
                             </select>
 
-                            <button class="btn btn-primary px-4">
+                            <button class="btn btn-primary rounded-pill px-4">
 
-                                Simpan Absensi
+                                <i class="bi bi-check-circle-fill me-2"></i>
+
+                                Simpan
 
                             </button>
 
@@ -336,23 +362,24 @@
 
                     </div>
 
-                    {{-- TABLE --}}
+                </div>
+
+                <div class="card-body p-0">
+
                     <div class="table-responsive">
 
-                        <table class="table align-middle">
+                        <table class="table table-hover align-middle mb-0">
 
-                            <thead class="table-light">
+                            <thead>
 
                                 <tr>
 
-                                    {{-- CHECKBOX ALL --}}
-                                    <th width="50">
+                                    <th width="55">
 
                                         <input
                                             type="checkbox"
                                             class="form-check-input"
-                                            id="tableCheckAll"
-                                        >
+                                            id="tableCheckAll">
 
                                     </th>
 
@@ -370,19 +397,19 @@
 
                                     <th width="120">
 
-                                        Jam Hadir
+                                        Hadir
 
                                     </th>
 
                                     <th width="220">
 
-                                        Update Kehadiran
+                                        Update
 
                                     </th>
 
                                     <th width="180">
 
-                                        Status Kehadiran
+                                        Status
 
                                     </th>
 
@@ -392,159 +419,173 @@
 
                             <tbody>
 
-                                @forelse($penempatan as $i => $p)
+    @forelse($penempatan as $i => $p)
 
-                                    @php
+        @php
 
-                                        $absen = \App\Models\AbsensiSiswa::where(
-                                                'jadwal_id',
-                                                $jadwal->id
-                                            )
-                                            ->where(
-                                                'siswa_id',
-                                                $p->siswa->id
-                                            )
-                                            ->where(
-                                                'tanggal',
-                                                date('Y-m-d')
-                                            )
-                                            ->first();
+            $absen = \App\Models\AbsensiSiswa::where('jadwal_id',$jadwal->id)
+                ->where('siswa_id',$p->siswa->id)
+                ->where('tanggal',date('Y-m-d'))
+                ->first();
 
-                                        $status =
-                                            $absen->status ?? 'hadir';
+            $status = $absen->status ?? 'hadir';
 
-                                    @endphp
+            $badge = match($status){
 
-                                    <tr>
+                'hadir' => 'success',
 
-                                        {{-- CHECKBOX --}}
-                                        <td>
+                'izin' => 'warning',
 
-                                            <input
-                                                type="checkbox"
-                                                class="form-check-input student-checkbox"
-                                            >
+                'sakit' => 'info',
 
-                                        </td>
+                default => 'danger'
 
-                                        {{-- NO --}}
-                                        <td>
+            };
 
-                                            {{ $i + 1 }}
+        @endphp
 
-                                        </td>
+        <tr>
 
-                                        {{-- NAMA --}}
-                                        <td>
+            <td>
 
-                                            <div class="fw-semibold">
+                <input
+                    type="checkbox"
+                    class="form-check-input student-checkbox">
 
-                                                {{ $p->siswa->nama }}
+            </td>
 
-                                            </div>
+            <td>
 
-                                            <small class="text-muted">
+                <span class="badge bg-light text-dark rounded-pill px-3 py-2">
 
-                                                NIS:
-                                                {{ $p->siswa->nis }}
+                    {{ $i+1 }}
 
-                                            </small>
+                </span>
 
-                                        </td>
+            </td>
 
-                                        {{-- JAM HADIR --}}
-                                        <td>
+            <td>
 
-                                            <small class="text-muted">
+                <div class="d-flex align-items-center">
 
-                                                {{
-                                                    optional(
-                                                        $absen?->created_at
-                                                    )->format('H:i')
-                                                    ?? '--'
-                                                }}
+                    <div class="student-avatar me-3">
 
-                                            </small>
+                        {{ strtoupper(substr($p->siswa->nama,0,1)) }}
 
-                                        </td>
+                    </div>
 
-                                        {{-- UPDATE --}}
-                                        <td>
+                    <div>
 
-                                            <small class="text-muted">
+                        <div class="fw-bold">
 
-                                                {{
-                                                    optional(
-                                                        $absen?->updated_at
-                                                    )->format('d M Y H:i')
-                                                    ?? '--'
-                                                }}
+                            {{ $p->siswa->nama }}
 
-                                            </small>
+                        </div>
 
-                                        </td>
+                        <small class="text-muted">
 
-                                        {{-- STATUS --}}
-                                        <td>
+                            NIS {{ $p->siswa->nis }}
 
-                                            <input
-                                                type="hidden"
-                                                name="absensi[{{ $p->siswa->id }}][status]"
-                                                value="{{ $status }}"
-                                                class="statusInput"
-                                            >
-
-                                            <span
-                                                class="
-                                                    badge
-                                                    statusBadge
-                                                    bg-{{
-                                                        match($status) {
-                                                            'hadir' => 'success',
-                                                            'izin' => 'warning',
-                                                            'sakit' => 'info',
-                                                            default => 'danger'
-                                                        }
-                                                    }}
-                                                "
-                                            >
-
-                                                {{ ucfirst($status) }}
-
-                                            </span>
-
-                                        </td>
-
-                                    </tr>
-
-                                @empty
-
-                                    <tr>
-
-                                        <td
-                                            colspan="6"
-                                            class="text-center text-muted py-4"
-                                        >
-
-                                            Tidak ada siswa pada kelas ini
-
-                                        </td>
-
-                                    </tr>
-
-                                @endforelse
-
-                            </tbody>
-
-                        </table>
+                        </small>
 
                     </div>
 
                 </div>
 
-            </div>
+            </td>
 
-        </form>
+            <td>
+
+                <span class="text-muted">
+
+                    {{
+
+                        optional($absen?->created_at)->format('H:i')
+
+                        ?? '--'
+
+                    }}
+
+                </span>
+
+            </td>
+
+            <td>
+
+                <small class="text-muted">
+
+                    {{
+
+                        optional($absen?->updated_at)->format('d M Y H:i')
+
+                        ?? '--'
+
+                    }}
+
+                </small>
+
+            </td>
+
+            <td>
+
+                <input
+                    type="hidden"
+                    name="absensi[{{ $p->siswa->id }}][status]"
+                    value="{{ $status }}"
+                    class="statusInput">
+
+                <span
+                    class="badge rounded-pill px-3 py-2 statusBadge bg-{{ $badge }}">
+
+                    {{ ucfirst($status) }}
+
+                </span>
+
+            </td>
+
+        </tr>
+
+    @empty
+
+        <tr>
+
+            <td colspan="6">
+
+                <div class="text-center py-5">
+
+                    <i class="bi bi-person-x display-3 text-secondary"></i>
+
+                    <h5 class="fw-bold mt-3">
+
+                        Belum Ada Data Siswa
+
+                    </h5>
+
+                    <p class="text-muted mb-0">
+
+                        Tidak ada siswa pada jadwal yang dipilih.
+
+                    </p>
+
+                </div>
+
+            </td>
+
+        </tr>
+
+    @endforelse
+
+</tbody>
+
+</table>
+
+</div>
+
+</div>
+
+</div>
+
+</form>
 
         <script>
 
@@ -665,13 +706,162 @@
                 });
 
         </script>
-
-
-
-
-
     @endif
 
 </div>
+
+<style>
+
+.card{
+
+    transition:.25s;
+
+}
+
+.card:hover{
+
+    box-shadow:0 18px 45px rgba(37,99,235,.08)!important;
+
+}
+
+.summary-card{
+
+    background:#f8fafc;
+
+    border-radius:18px;
+
+    padding:18px;
+
+    text-align:center;
+
+}
+
+.summary-card h3{
+
+    font-weight:700;
+
+    margin-bottom:2px;
+
+}
+
+.info-card{
+
+    background:#fff;
+
+    border-radius:18px;
+
+    padding:20px;
+
+    box-shadow:0 .125rem .5rem rgba(0,0,0,.05);
+
+    height:100%;
+
+}
+
+.info-card small{
+
+    color:#6c757d;
+
+    display:block;
+
+    margin-bottom:6px;
+
+}
+
+.info-card h6{
+
+    margin:0;
+
+    font-weight:700;
+
+}
+
+.student-avatar{
+
+    width:46px;
+
+    height:46px;
+
+    border-radius:50%;
+
+    background:linear-gradient(135deg,#2563eb,#0f4c81);
+
+    color:#fff;
+
+    display:flex;
+
+    align-items:center;
+
+    justify-content:center;
+
+    font-weight:700;
+
+    flex-shrink:0;
+
+}
+
+.table thead th{
+
+    background:#f8fafc;
+
+    border:0;
+
+    color:#64748b;
+
+    text-transform:uppercase;
+
+    font-size:.82rem;
+
+    letter-spacing:.5px;
+
+    padding:18px;
+
+}
+
+.table tbody td{
+
+    padding:18px;
+
+    vertical-align:middle;
+
+    border-color:#eef2f7;
+
+}
+
+.table-hover tbody tr:hover{
+
+    background:#f8fbff;
+
+}
+
+.form-select:focus{
+
+    border-color:#2563eb;
+
+    box-shadow:0 0 0 .2rem rgba(37,99,235,.15);
+
+}
+
+.badge{
+
+    font-weight:600;
+
+}
+
+.btn{
+
+    font-weight:600;
+
+    transition:.2s;
+
+}
+
+.btn:hover{
+
+    transform:translateY(-2px);
+
+}
+
+</style>
 
 @endsection
