@@ -21,222 +21,181 @@
         </div>
     </div>
 
+    {{-- ALERT --}}
+    <x-alert.flash key="success" type="success"/>
+
+    <x-alert.flash key="error" type="danger"/>
+
     <div class="d-flex justify-content-end align-items-center mb-4">
 
         <a href="{{ route('tu.pengajuan-surat.create') }}" 
-           class="btn btn-dark">
+           class="btn btn-primary">
             <i class="bi bi-plus-lg me-1"></i>
             Tambah Pengajuan
         </a>
     </div>
 
-    {{-- ALERT SUCCESS --}}
-    @if(session('success'))
+    {{-- TABLE --}}
+    <x-table.card
+        title="Daftar Pengajuan Surat"
+        subtitle="Seluruh Pengajuan Surat pada SDN Mekar Jaya"
+    >
+        <x-slot:badge>
+            <span class="badge bg-primary rounded-pill px-3 py-2">
+                {{ $pengajuan->count() }} Pengajuan Surat
+            </span>
+        </x-slot:badge>
 
-        <div class="alert alert-success border-0 shadow-sm">
-
-            <i class="bi bi-check-circle-fill me-2"></i>
-            {{ session('success') }}
-
-        </div>
-
-    @endif
-
-    {{-- ALERT ERROR --}}
-    @if(session('error'))
-
-        <div class="alert alert-danger border-0 shadow-sm">
-
-            <i class="bi bi-exclamation-circle-fill me-2"></i>
-            {{ session('error') }}
-
-        </div>
-
-    @endif
-
-    {{-- CARD --}}
-
-    <div class="card border-0 shadow-sm">
-
-        {{-- TOP BAR --}}
-        <div
-            class="card-header bg-light border-0 p-4"
-        >
-
-            <div
-                class="d-flex justify-content-between align-items-center flex-wrap gap-3"
+        <x-slot:actions>
+            <input
+                type="text"
+                id="searchInput"
+                class="form-control rounded-3"
+                placeholder="Cari dokumen..."
             >
-
-                <div>
-
-                    <h5 class="fw-semibold mb-1">
-                        Daftar Pengajuan Surat
-                    </h5>
-
-                    <span class="text-muted small">
-                        Total:
-                        {{ $pengajuan->count() }}
-                        pengajuan   
-                    </span>
-
-                </div>
-
-                <div style="max-width: 280px; width:100%;">
-
-                    <input
-                        type="text"
-                        id="searchInput"
-                        class="form-control rounded-3"
-                        placeholder="Cari dokumen..."
-                    >
-
-                </div>
-
-            </div>
-
-        </div>
-
-        <div class="card-body">
-
-            <div class="table-responsive">
-
-                <table class="table align-middle">
-
-                    <thead>
-
+        </x-slot:actions>
+        <div class="table-responsive">
+            <table class="table table-hover align-middle mb-0">
+                <thead>
+                    <tr>
+                        <th width="70">No</th>
+                        <th>Nama Dokumen</th>
+                        <th width="150">Kategori</th>
+                        <th width="150">Status</th>
+                        <th width="90">Aksi</th>
+                    </tr>
+                </thead>
+                <tbody id="tablePengajuan">
+                    @forelse($pengajuan as $row)
                         <tr>
-
-                            <th>No</th>
-                            <th>Nama Dokumen</th>
-                            <th>Kategori</th>
-                            <th>Status</th>
-                            <th>Aksi</th>
-
-                        </tr>
-
-                    </thead>
-
-                    <tbody id="tablePengajuan">
-
-                        @forelse($pengajuan as $row)
-
-                            <tr>
-
-                                <td>
+                            <td class="text-center">
+                                <span class="badge bg-light text-dark rounded-pill px-3 py-2">
                                     {{ $loop->iteration }}
-                                </td>
-
-                                <td>
-                                    {{ $row->nama_surat }}
-                                </td>
-
-                                <td>
-                                    <span class="badge bg-light text-dark border">
-                                        {{ $row->kategori_surat }}
-                                    </span>
-                                </td>
-
-                                <td>
-
-                                    @if($row->status == 'draft')
-
-                                        <span class="badge bg-warning-subtle text-warning-emphasis border border-warning-subtle">
-                                            <i class="bi bi-hourglass-split me-1"></i> Validasi
-                                        </span>
-
-                                    @elseif($row->status == 'disetujui')
-
-                                        <span class="badge bg-success-subtle text-success-emphasis border border-success-subtle">
-                                            <i class="bi bi-check-circle me-1"></i> Valid
-                                        </span>
-
-                                    @else
-
-                                        <span class="badge bg-danger-subtle text-danger-emphasis border border-danger-subtle">
-                                            <i class="bi bi-x-circle me-1"></i> Ditolak
-                                        </span>
-
-                                    @endif
-
-                                </td>
-
-                                <td>
-                                    <div class="dropdown">
-
-                                        <button class="btn btn-sm btn-outline-secondary dropdown-toggle"
-                                                type="button"
-                                                data-bs-toggle="dropdown"
-                                                aria-expanded="false">
-
-                                            <i class="bi bi-gear-fill"></i>
-
-                                        </button>
-
-                                        <ul class="dropdown-menu dropdown-menu-end shadow-sm border-0">
-
-                                            <li>
-                                                <a class="dropdown-item" href="{{ route('tu.pengajuan-surat.show', $row->id) }}">
-                                                    <i class="bi bi-eye me-2"></i> Detail
-                                                </a>
-                                            </li>
-
-                                            <li>
-                                                <a class="dropdown-item" href="{{ route('tu.pengajuan-surat.edit', $row->id) }}">
-                                                    <i class="bi bi-pencil-square me-2"></i> Edit
-                                                </a>
-                                            </li>
-
-                                            <li><hr class="dropdown-divider"></li>
-
-                                            <li>
-                                                <form action="{{ route('tu.pengajuan-surat.destroy', $row->id) }}"
-                                                    method="POST"
-                                                    onsubmit="return confirm('Hapus data ini?')">
-
-                                                    @csrf
-                                                    @method('DELETE')
-
-                                                    <button type="submit" class="dropdown-item text-danger">
-                                                        <i class="bi bi-trash me-2"></i> Hapus
-                                                    </button>
-
-                                                </form>
-                                            </li>
-
-                                        </ul>
-
+                                </span>
+                            </td>
+                            <td>
+                                <div class="d-flex align-items-center">
+                                    <div class="surat-icon me-3"><i class="bi bi-file-earmark-text-fill"></i></div>
+                                    <div>
+                                        <div class="fw-bold">{{ $row->nama_surat }}</div>
                                     </div>
-
-                                </td>
-
-                            </tr>
-
-                        @empty
-
-                            <tr>
-
-                                <td colspan="5"
-                                    class="text-center text-muted py-4">
-
-                                    Belum ada pengajuan surat
-
-                                </td>
-
-                            </tr>
-
-                        @endforelse
-
-                    </tbody>
-
-                </table>
-
-            </div>
-
+                                </div>
+                            </td>
+                            <td>
+                                <span class="badge bg-teal rounded-pill px-3 py-2">
+                                    {{ $row->kategori_surat }}
+                                </span>
+                            </td>
+                            <td>
+                                @if($row->status == 'draft')
+                                    <span class="badge bg-gold rounded-pill px-3 py-2">
+                                        <i class="bi bi-hourglass-split me-1"></i> Validasi
+                                    </span>
+                                @elseif($row->status == 'disetujui')
+                                    <span class="badge bg-success rounded-pill px-3 py-2">
+                                        <i class="bi bi-check-circle me-1"></i> Valid
+                                    </span>
+                                @else
+                                    <span class="badge bg-danger rounded-pill px-3 py-2">
+                                        <i class="bi bi-x-circle me-1"></i> Ditolak
+                                    </span>
+                                @endif
+                            </td>
+                            <td>
+                                <div class="dropdown">
+                                    <button class="btn btn-sm btn-outline-primary"
+                                            type="button"
+                                            data-bs-toggle="dropdown"
+                                            aria-expanded="false">
+                                        <i class="bi bi-gear-fill"></i>
+                                        <i class="bi bi-caret-down-fill"></i>
+                                    </button>
+                                    <ul class="dropdown-menu dropdown-menu-end shadow-sm border-0">
+                                        <li>
+                                            <a class="dropdown-item" href="{{ route('tu.pengajuan-surat.show', $row->id) }}">
+                                                <i class="bi bi-eye me-2"></i> Detail
+                                            </a>
+                                        </li>
+                                        <li>
+                                            <a class="dropdown-item" href="{{ route('tu.pengajuan-surat.edit', $row->id) }}">
+                                                <i class="bi bi-pencil-square me-2"></i> Edit
+                                            </a>
+                                        </li>
+                                        <li><hr class="dropdown-divider"></li>
+                                        <li>
+                                            <form action="{{ route('tu.pengajuan-surat.destroy', $row->id) }}"
+                                                method="POST"
+                                                >
+                                                @csrf
+                                                @method('DELETE')
+                                                <button type="submit" 
+                                                class="dropdown-item text-danger btn-confirm"
+                                                data-title="Hapus Pengajuan Surat"
+                                                data-message="Pengajuan Surat akan dihapus secara permanen"
+                                                data-button="btn-danger">
+                                                    <i class="bi bi-trash me-2"></i> Hapus
+                                                </button>
+                                            </form>
+                                        </li>
+                                    </ul>
+                                </div>
+                            </td>
+                        </tr>
+                    @empty
+                        <tr>
+                            <td colspan="5"
+                                class="text-center text-muted py-4">
+                                Belum ada pengajuan surat
+                            </td>
+                        </tr>
+                    @endforelse
+                </tbody>
+            </table>
         </div>
-
-    </div>
+    </x-table.card>
 
 </div>
+<style>
+
+.surat-icon{
+
+    width:50px;
+
+    height:50px;
+
+    border-radius:16px;
+
+    background:linear-gradient(135deg,#2563eb,#0f4c81);
+
+    color:#fff;
+
+    display:flex;
+
+    align-items:center;
+
+    justify-content:center;
+
+    font-size:1.2rem;
+
+    flex-shrink:0;
+
+}
+
+@media(max-width:768px){
+
+    .surat-icon{
+
+        width:42px;
+
+        height:42px;
+
+        font-size:1rem;
+
+    }
+
+}
+
+</style>
 {{-- SEARCH --}}
 <script>
 

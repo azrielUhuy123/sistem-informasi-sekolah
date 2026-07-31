@@ -1,11 +1,13 @@
 /* IMPORT MODULE DULU */
 
 @import "bootstrap/dist/css/bootstrap.min.css";
-
+@import './components/table.css';
+@import './components/bgcolor.css';
 
 /* BARU TAILWIND */
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
 
 @import './modules/rombel.css';

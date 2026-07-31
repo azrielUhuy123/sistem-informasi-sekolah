@@ -71,7 +71,7 @@
             background: #ffffff;
             padding: 30px 18px;
             border-right: 1px solid #e8e8e8;
-            overflow-y: auto;
+            overflow-y: visible;
         }
 
         .sidebar-title {
@@ -113,7 +113,7 @@
         .content {
             flex: 1;
             padding: 30px;
-            overflow-y: auto;
+            overflow-y: visible;
         }
         /* Indent submenu (item di dalam dropdown) */
 .submenu .menu-item {

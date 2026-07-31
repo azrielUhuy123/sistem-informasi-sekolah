@@ -166,7 +166,7 @@
 
             <div class="menu-left">
                 <i class="bi bi-calendar-week"></i>
-                <span>Jadwal</span>
+                <span>Jadwal Kelas</span>
             </div>
 
         </a>
@@ -261,42 +261,6 @@
             <div class="menu-left">
                 <i class="bi bi-hash"></i>
                 <span>Nomor Surat</span>
-            </div>
-
-        </a>
-
-    </div>
-    {{-- WEBSITE SEKOLAH --}}
-    <button
-        class="menu-item border-0 bg-transparent text-start"
-        onclick="toggleMenu('menuWebsite','arrowWebsite')"
-    >
-
-        <div class="menu-left">
-            <i class="bi bi-globe"></i>
-            <span>Website Sekolah</span>
-        </div>
-
-        <i
-            class="bi bi-chevron-right dropdown-arrow"
-            id="arrowWebsite"
-        ></i>
-
-    </button>
-
-    <div
-        class="submenu"
-        id="menuWebsite"
-    >
-
-        <a
-            class="menu-item"
-            href="{{ route('tu.website.berita.index') }}"
-        >
-
-            <div class="menu-left">
-                <i class="bi bi-newspaper"></i>
-                <span>Berita</span>
             </div>
 
         </a>

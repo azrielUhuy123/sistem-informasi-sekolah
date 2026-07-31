@@ -1,0 +1,167 @@
+/* ===========================
+   Modern Background Colors
+   =========================== */
+
+.bg-indigo {
+    background: #4f46e5;
+    color: #fff;
+}
+
+.bg-slate {
+    background: #334155;
+    color: #fff;
+}
+
+.bg-purple {
+    background: #7c3aed;
+    color: #fff;
+}
+
+.bg-pink {
+    background: #ec4899;
+    color: #fff;
+}
+
+.bg-orange {
+    background: #ea580c;
+    color: #fff;
+}
+
+.bg-teal {
+    background: #0f766e;
+    color: #fff;
+}
+
+.bg-emerald {
+    background: #10b981;
+    color: #fff;
+}
+
+.bg-cyan {
+    background: #06b6d4;
+    color: #fff;
+}
+
+.bg-sky {
+    background: #0ea5e9;
+    color: #fff;
+}
+
+.bg-violet {
+    background: #8b5cf6;
+    color: #fff;
+}
+
+.bg-fuchsia {
+    background: #d946ef;
+    color: #fff;
+}
+
+.bg-rose {
+    background: #e11d48;
+    color: #fff;
+}
+
+.bg-red-soft {
+    background: #ef4444;
+    color: #fff;
+}
+
+.bg-amber {
+    background: #f59e0b;
+    color: #fff;
+}
+
+.bg-lime {
+    background: #84cc16;
+    color: #fff;
+}
+
+.bg-green {
+    background: #22c55e;
+    color: #fff;
+}
+
+.bg-blue {
+    background: #2563eb;
+    color: #fff;
+}
+
+.bg-navy {
+    background: #1e3a8a;
+    color: #fff;
+}
+
+.bg-gray {
+    background: #6b7280;
+    color: #fff;
+}
+
+.bg-zinc {
+    background: #3f3f46;
+    color: #fff;
+}
+
+.bg-stone {
+    background: #57534e;
+    color: #fff;
+}
+
+.bg-black-soft {
+    background: #18181b;
+    color: #fff;
+}
+
+.bg-brown {
+    background: #8b5e3c;
+    color: #fff;
+}
+
+.bg-gold {
+    background: #d4af37;
+    color: #fff;
+}
+
+/* ===========================
+   Gradient Backgrounds
+   =========================== */
+
+.bg-blue-gradient {
+    background: linear-gradient(135deg, #2563eb, #1d4ed8);
+    color: #fff;
+}
+
+.bg-purple-gradient {
+    background: linear-gradient(135deg, #7c3aed, #5b21b6);
+    color: #fff;
+}
+
+.bg-green-gradient {
+    background: linear-gradient(135deg, #10b981, #059669);
+    color: #fff;
+}
+
+.bg-orange-gradient {
+    background: linear-gradient(135deg, #f97316, #ea580c);
+    color: #fff;
+}
+
+.bg-pink-gradient {
+    background: linear-gradient(135deg, #ec4899, #db2777);
+    color: #fff;
+}
+
+.bg-teal-gradient {
+    background: linear-gradient(135deg, #14b8a6, #0f766e);
+    color: #fff;
+}
+
+.bg-red-gradient {
+    background: linear-gradient(135deg, #ef4444, #b91c1c);
+    color: #fff;
+}
+
+.bg-dark-gradient {
+    background: linear-gradient(135deg, #334155, #0f172a);
+    color: #fff;
+}

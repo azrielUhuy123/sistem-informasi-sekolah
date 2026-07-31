@@ -20,290 +20,187 @@
             </div>
         </div>
     </div>
+    
+    {{-- ALERT --}}
+    <x-alert.flash key="success" type="success"/>
 
-
-    {{-- ALERT SUCCESS --}}
-    @if(session('success'))
-
-        <div class="alert alert-success border-0 shadow-sm">
-
-            <i class="bi bi-check-circle-fill me-2"></i>
-            {{ session('success') }}
-
-        </div>
-
-    @endif
-
-    {{-- ALERT ERROR --}}
-    @if(session('error'))
-
-        <div class="alert alert-danger border-0 shadow-sm">
-
-            <i class="bi bi-exclamation-circle-fill me-2"></i>
-            {{ session('error') }}
-
-        </div>
-
-    @endif
-
+    <x-alert.flash key="error" type="danger"/>
+ 
     {{-- CARD --}}
+    <x-table.card
+        title="Daftar Pengguna Sistem"
+        subtitle="Seluruh pengguna sistem yang terdaftar."
+    >
+        <x-slot:badge>
+            <span class="badge bg-primary rounded-pill px-3 py-2">
+                {{ $data->total() }} Pengguna
+            </span>
+        </x-slot:badge>
 
-    <div class="card border-0 shadow-sm">
-        {{-- TOP BAR --}}
-        <div
-            class="card-header bg-light border-0 p-4"
-        >
-
-            <div
-                class="d-flex justify-content-between align-items-center flex-wrap gap-3"
-            >
-
-                <div>
-
-                    <h5 class="fw-semibold mb-1">
-                        Daftar Pengguna Sistem
-                    </h5>
-
-                    <span class="text-muted small">
-                        Total:
-                        {{ $data->count() }}
-                        pengguna   
-                    </span>
-
-                </div>
-                
-
-                {{-- Filter + Search --}}
-                <div class="d-flex flex-column align-items-end gap-2">
-
-                    <form action="{{ route('tu.akun.index') }}" method="GET" class="d-flex gap-2 flex-wrap">
-
-                        <select
-                            name="role"
-                            class="form-select rounded-3"
-                            style="width: 160px;"
-                        >
-                            <option value="">Semua Role</option>
-                            <option value="guru" @selected(request('role') == 'guru')>
-                                Guru
-                            </option>
-                            <option value="siswa" @selected(request('role') == 'siswa')>
-                                Siswa
-                            </option>
-                        </select>
-
-                        <select
-                            name="status"
-                            class="form-select rounded-3"
-                            style="width: 160px;"
-                        >
-                            <option value="">Semua Status</option>
-                            <option value="1" @selected(request('status') === '1')>
-                                Aktif
-                            </option>
-                            <option value="0" @selected(request('status') === '0')>
-                                Nonaktif
-                            </option>
-                        </select>
-
-                        <button class="btn btn-primary rounded-3" type="submit">
-                            Filter
-                        </button>
-
-                    </form>
-
-                    <input
-                        type="text"
-                        id="searchInput"
-                        class="form-control rounded-3"
-                        placeholder="Cari pengguna..."
-                        style="width: 320px;"
+        <x-slot:actions>
+            <div class="d-flex flex-column align-items-center gap-2">
+                <form action="{{ route('tu.akun.index') }}" method="GET" class="d-flex align-items-center gap-2 flex-wrap">
+                    <select
+                        name="role"
+                        class="form-select rounded-3"
+                        style="width: 160px;"
                     >
-
-                </div>
-
+                        <option value="">Semua Role</option>
+                        <option value="guru" @selected(request('role') == 'guru')>
+                            Guru
+                        </option>
+                        <option value="siswa" @selected(request('role') == 'siswa')>
+                            Siswa
+                        </option>
+                    </select>
+                    <select
+                        name="status"
+                        class="form-select rounded-3"
+                        style="width: 160px;"
+                    >
+                        <option value="">Semua Status</option>
+                        <option value="1" @selected(request('status') === '1')>
+                            Aktif
+                        </option>
+                        <option value="0" @selected(request('status') === '0')>
+                            Nonaktif
+                        </option>
+                    </select>
+                    <button class="btn btn-primary rounded-3" type="submit">
+                        Filter
+                    </button>
+                </form>
+                <input
+                    type="text"
+                    id="searchInput"
+                    class="form-control rounded-3"
+                    placeholder="Cari pengguna..."
+                    style="width: 320px;"
+                >
             </div>
 
-        </div>
+        </x-slot:actions>
 
-
-        <div class="card-body">
-        
-            <div class="table-responsive">
-
-                <table class="table align-middle">
-
-                    <thead>
-
+        <div class="table-responsive">
+            <table class="table table-hover align-middle mb-0">
+                <thead>
+                    <tr>
+                        <th width="70">No</th>
+                        <th>Nama & Username</th>
+                        <th width="150">Role</th>
+                        <th width="150">Status</th>
+                        <th width="90">
+                            Aksi
+                        </th>
+                    </tr>
+                </thead>
+                <tbody id="tablePengguna">
+                    @forelse($data as $item)
                         <tr>
-
-                            <th>No</th>
-
-                            <th>Nama</th>
-
-                            <th>Username</th>
-
-                            <th>Role</th>
-
-                            <th>Status</th>
-
-                            <th>
-                                Aksi
-                            </th>
-
-                        </tr>
-
-                    </thead>
-
-                    <tbody id="tablePengguna">
-
-                        @forelse($data as $item)
-
-                            <tr>
-
-                                <td>
-
-                                    {{ $loop->iteration }}  
-
-                                </td>
-
-                                <td>
-
-                                    {{ $item->name }}
-
-                                </td>
-
-                                <td>
-
-                                    {{ $item->username }}
-
-                                </td>
-
-                                <td>
-                                    <span class="badge bg-light text-dark border">
-
-                                        {{ strtoupper($item->role) }}
-
-                                    </span>
-                                </td>
-
-                                <td>
-
-                                    @if($item->is_active)
-
-                                        <span class="badge bg-success-subtle text-success-emphasis border border-success-subtle">
-                                            <i class="bi bi-check-circle me-1"></i> Aktif
-                                        </span>
-
-                                    @else
-
-                                        <span class="badge bg-danger-subtle text-danger-emphasis border border-danger-subtle">
-                                            <i class="bi bi-x-circle me-1"></i> Nonaktif
-                                        </span>
-
-                                    @endif
-
-                                </td>
-
-                                <td>
-                                    <div class="dropdown">
-
-                                        <button class="btn btn-sm btn-outline-secondary dropdown-toggle"
-                                                type="button"
-                                                data-bs-toggle="dropdown"
-                                                aria-expanded="false">
-
-                                            <i class="bi bi-gear-fill"></i>
-
-                                        </button>
-
-                                        <ul class="dropdown-menu dropdown-menu-end shadow-sm border-0">
-
-                                            <li>
-                                                <a class="dropdown-item" href="{{ route('tu.akun.show',$item) }}">
-                                                    <i class="bi bi-eye me-2"></i> Detail
-                                                </a>
-                                            </li>
-                                            @if(in_array($item->role, ['guru', 'tu', 'siswa', 'superadmin']))
-
-                                                <form
-                                                    method="POST"
-                                                    action="{{ route('tu.akun.reset-password', $item) }}"
-                                                >
-
-                                                    @csrf
-
-                                                    <button
-                                                        type="submit"
-                                                        class="dropdown-item"
-                                                        onclick="return confirm('Reset password akun ini?')"
-                                                    >
-
-                                                        <i class="bi bi-key me-2"></i>
-                                                        Reset Password
-
-                                                    </button>
-
-                                                </form>
-
-                                            @endif
-
-                                            <li><hr class="dropdown-divider"></li>
-
-                                            <li>
-                                                <form
-                                                    method="POST"
-                                                    action="{{ route('tu.akun.toggle-status',$item) }}"
-                                                >
-                                                    @csrf
-                                                    <button type="submit" class="dropdown-item text-danger">
-                                                        <i class="bi bi-person-x me-2"></i>
-                                                        {{ $item->is_active
-                                                            ? 'Nonaktifkan'
-                                                            : 'Aktifkan' }}
-                                                    </button>
-                                                </form>
-                                                
-                                            </li>
-
-                                        </ul>
-
+                            <td class="text-center">
+                                <span class="badge bg-light text-dark rounded-pill px-3 py-2">
+                                    {{ $loop->iteration }}
+                                </span>
+                            </td>
+                            <td>
+                                <div class="d-flex align-items-center">
+                                    <div class="rounded-circle bg-primary-subtle text-primary d-flex align-items-center justify-content-center me-3" style="width: 48px; height: 48px;">
+                                        <i class="bi bi-person-fill fs-4"></i>
                                     </div>
 
+                                    <div>
+                                        <div class="fw-bold">
+                                            {{ $item->name }}
+                                        </div>
 
-                                </td>
-
-                            </tr>
-
-                        @empty
-
-                            <tr>
-
-                                <td
-                                    colspan="5"
-                                    class="text-center"
-                                >
-
-                                    Data tidak ditemukan
-
-                                </td>
-
-                            </tr>
-
-                        @endforelse
-
-                    </tbody>
-
-                </table>
-
-            </div>
-
-            {{ $data->links() }}
-
+                                        <small class="text-muted">
+                                            Username : {{ $item->username }}
+                                        </small>
+                                    </div>
+                                </div>
+                            </td>
+                            <td>
+                                <span class="badge bg-light rounded-pill text-dark border px-3 py-2">
+                                    {{ strtoupper($item->role) }}
+                                </span>
+                            </td>
+                            <td>
+                                @if($item->is_active)
+                                    <span class="badge bg-success rounded-pill px-3 py-2">
+                                        <i class="bi bi-check-circle me-1"></i> Aktif
+                                    </span>
+                                @else
+                                    <span class="badge bg-danger rounded-pill px-3 py-2">
+                                        <i class="bi bi-x-circle me-1"></i> Nonaktif
+                                    </span>
+                                @endif
+                            </td>
+                            <td>
+                                <div class="dropdown">
+                                    <button class="btn btn-sm btn-outline-primary"
+                                            type="button"
+                                            data-bs-toggle="dropdown"
+                                            aria-expanded="false">
+                                        <i class="bi bi-gear-fill"></i>
+                                        <i class="bi bi-caret-down-fill"></i>
+                                    </button>
+                                    <ul class="dropdown-menu dropdown-menu-end shadow-sm border-0">
+                                        <li>
+                                            <a class="dropdown-item" href="{{ route('tu.akun.show',$item) }}">
+                                                <i class="bi bi-eye me-2"></i> Detail
+                                            </a>
+                                        </li>
+                                        @if(in_array($item->role, ['guru', 'tu', 'siswa', 'superadmin']))
+                                            <form
+                                                method="POST"
+                                                action="{{ route('tu.akun.reset-password', $item) }}"
+                                            >
+                                                @csrf
+                                                <button
+                                                    type="submit"
+                                                    class="dropdown-item"
+                                                    onclick="return confirm('Reset password akun ini?')"
+                                                >
+                                                    <i class="bi bi-key me-2"></i>
+                                                    Reset Password
+                                                </button>
+                                            </form>
+                                        @endif
+                                        <li><hr class="dropdown-divider"></li>
+                                        <li>
+                                            <form
+                                                method="POST"
+                                                action="{{ route('tu.akun.toggle-status',$item) }}"
+                                            >
+                                                @csrf
+                                                <button type="submit" class="dropdown-item text-danger">
+                                                    <i class="bi bi-person-x me-2"></i>
+                                                    {{ $item->is_active
+                                                        ? 'Nonaktifkan'
+                                                        : 'Aktifkan' }}
+                                                </button>
+                                            </form>                                                
+                                        </li>
+                                    </ul>
+                                </div>
+                            </td>
+                        </tr>
+                    @empty
+                        <tr>
+                            <td colspan="5">
+                                <div class="text-center py-5">
+                                    <i class="bi bi-folder2-open display-3 text-secondary"></i>
+                                    <h5 class="fw-bold mt-3">Belum Ada Pengguna</h5>
+                                    <p class="text-muted mb-0">Saat ini belum ada pengguna dari sistem ini.</p>
+                                </div>
+                            </td>
+                        </tr>
+                    @endforelse
+                </tbody>
+            </table>
         </div>
-
-    </div>
-
+        {{ $data->links() }}
+    </x-table.card>
 </div>
 {{-- SEARCH --}}
 <script>

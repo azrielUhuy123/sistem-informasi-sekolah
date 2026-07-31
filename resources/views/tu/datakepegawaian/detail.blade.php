@@ -107,18 +107,6 @@
                                         </div>
                                     </div>
                                 </div>
-
-                                <div class="mt-4">
-                                    @if(request()->is('superadmin/*'))
-                                        <a href="{{ route('superadmin.datakepegawaian.approval') }}" class="btn btn-outline-secondary">
-                                            <i class="bi bi-arrow-left me-1"></i> Kembali
-                                        </a>
-                                    @else
-                                        <a href="{{ route('tu.datakepegawaian.index') }}" class="btn btn-outline-secondary">
-                                            <i class="bi bi-arrow-left me-1"></i> Kembali
-                                        </a>
-                                    @endif
-                                </div>
                             </div>
                         </div>
                     </div>
@@ -354,6 +342,19 @@
 
                 </div>
 
+            </div>
+        </div>
+        <div class="sticky-bottom bg-white border border-light-subtle py-3 mt-4">
+            <div class="d-flex justify-content-between align-items-center">
+                 @if(request()->is('superadmin/*'))
+                    <a href="{{ route('superadmin.datakepegawaian.approval') }}" class="btn btn-outline-secondary ml-4">
+                        <i class="bi bi-arrow-left me-1"></i> Kembali
+                    </a>
+                @else
+                    <a href="{{ route('tu.datakepegawaian.index') }}" class="btn btn-outline-secondary ml-4">
+                        <i class="bi bi-arrow-left me-1"></i> Kembali
+                    </a>
+                @endif
             </div>
         </div>
 

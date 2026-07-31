@@ -1,6 +1,6 @@
 @extends('layouts.app')
 
-@section('title', 'Jadwal Final')
+@section('title', 'Jadwal Kelas')
 
 @section('content')
 
@@ -33,22 +33,26 @@
 
             <div>
 
-                <span
+                <div
                     id="selectedCount"
                     class="fw-semibold"
                 >
-
                     0 kelas dipilih
+                </div>
 
-                </span>
+                <small class="text-muted">
+                    Total {{ $kelasByTingkat->flatten()->count() }} kelas tersedia
+                </small>
 
             </div>
 
             <button
-                class="btn btn-danger"
+                id="btnExport"  
+                class="btn btn-success"
                 type="submit"
-            >
-
+                disabled
+            >   
+                <i class="bi bi-file-earmark-pdf me-2"></i>
                 Export PDF
 
             </button>
@@ -56,6 +60,22 @@
         </div>
 
         {{-- TAB TINGKAT --}}
+        <div class="form-check mb-3">
+
+            <input
+                class="form-check-input"
+                type="checkbox"
+                id="checkAll"
+            >
+
+            <label
+                class="form-check-label fw-semibold"
+                for="checkAll"
+            >
+                Pilih Semua Kelas
+            </label>
+
+        </div>
         <ul
             class="nav nav-pills mb-4"
             id="tingkatTab"
@@ -127,7 +147,21 @@
                                             data-bs-target="#kelas{{ $k->id }}"
                                         >
 
-                                            {{ $k->nama_kelas }}
+                                            <div class="d-flex align-items-center justify-content-between w-100 me-3">
+
+                                                <span class="fw-bold">
+
+                                                    {{ $k->nama_kelas }}
+
+                                                </span>
+
+                                                <span class="badge bg-primary rounded-pill">
+
+                                                    {{ $k->pengajuanJadwal->count() }} JP
+
+                                                </span>
+
+                                            </div>
 
                                         </button>
 
@@ -145,7 +179,7 @@
 
                                         <div class="table-responsive">
 
-                                            <table class="table table-bordered align-middle text-center">
+                                            <table class="table table-bordered table-hover align-middle text-center">
 
                                                 <thead class="table-light">
 
@@ -247,5 +281,76 @@
     </form>
 
 </div>
+<script>
 
+const checkboxes =
+    document.querySelectorAll('.kelas-checkbox');
+
+const selectedCount =
+    document.getElementById('selectedCount');
+
+const btnExport =
+    document.getElementById('btnExport');
+
+const checkAll =
+    document.getElementById('checkAll');
+
+function updateCounter(){
+
+    const total =
+        document.querySelectorAll(
+            '.kelas-checkbox:checked'
+        ).length;
+
+    selectedCount.innerHTML =
+        total + ' kelas dipilih';
+
+    btnExport.disabled =
+        total === 0;
+
+}
+
+checkboxes.forEach(box=>{
+
+    box.addEventListener(
+        'change',
+        updateCounter
+    );
+
+});
+
+checkAll.addEventListener(
+    'change',
+    function(){
+
+        checkboxes.forEach(box=>{
+
+            box.checked =
+                this.checked;
+
+        });
+
+        updateCounter();
+
+    }
+);
+
+updateCounter();
+
+document
+.getElementById('formExport')
+.addEventListener(
+'submit',
+function(e){
+
+    if(document.querySelectorAll('.kelas-checkbox:checked').length==0){
+
+        e.preventDefault();
+
+        alert('Pilih minimal satu kelas.');
+
+    }
+
+});
+</script>
 @endsection

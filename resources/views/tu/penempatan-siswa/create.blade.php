@@ -101,19 +101,16 @@
                 </div>
 
                 {{-- ACTION --}}
-                <div class="d-flex justify-content-end">
-                    <a href="{{ route('tu.siswa.index') }}" class="btn btn-secondary me-2">
-                        Batal
+                <div class="d-flex justify-content-between align-items-center mt-4">
+                    <a href="{{ route('tu.siswa.index') }}" class="btn btn-outline-secondary">
+                        <i class="bi bi-arrow-left me-1"></i> Kembali
                     </a>
-
-                    <button 
-                        class="btn btn-success"
+                    <button type="submit" class="btn btn-primary px-4"
                         {{ $tahunAktif->status !== 'aktif' ? 'disabled' : '' }}
                     >
-                        <i class="bi bi-save"></i> Simpan
+                        <i class="bi bi-save me-1"></i> Simpan Data
                     </button>
                 </div>
-
             </form>
         </div>
     </div>

@@ -43,27 +43,27 @@
                             <div class="row g-3">
                                 <div class="col-md-6 col-lg-4">
                                     <label class="form-label">Nama <span class="text-danger">*</span></label>
-                                    <input type="text" name="nama" class="form-control" value="{{ old('nama', $pegawai->nama) }}" required>
+                                    <input type="text" name="nama" class="form-control rounded-3" value="{{ old('nama', $pegawai->nama) }}" required>
                                 </div>
 
                                 <div class="col-md-6 col-lg-4">
                                     <label class="form-label">NIP</label>
-                                    <input type="text" name="nip" class="form-control" value="{{ old('nip', $pegawai->nip) }}">
+                                    <input type="text" name="nip" class="form-control rounded-3" value="{{ old('nip', $pegawai->nip) }}">
                                 </div>
 
                                 <div class="col-md-6 col-lg-4">
                                     <label class="form-label">NUPTK</label>
-                                    <input type="text" name="nuptk" class="form-control" value="{{ old('nuptk', $pegawai->nuptk) }}">
+                                    <input type="text" name="nuptk" class="form-control rounded-3" value="{{ old('nuptk', $pegawai->nuptk) }}">
                                 </div>
 
                                 <div class="col-md-6 col-lg-4">
                                     <label class="form-label">Tempat Lahir</label>
-                                    <input type="text" name="tempat_lahir" class="form-control" value="{{ old('tempat_lahir', $pegawai->tempat_lahir) }}">
+                                    <input type="text" name="tempat_lahir" class="form-control rounded-3" value="{{ old('tempat_lahir', $pegawai->tempat_lahir) }}">
                                 </div>
 
                                 <div class="col-md-6 col-lg-4">
                                     <label class="form-label">Tanggal Lahir <span class="text-danger">*</span></label>
-                                    <input type="date" name="tanggal_lahir" class="form-control" value="{{ old('tanggal_lahir', $pegawai->tanggal_lahir ? $pegawai->tanggal_lahir->format('Y-m-d') : '') }}" required>
+                                    <input type="date" name="tanggal_lahir" class="form-control rounded-3" value="{{ old('tanggal_lahir', $pegawai->tanggal_lahir ? $pegawai->tanggal_lahir->format('Y-m-d') : '') }}" required>
                                 </div>
 
                                 <div class="col-md-6 col-lg-4">
@@ -136,12 +136,12 @@
 
                                 <div class="col-md-6 col-lg-3">
                                     <label class="form-label">Mulai Kerja</label>
-                                    <input type="date" name="mulai_kerja" class="form-control" value="{{ old('mulai_kerja', $pegawai->mulai_kerja ? $pegawai->mulai_kerja->format('Y-m-d') : '') }}">
+                                    <input type="date" name="mulai_kerja" class="form-control rounded-3" value="{{ old('mulai_kerja', $pegawai->mulai_kerja ? $pegawai->mulai_kerja->format('Y-m-d') : '') }}">
                                 </div>
 
                                 <div class="col-md-6 col-lg-3">
                                     <label class="form-label">Ijazah Terakhir</label>
-                                    <input type="text" name="ijazah_terakhir" class="form-control" value="{{ old('ijazah_terakhir', $pegawai->ijazah_terakhir) }}">
+                                    <input type="text" name="ijazah_terakhir" class="form-control rounded-3" value="{{ old('ijazah_terakhir', $pegawai->ijazah_terakhir) }}">
                                 </div>
                             </div>
                         </div>
@@ -166,15 +166,15 @@
                                         <div class="row g-3">
                                             <div class="col-md-6">
                                                 <label class="form-label">Pangkat/Gol</label>
-                                                <input type="text" name="sk_terakhir_pangkat" class="form-control" value="{{ old('sk_terakhir_pangkat', $pegawai->sk_terakhir_pangkat) }}">
+                                                <input type="text" name="sk_terakhir_pangkat" class="form-control rounded-3" value="{{ old('sk_terakhir_pangkat', $pegawai->sk_terakhir_pangkat) }}">
                                             </div>
                                             <div class="col-md-6">
                                                 <label class="form-label">Nomor SK</label>
-                                                <input type="text" name="sk_terakhir_no" class="form-control" value="{{ old('sk_terakhir_no', $pegawai->sk_terakhir_no) }}">
+                                                <input type="text" name="sk_terakhir_no" class="form-control rounded-3" value="{{ old('sk_terakhir_no', $pegawai->sk_terakhir_no) }}">
                                             </div>
                                             <div class="col-12">
                                                 <label class="form-label">TMT</label>
-                                                <input type="date" name="sk_terakhir_tmt" class="form-control" value="{{ old('sk_terakhir_tmt', $pegawai->sk_terakhir_tmt ? $pegawai->sk_terakhir_tmt->format('Y-m-d') : '') }}">
+                                                <input type="date" name="sk_terakhir_tmt" class="form-control rounded-3" value="{{ old('sk_terakhir_tmt', $pegawai->sk_terakhir_tmt ? $pegawai->sk_terakhir_tmt->format('Y-m-d') : '') }}">
                                             </div>
                                         </div>
                                     </div>
@@ -186,15 +186,15 @@
                                         <div class="row g-3">
                                             <div class="col-md-6">
                                                 <label class="form-label">Pangkat/Gol</label>
-                                                <input type="text" name="sk_berkala_pangkat" class="form-control" value="{{ old('sk_berkala_pangkat', $pegawai->sk_berkala_pangkat) }}">
+                                                <input type="text" name="sk_berkala_pangkat" class="form-control rounded-3" value="{{ old('sk_berkala_pangkat', $pegawai->sk_berkala_pangkat) }}">
                                             </div>
                                             <div class="col-md-6">
                                                 <label class="form-label">Nomor SK</label>
-                                                <input type="text" name="sk_berkala_no" class="form-control" value="{{ old('sk_berkala_no', $pegawai->sk_berkala_no) }}">
+                                                <input type="text" name="sk_berkala_no" class="form-control rounded-3" value="{{ old('sk_berkala_no', $pegawai->sk_berkala_no) }}">
                                             </div>
                                             <div class="col-12">
                                                 <label class="form-label">TMT</label>
-                                                <input type="date" name="sk_berkala_tmt" class="form-control" value="{{ old('sk_berkala_tmt', $pegawai->sk_berkala_tmt ? $pegawai->sk_berkala_tmt->format('Y-m-d') : '') }}">
+                                                <input type="date" name="sk_berkala_tmt" class="form-control rounded-3" value="{{ old('sk_berkala_tmt', $pegawai->sk_berkala_tmt ? $pegawai->sk_berkala_tmt->format('Y-m-d') : '') }}">
                                             </div>
                                         </div>
                                     </div>
@@ -223,14 +223,14 @@
                                             <div class="col-md-6">
                                                 <label class="form-label">Tahun</label>
                                                 <div class="input-group">
-                                                    <input type="number" name="masa_kerja_gol_th" class="form-control" min="0" value="{{ old('masa_kerja_gol_th', $pegawai->masa_kerja_gol_th) }}">
+                                                    <input type="number" name="masa_kerja_gol_th" class="form-control rounded-3" min="0" value="{{ old('masa_kerja_gol_th', $pegawai->masa_kerja_gol_th) }}">
                                                     <span class="input-group-text">Tahun</span>
                                                 </div>
                                             </div>
                                             <div class="col-md-6">
                                                 <label class="form-label">Bulan</label>
                                                 <div class="input-group">
-                                                    <input type="number" name="masa_kerja_gol_bln" class="form-control" min="0" max="11" value="{{ old('masa_kerja_gol_bln', $pegawai->masa_kerja_gol_bln) }}">
+                                                    <input type="number" name="masa_kerja_gol_bln" class="form-control rounded-3" min="0" max="11" value="{{ old('masa_kerja_gol_bln', $pegawai->masa_kerja_gol_bln) }}">
                                                     <span class="input-group-text">Bln</span>
                                                 </div>
                                             </div>
@@ -245,14 +245,14 @@
                                             <div class="col-md-6">
                                                 <label class="form-label">Tahun</label>
                                                 <div class="input-group">
-                                                    <input type="number" name="masa_kerja_total_th" class="form-control" min="0" value="{{ old('masa_kerja_total_th', $pegawai->masa_kerja_total_th) }}">
+                                                    <input type="number" name="masa_kerja_total_th" class="form-control rounded-3" min="0" value="{{ old('masa_kerja_total_th', $pegawai->masa_kerja_total_th) }}">
                                                     <span class="input-group-text">Tahun</span>
                                                 </div>
                                             </div>
                                             <div class="col-md-6">
                                                 <label class="form-label">Bulan</label>
                                                 <div class="input-group">
-                                                    <input type="number" name="masa_kerja_total_bln" class="form-control" min="0" max="11" value="{{ old('masa_kerja_total_bln', $pegawai->masa_kerja_total_bln) }}">
+                                                    <input type="number" name="masa_kerja_total_bln" class="form-control rounded-3" min="0" max="11" value="{{ old('masa_kerja_total_bln', $pegawai->masa_kerja_total_bln) }}">
                                                     <span class="input-group-text">Bln</span>
                                                 </div>
                                             </div>
@@ -278,11 +278,11 @@
                             <div class="row g-3">
                                 <div class="col-md-6">
                                     <label class="form-label">Nomor Sertifikasi</label>
-                                    <input type="text" name="nomor_sertifikasi" class="form-control" value="{{ old('nomor_sertifikasi', $pegawai->nomor_sertifikasi) }}">
+                                    <input type="text" name="nomor_sertifikasi" class="form-control rounded-3" value="{{ old('nomor_sertifikasi', $pegawai->nomor_sertifikasi) }}">
                                 </div>
                                 <div class="col-md-6">
                                     <label class="form-label">Tahun Sertifikasi</label>
-                                    <input type="number" name="tahun_sertifikasi" class="form-control" min="2000" value="{{ old('tahun_sertifikasi', $pegawai->tahun_sertifikasi) }}">
+                                    <input type="number" name="tahun_sertifikasi" class="form-control rounded-3" min="2000" value="{{ old('tahun_sertifikasi', $pegawai->tahun_sertifikasi) }}">
                                 </div>
                             </div>
                         </div>
@@ -305,7 +305,7 @@
                                     <label class="form-label">Gaji Pokok</label>
                                     <div class="input-group">
                                         <span class="input-group-text">Rp</span>
-                                        <input type="text" name="gaji_pokok" class="form-control" placeholder="contoh: 4000000" inputmode="numeric" value="{{ old('gaji_pokok', $pegawai->gaji_pokok ? number_format($pegawai->gaji_pokok, 0, '', '') : '') }}">
+                                        <input type="text" name="gaji_pokok" class="form-control rounded-3" placeholder="contoh: 4000000" inputmode="numeric" value="{{ old('gaji_pokok', $pegawai->gaji_pokok ? number_format($pegawai->gaji_pokok, 0, '', '') : '') }}">
                                     </div>
                                 </div>
                             </div>
@@ -326,7 +326,7 @@
 
                             <div class="mb-0">
                                 <label class="form-label">Catatan Tambahan</label>
-                                <textarea name="keterangan" class="form-control" rows="4">{{ old('keterangan', $pegawai->keterangan) }}</textarea>
+                                <textarea name="keterangan" class="form-control rounded-3" rows="4">{{ old('keterangan', $pegawai->keterangan) }}</textarea>
                             </div>
                         </div>
                     </div>
@@ -344,12 +344,12 @@
                 </ul>
             </div>
 
-            <div class="sticky-bottom bg-white border-top py-3 mt-4">
+            <div class="sticky-bottom bg-white border border-light-subtle py-3 mt-4">
                 <div class="d-flex justify-content-between align-items-center">
-                    <a href="{{ route('tu.datakepegawaian.index') }}" class="btn btn-outline-secondary">
+                    <a href="{{ route('tu.datakepegawaian.index') }}" class="btn btn-outline-secondary ml-4">
                         <i class="bi bi-arrow-left me-1"></i> Kembali
                     </a>
-                    <button type="submit" class="btn btn-primary px-4">
+                    <button type="submit" class="btn btn-primary mr-4 px-4">
                         <i class="bi bi-save me-1"></i> Update Data
                     </button>
                 </div>

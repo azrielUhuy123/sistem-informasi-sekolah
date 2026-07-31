@@ -180,12 +180,7 @@
 
                 @endif
 
-                <a
-                    href="{{ route('profile.edit') }}"
-                    class="btn btn-primary btn-sm"
-                >
-                    Kelola Akun
-                </a>
+                
 
             </div>
 

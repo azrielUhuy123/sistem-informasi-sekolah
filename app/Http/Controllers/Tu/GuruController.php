@@ -29,7 +29,7 @@ class GuruController extends Controller
 
     public function show($id)
     {
-        $pegawai = Guru::findOrFail($id);
+        $pegawai = Guru::with('pegawai')->findOrFail($id);
         return view('tu.guru.show', compact('pegawai'));
     }
 

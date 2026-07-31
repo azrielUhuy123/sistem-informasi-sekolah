@@ -25,9 +25,10 @@
         <div class="d-flex gap-2">
 
             <a href="{{ route('tu.datakepegawaian.create') }}"
-            class="btn btn-dark">
+            class="btn btn-primary">
 
-                + Tambah Pegawai
+                <i class="bi bi-plus-lg me-1"></i>
+                Tambah Pegawai
 
             </a>
 
@@ -44,8 +45,9 @@
             @else
 
                 <a href="{{ route('tu.datakepegawaian.export.excel') }}"
-                class="btn btn-success">
+                class="d-flex btn btn-success gap-2">
 
+                    <i class="bi bi-file-earmark-excel"></i>    
                     Export Excel
 
                 </a>
@@ -56,273 +58,178 @@
 
     </div>
 
-    {{-- ALERT SUCCESS --}}
-        @if(session('success'))
+    {{-- ALERT --}}
+    <x-alert.flash key="success" type="success"/>
 
-            <div class="alert alert-success border-0 shadow-sm">
+    <x-alert.flash key="error" type="danger"/>
+    {{-- CARD --}}
+    <x-table.card
+        title="Daftar Pegawai"
+        subtitle="Seluruh pegawai pada SDN Mekar Jaya."
+    >
+        <x-slot:badge>
+            <span class="badge bg-primary rounded-pill px-3 py-2">
+                {{ $data->count() }} Pegawai
+            </span>
+        </x-slot:badge>
 
-                <i class="bi bi-check-circle-fill me-2"></i>
-                {{ session('success') }}
-
-            </div>
-
-        @endif
-
-        {{-- ALERT ERROR --}}
-        @if(session('error'))
-
-            <div class="alert alert-danger border-0 shadow-sm">
-
-                <i class="bi bi-exclamation-circle-fill me-2"></i>
-                {{ session('error') }}
-
-            </div>
-
-        @endif
-
-    <div class="card border-0 shadow-sm">
-
-        {{-- TOP BAR --}}
-            <div
-                class="card-header bg-light border-0 p-4"
-            >
-
-                <div
-                    class="d-flex justify-content-between align-items-center flex-wrap gap-3"
+        <x-slot:actions>
+            <div class="d-flex flex-column align-items-end gap-2">
+                <input
+                    type="text"
+                    id="searchInput"
+                    class="form-control rounded-3"
+                    placeholder="Cari pengguna..."
+                    style="width: 320px;"
                 >
-
-                    <div>
-
-                        <h5 class="fw-semibold mb-1">
-                            Daftar Pegawai
-                        </h5>
-
-                        <span class="text-muted small">
-                            Total:
-                            {{ $data->count() }}
-                            pegawai
-                        </span>
-
-                    </div>
-
-                    <div style="max-width: 280px; width:100%;">
-
-                        <input
-                            type="text"
-                            id="searchInput"
-                            class="form-control rounded-3"
-                            placeholder="Cari pegawai..."
-                        >
-
-                    </div>
-
-                </div>
-
             </div>
 
-        <div class="card-body">
+        </x-slot:actions>
 
-            <div class="table-responsive">
-
-                <table class="table align-middle">
-
-                    <thead>
-
+        <div class="table-responsive">
+            <table class="table table-hover align-middle mb-0">
+                <thead>
+                    <tr> 
+                        <th width="70">No</th>
+                        <th>Nama Pegawai & NIP</th>
+                        <th width="150">Status</th>
+                        <th width="150">Akun</th>
+                        <th width="150">Pesan</th>
+                        <th width="90">Aksi</th>
+                    </tr>
+                </thead>
+                <tbody id="tablePegawai">
+                    @forelse($data as $row)
                         <tr>
-
-                            <th>No</th>
-                            <th>Nama Pegawai</th>
-                            <th>NIP</th>
-                            <th>Status</th>
-                            <th>Akun</th>
-                            <th>Pesan</th>
-                            <th>Aksi</th>
-
-                        </tr>
-
-                    </thead>
-
-                    <tbody id="tablePegawai">
-
-                        @forelse($data as $row)
-
-                            <tr>
-
-                                <td>
+                            <td class="text-center">
+                                <span class="badge bg-light text-dark rounded-pill px-3 py-2">
                                     {{ $loop->iteration }}
-                                </td>
-
-                                <td>
-                                    {{ $row->nama }}
-                                </td>
-
-                                <td>
-                                    {{ $row->nip ?? '-' }}
-                                </td>
-
-                                <td>
-
-                                    @if($row->approval_status == 'approved')
-
-                                        <span class="badge bg-success-subtle text-success-emphasis border border-success-subtle">
-                                            <i class="bi bi-check-circle me-1"></i> Valid
-                                        </span>
-
-                                    @elseif($row->approval_status == 'rejected')
-
-                                        <span class="badge bg-danger-subtle text-danger-emphasis border border-danger-subtle">
-                                            <i class="bi bi-x-circle me-1"></i> Ditolak
-                                        </span>
-
-                                    @else
-
-                                        <span class="badge bg-warning-subtle text-warning-emphasis border border-warning-subtle">
-                                            <i class="bi bi-hourglass-split me-1"></i> Validasi
-                                        </span>
-
-                                    @endif
-
-                                </td>
-
-                                {{-- AKUN --}}
-                                <td>
-
-                                    @if($row->approval_status == 'approved')
-
-                                        @if(!$row->user)
-
-                                            <form
-                                                action="{{ route('tu.datakepegawaian.create-account', $row->id) }}"
-                                                method="POST"
-                                                class="d-inline">
-
-                                                @csrf
-
-                                                <button class="btn btn-outline-success btn-sm">
-                                                    <i class="bi bi-person-plus me-1"></i> Tambah Akun
-                                                </button>
-
-                                            </form>
-
-                                        @else
-
-                                            <span class="badge bg-success-subtle text-success-emphasis border border-success-subtle">
-                                                <i class="bi bi-person-check me-1"></i> Sudah Ada Akun
-                                            </span>
-
-                                        @endif
-
-                                    @else
-
-                                        <span class="text-muted small">-</span>
-
-                                    @endif
-
-                                </td>
-
-                                {{-- PESAN --}}
-                                <td>
-
-                                    @if($row->approval_status == 'rejected')
-
-                                        <button
-                                            class="btn btn-primary btn-sm"
-                                            data-bs-toggle="modal"
-                                            data-bs-target="#messageModal{{ $row->id }}">
-
-                                            <i id="message-icon-{{ $row->id }}"
-                                            class="bi {{ $row->is_message_read ? 'bi-envelope-open-fill' : 'bi-envelope-fill' }}">
-                                            </i>
-
-                                        </button>
-
-                                    @else
-
-                                        <span class="text-muted">
-                                            -
-                                        </span>
-
-                                    @endif
-
-                                </td>
-
-                                {{-- AKSI --}}
-                                <td>
-
-                                    <div class="dropdown">
-
-                                        <button class="btn btn-sm btn-outline-secondary dropdown-toggle"
-                                                type="button"
-                                                data-bs-toggle="dropdown"
-                                                aria-expanded="false">
-
-                                            <i class="bi bi-gear-fill"></i>
-
-                                        </button>
-
-                                        <ul class="dropdown-menu dropdown-menu-end shadow-sm border-0">
-
-                                            <li>
-                                                <a class="dropdown-item" href="{{ route('tu.datakepegawaian.show', $row->id) }}">
-                                                    <i class="bi bi-eye me-2"></i> Detail
-                                                </a>
-                                            </li>
-
-                                            <li>
-                                                <a class="dropdown-item" href="{{ route('tu.datakepegawaian.edit', $row->id) }}">
-                                                    <i class="bi bi-pencil-square me-2"></i> Edit
-                                                </a>
-                                            </li>
-
-                                            <li><hr class="dropdown-divider"></li>
-
-                                            <li>
-                                                <form action="{{ route('tu.datakepegawaian.destroy', $row->id) }}"
-                                                    method="POST"
-                                                    onsubmit="return confirm('Hapus data ini?')">
-
-                                                    @csrf
-                                                    @method('DELETE')
-
-                                                    <button type="submit" class="dropdown-item text-danger">
-                                                        <i class="bi bi-trash me-2"></i> Hapus
-                                                    </button>
-
-                                                </form>
-                                            </li>
-
-                                        </ul>
-
+                                </span>
+                            </td>
+                            <td>
+                                <div class="d-flex align-items-center">
+                                    <div class="rounded-circle bg-primary-subtle text-primary d-flex align-items-center justify-content-center me-3" style="width: 48px; height: 48px;">
+                                        <i class="bi bi-person-fill fs-4"></i>
                                     </div>
 
-                                </td>
+                                    <div>
+                                        <div class="fw-bold">
+                                            {{ $row->nama }}
+                                        </div>
 
-                            </tr>
-
-                        @empty
-
-                            <tr>
-
-                                <td colspan="7"
-                                    class="text-center text-muted py-4">
-
-                                    Belum ada data pegawai
-
-                                </td>
-
-                            </tr>
-
-                        @endforelse
-
-                    </tbody>
-
-                </table>
-            
-            </div>
-
+                                        <small class="text-muted">
+                                            NIP : {{ $row->nip ?? '-' }}
+                                        </small>
+                                    </div>
+                                </div>
+                            </td>
+                            <td>
+                                @if($row->approval_status == 'approved')
+                                    <span class="badge bg-success rounded-pill px-3 py-2">
+                                        <i class="bi bi-check-circle me-1"></i> Valid
+                                    </span>
+                                @elseif($row->approval_status == 'rejected')
+                                    <span class="badge bg-danger rounded-pill px-3 py-2">
+                                        <i class="bi bi-x-circle me-1"></i> Ditolak
+                                    </span>
+                                @else
+                                    <span class="badge bg-warning rounded-pill px-3 py-2">
+                                        <i class="bi bi-hourglass-split me-1"></i> Validasi
+                                    </span>
+                                @endif
+                            </td>
+                            {{-- AKUN --}}
+                            <td>
+                                @if($row->approval_status == 'approved')
+                                    @if(!$row->user)
+                                        <form
+                                            action="{{ route('tu.datakepegawaian.create-account', $row->id) }}"
+                                            method="POST"
+                                            class="d-inline">
+                                            @csrf
+                                            <button class="btn btn-outline-success btn-sm">
+                                                <i class="bi bi-person-plus me-1"></i> Tambah Akun
+                                            </button>
+                                        </form>
+                                    @else
+                                        <span class="badge bg-success-subtle text-success-emphasis border border-success-subtle">
+                                            <i class="bi bi-person-check me-1"></i> Sudah Ada Akun
+                                        </span>
+                                    @endif
+                                @else
+                                    <span class="text-muted small">-</span>
+                                @endif
+                            </td>
+                            {{-- PESAN --}}
+                            <td>
+                                @if($row->approval_status == 'rejected')
+                                    <button
+                                        class="btn btn-primary btn-sm"
+                                        data-bs-toggle="modal"
+                                        data-bs-target="#messageModal{{ $row->id }}">
+                                        <i id="message-icon-{{ $row->id }}"
+                                        class="bi {{ $row->is_message_read ? 'bi-envelope-open-fill' : 'bi-envelope-fill' }}">
+                                        </i>
+                                    </button>
+                                @else
+                                    <span class="text-muted">
+                                        -
+                                    </span>
+                                @endif
+                            </td>
+                            {{-- AKSI --}}
+                            <td>
+                                <div class="dropdown">
+                                    <button class="btn btn-sm btn-outline-primary"
+                                            type="button"
+                                            data-bs-toggle="dropdown"
+                                            aria-expanded="false">
+                                        <i class="bi bi-gear-fill"></i>
+                                        <i class="bi bi-caret-down-fill"></i>
+                                    </button>
+                                    <ul class="dropdown-menu dropdown-menu-end shadow-sm border-0">
+                                        <li>
+                                            <a class="dropdown-item" href="{{ route('tu.datakepegawaian.show', $row->id) }}">
+                                                <i class="bi bi-eye me-2"></i> Detail
+                                            </a>
+                                        </li>
+                                        <li>
+                                            <a class="dropdown-item" href="{{ route('tu.datakepegawaian.edit', $row->id) }}">
+                                                <i class="bi bi-pencil-square me-2"></i> Edit
+                                            </a>
+                                        </li>
+                                        <li><hr class="dropdown-divider"></li>
+                                        <li>
+                                            <form action="{{ route('tu.datakepegawaian.destroy', $row->id) }}"
+                                                method="POST"
+                                                onsubmit="return confirm('Hapus data ini?')"
+                                            >
+                                                @csrf
+                                                @method('DELETE')
+                                                <button type="submit" class="dropdown-item text-danger">
+                                                    <i class="bi bi-trash me-2"></i> Hapus
+                                                </button>
+                                            </form>
+                                        </li>
+                                    </ul>
+                                </div>
+                            </td>
+                        </tr>
+                    @empty
+                        <tr>
+                            <td colspan="5">
+                                <div class="text-center py-5">
+                                    <i class="bi bi-folder2-open display-3 text-secondary"></i>
+                                    <h5 class="fw-bold mt-3">Belum Ada Pegawai Yang Terdaftar</h5>
+                                    <p class="text-muted mb-0">Saat ini belum ada pegawai yang terdaftar pada sekolah ini</p>
+                                </div>
+                            </td>
+                        </tr>
+                    @endforelse
+                </tbody>
+            </table>    
         </div>
-
-    </div>
+    </x-table.card>
 
     {{-- MODAL PESAN --}}
     @foreach($data as $row)
