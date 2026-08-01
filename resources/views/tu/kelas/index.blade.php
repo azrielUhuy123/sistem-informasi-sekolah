@@ -58,7 +58,7 @@
                         <th>Tingkat</th>
                         <th width="200">Angkatan</th>
                         <th width="150">Jumlah Kelas</th>
-                        <th width="250">Aksi</th>
+                        <th width="90">Aksi</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -71,7 +71,11 @@
                             </td>
                             <td>
                                 <div class="fw-semibold">
-                                    Kelas {{ $grup->kelasMaster->tingkat }}
+                                    Kelas  
+                                    <span class="font-monospace">
+                                        {{ $grup->kelasMaster->tingkat }}
+                                    </span>
+                                    
                                 </div>
                             </td>
                             <td>
@@ -86,16 +90,28 @@
                                 </span>
                             </td>
                             <td>
-                                <a href="{{ route('tu.kelas.rombel.index', $grup->id) }}"
-                                class="btn btn-primary btn-sm rounded-pill d-inline-flex align-items-center gap-2 px-3">
-                                    Rombel
-                                </a>
-                                <a
-                                    href="{{ route('tu.kelas.export',$grup) }}"
-                                    class="btn btn-success btn-sm rounded-pill d-inline-flex align-items-center gap-2 px-3">
-                                    <i class="bi bi-file-earmark-excel"></i>
-                                    Export
-                                </a>
+                                <div class="dropdown">
+                                    <button class="btn btn-sm btn-outline-primary"
+                                        type="button"
+                                        data-bs-toggle="dropdown"
+                                        aria-expanded="false">
+                                        <i class="bi bi-gear-fill"></i>
+                                        <i class="bi bi-caret-down-fill"></i>
+                                    </button>
+                                    <ul class="dropdown-menu dropdown-menu-end shadow-sm border-0">
+                                        <li>
+                                            <a class="dropdown-item" href="{{ route('tu.kelas.rombel.index', $grup->id) }}">
+                                                <i class="bi bi-door-open me-2"></i> Rombel
+                                            </a>
+                                        </li>
+                                        <li><hr class="dropdown-divider"></li>
+                                        <li>
+                                            <a class="dropdown-item" href="{{ route('tu.kelas.export',$grup) }}">
+                                                <i class="bi bi-file-earmark-excel me-2"></i> Export Excel
+                                            </a>                                            
+                                        </li>
+                                    </ul>
+                                </div>
                             </td>
                         </tr>
                     @empty

@@ -1,77 +1,189 @@
 @extends('layouts.app')
 
+@section('title', 'Edit Siswa')
+
 @section('content')
 
-<h1 class="mb-4">Edit Siswa</h1>
+<div class="container-fluid py-4">
 
-<div class="card">
-    <div class="card-body">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h4 class="mb-1">Edit Siswa</h4>
+            <p class="text-muted mb-0">
+                Perbarui Data Siswa
+            </p>
+        </div>
+    </div>
+    @if ($errors->any())
+    <div class="alert alert-danger">
+        <ul class="mb-0">
+            @foreach ($errors->all() as $error)
+                <li>{{ $error }}</li>
+            @endforeach
+        </ul>
+    </div>
+@endif
 
-        <form action="{{ route('tu.siswa.update', $siswa->id) }}" method="POST">
-            @csrf
-            @method('PUT')
+    <div class="card border-0 shadow-sm">
 
-            <div class="mb-3">
-                <label>Nama Siswa</label>
-                <input type="text" name="nama" class="form-control" value="{{ $siswa->nama }}" required>
-            </div>
+        <div class="card-body">
 
-            <div class="mb-3">
-                <label>NIS</label>
-                <input type="text" name="nis" class="form-control" value="{{ $siswa->nis }}" required>
-            </div>
+            <form
+                action="{{ route('tu.siswa.update', $siswa->id) }}"
+                method="POST"
+            >
 
-            <div class="mb-3">
-                <label>NISN (opsional)</label>
-                <input type="text" name="nisn" class="form-control" value="{{ $siswa->nisn }}">
-            </div>
+                @csrf
+                @method('PUT')
 
-            <div class="mb-3">
-                <label>Kelas</label>
-                <select name="kelas_id" class="form-control" required>
-                    @foreach($kelas as $k)
-                        <option value="{{ $k->id }}" 
-                                {{ $siswa->kelas_id == $k->id ? 'selected' : '' }}>
-                            {{ $k->nama_kelas }}
-                        </option>
-                    @endforeach
-                </select>
-            </div>
+                <input
+                    type="hidden"
+                    name="redirect_to"
+                    value="{{ url()->previous() }}"
+                >
 
-            <div class="mb-3">
-                <label>Jenis Kelamin</label>
-                <select name="jenis_kelamin" class="form-control" required>
-                    <option value="L" {{ $siswa->jenis_kelamin == 'L' ? 'selected' : '' }}>Laki-laki</option>
-                    <option value="P" {{ $siswa->jenis_kelamin == 'P' ? 'selected' : '' }}>Perempuan</option>
-                </select>
-            </div>
+                <div class="row g-4">
 
-            <div class="mb-3">
-                <label>Tanggal Lahir</label>
-                <input type="date" name="tanggal_lahir" 
-                       class="form-control" 
-                       value="{{ $siswa->tanggal_lahir }}">
-            </div>
+                    <div class="col-md-6">
+                        <label class="form-label">
+                            Nama Siswa
+                        </label>
 
-            <div class="mb-3">
-                <label>Alamat</label>
-                <textarea name="alamat" class="form-control" rows="2">{{ $siswa->alamat }}</textarea>
-            </div>
+                        <input
+                            type="text"
+                            name="nama"
+                            class="form-control rounded-3"
+                            value="{{ old('nama', $siswa->nama) }}"
+                            required
+                        >
+                    </div>
 
-            <div class="mb-3">
-                <label>Nama Wali</label>
-                <input type="text" name="nama_wali" class="form-control" value="{{ $siswa->nama_wali }}">
-            </div>
+                    <div class="col-md-3">
+                        <label class="form-label">
+                            NIS
+                        </label>
 
-            <div class="mb-3">
-                <label>Telepon Wali</label>
-                <input type="text" name="telepon_wali" class="form-control" value="{{ $siswa->telepon_wali }}">
-            </div>
+                        <input
+                            type="text"
+                            name="nis"
+                            class="form-control rounded-3"
+                            value="{{ old('nis', $siswa->nis) }}"
+                            required
+                        >
+                    </div>
 
-            <button class="btn btn-primary">Update</button>
-        </form>
+                    <div class="col-md-3">
+                        <label class="form-label">
+                            NISN
+                        </label>
+
+                        <input
+                            type="text"
+                            name="nisn"
+                            class="form-control rounded-3"
+                            value="{{ old('nisn', $siswa->nisn) }}"
+                        >
+                    </div>
+
+                    <div class="col-md-6">
+                        <label class="form-label">
+                            Jenis Kelamin
+                        </label>
+
+                        <select
+                            name="jenis_kelamin"
+                            class="form-select rounded-3"
+                            required
+                        >
+                            <option value="L" @selected(old('jenis_kelamin', $siswa->jenis_kelamin) == 'L')>
+                                Laki-laki
+                            </option>
+
+                            <option value="P" @selected(old('jenis_kelamin', $siswa->jenis_kelamin) == 'P')>
+                                Perempuan
+                            </option>
+                        </select>
+                    </div>
+
+                    <div class="col-md-6">
+                        <label class="form-label">
+                            Tanggal Lahir
+                        </label>
+
+                        <input
+                            type="date"
+                            name="tanggal_lahir"
+                            class="form-control rounded-3"
+                            value="{{ old('tanggal_lahir', $siswa->tanggal_lahir) }}"
+                        >
+                    </div>
+
+                    <div class="col-12">
+                        <label class="form-label">
+                            Alamat
+                        </label>
+
+                        <textarea
+                            name="alamat"
+                            rows="3"
+                            class="form-control rounded-3"
+                        >{{ old('alamat', $siswa->alamat) }}</textarea>
+                    </div>
+
+                    <div class="col-md-6">
+                        <label class="form-label">
+                            Nama Wali
+                        </label>
+
+                        <input
+                            type="text"
+                            name="nama_wali"
+                            class="form-control rounded-3"
+                            value="{{ old('nama_wali', $siswa->nama_wali) }}"
+                        >
+                    </div>
+
+                    <div class="col-md-6">
+                        <label class="form-label">
+                            Telepon Wali
+                        </label>
+
+                        <input
+                            type="text"
+                            name="telepon_wali"
+                            class="form-control rounded-3"
+                            value="{{ old('telepon_wali', $siswa->telepon_wali) }}"
+                        >
+                    </div>
+
+                </div>
+
+                <div class="d-flex justify-content-between align-items-center mt-4">
+
+                    <a
+                        href="{{ url()->previous() }}"
+                        class="btn btn-outline-secondary"
+                    >
+                        <i class="bi bi-arrow-left me-1"></i>
+                        Kembali
+                    </a>
+
+                    <button
+                        type="submit"
+                        class="btn btn-primary px-4"
+                    >
+                        <i class="bi bi-save me-1"></i>
+                        Simpan Perubahan
+                    </button>
+
+                </div>
+
+            </form>
+
+        </div>
 
     </div>
+
 </div>
 
 @endsection

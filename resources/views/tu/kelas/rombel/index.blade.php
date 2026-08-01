@@ -29,8 +29,8 @@
     {{-- TABLE --}}
     <x-table.card
         title="Daftar Rombel"
-        subtitle="Kelas {{ $kelasGrup->tingkat }} – Angkatan {{ $kelasGrup->angkatan->tahun }}"
-    >
+        subtitle="Kelas {{ $kelasGrup->kelasMaster->tingkat }} – Angkatan {{ $kelasGrup->angkatan->tahun }}"
+    > 
         <x-slot:badge>
             <span class="badge bg-primary rounded-pill px-3 py-2">
                 {{ $rombels->count() }} Rombel
@@ -74,7 +74,7 @@
                                 </span>
                             </td>
                             <td>
-                                <span class="badge bg-info text-dark fw-semibold rounded-pill px-3 py-2">
+                                <span class="badge bg-info text-dark fw-semibold rounded-pill px-3 py-2 font-monospace">
                                     {{ $rombel->nama_kelas }}
                                 </span>
                             </td>

@@ -74,7 +74,7 @@
                                         <div class="fw-bold">
                                             {{ $guru->pegawai->nama }}
                                         </div>
-
+ 
                                         <small class="text-muted">
                                             NIP : {{ $guru->pegawai->nip ?? '-' }}
                                         </small>

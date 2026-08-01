@@ -1,210 +1,319 @@
 @extends('layouts.app')
 
-@section('title','Detail Siswa')
+@section('title', 'Detail Siswa')
 
 @section('content')
 
-<div class="container-fluid">
+    <div class="container-fluid">
 
-<div class="card shadow-sm border-0">
+        <div class="card shadow-sm border-0 overflow-hidden">
+            <div class="card-body p-4 p-lg-5">
 
-<div class="card-body">
+                <div class="row g-4 align-items-start">
 
-<div class="row align-items-start">
+                    <div class="col-lg-4">
+                        <div class="bg-primary bg-opacity-10 rounded-4 p-4 border h-100">
+                            <div class="d-flex flex-column align-items-center text-center gap-3">
+                                <img
+                                    src="{{ $siswa->foto
+                                        ? asset('storage/foto_siswa/'.$siswa->foto)
+                                        : 'https://ui-avatars.com/api/?name='.urlencode($siswa->nama).'&background=E9ECEF&color=495057&size=120' }}"
+                                    class="rounded-circle"
+                                    width="110"
+                                    height="110"
+                                    style="object-fit:cover;"
+                                >
 
-<div class="col-md-4 pe-4 border-end">
+                                <div>
+                                    <h4 class="mb-1 fw-bold">{{ $siswa->nama }}</h4>
+                                    <p class="text-muted mb-2">Siswa</p>
 
-<div class="d-flex align-items-center gap-3">
+                                    <div class="d-flex flex-wrap gap-2 justify-content-center">
+                                        <span class="badge bg-primary-subtle text-primary-emphasis border border-primary-subtle">
+                                            <i class="bi bi-person-badge me-1"></i> NIS {{ $siswa->nis }}
+                                        </span>
+                                        <span class="badge bg-info-subtle text-info-emphasis border border-info-subtle">
+                                            <i class="bi bi-credit-card-2-front me-1"></i> NISN {{ $siswa->nisn ?? '-' }}
+                                        </span>
+                                    </div>
+                                </div>
 
-<img
-src="{{ $siswa->foto
-    ? asset('storage/foto_siswa/'.$siswa->foto)
-    : 'https://ui-avatars.com/api/?name='.urlencode($siswa->nama).'&background=E9ECEF&color=495057&size=120' }}"
-class="rounded-circle"
-width="90"
-height="90"
-style="object-fit:cover;"
->
+                                <div class="w-100">
+                                    <div class="row g-2">
+                                        <div class="col-6">
+                                            <div class="border rounded-3 p-2 bg-white">
+                                                <div class="small text-muted">Status Siswa</div>
+                                                <div class="fw-semibold">
+                                                    @if($siswa->penempatanAktif)
+                                                        Aktif
+                                                    @else
+                                                        Tidak Aktif
+                                                    @endif
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="col-6">
+                                            <div class="border rounded-3 p-2 bg-white">
+                                                <div class="small text-muted">Rombel</div>
+                                                <div class="fw-semibold">
+                                                    <span class="badge bg-success">{{ $siswa->penempatanAktif?->kelas?->nama_kelas ?? '-' }}</span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
 
-<div>
+                    <div class="col-lg-8">
+                        <div class="card border-0 h-100">
+                            <div class="card-body">
+                                <div class="d-flex justify-content-between align-items-center mb-3">
+                                    <h5 class="fw-bold mb-0">Profil Siswa</h5>
+                                    <span class="badge bg-secondary-subtle text-secondary-emphasis border border-secondary-subtle">
+                                        <i class="bi bi-person-lines-fill me-1"></i> Master Data
+                                    </span>
+                                </div>
 
-<h5 class="fw-bold mb-1">{{ $siswa->nama }}</h5>
+                                <div class="row g-3">
+                                    <div class="col-md-6">
+                                        <div class="small text-muted mb-1">Tempat, Tanggal Lahir</div>
+                                        <div class="fw-semibold">
+                                            {{ $siswa->ppdb?->tempat_lahir ?? '-' }},
+                                            {{ $siswa->ppdb?->tanggal_lahir
+                                            ? \Carbon\Carbon::parse($siswa->ppdb?->tanggal_lahir)->format('d-m-Y')
+                                            : '-' }}
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="small text-muted mb-1">Agama</div>
+                                        <div class="fw-semibold">{{ $siswa->ppdb?->agama }}</div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="small text-muted mb-1">Alamat</div>
+                                        <div class="fw-semibold">{{ $siswa->alamat }}</div>
+                                    </div>
+                                    
+                                    <div class="col-md-6">
+                                        <div class="small text-muted mb-1">Jenis Kelamin</div>
+                                        <div class="fw-semibold">
+                                            @if($siswa->jenis_kelamin == 'L')
+                                                <span class="badge bg-primary">Laki-laki</span>
+                                            @else
+                                                <span class="badge bg-danger">Perempuan</span>
+                                            @endif
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
 
-<div class="text-muted small">
-NIS {{ $siswa->nis }}
-</div>
+                </div>
 
-<div class="text-muted small">
-NISN {{ $siswa->nisn ?? '-' }}
-</div>
+                <hr class="my-4">
 
-</div>
+                <div class="row g-4">
 
-</div>
+                    <div class="col-lg-6">
+                        <div class="card border h-100">
+                            <div class="card-body">
+                                <div class="d-flex align-items-center mb-3">
+                                    <div class="rounded-circle bg-primary bg-opacity-10 p-2 me-2">
+                                        <i class="bi bi-file-earmark-text fs-5 text-primary"></i>
+                                    </div>
+                                    <h5 class="fw-bold mb-0">Informasi Akademik</h5>
+                                </div>
 
-</div>
+                                <div class="row g-3">
+                                    <div class="col-12">
+                                        <div class="small text-muted mb-1">Nomor Pendaftaran</div>
+                                        <div class="fw-semibold">{{ $siswa->ppdb?->no_pendaftaran }}</div>
+                                    </div>
+                                    <div class="col-12">
+                                        <div class="small text-muted mb-1">Tahun Ajaran</div>
+                                        <div class="fw-semibold">{{ $siswa->ppdb?->tahunAjaran?->tahun }}</div>
+                                    </div>
+                                    <div class="col-12">
+                                        <div class="small text-muted mb-1">Tanggal Pendaftaran</div>
+                                        <div class="fw-semibold">{{ $siswa->ppdb?->tanggal_pendaftaran }}</div>
+                                    </div>
+                                    <div class="col-12">
+                                        <div class="small text-muted mb-1">Status Daftar Ulang</div>
+                                        <div class="fw-semibold">{{ ucfirst($siswa->ppdb?->status_daftar_ulang ?? '-') }}</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
 
+                    <div class="col-lg-6">
+                        <div class="card border h-100">
+                            <div class="card-body">
+                                <div class="d-flex align-items-center mb-3">
+                                    <div class="rounded-circle bg-info bg-opacity-10 p-2 me-2">
+                                        <i class="bi bi-briefcase fs-5 text-info"></i>
+                                    </div>
+                                    <h5 class="fw-bold mb-0">Data Orang Tua</h5>
+                                </div>
 
-<div class="col-md-8 ps-4">
+                                <div class="row g-3">
+                                    <div class="col-12">
+                                        <div class="small text-muted mb-1">Nama Wali</div>
+                                        <div class="fw-semibold">{{ $siswa->nama_wali }}</div>
+                                    </div>
+                                    <div class="col-12">
+                                        <div class="small text-muted mb-1">Telepon Wali</div>
+                                        <div class="fw-semibold">{{ $siswa->telepon_wali }}</div>
+                                    </div>
+                                    <div class="col-12">
+                                        <div class="small text-muted mb-1">Telepon Ayah</div>
+                                        <div class="fw-semibold">{{ $siswa->ppdb?->hp_ayah }}</div>
+                                    </div>
+                                    <div class="col-12">
+                                        <div class="small text-muted mb-1">Telepon Ibu</div>
+                                        <div class="fw-semibold">{{ $siswa->ppdb?->hp_ibu }}</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
 
-<h6 class="fw-semibold border-bottom pb-2 mb-3">Informasi Akademik</h6>
+                    <div class="col-lg-6">
+                        <div class="card border h-100">
+                            <div class="card-body">
+                                <div class="d-flex align-items-center mb-3">
+                                    <div class="rounded-circle bg-secondary bg-opacity-10 p-2 me-2">
+                                        <i class="bi bi-award fs-5 text-secondary"></i>
+                                    </div>
+                                    <h5 class="fw-bold mb-0">Data Kependudukan</h5>
+                                </div>
 
-<table class="table table-sm">
+                                <div class="row g-3">
+                                    <div class="col-12">
+                                        <div class="small text-muted mb-1">NIK</div>
+                                        <div class="fw-semibold">{{ $siswa->ppdb?->nik }}</div>
+                                    </div>
+                                    <div class="col-12">
+                                        <div class="small text-muted mb-1">Nomor KK</div>
+                                        <div class="fw-semibold">{{ $siswa->ppdb?->nomor_kk }}</div>
+                                    </div>
+                                    <div class="col-12">
+                                        <div class="small text-muted mb-1">Nomor Akta</div>
+                                        <div class="fw-semibold">{{ $siswa->ppdb?->nomor_akta }}</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-12">
+                        <div class="card border h-100">
+                            <div class="card-body">
 
-<tr class="{{ $siswa->penempatanAktif ? 'table-success' : '' }}">
-<th width="200">Kelas</th>
-<td>{{ $siswa->penempatanAktif?->kelas?->nama_kelas ?? '-' }}
-@if($siswa->penempatanAktif?->kelas?->kelasGrup?->angkatan)
-    <small class="text-muted">
-        ({{ $siswa->penempatanAktif->kelas->kelasGrup->angkatan->tahun }})
-    </small>
-@endif
-</td>
-</tr>
+                                <div class="d-flex align-items-center mb-3">
+                                    <div class="rounded-circle bg-success bg-opacity-10 p-2 me-2">
+                                        <i class="bi bi-clock-history fs-5 text-success"></i>
+                                    </div>
 
-<tr>
-<th>Jenis Kelamin</th>
-<td>
-@if($siswa->jenis_kelamin == 'L')
-<span class="badge bg-primary">Laki-laki</span>
-@else
-<span class="badge bg-danger">Perempuan</span>
-@endif
-</td>
-</tr>
+                                    <h5 class="fw-bold mb-0">
+                                        Riwayat Kelas
+                                    </h5>
+                                </div>
 
-<tr>
-<th>Tanggal Lahir</th>
-<td>
-{{ $siswa->tanggal_lahir
-? \Carbon\Carbon::parse($siswa->tanggal_lahir)->format('d M Y')
-: '-' }}
-</td>
-</tr>
+                                <div class="table-responsive">
 
-</table>
+                                    <table class="table table-hover align-middle mb-0">
 
+                                        <thead class="table-light">
+                                            <tr>
+                                                <th>Tahun Ajaran</th>
+                                                <th>Kelas</th>
+                                                <th>Tanggal Masuk</th>
+                                                <th>Tanggal Keluar</th>
+                                                <th>Status</th>
+                                            </tr>
+                                        </thead>
 
-<h6 class="fw-semibold mt-4 mb-3">Data Wali</h6>
+                                        <tbody>
 
-<table class="table table-sm">
+                                            @forelse($siswa->penempatan as $item)
 
-<tr>
-<th width="200">Nama Wali</th>
-<td>{{ $siswa->nama_wali ?? '-' }}</td>
-</tr>
+                                                <tr>
 
-<tr>
-<th>Telepon Wali</th>
-<td>{{ $siswa->telepon_wali ?? '-' }}</td>
-</tr>
+                                                    <td>
+                                                        {{ $item->tahunAjaran?->tahun ?? '-' }}
+                                                        {{ $item->tahunAjaran?->semester ? '- '.$item->tahunAjaran->semester : '' }}
+                                                    </td>
 
-<tr>
-<th>Alamat</th>
-<td>{{ $siswa->alamat ?? '-' }}</td>
-</tr>
+                                                    <td>
+                                                        <span class="badge bg-secondary">
+                                                            {{ $item->kelas?->nama_kelas ?? '-' }}
+                                                        </span>
+                                                    </td>
 
-</table>
-<h6 class="fw-semibold mt-4 mb-3">Riwayat Kelas</h6>
+                                                    <td>
+                                                        {{ \Carbon\Carbon::parse($item->tanggal_masuk)->format('d M Y') }}
+                                                    </td>
 
-<div class="card shadow-sm border-0">
-<div class="card-body p-0">
+                                                    <td>
+                                                        {{ $item->tanggal_keluar
+                                                            ? \Carbon\Carbon::parse($item->tanggal_keluar)->format('d M Y')
+                                                            : '-' }}
+                                                    </td>
 
-<table class="table table-sm table-hover mb-0">
-<thead class="table-light">
-<tr>
-<th width="160">Tahun Ajaran</th>
-<th width="120">Kelas</th>
-<th width="140">Tanggal Masuk</th>
-<th width="140">Tanggal Keluar</th>
-<th width="100">Status</th>
-</tr>
-</thead>
+                                                    <td>
 
-<tbody>
+                                                        @if($item->tanggal_keluar === null)
 
-@forelse($siswa->penempatan as $item)
+                                                            <span class="badge bg-success">
+                                                                Aktif
+                                                            </span>
 
-<tr>
+                                                        @else
 
-<td>
-{{ $item->tahunAjaran?->tahun ?? '-' }} {{ $item->tahunAjaran?->semester ? '- '.$item->tahunAjaran->semester : '' }}
-</td>
+                                                            <span class="badge bg-secondary">
+                                                                Selesai
+                                                            </span>
 
-<td>
-<span class="badge bg-secondary">
-{{ $item->kelas?->nama_kelas ?? '-' }}
-</span>
-</td>
+                                                        @endif
 
-<td>
-{{ \Carbon\Carbon::parse($item->tanggal_masuk)->format('d M Y') }}
-</td>
+                                                    </td>
 
-<td>
-@if($item->tanggal_keluar)
-{{ \Carbon\Carbon::parse($item->tanggal_keluar)->format('d M Y') }}
-@else
--
-@endif
-</td>
+                                                </tr>
 
-<td>
+                                            @empty
 
-@if($item->tanggal_keluar === null)
+                                                <tr>
+                                                    <td colspan="5" class="text-center text-muted py-4">
+                                                        Belum ada riwayat kelas.
+                                                    </td>
+                                                </tr>
 
-<span class="badge bg-success">
-Aktif
-</span>
+                                            @endforelse
 
-@else
+                                        </tbody>
 
-<span class="badge bg-secondary">
-Selesai
-</span>
+                                    </table>
 
-@endif
+                                </div>
 
-</td>
+                            </div>
+                        </div>
+                    </div>
 
-</tr>
+                </div>
+ 
+            </div>
 
-@empty
+        </div>
+        <div class="sticky-bottom bg-white border border-light-subtle py-3 mt-4">
+            <div class="d-flex justify-content-between align-items-center">
+                <a href="{{ route('tu.siswa.index') }}" class="btn btn-outline-secondary ml-4">
+                    <i class="bi bi-arrow-left me-1"></i> Kembali
+                </a>
+            </div>
+        </div>
 
-<tr>
-<td colspan="5" class="text-center text-muted py-3">
-Belum ada riwayat kelas
-</td>
-</tr>
-
-@endforelse
-
-</tbody>
-</table>
-
-</div>
-</div>
-<div class="mt-3">
-
-<a href="{{ route('tu.siswa.edit',$siswa->id) }}"
-class="btn btn-warning btn-sm">
-Edit Data
-</a>
-
-<a href="{{ url()->previous() }}"
-class="btn btn-secondary btn-sm">
-Kembali
-</a>
-
-</div>
-
-</div>
-
-</div>
-
-</div>
-</div>
-
-</div>
-
+    </div>
 @endsection

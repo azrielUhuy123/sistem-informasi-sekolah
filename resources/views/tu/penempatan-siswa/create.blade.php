@@ -64,7 +64,7 @@
                     <label class="form-label">Siswa</label>
                     <select 
                         name="siswa_id" 
-                        class="form-select"
+                        class="form-select rounded-3"
                         required
                         {{ $tahunAktif->status !== 'aktif' ? 'disabled' : '' }}
                     >
@@ -86,7 +86,7 @@
                     <label class="form-label">Kelas</label>
                     <select 
                         name="kelas_id" 
-                        class="form-select"
+                        class="form-select rounded-3"
                         required
                         {{ $tahunAktif->status !== 'aktif' ? 'disabled' : '' }}
                     >

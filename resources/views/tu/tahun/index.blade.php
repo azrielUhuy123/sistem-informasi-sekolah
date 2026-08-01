@@ -23,7 +23,7 @@
     <div class="d-flex justify-content-end align-items-center mb-4">
 
         <a href="{{ route('tu.tahun.create') }}" 
-           class="btn btn-dark">
+           class="btn btn-primary">
             <i class="bi bi-plus-lg me-1"></i>
             Tambah Tahun Ajaran
         </a>
@@ -193,100 +193,78 @@
     @endif
 
     <!-- 🔷 TABLE -->
-    <div class="card shadow-sm border-0">
-        {{-- TOP BAR --}}
-            <div
-                class="card-header bg-light border-0 p-4"
+    {{-- TABLE --}}
+    <x-table.card
+        title="Daftar Tahun Ajaran"
+        subtitle="Seluruh Tahun Ajaran yang terdata pada sistem ini"
+    >
+        <x-slot:badge>
+            <span class="badge bg-primary rounded-pill px-3 py-2">
+                {{ $tahun->count() }} Dokumen Sekolah
+            </span>
+        </x-slot:badge>
+ 
+        <x-slot:actions>
+            <input
+                type="text"
+                id="searchInput"
+                class="form-control rounded-3"
+                placeholder="Cari Tahun..."
             >
-
-                <div
-                    class="d-flex justify-content-between align-items-center flex-wrap gap-3"
-                >
-
-                    <div>
-
-                        <h5 class="fw-semibold mb-1">
-                            Daftar Tahun Ajaran
-                        </h5>
-
-                        <span class="text-muted small">
-                            Total:
-                            {{ $tahun->count() }}
-                            tahun
-                        </span>
-
-                    </div>
-
-                    <div style="max-width: 280px; width:100%;">
-
-                        <input
-                            type="text"
-                            id="searchInput"
-                            class="form-control rounded-3"
-                            placeholder="Cari tahun ajaran..."
-                        >
-
-                    </div>
-
-                </div>
-
-            </div>
-        <div class="card-body">
-                <table class="table align-middle">
-
-                    <thead>
+        </x-slot:actions>
+        <div class="table-responsive">
+            <table class="table table-hover align-middle mb-0">
+                <thead>
+                    <tr>
+                        <th width="100">Perubahan</th>
+                        <th>Tahun</th>
+                        <th width="150">Semester</th>
+                        <th width="150">Status</th>
+                        
+                    </tr>
+                </thead>
+                <tbody id="tableTahun">
+                    @forelse($tahun as $row)
                         <tr>
-                            <th>Tahun</th>
-                            <th>Semester</th>
-                            <th>Status</th>
-                            <th>Aksi</th>
+                            <td class="text-center">
+                                <span class="badge bg-light rounded-pill text-dark border px-3 py-2 d-flex gap-2">
+                                    <i class="bi bi-calendar"></i>
+                                    {{ $row->updated_at->format('d M Y') }}
+                                </span>
+                            </td>
+                            <td>
+                                <span class="fw-bold">
+                                    {{ $row->tahun }}
+                                </span>
+                            </td>
+                            <td>
+                                <span class="badge bg-teal fw-bold rounded-pill px-3 py-2">
+                                    {{ $row->semester }}
+                                </span>
+                            </td>
+                            <td>
+                                {!! match($row->status) {
+                                    'aktif'   => '<span class="badge bg-success fw-bold rounded-pill px-3 py-2"><i class="bi bi-check-circle me-1"></i>Aktif</span>',
+                                    'draft'   => '<span class="badge bg-secondary fw-bold rounded-pill px-3 py-2"><i class="bi bi-archive me-1"></i>Draft</span>',
+                                    'selesai' => '<span class="badge bg-light border fw-bold text-dark rounded-pill px-3 py-2"><i class="bi bi-check-circle me-1"></i>Selesai</span>',
+                                } !!}
+                            </td>
+                            
                         </tr>
-                    </thead>
-
-                    <tbody id="tableTahun">
-                        @forelse($tahun as $row)
-                            <tr>
-                                <td>{{ $row->tahun }}</td>
-
-                                <td>
-                                    <span class="badge bg-light text-dark border">
-                                        {{ $row->semester }}
-                                    </span>
-                                </td>
-
-                                <td>
-                                    {!! match($row->status) {
-                                        'aktif'   => '<span class="badge bg-success-subtle text-success-emphasis border border-success-subtle"><i class="bi bi-check-circle me-1"></i>Aktif</span>',
-                                        'draft'   => '<span class="badge bg-warning-subtle text-warning-emphasis border border-warning-subtle"><i class="bi bi-archive me-1"></i>Draft</span>',
-                                        'selesai' => '<span class="badge bg-secondary-subtle text-secondary-emphasis border border-secondary-subtle"><i class="bi bi-check-circle me-1"></i>Selesai</span>',
-                                    } !!}
-                                </td>
-
-                                <td>
-                                    <a href="{{ route('tu.tahun.detail', $row->id) }}"
-                                       class="btn btn-sm btn-dark">
-                                        Detail
-                                    </a>
-                                </td>
-                            </tr>
-                        @empty
-                            <tr>
-                                <td colspan="4" class="text-center py-4 text-muted">
-                                    Belum ada data tahun ajaran
-                                </td>
-                            </tr>
-                        @endforelse
-                    </tbody>
-
-                </table>
-            </div>
-
-            <div class="mt-3">
+                    @empty
+                        <tr>
+                            <td colspan="4" class="text-center py-4 text-muted">
+                                Belum ada data tahun ajaran
+                            </td>
+                        </tr>
+                    @endforelse
+                </tbody>
+            </table>
+            <div class="mt-4 d-flex justify-content-end">
                 {{ $tahun->links() }}
             </div>
-
         </div>
-    </div>
+    </x-table.card>
 
 </div>
 

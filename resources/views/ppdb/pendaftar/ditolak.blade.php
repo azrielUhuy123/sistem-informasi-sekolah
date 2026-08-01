@@ -1,6 +1,6 @@
 @extends('layouts.app')
 
-@section('title','Data Ditolak')
+@section('title', 'Data Pendaftar Ditolak')
 
 @section('content')
 
@@ -10,8 +10,8 @@
             <div class="card-body p-4 p-lg-5 text-white" style="background: linear-gradient(135deg, #0f4c81 0%, #2563eb 100%);">
                 <div class="d-flex flex-column flex-lg-row justify-content-between align-items-lg-center gap-3">
                     <div>
-                        <h3 class="fw-bold mb-2">Data Pendaftar Ditolak</h3>
-                        <p class="mb-0 opacity-75">Kelola data pendaftar yang ditolak</p>
+                        <h3 class="fw-bold mb-2">Daftar Pendaftar Ditolak</h3>
+                        <p class="mb-0 opacity-75">Kelola data pendaftar yang ditolak.</p>
                     </div>
                     <div class="badge bg-white text-primary px-3 py-2 fs-6">
                         <i class="bi bi-shield-check me-2"></i> Sistem Terhubung
@@ -20,148 +20,99 @@
             </div>
         </div>
 
+    {{-- ALERT --}}
+    <x-alert.flash key="success" type="success"/>
 
-        {{-- ALERT SUCCESS --}}
-        @if(session('success'))
+    <x-alert.flash key="error" type="danger"/>
 
-            <div class="alert alert-success border-0 shadow-sm">
+    {{-- CARD --}}
+    <x-table.card
+        title="Daftar Pendaftar Ditolak"
+        subtitle="Seluruh pendaftar peserta didik baru yang ditolak pada SDN Mekar Jaya."
+    >
+        <x-slot:badge>
+            <span class="badge bg-primary rounded-pill px-3 py-2">
+                {{ $data->count() }} Pendaftar
+            </span>
+        </x-slot:badge>
 
-                <i class="bi bi-check-circle-fill me-2"></i>
-                {{ session('success') }}
-
+        <x-slot:actions>
+            <div class="d-flex flex-column align-items-end gap-2">
+                <input
+                    type="text"
+                    id="searchInput"
+                    class="form-control rounded-3"
+                    placeholder="Cari Pendaftar..."
+                    style="width: 320px;"
+                >
             </div>
 
-        @endif
+        </x-slot:actions>
 
-        {{-- ALERT ERROR --}}
-        @if(session('error'))
-
-            <div class="alert alert-danger border-0 shadow-sm">
-
-                <i class="bi bi-exclamation-circle-fill me-2"></i>
-                {{ session('error') }}
-
-            </div>
-
-        @endif
-
-    <div class="card border-0 shadow-sm">
-
-        {{-- TOP BAR --}}
-
-        <div
-            class="card-header bg-light border-0 p-4"
-        >
-
-            <div
-                class="d-flex justify-content-between align-items-center flex-wrap gap-3"
-            >
-
-                <div>
-
-                    <h5 class="fw-semibold mb-1">
-                        Daftar Pendaftar Ditolak
-                    </h5>
-
-                    <span class="text-muted small">
-                        Total:
-                        {{ $data->count() }}
-                        pendaftar ditolak   
-                    </span>
-
-                </div>
-
-                <div style="max-width: 280px; width:100%;">
-
-                    <input
-                        type="text"
-                        id="searchInput"
-                        class="form-control rounded-3"
-                        placeholder="Cari pendaftar..."
-                    >
-
-                </div>
-
-            </div>
-
-        </div>
-
-        <div class="card-body">
-
-                <table class="table align-middle">
-
-                    <thead>
-
-                        <tr>
-
-                            <th>No</th>
-                            <th>No Pendaftaran</th>
-                            <th>Nama</th>
-                            <th>Alasan</th>
-                            <th>Aksi</th>
-
-                        </tr>
-
-                    </thead>
-
-                    <tbody id="tableTolak">
-
-                        @forelse($data as $item)
-
-                        <tr>
-
-                            <td>
-                                {{ $loop->iteration }}
-                            </td>
-
-                            <td>
+        <div class="table-responsive">
+            <table class="table table-hover align-middle mb-0">
+                <thead>
+                    <tr>
+                        <th width="180">No Pendaftaran</th>
+                        <th>Nama</th>
+                        <th width="150">Jenis Kelamin</th>
+                        <th width="250">Tanggal Pendaftaran</th>
+                        <th width="150">Alasan</th>
+                        <th width="130">Aksi</th>
+                    </tr>
+                </thead>
+                <tbody id="tablePPDB">
+                    @foreach($data as $item)
+                    <tr>
+                        <td>
+                            <span>
                                 {{ $item->no_pendaftaran }}
-                            </td>
-
-                            <td>
-                                {{ $item->nama }}
-                            </td>
-
-                            <td>
+                            </span>
+                        </td>
+                        <td>
+                            <div class="d-flex align-items-center">
+                                <div class="rounded-circle bg-primary-subtle text-primary d-flex align-items-center justify-content-center me-3" style="width: 48px; height: 48px;">
+                                    <i class="bi bi-person-fill fs-4"></i>
+                                </div>
+                                <div>
+                                    <div class="fw-bold text-lowercase">
+                                        {{ $item->nama }}
+                                    </div>
+                                    <small class="text-muted">
+                                       NIK : {{ $item->nik }}
+                                    </small>
+                                </div>
+                            </div>
+                            
+                        </td>
+                        
+                        <td>
+                            <span class="badge bg-teal rounded-pill px-3 py-2">
+                                {{ $item->jenis_kelamin }}
+                            </span>
+                        </td>
+                        <td>{{ $item->tanggal_pendaftaran }}</td>
+                        <td>
+                           <span class="badge bg-secondary rounded-pill px-3 py-2">
                                 {{ $item->catatan_verifikasi }}
-                            </td>
-
-                            <td>
-
-                                <a href="{{ route('tu.ppdb.pendaftar.show', $item) }}"
-                                    class="btn btn-sm btn-dark">
-                                        Detail
-                                </a>
-
-                            </td>
-
-                        </tr>
-
-                        @empty
-
-                        <tr>
-
-                            <td colspan="5" class="text-center">
-
-                                Tidak ada data
-
-                            </td>
-
-                        </tr>
-
-                        @endforelse
-
-                    </tbody>
-
-                </table>
-
-
-            {{ $data->links() }}
-
+                            </span>
+                        </td>
+                        <td>
+                            <a href="{{ route('tu.ppdb.pendaftar.show', $item) }}"
+                            class="btn btn-primary btn-sm rounded-pill d-inline-flex align-items-center gap-2 px-3">
+                                <i class="bi bi-eye-fill"></i>
+                                Detail
+                            </a>
+                        </td>
+                    </tr>
+                    @endforeach
+                </tbody>
+            </table>   
+            <div class="mt-4 d-flex justify-content-end">
+                {{ $data->links() }} 
+            </div>
         </div>
-
-    </div>
-
+    </x-table.card>
 </div>
 {{-- SEARCH --}}
 <script>
@@ -176,7 +127,7 @@
 
         const rows =
             document.querySelectorAll(
-                '#tableTolak tr'
+                '#tablePPDB tr'
             );
 
         rows.forEach(row => {

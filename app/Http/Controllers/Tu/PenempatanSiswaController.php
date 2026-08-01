@@ -247,8 +247,66 @@ class PenempatanSiswaController extends Controller
             'tahunAktif'
         ));
     }
+    public function edit(PenempatanSiswa $penempatan)
+    {
+        $tahunAktif = TahunAjaran::current();
 
-    public function keluarkan($id)
+        if (!$tahunAktif || $tahunAktif->status !== 'aktif') {
+            return back()->with('error', 'Mutasi hanya dapat dilakukan pada tahun ajaran aktif.');
+        }
+
+        $penempatan->load([
+            'siswa',
+            'kelas.kelasGrup.angkatan'
+        ]);
+
+        $kelas = Kelas::orderBy('nama_kelas')->get();
+
+        return view('tu.penempatan-siswa.edit', compact(
+            'penempatan',
+            'kelas',
+            'tahunAktif'
+        ));
+    }
+    public function update(Request $request, PenempatanSiswa $penempatan)
+    {
+        $request->validate([
+            'kelas_id' => 'required|exists:kelas,id',
+        ]);
+
+        $tahunAktif = TahunAjaran::current();
+
+        if (!$tahunAktif || $tahunAktif->status !== 'aktif') {
+            return back()->with('error', 'Mutasi hanya dapat dilakukan pada tahun ajaran aktif.');
+        }
+
+        if ($penempatan->kelas_id == $request->kelas_id) {
+            return back()->with('error', 'Siswa sudah berada di kelas tersebut.');
+        }
+
+        DB::transaction(function () use ($request, $penempatan) {
+
+            // tutup penempatan lama
+            $penempatan->update([
+                'tanggal_keluar' => now()
+            ]);
+
+            // buat penempatan baru
+            PenempatanSiswa::create([
+                'siswa_id'        => $penempatan->siswa_id,
+                'kelas_id'        => $request->kelas_id,
+                'tahun_ajaran_id' => $penempatan->tahun_ajaran_id,
+                'tanggal_masuk'   => now(),
+                'tanggal_keluar'  => null,
+            ]);
+        });
+
+        return redirect()
+            ->route('tu.siswa.index', $penempatan->siswa_id)
+            ->with('success', 'Siswa berhasil dipindahkan ke kelas baru.');
+    }
+
+    public function keluarkan(PenempatanSiswa $penempatan)
     {
         $tahunAktif = TahunAjaran::current();
 
@@ -256,15 +314,19 @@ class PenempatanSiswaController extends Controller
             abort(403, 'Tidak bisa mengeluarkan siswa di fase ini.');
         }
 
-        $penempatan = PenempatanSiswa::where('tahun_ajaran_id', $tahunAktif->id)
-            ->whereNull('tanggal_keluar')
-            ->findOrFail($id);
+        if ($penempatan->tahun_ajaran_id != $tahunAktif->id) {
+            abort(404);
+        }
+
+        if ($penempatan->tanggal_keluar) {
+            return back()->with('warning', 'Penempatan sudah tidak aktif.');
+        }
 
         $penempatan->update([
-            'tanggal_keluar' => now()
+            'tanggal_keluar' => now(),
         ]);
 
-        return back()->with('success', 'Siswa berhasil dikeluarkan dari rombel');
+        return back()->with('success', 'Siswa berhasil dikeluarkan dari rombel.');
     }
 
 

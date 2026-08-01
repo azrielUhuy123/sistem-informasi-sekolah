@@ -257,45 +257,40 @@ public function ajaxTable(Request $request)
         $siswa = Siswa::withTrashed()->findOrFail($id);
 
         $request->validate([
-            'kelas_id'       => 'required|exists:kelas,id',
             'nama'           => 'required|string|max:255',
-            'nis'            => 'required|numeric|unique:siswa,nis,' . $siswa->id,
-            'nisn'           => 'nullable|numeric|unique:siswa,nisn,' . $siswa->id,
+            'nis'            => 'required|string|max:50|unique:siswa,nis,' . $siswa->id,
+            'nisn'           => 'nullable|string|max:50|unique:siswa,nisn,' . $siswa->id,
             'jenis_kelamin'  => 'required|in:L,P',
             'tanggal_lahir'  => 'nullable|date',
             'alamat'         => 'nullable|string',
             'nama_wali'      => 'nullable|string|max:255',
             'telepon_wali'   => 'nullable|string|max:20',
+            'redirect_to'    => 'nullable|url',
         ]);
 
-        $siswa->update($request->only([
-            'nama',
-            'nis',
-            'nisn',
-            'jenis_kelamin',
-            'tanggal_lahir',
-            'alamat',
-            'nama_wali',
-            'telepon_wali',
-        ]));
-        $penempatanAktif = $siswa->penempatanAktif;
+        DB::transaction(function () use ($request, $siswa) {
 
-        if ($penempatanAktif && $penempatanAktif->kelas_id != $request->kelas_id) {
-
-            $penempatanAktif->update([
-                'tanggal_keluar' => now()
+            $siswa->update([
+                'nama'          => $request->nama,
+                'nis'           => $request->nis,
+                'nisn'          => $request->nisn,
+                'jenis_kelamin' => $request->jenis_kelamin,
+                'tanggal_lahir' => $request->tanggal_lahir,
+                'alamat'        => $request->alamat,
+                'nama_wali'     => $request->nama_wali,
+                'telepon_wali'  => $request->telepon_wali,
             ]);
 
-            PenempatanSiswa::create([
-                'siswa_id'        => $siswa->id,
-                'kelas_id'        => $request->kelas_id,
-                'tahun_ajaran_id' => $penempatanAktif->tahun_ajaran_id,
-                'tanggal_masuk'   => now(),
-                'tanggal_keluar'  => null,
-            ]);
+        });
+
+        if ($request->filled('redirect_to')) {
+            return redirect($request->redirect_to)
+                ->with('success', 'Data siswa berhasil diperbarui.');
         }
 
-        return back()->with('success', 'Data siswa berhasil diperbarui');
+        return redirect()
+            ->route('tu.siswa.index')
+            ->with('success', 'Data siswa berhasil diperbarui.');
     }
 
     /**

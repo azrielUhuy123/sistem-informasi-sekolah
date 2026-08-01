@@ -8,9 +8,9 @@
 
                 <div class="mb-4">
                     <div id="confirmIcon"
-                        class="bg-danger bg-opacity-10 rounded-circle d-inline-flex align-items-center justify-content-center"
+                        class="bg-warning border bg-opacity-10 rounded-circle d-inline-flex align-items-center justify-content-center"
                         style="width:80px;height:80px;">
-                        <i class="bi bi-exclamation-triangle-fill text-danger fs-1"></i>
+                        <i class="bi bi-exclamation-triangle-fill text-warning fs-1"></i>
                     </div>
                 </div>
 

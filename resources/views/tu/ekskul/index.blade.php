@@ -158,10 +158,16 @@
                                         <li>
                                             <form action="{{ route('tu.ekskul.destroy', $e->id) }}"
                                                 method="POST"
-                                                onsubmit="return confirm('Hapus data ini?')">
+                                                
                                                 @csrf
                                                 @method('DELETE')
-                                                <button type="submit" class="dropdown-item text-danger">
+                                                <button type="submit" class="dropdown-item text-danger
+                                                text-danger
+                                                btn-confirm"
+                                                data-title="HAPUS EKSKUL INI?"
+                                                data-message="Ekskul ini akan dihapus dari sistem ini."
+                                                data-button="btn-danger">
+                                
                                                     <i class="bi bi-trash me-2"></i> Hapus
                                                 </button>
                                             </form>

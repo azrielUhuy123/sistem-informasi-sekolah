@@ -158,8 +158,11 @@
                                                 @csrf
                                                 <button
                                                     type="submit"
-                                                    class="dropdown-item"
-                                                    onclick="return confirm('Reset password akun ini?')"
+                                                    class="dropdown-item
+                                                    btn-confirm"
+                                                    data-title="RESET PASSWORD AKUN INI?"
+                                                    data-message="Akun ini passowrdnya akan direset kembali ke tanggal lahir."
+                                                    data-button="btn-danger"
                                                 >
                                                     <i class="bi bi-key me-2"></i>
                                                     Reset Password
@@ -173,7 +176,10 @@
                                                 action="{{ route('tu.akun.toggle-status',$item) }}"
                                             >
                                                 @csrf
-                                                <button type="submit" class="dropdown-item text-danger">
+                                                <button type="submit" class="dropdown-item text-danger btn-confirm"
+                                                data-title="NONAKTIFKAN AKUN INI?"
+                                                data-message="Akun ini akan dinonaktifkan dari pengguna sistem ini."
+                                                data-button="btn-danger">
                                                     <i class="bi bi-person-x me-2"></i>
                                                     {{ $item->is_active
                                                         ? 'Nonaktifkan'

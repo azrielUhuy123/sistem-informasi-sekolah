@@ -388,15 +388,25 @@ Route::get(
                 Route::post('/naik-kelas', [PenempatanSiswaController::class, 'naikKelas'])->name('naik-kelas');
                 Route::get('/preview-naik-kelas', [PenempatanSiswaController::class, 'previewNaikKelas'])
                     ->name('preview-naik-kelas');
-                Route::post('/{id}/keluarkan',
+                Route::post('/{penempatan}/keluarkan',
                     [PenempatanSiswaController::class, 'keluarkan']
                 )->name('keluarkan');
+                Route::get(
+                    '/{penempatan}/edit',
+                    [PenempatanSiswaController::class, 'edit']
+                )->name('edit');
+
+                Route::put(
+                    '/{penempatan}',
+                    [PenempatanSiswaController::class, 'update']
+                )->name('update');
                 Route::get('/naik-kelas',
                     [PenempatanSiswaController::class, 'indexNaikKelas']
                 )->name('naik-kelas.index');
                 Route::get('/naik-kelas/mapping',
                     [PenempatanSiswaController::class, 'mappingNaikKelas']
                 )->name('naik-kelas.mapping');
+                
             });
 
         /*

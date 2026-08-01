@@ -45,7 +45,7 @@
                 {{ $pengajuan->count() }} Pengajuan Surat
             </span>
         </x-slot:badge>
-
+ 
         <x-slot:actions>
             <input
                 type="text"
@@ -130,7 +130,7 @@
                                                 @method('DELETE')
                                                 <button type="submit" 
                                                 class="dropdown-item text-danger btn-confirm"
-                                                data-title="Hapus Pengajuan Surat"
+                                                data-title="HAPUS PENGAJUAN SURAT?"
                                                 data-message="Pengajuan Surat akan dihapus secara permanen"
                                                 data-button="btn-danger">
                                                     <i class="bi bi-trash me-2"></i> Hapus

@@ -72,7 +72,7 @@
                                         </div>
 
                                         <div>
-                                            <div class="fw-bold">
+                                            <div class="fw-bold text-lowercase">
                                                 {{ $item->siswa->nama ?? '-' }}
                                             </div>
                                             <small class="text-muted">
@@ -93,14 +93,14 @@
                                     <span class="badge bg-light rounded-pill text-dark border px-3 py-2 d-flex gap-2">
                                         <i class="bi bi-calendar"></i>
                                         {{ optional($item->siswa)->tanggal_lahir
-                                        ? \Carbon\Carbon::parse($item->siswa->tanggal_lahir)->format('d/m/Y')
+                                        ? \Carbon\Carbon::parse($item->siswa->tanggal_lahir)->format('d M Y')
                                         : '-' }}
                                     </span>
                                 </td>
                                 <td>
                                     <div class="d-flex align-items-center">
                                         <div>
-                                            <div class="fw-bold">
+                                            <div class="text-lowercase">
                                                 {{ $item->siswa->nama_wali ?? '-' }}
                                             </div>
                                             <div class="mt-1">
@@ -143,7 +143,7 @@
                                                     <button
                                                         type="submit"
                                                         class="dropdown-item text-danger btn-confirm"
-                                                        data-title="Keluarkan Siswa"
+                                                        data-title="KELUARKAN SISWA INI?"
                                                         data-message="Siswa akan dikeluarkan dari rombel ini."
                                                         data-button="btn-danger">
 

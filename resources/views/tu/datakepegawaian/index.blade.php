@@ -202,11 +202,15 @@
                                         <li>
                                             <form action="{{ route('tu.datakepegawaian.destroy', $row->id) }}"
                                                 method="POST"
-                                                onsubmit="return confirm('Hapus data ini?')"
+                                                
                                             >
                                                 @csrf
                                                 @method('DELETE')
-                                                <button type="submit" class="dropdown-item text-danger">
+                                                <button type="submit" class="dropdown-item text-danger
+                                                btn-confirm"
+                                                data-title="HAPUS PEGAWAI INI?"
+                                                data-message="Pegawai ini akan dihapus dari sistem ini."
+                                                data-button="btn-danger">
                                                     <i class="bi bi-trash me-2"></i> Hapus
                                                 </button>
                                             </form>
@@ -239,7 +243,7 @@
             <div class="modal fade"
                 id="messageModal{{ $row->id }}"
                 tabindex="-1">
-
+ 
                 <div class="modal-dialog modal-lg modal-dialog-centered">
 
                     <div class="modal-content border-0 shadow">

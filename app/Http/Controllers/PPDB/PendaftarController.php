@@ -360,11 +360,17 @@ class PendaftarController extends Controller
 
     public function penempatanKelas()
     {
+        $tahunAktif = TahunAjaran::aktif();
+
         $data = PpdbPendaftar::with([
-            'siswa.penempatanAktif.kelas'
+                'siswa.penempatanAktif.kelas'
             ])
             ->whereNotNull('siswa_id')
-            ->latest()
+            ->whereHas('siswa')
+            ->whereDoesntHave('siswa.penempatan', function ($q) use ($tahunAktif) {
+                $q->where('tahun_ajaran_id', $tahunAktif->id)
+                ->whereNull('tanggal_keluar');
+            })
             ->paginate(20);
 
         $kelas = Kelas::orderBy('nama_kelas')

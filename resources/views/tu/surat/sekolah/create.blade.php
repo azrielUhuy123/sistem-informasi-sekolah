@@ -17,14 +17,6 @@
             </p>
         </div>
 
-        <a href="{{ route('tu.dokumen.sekolah') }}"
-           class="btn btn-secondary">
-
-            <i class="fas fa-arrow-left me-1"></i>
-            Kembali
-
-        </a>
-
     </div>
 
     {{-- VALIDATION ERROR --}}
@@ -71,7 +63,7 @@
 
                     <input type="text"
                            name="nama_surat"
-                           class="form-control"
+                           class="form-control rounded-3"
                            placeholder="Masukkan nama surat"
                            value="{{ old('nama_surat') }}"
                            required>
@@ -87,7 +79,7 @@
 
                     <input type="text"
                            name="kategori_surat"
-                           class="form-control"
+                           class="form-control rounded-3"
                            placeholder="Contoh: SK, Internal, Guru"
                            value="{{ old('kategori_surat') }}"
                            required>
@@ -113,16 +105,13 @@
                 </div>
 
                 {{-- BUTTON --}}
-                <div class="d-flex justify-content-end">
-
-                    <button type="submit"
-                            class="btn btn-primary">
-
-                        <i class="fas fa-save me-1"></i>
-                        Simpan Dokumen
-
+                <div class="d-flex justify-content-between align-items-center mt-4">
+                    <a href="{{ route('tu.dokumen.sekolah') }}" class="btn btn-outline-secondary">
+                        <i class="bi bi-arrow-left me-1"></i> Kembali
+                    </a>
+                    <button type="submit" class="btn btn-primary px-4">
+                        <i class="bi bi-save me-1"></i> Simpan Data
                     </button>
-
                 </div>
 
             </form>

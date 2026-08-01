@@ -14,38 +14,29 @@ class TahunAjaranController extends Controller
      */
     public function index(Request $request)
     {
-        $deleted = $request->deleted ?? 'active';
+        $query = TahunAjaran::query();
 
-        if ($deleted === 'only') {
-            $query = TahunAjaran::onlyTrashed();
-        } elseif ($deleted === 'all') {
-            $query = TahunAjaran::withTrashed();
-        } else {
-            $query = TahunAjaran::query();
-        }
-
-        if ($request->q) {
+        // Search
+        if ($request->filled('q')) {
             $query->where(function ($q) use ($request) {
-                $q->where('tahun', 'like', "%{$request->q}%")
-                ->orWhere('status', 'like', "%{$request->q}%");
+                $q->where('tahun', 'like', '%' . $request->q . '%')
+                ->orWhere('semester', 'like', '%' . $request->q . '%')
+                ->orWhere('status', 'like', '%' . $request->q . '%');
             });
         }
 
-        $sort  = $request->sort ?? 'id';
-        $order = $request->order ?? 'asc';
-
-        $allowed = ['id', 'tahun', 'status'];
-        if (!in_array($sort, $allowed)) {
-            $sort = 'id';
-        }
-
-        $query->orderBy($sort, $order);
-
-        $tahun = $query->paginate($request->per_page ?? 15)->withQueryString();
+        // Data terbaru paling atas
+        $tahun = $query
+            ->orderByDesc('id')
+            ->paginate(10)
+            ->withQueryString();
 
         $tahunAktif = TahunAjaran::current();
 
-        return view('tu.tahun.index', compact('tahun', 'tahunAktif'));
+        return view('tu.tahun.index', compact(
+            'tahun',
+            'tahunAktif'
+        ));
     }
 
     /**

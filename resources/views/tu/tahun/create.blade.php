@@ -30,7 +30,7 @@
                         type="text"
                         name="tahun"
                         id="tahunInput"
-                        class="form-control"
+                        class="form-control rounded-3"
                         value="{{ $tahunAuto }}"
                         readonly
                         required
@@ -48,7 +48,7 @@
                     <select
                         name="semester"
                         id="semesterInput"
-                        class="form-select"
+                        class="form-select rounded-3"
                         disabled
                     >
                         <option value="Ganjil" {{ $semesterAuto === 'Ganjil' ? 'selected' : '' }}>Ganjil</option>
