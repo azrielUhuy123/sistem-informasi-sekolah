@@ -143,7 +143,7 @@
     }
 
     .brand-text h1{
-        margin-top:20px;
+        margin-top:10px;
         font-size:14px;
         line-height:1.2;
     }
@@ -170,6 +170,7 @@
 
     .brand-text h1{
         font-size:12px;
+        margin-top:10px;
     }
 
     .login-btn{
