@@ -84,17 +84,6 @@ Route::middleware([
             }
         )->name('switch-mode');
 
-        Route::prefix('website')
-            ->name('website.')
-            ->group(function () {
-
-                Route::resource(
-                    'berita',
-                    BeritaController::class
-                );
-
-            });
-
         /*
         |--------------------------------------------------------------------------
         | KELAS & ROMBEL
