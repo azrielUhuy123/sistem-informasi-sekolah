@@ -143,7 +143,7 @@
     }
 
     .brand-text h1{
-        margin-top:10px;
+        margin-top:20px;
         font-size:14px;
         line-height:1.2;
     }
