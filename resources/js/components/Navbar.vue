@@ -39,143 +39,129 @@
 
 <style scoped>
 
-.navbar-wrapper{
+/* =========================
+   Navbar
+========================= */
+
+.navbar-container {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 14px 24px;
+    background: #fff;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, .08);
     position: sticky;
-    top:0;
-    z-index:1000;
-
-    background: rgba(255,255,255,.9);
-    backdrop-filter: blur(12px);
-
-    border-bottom:1px solid #e5e7eb;
+    top: 0;
+    z-index: 100;
 }
 
-.navbar-container{
-    max-width:1400px;
-    margin:auto;
+/* =========================
+   Brand
+========================= */
 
-    padding:16px 32px;
-
-    display:flex;
-    align-items:center;
-    justify-content:space-between;
+.brand {
+    display: flex;
+    align-items: center;
+    gap: 10px;
 }
 
-.brand{
-    display:flex;
-    align-items:center;
-    gap:14px;
+.brand-logo {
+    width: 42px;
+    height: 42px;
+    object-fit: contain;
+    display: block;
+    flex-shrink: 0;
 }
 
-.brand-logo{
-    width:52px;
-    height:52px;
-    object-fit:contain;
+.brand-text {
+    display: flex;
+    align-items: center;
 }
 
-.brand-text h1{
-    margin-top:10px;
-    font-size:1.2rem;
-    font-weight:700;
-    color:#6b7280;
+.brand-text h1 {
+    margin: 0;
+    font-size: 20px;
+    font-weight: 700;
+    line-height: 1.2;
+    color: #1f2937;
+    white-space: nowrap;
 }
 
+/* =========================
+   Login Button
+========================= */
 
-.nav-links{
-    display:flex;
-    gap:30px;
+.login-btn {
+    display: inline-flex;
+    justify-content: center;
+    align-items: center;
+    padding: 10px 18px;
+    border-radius: 8px;
+    background: #2563eb;
+    color: #fff;
+    text-decoration: none;
+    font-size: 14px;
+    font-weight: 600;
+    transition: .3s;
 }
 
-.nav-links a{
-    text-decoration:none;
-    color:#374151;
-    font-weight:500;
-    transition:.2s;
+.login-btn:hover {
+    background: #1d4ed8;
 }
 
-.nav-links a:hover{
-    color:#2563eb;
-}
-
-.router-link-active{
-    color:#2563eb !important;
-    font-weight:700;
-}
-
-.login-btn{
-    text-decoration:none;
-
-    background:#2563eb;
-    color:white;
-
-    padding:10px 18px;
-    border-radius:12px;
-
-    font-weight:600;
-
-    transition:.2s;
-}
-
-.login-btn:hover{
-    background:#1d4ed8;
-}
+/* =========================
+   Tablet
+========================= */
 
 @media (max-width: 992px) {
 
-    .navbar-container{
-        padding:12px 16px;
+    .navbar-container {
+        padding: 12px 18px;
     }
 
-    .nav-links{
-        display:none;
-        margin-top:auto;
+    .brand-logo {
+        width: 38px;
+        height: 38px;
     }
 
-    .brand{
-        gap:10px;
-        flex:1;
-        min-width:0;
+    .brand-text h1 {
+        font-size: 16px;
     }
 
-    .brand-logo{
-        width:42px;
-        height:42px;
+    .login-btn {
+        padding: 8px 16px;
+        font-size: 13px;
     }
-
-    .brand-text h1{
-        margin-top:10px;
-        font-size:14px;
-        line-height:1.2;
-    }
-
-    .login-btn{
-        padding:10px 14px;
-        font-size:13px;
-        white-space:nowrap;
-        border-radius:10px;
-    }
-
 }
 
-@media (max-width: 480px){
+/* =========================
+   Mobile
+========================= */
 
-    .navbar-container{
-        padding:10px 12px;
+@media (max-width: 480px) {
+
+    .navbar-container {
+        padding: 10px 14px;
     }
 
-    .brand-logo{
-        width:38px;
-        height:38px;
+    .brand {
+        gap: 8px;
     }
 
-    .brand-text h1{
-        font-size:12px;
-        margin-top:10px;
+    .brand-logo {
+        width: 34px;
+        height: 34px;
     }
 
-    .login-btn{
-        padding:8px 10px;
-        font-size:12px;
+    .brand-text h1 {
+        font-size: 14px;
+        line-height: 1.2;
+        margin: 0;
+    }
+
+    .login-btn {
+        padding: 7px 14px;
+        font-size: 12px;
     }
 
 }
