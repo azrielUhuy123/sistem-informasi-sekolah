@@ -1,45 +1,153 @@
 import { Modal } from 'bootstrap';
 
-let targetForm = null;
+const defaultTitle = 'Konfirmasi';
+const defaultMessage = 'Apakah Anda yakin?';
+const defaultConfirmText = 'Ya, Lanjutkan';
+const defaultButtonClass = 'btn-danger';
 
-document.addEventListener('DOMContentLoaded', () => {
+const state = {
+    modalElement: null,
+    modal: null,
+    confirmButton: null,
+    titleElement: null,
+    messageElement: null,
+    targetForm: null,
+    isProcessing: false,
+};
 
-    const modalElement = document.getElementById('confirmModal');
+const getConfirmText = (triggerButton) => triggerButton?.dataset.confirmText || defaultConfirmText;
+const getButtonClass = (triggerButton) => triggerButton?.dataset.button || defaultButtonClass;
 
-    if (!modalElement) return;
+const setConfirmButtonState = (isLoading = false) => {
+    if (!state.confirmButton) {
+        return;
+    }
 
-    const modal = new Modal(modalElement);
+    state.confirmButton.disabled = isLoading;
+    state.confirmButton.setAttribute('aria-busy', isLoading ? 'true' : 'false');
 
-    document.addEventListener('click', function (e) {
+    if (isLoading) {
+        state.confirmButton.innerHTML = '<span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>Mengirim...';
+        return;
+    }
 
-        const btn = e.target.closest('.btn-confirm');
+    const confirmText = state.confirmButton.dataset.confirmText || defaultConfirmText;
+    state.confirmButton.innerHTML = '';
+    state.confirmButton.textContent = confirmText;
+};
 
-        if (!btn) return;
+const resetModal = () => {
+    if (!state.modalElement || !state.titleElement || !state.messageElement || !state.confirmButton) {
+        return;
+    }
 
-        e.preventDefault();
+    state.titleElement.textContent = defaultTitle;
+    state.messageElement.textContent = defaultMessage;
+    state.confirmButton.className = `btn px-4 ${defaultButtonClass}`;
+    state.confirmButton.dataset.confirmText = defaultConfirmText;
+    setConfirmButtonState(false);
 
-        targetForm = btn.closest('form');
+    if (state.targetForm) {
+        state.targetForm.removeAttribute('data-confirmed');
+    }
 
-        document.getElementById('confirmTitle').textContent =
-            btn.dataset.title ?? 'Konfirmasi';
+    state.targetForm = null;
+    state.isProcessing = false;
+};
 
-        document.getElementById('confirmMessage').textContent =
-            btn.dataset.message ?? 'Apakah Anda yakin?';
+const openConfirmModal = (triggerButton) => {
+    if (!state.modalElement || !state.titleElement || !state.messageElement || !state.confirmButton) {
+        return;
+    }
 
-        const submit = document.getElementById('confirmSubmit');
+    const form = triggerButton.closest('form');
 
-        submit.className = 'btn px-4 ' + (btn.dataset.button ?? 'btn-danger');
+    if (!form) {
+        return;
+    }
 
-        modal.show();
+    state.targetForm = form;
+    state.isProcessing = false;
 
-    });
+    state.titleElement.textContent = triggerButton.dataset.title || defaultTitle;
+    state.messageElement.textContent = triggerButton.dataset.message || defaultMessage;
+    state.confirmButton.className = `btn px-4 ${getButtonClass(triggerButton)}`;
+    state.confirmButton.dataset.confirmText = getConfirmText(triggerButton);
+    setConfirmButtonState(false);
 
-    document.getElementById('confirmSubmit').addEventListener('click', () => {
+    state.modal.show();
+};
 
-        if (targetForm) {
-            targetForm.submit();
+const confirmSubmit = () => {
+    if (!state.targetForm || state.isProcessing) {
+        return;
+    }
+
+    const form = state.targetForm;
+
+    if (!form.checkValidity()) {
+        form.reportValidity();
+        setConfirmButtonState(false);
+        return;
+    }
+
+    state.isProcessing = true;
+    setConfirmButtonState(true);
+    form.setAttribute('data-confirmed', 'true');
+
+    state.modal.hide();
+    form.requestSubmit();
+};
+
+const bindConfirmButtons = () => {
+    document.addEventListener('click', (event) => {
+        const triggerButton = event.target.closest('.btn-confirm');
+
+        if (!triggerButton) {
+            return;
         }
 
+        event.preventDefault();
+        openConfirmModal(triggerButton);
+    });
+};
+
+const bindFormSubmitEvents = () => {
+    document.addEventListener('submit', (event) => {
+        const form = event.target;
+
+        if (form instanceof HTMLFormElement && form.getAttribute('data-confirmed') === 'true') {
+            form.removeAttribute('data-confirmed');
+        }
+    }, true);
+};
+
+document.addEventListener('DOMContentLoaded', () => {
+    state.modalElement = document.getElementById('confirmModal');
+
+    if (!state.modalElement) {
+        return;
+    }
+
+    state.modal = new Modal(state.modalElement);
+    state.confirmButton = document.getElementById('confirmSubmit');
+    state.titleElement = document.getElementById('confirmTitle');
+    state.messageElement = document.getElementById('confirmMessage');
+
+    if (!state.confirmButton || !state.titleElement || !state.messageElement) {
+        return;
+    }
+
+    bindConfirmButtons();
+    bindFormSubmitEvents();
+
+    state.confirmButton.addEventListener('click', confirmSubmit);
+
+    state.modalElement.addEventListener('shown.bs.modal', () => {
+        state.confirmButton.focus();
     });
 
+    state.modalElement.addEventListener('hidden.bs.modal', () => {
+        resetModal();
+    });
 });

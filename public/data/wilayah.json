@@ -1,0 +1,462 @@
+[
+  {
+    "id": "36",
+    "nama": "Banten",
+    "kabupaten": [
+      {
+        "id": "3603",
+        "nama": "Kabupaten Tangerang",
+        "kecamatan": [
+          {
+            "id": "360301",
+            "nama": "Balaraja",
+            "desa": [
+              { "id": "3603010001", "nama": "Cangkudu" },
+              { "id": "3603010002", "nama": "Gembong" },
+              { "id": "3603010003", "nama": "Saga" },
+              { "id": "3603010004", "nama": "Sentul" },
+              { "id": "3603010005", "nama": "Sentul Jaya" },
+              { "id": "3603010006", "nama": "Sukamurni" },
+              { "id": "3603010007", "nama": "Talagasari" },
+              { "id": "3603010008", "nama": "Tobat" },
+              { "id": "3603010009", "nama": "Balaraja" }
+            ]
+          },
+          {
+            "id": "360318",
+            "nama": "Cikupa",
+            "desa": [
+              { "id": "3603180001", "nama": "Bitung Jaya" },
+              { "id": "3603180002", "nama": "Bojong" },
+              { "id": "3603180003", "nama": "Budi Mulya" },
+              { "id": "3603180004", "nama": "Cibadak" },
+              { "id": "3603180005", "nama": "Cikupa" },
+              { "id": "3603180006", "nama": "Dukuh" },
+              { "id": "3603180007", "nama": "Pasir Gadung" },
+              { "id": "3603180008", "nama": "Pasir Jaya" },
+              { "id": "3603180009", "nama": "Sukadamai" },
+              { "id": "3603180010", "nama": "Sukanagara" },
+              { "id": "3603180011", "nama": "Talaga" },
+              { "id": "3603180012", "nama": "Talagasari" },
+              { "id": "3603180013", "nama": "Bunder" },
+              { "id": "3603180014", "nama": "Sukamulya" }
+            ]
+          },
+          {
+            "id": "360323",
+            "nama": "Cisauk",
+            "desa": [
+              { "id": "3603230001", "nama": "Cibogo" },
+              { "id": "3603230002", "nama": "Dangdang" },
+              { "id": "3603230003", "nama": "Mekar Wangi" },
+              { "id": "3603230004", "nama": "Sampora" },
+              { "id": "3603230005", "nama": "Suradita" },
+              { "id": "3603230006", "nama": "Cisauk" }
+            ]
+          },
+          {
+            "id": "360305",
+            "nama": "Cisoka",
+            "desa": [
+              { "id": "3603050001", "nama": "Bojong Loa" },
+              { "id": "3603050002", "nama": "Carenang" },
+              { "id": "3603050003", "nama": "Caringin" },
+              { "id": "3603050004", "nama": "Cempaka" },
+              { "id": "3603050005", "nama": "Cibugel" },
+              { "id": "3603050006", "nama": "Cisoka" },
+              { "id": "3603050007", "nama": "Jeungjing" },
+              { "id": "3603050008", "nama": "Karangharja" },
+              { "id": "3603050009", "nama": "Selapajang" },
+              { "id": "3603050010", "nama": "Sukatani" }
+            ]
+          },
+          {
+            "id": "360317",
+            "nama": "Curug",
+            "desa": [
+              { "id": "3603170001", "nama": "Cukanggalih" },
+              { "id": "3603170002", "nama": "Curug Wetan" },
+              { "id": "3603170003", "nama": "Kadu" },
+              { "id": "3603170004", "nama": "Kadu Jaya" },
+              { "id": "3603170005", "nama": "Binong" },
+              { "id": "3603170006", "nama": "Curug Kulon" },
+              { "id": "3603170007", "nama": "Sukabakti" }
+            ]
+          },
+          {
+            "id": "360332",
+            "nama": "Gunung Kaler",
+            "desa": [
+              { "id": "3603320001", "nama": "Cibetok" },
+              { "id": "3603320002", "nama": "Cipaeh" },
+              { "id": "3603320003", "nama": "Gunung Kaler" },
+              { "id": "3603320004", "nama": "Kandawati" },
+              { "id": "3603320005", "nama": "Kedung" },
+              { "id": "3603320006", "nama": "Onyam" },
+              { "id": "3603320007", "nama": "Rancagede" },
+              { "id": "3603320008", "nama": "Sidoko" },
+              { "id": "3603320009", "nama": "Tamiang" }
+            ]
+          },
+          {
+            "id": "360304",
+            "nama": "Jambe",
+            "desa": [
+              { "id": "3603040001", "nama": "Ancol Pasir" },
+              { "id": "3603040002", "nama": "Daru" },
+              { "id": "3603040003", "nama": "Jambe" },
+              { "id": "3603040004", "nama": "Kutruk" },
+              { "id": "3603040005", "nama": "Mekarsari" },
+              { "id": "3603040006", "nama": "Pasir Barat" },
+              { "id": "3603040007", "nama": "Ranca Buaya" },
+              { "id": "3603040008", "nama": "Sukamanah" },
+              { "id": "3603040009", "nama": "Taban" },
+              { "id": "3603040010", "nama": "Tipar Raya" }
+            ]
+          },
+          {
+            "id": "360302",
+            "nama": "Jayanti",
+            "desa": [
+              { "id": "3603020001", "nama": "Cikande" },
+              { "id": "3603020002", "nama": "Dangdeur" },
+              { "id": "3603020003", "nama": "Jayanti" },
+              { "id": "3603020004", "nama": "Pabuaran" },
+              { "id": "3603020005", "nama": "Pangkat" },
+              { "id": "3603020006", "nama": "Pasir Gintung" },
+              { "id": "3603020007", "nama": "Pasir Muncang" },
+              { "id": "3603020008", "nama": "Sumurbandung" }
+            ]
+          },
+          {
+            "id": "360328",
+            "nama": "Kelapa Dua",
+            "desa": [
+              { "id": "3603280001", "nama": "Curug Sangereng" },
+              { "id": "3603280002", "nama": "Bencongan" },
+              { "id": "3603280003", "nama": "Bencongan Indah" },
+              { "id": "3603280004", "nama": "Bojong Nangka" },
+              { "id": "3603280005", "nama": "Kelapa Dua" },
+              { "id": "3603280006", "nama": "Pakulonan Barat" }
+            ]
+          },
+          {
+            "id": "360309",
+            "nama": "Kemiri",
+            "desa": [
+              { "id": "3603090001", "nama": "Karang Anyar" },
+              { "id": "3603090002", "nama": "Kemiri" },
+              { "id": "3603090003", "nama": "Klebet" },
+              { "id": "3603090004", "nama": "Legok Suka Maju" },
+              { "id": "3603090005", "nama": "Lontar" },
+              { "id": "3603090006", "nama": "Patramanggala" },
+              { "id": "3603090007", "nama": "Ranca Labuh" }
+            ]
+          },
+          {
+            "id": "360306",
+            "nama": "Kresek",
+            "desa": [
+              { "id": "3603060001", "nama": "Jengkol" },
+              { "id": "3603060002", "nama": "Kemuning" },
+              { "id": "3603060003", "nama": "Koper" },
+              { "id": "3603060004", "nama": "Kresek" },
+              { "id": "3603060005", "nama": "Pasir Ampo" },
+              { "id": "3603060006", "nama": "Patrasana" },
+              { "id": "3603060007", "nama": "Rancailat" },
+              { "id": "3603060008", "nama": "Renged" },
+              { "id": "3603060009", "nama": "Talok" }
+            ]
+          },
+          {
+            "id": "360307",
+            "nama": "Kronjo",
+            "desa": [
+              { "id": "3603070001", "nama": "Bakung" },
+              { "id": "3603070002", "nama": "Blukbuk" },
+              { "id": "3603070003", "nama": "Cirumpak" },
+              { "id": "3603070004", "nama": "Kronjo" },
+              { "id": "3603070005", "nama": "Muncung" },
+              { "id": "3603070006", "nama": "Pagedangan Ilir" },
+              { "id": "3603070007", "nama": "Pagedangan Udik" },
+              { "id": "3603070008", "nama": "Pagenjahan" },
+              { "id": "3603070009", "nama": "Pasilian" },
+              { "id": "3603070010", "nama": "Pasir" }
+            ]
+          },
+          {
+            "id": "360314",
+            "nama": "Kosambi",
+            "desa": [
+              { "id": "3603140001", "nama": "Belimbing" },
+              { "id": "3603140002", "nama": "Cengklong" },
+              { "id": "3603140003", "nama": "Jati Mulya" },
+              { "id": "3603140004", "nama": "Kosambi Timur" },
+              { "id": "3603140005", "nama": "Rawa Burung" },
+              { "id": "3603140006", "nama": "Rawa Rengas" },
+              { "id": "3603140007", "nama": "Salembaran Jati" },
+              { "id": "3603140008", "nama": "Dadap" },
+              { "id": "3603140009", "nama": "Kosambi Barat" },
+              { "id": "3603140010", "nama": "Salembaran Jaya" }
+            ]
+          },
+          {
+            "id": "360320",
+            "nama": "Legok",
+            "desa": [
+              { "id": "3603200001", "nama": "Babat" },
+              { "id": "3603200002", "nama": "Bojongkamal" },
+              { "id": "3603200003", "nama": "Caringin" },
+              { "id": "3603200004", "nama": "Ciangir" },
+              { "id": "3603200005", "nama": "Cirarab" },
+              { "id": "3603200006", "nama": "Kemuning" },
+              { "id": "3603200007", "nama": "Legok" },
+              { "id": "3603200008", "nama": "Palasari" },
+              { "id": "3603200009", "nama": "Rancagong" },
+              { "id": "3603200010", "nama": "Serdang Wetan" },
+              { "id": "3603200011", "nama": "Babakan" }
+            ]
+          },
+          {
+            "id": "360308",
+            "nama": "Mauk",
+            "desa": [
+              { "id": "3603080001", "nama": "Banyu Asih" },
+              { "id": "3603080002", "nama": "Gunung Sari" },
+              { "id": "3603080003", "nama": "Jatiwaringin" },
+              { "id": "3603080004", "nama": "Kedung Dalem" },
+              { "id": "3603080005", "nama": "Ketapang" },
+              { "id": "3603080006", "nama": "Marga Mulya" },
+              { "id": "3603080007", "nama": "Mauk Barat" },
+              { "id": "3603080008", "nama": "Sasak" },
+              { "id": "3603080009", "nama": "Tanjung Anom" },
+              { "id": "3603080010", "nama": "Tegal Kunir Kidul" },
+              { "id": "3603080011", "nama": "Tegal Kunir Lor" },
+              { "id": "3603080012", "nama": "Mauk Timur" }
+            ]
+          },
+          {
+            "id": "360333",
+            "nama": "Mekarbaru",
+            "desa": [
+              { "id": "3603330001", "nama": "Cijeruk" },
+              { "id": "3603330002", "nama": "Gandaria" },
+              { "id": "3603330003", "nama": "Jenggot" },
+              { "id": "3603330004", "nama": "Kedaung" },
+              { "id": "3603330005", "nama": "Klutuk" },
+              { "id": "3603330006", "nama": "Kosambi Dalam" },
+              { "id": "3603330007", "nama": "Mekarbaru" },
+              { "id": "3603330008", "nama": "Waliwis" }
+            ]
+          },
+          {
+            "id": "360322",
+            "nama": "Pagedangan",
+            "desa": [
+              { "id": "3603220001", "nama": "Cicalengka" },
+              { "id": "3603220002", "nama": "Cihuni" },
+              { "id": "3603220003", "nama": "Cijantra" },
+              { "id": "3603220004", "nama": "Jatake" },
+              { "id": "3603220005", "nama": "Kadu Sirung" },
+              { "id": "3603220006", "nama": "Karang Tenga" },
+              { "id": "3603220007", "nama": "Lengkong Kulon" },
+              { "id": "3603220008", "nama": "Malang Nengah" },
+              { "id": "3603220009", "nama": "Pagedangan" },
+              { "id": "3603220010", "nama": "Situ Gadung" },
+              { "id": "3603220011", "nama": "Medang" }
+            ]
+          },
+          {
+            "id": "360315",
+            "nama": "Pakuhaji",
+            "desa": [
+              { "id": "3603150001", "nama": "Buaran Bambu" },
+              { "id": "3603150002", "nama": "Buaran Mangga" },
+              { "id": "3603150003", "nama": "Bunisari" },
+              { "id": "3603150004", "nama": "Gaga" },
+              { "id": "3603150005", "nama": "Kalibaru" },
+              { "id": "3603150006", "nama": "Kiara Payung" },
+              { "id": "3603150007", "nama": "Kohod" },
+              { "id": "3603150008", "nama": "Kramat" },
+              { "id": "3603150009", "nama": "Laksana" },
+              { "id": "3603150010", "nama": "Paku Alam" },
+              { "id": "3603150011", "nama": "Rawa Boni" },
+              { "id": "3603150012", "nama": "Sukawali" },
+              { "id": "3603150013", "nama": "Surya Bahari" },
+              { "id": "3603150014", "nama": "Pakuhaji" }
+            ]
+          },
+          {
+            "id": "360319",
+            "nama": "Panongan",
+            "desa": [
+              { "id": "3603190001", "nama": "Ciakar" },
+              { "id": "3603190002", "nama": "Mekar Jaya" },
+              { "id": "3603190003", "nama": "Panongan" },
+              { "id": "3603190004", "nama": "Peusar" },
+              { "id": "3603190005", "nama": "Ranca Iyuh" },
+              { "id": "3603190006", "nama": "Ranca Kalapa" },
+              { "id": "3603190007", "nama": "Serdang Kulon" },
+              { "id": "3603190008", "nama": "Mekar Bakti" }
+            ]
+          },
+          {
+            "id": "360312",
+            "nama": "Pasar Kemis",
+            "desa": [
+              { "id": "3603120001", "nama": "Gelam Jaya" },
+              { "id": "3603120002", "nama": "Pangadegan" },
+              { "id": "3603120003", "nama": "Pasar Kemis" },
+              { "id": "3603120004", "nama": "Suka Asih" },
+              { "id": "3603120005", "nama": "Sukamantri" },
+              { "id": "3603120006", "nama": "Kuta Baru" },
+              { "id": "3603120007", "nama": "Kutabumi" },
+              { "id": "3603120008", "nama": "Kuta Jaya" },
+              { "id": "3603120009", "nama": "Sindangsari" }
+            ]
+          },
+          {
+            "id": "360311",
+            "nama": "Rajeg",
+            "desa": [
+              { "id": "3603110001", "nama": "Daon" },
+              { "id": "3603110002", "nama": "Jambu Karya" },
+              { "id": "3603110003", "nama": "Lembangsari" },
+              { "id": "3603110004", "nama": "Mekarsari" },
+              { "id": "3603110005", "nama": "Pangarengan" },
+              { "id": "3603110006", "nama": "Rajeg" },
+              { "id": "3603110007", "nama": "Rajeg Mulya" },
+              { "id": "3603110008", "nama": "Ranca Bango" },
+              { "id": "3603110009", "nama": "Sukamanah" },
+              { "id": "3603110010", "nama": "Sukasari" },
+              { "id": "3603110011", "nama": "Tanjakan" },
+              { "id": "3603110012", "nama": "Tanjakan Mekar" },
+              { "id": "3603110013", "nama": "Sukatani" }
+            ]
+          },
+          {
+            "id": "360316",
+            "nama": "Sepatan",
+            "desa": [
+              { "id": "3603160001", "nama": "Karet" },
+              { "id": "3603160002", "nama": "Kayu Agung" },
+              { "id": "3603160003", "nama": "Kayu Bongkok" },
+              { "id": "3603160004", "nama": "Mekar Jaya" },
+              { "id": "3603160005", "nama": "Pisangan Jaya" },
+              { "id": "3603160006", "nama": "Pondok Jaya" },
+              { "id": "3603160007", "nama": "Sarakan" },
+              { "id": "3603160008", "nama": "Sepatan" }
+            ]
+          },
+          {
+            "id": "360330",
+            "nama": "Sepatan Timur",
+            "desa": [
+              { "id": "3603300001", "nama": "Gempol Sari" },
+              { "id": "3603300002", "nama": "Jati Mulya" },
+              { "id": "3603300003", "nama": "Kampung Kelor" },
+              { "id": "3603300004", "nama": "Kedaung Barat" },
+              { "id": "3603300005", "nama": "Lebak Wangi" },
+              { "id": "3603300006", "nama": "Pondok Kelor" },
+              { "id": "3603300007", "nama": "Sangiang" },
+              { "id": "3603300008", "nama": "Tanah Merah" }
+            ]
+          },
+          {
+            "id": "360329",
+            "nama": "Sindang Jaya",
+            "desa": [
+              { "id": "3603290001", "nama": "Badak Anom" },
+              { "id": "3603290002", "nama": "Sindangasih" },
+              { "id": "3603290003", "nama": "Sindang Jaya" },
+              { "id": "3603290004", "nama": "Sindangpanon" },
+              { "id": "3603290005", "nama": "Sindangsono" },
+              { "id": "3603290006", "nama": "Sukaharja" },
+              { "id": "3603290007", "nama": "Wanakerta" }
+            ]
+          },
+          {
+            "id": "360331",
+            "nama": "Solear",
+            "desa": [
+              { "id": "3603310001", "nama": "Cikareo" },
+              { "id": "3603310002", "nama": "Cikasungka" },
+              { "id": "3603310003", "nama": "Cikuya" },
+              { "id": "3603310004", "nama": "Cireundeu" },
+              { "id": "3603310005", "nama": "Munjul" },
+              { "id": "3603310006", "nama": "Pasanggrahan" },
+              { "id": "3603310007", "nama": "Solear" }
+            ]
+          },
+          {
+            "id": "360310",
+            "nama": "Sukadiri",
+            "desa": [
+              { "id": "3603100001", "nama": "Buaran Jati" },
+              { "id": "3603100002", "nama": "Gintung" },
+              { "id": "3603100003", "nama": "Karang Serang" },
+              { "id": "3603100004", "nama": "Kosambi" },
+              { "id": "3603100005", "nama": "Mekar Kondang" },
+              { "id": "3603100006", "nama": "Pekayon" },
+              { "id": "3603100007", "nama": "Rawa Kidang" },
+              { "id": "3603100008", "nama": "Sukadiri" }
+            ]
+          },
+          {
+            "id": "360327",
+            "nama": "Sukamulya",
+            "desa": [
+              { "id": "3603270001", "nama": "Benda" },
+              { "id": "3603270002", "nama": "Bunar" },
+              { "id": "3603270003", "nama": "Buniayu" },
+              { "id": "3603270004", "nama": "Kaliasin" },
+              { "id": "3603270005", "nama": "Kubang" },
+              { "id": "3603270006", "nama": "Merak" },
+              { "id": "3603270007", "nama": "Parahu" },
+              { "id": "3603270008", "nama": "Sukamulya" }
+            ]
+          },
+          {
+            "id": "360313",
+            "nama": "Teluknaga",
+            "desa": [
+              { "id": "3603130001", "nama": "Babakan Asem" },
+              { "id": "3603130002", "nama": "Bojong Renged" },
+              { "id": "3603130003", "nama": "Kampung Besar" },
+              { "id": "3603130004", "nama": "Kampung Melayu Barat" },
+              { "id": "3603130005", "nama": "Kampung Melayu Timur" },
+              { "id": "3603130006", "nama": "Keboncau" },
+              { "id": "3603130007", "nama": "Lemo" },
+              { "id": "3603130008", "nama": "Muara" },
+              { "id": "3603130009", "nama": "Pangkalan" },
+              { "id": "3603130010", "nama": "Tanjung Burung" },
+              { "id": "3603130011", "nama": "Tanjung Pasir" },
+              { "id": "3603130012", "nama": "Tegal Angus" },
+              { "id": "3603130013", "nama": "Teluknaga" }
+            ]
+          },
+          {
+            "id": "360303",
+            "nama": "Tigaraksa",
+            "desa": [
+              { "id": "3603030001", "nama": "Bantar Panjang" },
+              { "id": "3603030002", "nama": "Cileles" },
+              { "id": "3603030003", "nama": "Cisereh" },
+              { "id": "3603030004", "nama": "Margasari" },
+              { "id": "3603030005", "nama": "Matagara" },
+              { "id": "3603030006", "nama": "Pasir Bolang" },
+              { "id": "3603030007", "nama": "Pasir Nangka" },
+              { "id": "3603030008", "nama": "Pematang" },
+              { "id": "3603030009", "nama": "Pete" },
+              { "id": "3603030010", "nama": "Sodong" },
+              { "id": "3603030011", "nama": "Tapos" },
+              { "id": "3603030012", "nama": "Tegalsari" },
+              { "id": "3603030013", "nama": "Kadu Agung" },
+              { "id": "3603030014", "nama": "Tigaraksa" }
+            ]
+          }
+        ]
+      }
+    ]
+  }
+]

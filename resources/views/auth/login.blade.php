@@ -319,9 +319,7 @@
                     placeholder="Kata Sandi"
                     required
                 >
-                <span class="toggle-password" onclick="togglePassword()">
-                    Lihat
-                </span>
+                
             </div>
 
             <!-- Forgot -->

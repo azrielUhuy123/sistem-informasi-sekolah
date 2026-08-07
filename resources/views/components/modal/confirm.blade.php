@@ -1,4 +1,12 @@
-<div class="modal fade" id="confirmModal" tabindex="-1" aria-hidden="true">
+<div
+    class="modal fade"
+    id="confirmModal"
+    tabindex="-1"
+    role="dialog"
+    aria-modal="true"
+    aria-labelledby="confirmTitle"
+    aria-describedby="confirmMessage"
+>
 
     <div class="modal-dialog modal-dialog-centered">
 
@@ -25,6 +33,7 @@
                 <div class="d-flex justify-content-center gap-2">
 
                     <button
+                        type="button"
                         class="btn btn-light px-4"
                         data-bs-dismiss="modal">
                         Batal
@@ -32,6 +41,7 @@
 
                     <button
                         id="confirmSubmit"
+                        type="button"
                         class="btn btn-danger px-4">
                         Ya, Lanjutkan
                     </button>
