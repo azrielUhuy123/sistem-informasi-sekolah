@@ -1,4 +1,4 @@
-               <div id="step4" class="wizard-step d-none">
+<div id="step4" class="wizard-step d-none">
     <h4 class="mb-4">Kontak</h4>
 
     <div class="row">

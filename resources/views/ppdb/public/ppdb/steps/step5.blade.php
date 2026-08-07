@@ -1,153 +1,54 @@
-@extends('layouts.public')
+<div id="step5" class="wizard-step d-none">
+    <h4 class="mb-4">Data Periodik</h4>
 
-@section('title', 'Form Pendaftaran PPDB')
-
-@section('content')
-
-<style>
-    .card.shadow {
-        border: none;
-        border-radius: 24px;
-        overflow: hidden;
-    }
-    .card-header {
-        border-bottom: none;
-    }
-    .card-header h3 {
-        margin-bottom: 0;
-        font-size: 1.25rem;
-    }
-    .progress {
-        height: 14px;
-        border-radius: 999px;
-        background: rgba(23,65,110,.12);
-        overflow: hidden;
-    }
-    .progress-bar {
-        border-radius: 999px;
-        transition: width .35s ease;
-        background: linear-gradient(90deg, #3a7edd, #17416e);
-    }
-    .wizard-steps {
-        gap: 0.75rem;
-    }
-    .wizard-steps .col {
-        flex: 0 0 20%;
-        max-width: 20%;
-    }
-    .wizard-steps small {
-        display: block;
-        color: #5b636e;
-        font-size: 0.88rem;
-        line-height: 1.3;
-        white-space: normal;
-    }
-    @media (max-width: 768px) {
-        .card-body {
-            padding: 1.5rem 1.25rem;
-        }
-        .wizard-steps .col {
-            flex: 0 0 50%;
-            max-width: 50%;
-        }
-        .wizard-steps small {
-            display: none;
-        }
-    }
-    @media (max-width: 576px) {
-        .container {
-            padding-left: 0.75rem;
-            padding-right: 0.75rem;
-        }
-        .card {
-            box-shadow: 0 16px 40px rgba(0,0,0,.08);
-        }
-        .progress {
-            height: 12px;
-        }
-        .wizard-steps .col {
-            flex: 0 0 100%;
-            max-width: 100%;
-        }
-        .wizard-steps small {
-            
-            color: #3f4a5a;
-        }
-    }
-</style>
-
-{{-- ALERT --}}
-    <x-alert.flash key="success" type="success"/>
-
-    <x-alert.flash key="error" type="danger"/>
-    
-<div class="container py-5">
-    <div class="card shadow">
-        <div class="card-header">
-            <h3 class="mb-0">Form Pendaftaran PPDB</h3>
+    <div class="row">
+        <div class="col-md-3 mb-3">
+            <label>Tinggi Badan</label>
+            <input type="number" step="0.01" name="tinggi_badan" class="form-control">
         </div>
 
-        <div class="card-body">
-            {{-- Progress Wizard --}}
-            <div class="mb-4">
-                <div class="progress" style="height:12px;">
-                    <div id="wizardBar" class="progress-bar progress-bar-striped progress-bar-animated" style="width:20%"></div>
-                </div>
+        <div class="col-md-3 mb-3">
+            <label>Berat Badan</label>
+            <input type="number" step="0.01" name="berat_badan" class="form-control">
+        </div>
 
-                <div class="row text-center mt-3 wizard-steps">
-                    <div class="col">
-                        <small id="labelStep1">Data Pribadi</small>
-                    </div>
+        <div class="col-md-3 mb-3">
+            <label>Anak Ke</label>
+            <input type="number" name="anak_ke" class="form-control">
+        </div>
 
-                    <div class="col">
-                        <small id="labelStep2">Alamat</small>
-                    </div>
-
-                    <div class="col">
-                        <small id="labelStep3">Orang Tua</small>
-                    </div>
-
-                    <div class="col">
-                        <small id="labelStep4">Kontak</small>
-                    </div>
-
-                    <div class="col">
-                        <small id="labelStep5">Berkas</small>
-                    </div>
-                </div>
-            </div>
-
-            <form action="{{ route('ppdb.store') }}" method="POST" enctype="multipart/form-data">
-                @csrf
-
-                @include('ppdb.public.ppdb.steps.step1')
-                @include('ppdb.public.ppdb.steps.step2')
-                @include('ppdb.public.ppdb.steps.step3')
-                @include('ppdb.public.ppdb.steps.step4')
-                @include('ppdb.public.ppdb.steps.step5')
-            </form>
+        <div class="col-md-3 mb-3">
+            <label>Jumlah Saudara</label>
+            <input type="number" name="jumlah_saudara" class="form-control">
         </div>
     </div>
+
+    <hr class="my-4">
+
+    <h4 class="mb-4">Upload Berkas</h4>
+
+    <div class="mb-3">
+        <label>Kartu Keluarga</label>
+        <input type="file" name="kartu_keluarga" class="form-control">
+    </div>
+
+    <div class="mb-3">
+        <label>Akta Kelahiran</label>
+        <input type="file" name="akta_lahir" class="form-control">
+    </div>
+
+    <div class="mb-3">
+        <label>Pas Foto</label>
+        <input type="file" name="foto" class="form-control">
+    </div>
+
+    <div class="d-flex justify-content-between mt-4">
+        <button type="button" class="btn btn-secondary" onclick="showStep(4)">
+            Sebelumnya
+        </button>
+
+        <button type="submit" class="btn btn-success btn-lg">
+            Daftar Sekarang
+        </button>
+    </div>
 </div>
-
-@endsection
-
-@push('scripts')
-<script>
-    function showStep(step) {
-        document.querySelectorAll('.wizard-step').forEach(item => {
-            item.classList.add('d-none');
-        });
-
-        document.getElementById('step' + step).classList.remove('d-none');
-
-        let width = 20;
-        if (step == 2) width = 40;
-        if (step == 3) width = 60;
-        if (step == 4) width = 80;
-        if (step == 5) width = 100;
-
-        document.getElementById('wizardBar').style.width = width + '%';
-    }
-</script>
-@endpush
