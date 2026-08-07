@@ -4,6 +4,7 @@ namespace App\Http\Controllers\SuperAdmin;
 
 use App\Http\Controllers\Controller;
 use App\Models\PengajuanSurat;
+use illuminate\Support\Facades\Auth;
 
 
 class ValidasiSuratController extends Controller
@@ -52,7 +53,7 @@ class ValidasiSuratController extends Controller
 
             'status' => 'disetujui',
 
-            'validated_by' => auth()->id(),
+            'validated_by' => Auth::id(),
 
             'validated_at' => now(),
 

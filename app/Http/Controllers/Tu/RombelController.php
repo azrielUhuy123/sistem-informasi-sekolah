@@ -1,7 +1,8 @@
 <?php
 
-namespace App\Http\Controllers;
+namespace App\Http\Controllers\Tu;
 
+use App\Http\Controllers\Controller;
 use App\Models\Kelas;
 use App\Models\PenempatanSiswa;
 use App\Models\TahunAjaran;

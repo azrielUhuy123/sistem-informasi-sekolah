@@ -4,6 +4,7 @@ namespace App\Http\Controllers\SuperAdmin;
 
 use App\Http\Controllers\Controller;
 use App\Models\NomorSurat;
+use illuminate\Support\Facades\Auth;
 
 class NomorSuratController extends Controller
 {
@@ -16,7 +17,7 @@ class NomorSuratController extends Controller
     {
         $nomorSurat = NomorSurat::where(
                 'user_id',
-                auth()->id()
+                Auth::id()
             )
             ->latest()
             ->get();
@@ -89,9 +90,9 @@ class NomorSuratController extends Controller
         */
         NomorSurat::create([
 
-            'user_id' => auth()->id(),
+            'user_id' => Auth::id(),
 
-            'pengirim' => auth()->user()->role,
+            'pengirim' => Auth::user()->role,
 
             'nomor_surat' => $nomorSurat,
 

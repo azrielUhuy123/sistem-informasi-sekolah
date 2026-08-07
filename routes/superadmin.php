@@ -18,9 +18,9 @@ use App\Http\Controllers\SuperAdmin\PengampuMapelController;
 use App\Http\Controllers\SuperAdmin\WaliKelasController;
 use App\Http\Controllers\SuperAdmin\JadwalFinalController;
 use App\Http\Controllers\SuperAdmin\MataPelajaranController;
-use App\Http\Controllers\Superadmin\PembinaEkskulController;
-use App\Http\Controllers\Superadmin\MonitoringEkskulController;
-use App\Http\Controllers\Superadmin\JadwalFinalEkskulController;
+use App\Http\Controllers\SuperAdmin\PembinaEkskulController;
+use App\Http\Controllers\SuperAdmin\MonitoringEkskulController;
+use App\Http\Controllers\SuperAdmin\JadwalFinalEkskulController;
 use App\Http\Controllers\SuperAdmin\SiswaController;
 use App\Http\Controllers\SuperAdmin\KenaikanKelasController;
 

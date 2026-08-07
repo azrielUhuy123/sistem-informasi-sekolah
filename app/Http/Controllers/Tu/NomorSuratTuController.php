@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Http\Controllers\TU;
+namespace App\Http\Controllers\Tu;
 
 use App\Http\Controllers\Controller;
 use App\Models\NomorSurat;

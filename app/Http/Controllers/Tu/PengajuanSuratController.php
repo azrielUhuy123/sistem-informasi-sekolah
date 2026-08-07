@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\PengajuanSurat;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\File;
+use illuminate\Support\Facades\Auth;
 
 class PengajuanSuratController extends Controller
 {
@@ -72,10 +73,10 @@ class PengajuanSuratController extends Controller
         */
         PengajuanSurat::create([
 
-            'user_id'         => auth()->id(),
+            'user_id'         => Auth::id(),
 
             // PENGIRIM OTOMATIS
-            'pengirim'        => auth()->user()->role,
+            'pengirim'        => Auth::user()->role,
 
             'nama_surat'      => $request->nama_surat,
             'kategori_surat'  => $request->kategori_surat,
