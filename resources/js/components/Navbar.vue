@@ -128,6 +128,7 @@
 
     .nav-links{
         display:none;
+        margin-top:auto;
     }
 
     .brand{
