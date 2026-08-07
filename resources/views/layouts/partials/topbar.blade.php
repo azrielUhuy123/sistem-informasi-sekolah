@@ -6,7 +6,7 @@
             src="{{ asset('assets/images/logo-kolaan.png') }}"
             alt="Logo"
             width="40"
-            height="50"
+            height="40"
             class="rounded-circle"
         >
 

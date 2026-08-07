@@ -24,7 +24,7 @@
                         <h2 class="fw-bold mb-2">Jadwal Pelajaran</h2>
                         <p class="mb-0 opacity-75">
                             Jadwal resmi pembelajaran untuk
-                            <strong>{{ $penempatan->kelas->nama_kelas ?? '-' }}</strong>
+                            <strong>{{ $penempatan->kelas->nama_kelas_label ?? '-' }}</strong>
                             selama satu minggu.
                         </p>
                     </div>
@@ -64,7 +64,7 @@
         >
             <x-slot:badge>
                 <span class="badge bg-primary rounded-pill px-3 py-2">
-                    {{ $penempatan->kelas->nama_kelas ?? '-' }}
+                    {{ $penempatan->kelas->nama_kelas_label ?? '-' }}
                 </span>
             </x-slot:badge>
 

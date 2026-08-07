@@ -63,6 +63,14 @@
             border-top:1px solid #e9ecef;
         }
 
+        @media (max-width: 992px) {
+
+            .navbar-brand{
+                display:none;
+            }
+
+        }
+
     </style>
 
     @stack('styles')

@@ -128,7 +128,7 @@
                                         <tr>
                                             <td>{{ $loop->iteration }}</td>
                                             <td>
-                                                <div class="fw-semibold">{{ $kelas->nama_kelas }}</div>
+                                                <div class="fw-semibold">{{ $kelas->nama_kelas_label }}</div>
                                             </td>
                                             <td>
                                                 @php

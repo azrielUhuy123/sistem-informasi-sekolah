@@ -80,7 +80,7 @@
                                     }}
                                 >
 
-                                    {{ $item->kelas->nama_kelas }}
+                                    {{ $item->kelas->nama_kelas_label }}
 
                                 </option>
 
@@ -281,7 +281,7 @@
 
                     <h5 class="fw-bold mb-1">
 
-                        {{ $selected->kelas->nama_kelas }}
+                        {{ $selected->kelas->nama_kelas_label }}
 
                         -
                         {{ $selected->mapel->nama_mapel }}

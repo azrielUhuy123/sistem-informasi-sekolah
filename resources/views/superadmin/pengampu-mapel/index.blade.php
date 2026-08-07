@@ -207,7 +207,7 @@
 
                                 <span class="kelas-badge">
 
-                                    {{ $k->nama_kelas }}
+                                    {{ $k->nama_kelas_label }}
 
                                 </span>
 
@@ -324,7 +324,7 @@
 
                                     <span class="badge bg-success-subtle text-success px-3 py-2">
 
-                                        {{ $p->kelas->nama_kelas }}
+                                        {{ $p->kelas->nama_kelas_label }}
 
                                     </span>
 

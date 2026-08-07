@@ -32,7 +32,7 @@
                         <option value="{{ $item->id }}"
                             {{ request('kelas_id') == $item->id ? 'selected' : '' }}>
 
-                            {{ $item->nama_kelas }}
+                            {{ $item->nama_kelas_label }}
 
                         </option>
 

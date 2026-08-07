@@ -64,7 +64,7 @@
             <div class="row g-3">
                 <div class="col-md-4">
                     <small class="text-muted">Nama Kelas</small>
-                    <div class="fw-bold">{{ $kelas->nama_kelas }}</div>
+                    <div class="fw-bold">{{ $kelas->nama_kelas_label }}</div>
                 </div>
                 <div class="col-md-4">
                     <small class="text-muted">Tingkat</small>

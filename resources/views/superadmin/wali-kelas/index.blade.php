@@ -166,7 +166,7 @@
 
                                     <span class="badge bg-success-subtle text-success px-3 py-2">
 
-                                        {{ $item->kelas->nama_kelas }}
+                                        {{ $item->kelas->nama_kelas_label }}
 
                                     </span>
 

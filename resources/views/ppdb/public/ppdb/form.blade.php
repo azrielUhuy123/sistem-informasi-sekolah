@@ -4,6 +4,78 @@
 
 @section('content')
 
+<style>
+    .card.shadow {
+        border: none;
+        border-radius: 24px;
+        overflow: hidden;
+    }
+    .card-header {
+        border-bottom: none;
+    }
+    .card-header h3 {
+        margin-bottom: 0;
+        font-size: 1.25rem;
+    }
+    .progress {
+        height: 14px;
+        border-radius: 999px;
+        background: rgba(23,65,110,.12);
+        overflow: hidden;
+    }
+    .progress-bar {
+        border-radius: 999px;
+        transition: width .35s ease;
+        background: linear-gradient(90deg, #3a7edd, #17416e);
+    }
+    .wizard-steps {
+        gap: 0.75rem;
+    }
+    .wizard-steps .col {
+        flex: 0 0 20%;
+        max-width: 20%;
+    }
+    .wizard-steps small {
+        display: block;
+        color: #5b636e;
+        font-size: 0.88rem;
+        line-height: 1.3;
+        white-space: normal;
+    }
+    @media (max-width: 768px) {
+        .card-body {
+            padding: 1.5rem 1.25rem;
+        }
+        .wizard-steps .col {
+            flex: 0 0 50%;
+            max-width: 50%;
+        }
+        .wizard-steps small {
+            display: none;
+        }
+    }
+    @media (max-width: 576px) {
+        .container {
+            padding-left: 0.75rem;
+            padding-right: 0.75rem;
+        }
+        .card {
+            box-shadow: 0 16px 40px rgba(0,0,0,.08);
+        }
+        .progress {
+            height: 12px;
+        }
+        .wizard-steps .col {
+            flex: 0 0 100%;
+            max-width: 100%;
+        }
+        .wizard-steps small {
+            
+            color: #3f4a5a;
+        }
+    }
+</style>
+
 <div class="container py-5">
     <div class="card shadow">
         <div class="card-header">
@@ -17,9 +89,9 @@
                     <div id="wizardBar" class="progress-bar progress-bar-striped progress-bar-animated" style="width:20%"></div>
                 </div>
 
-                <div class="row text-center mt-3">
+                <div class="row text-center mt-3 wizard-steps">
                     <div class="col">
-                        <small id="labelStep1" class="fw-bold text-primary">Data Pribadi</small>
+                        <small id="labelStep1">Data Pribadi</small>
                     </div>
 
                     <div class="col">

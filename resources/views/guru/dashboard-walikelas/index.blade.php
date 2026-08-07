@@ -12,7 +12,7 @@
                 <div>
                     <h3 class="fw-bold mb-2">Dashboard Wali Kelas</h3>
                     <p class="mb-0 opacity-75">
-                        {{ $kelas->nama_kelas }} • Tahun Ajaran {{ current_tahun()?->tahun }}
+                        {{ $kelas->nama_kelas_label }} • Tahun Ajaran {{ current_tahun()?->tahun }}
                     </p>
                 </div>
                 <div class="d-flex flex-wrap gap-2">
@@ -150,7 +150,7 @@
                         <li class="list-group-item px-0 py-3">
                             <div class="d-flex justify-content-between align-items-center">
                                 <span class="text-muted">Kelas</span>
-                                <span class="fw-semibold">{{ $kelas->nama_kelas }}</span>
+                                <span class="fw-semibold">{{ $kelas->nama_kelas_label }}</span>
                             </div>
                         </li>
                         <li class="list-group-item px-0 py-3">

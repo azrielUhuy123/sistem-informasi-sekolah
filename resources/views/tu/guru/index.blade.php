@@ -137,14 +137,14 @@
                                     {{-- Kelas Wali --}}
                                     @if($kelasWali)
                                         <span class="badge bg-info text-dark fw-semibold rounded-pill px-3 py-2">
-                                            {{ $kelasWali->nama_kelas }}
+                                            {{ $kelasWali->nama_kelas_label }}
                                         </span>
                                     @endif
                                     {{-- Kelas Mengajar --}}    
                                     @foreach($kelasMengajar as $kelas)
                                         @if(!$kelasWali || $kelas->id != $kelasWali->id)
                                             <span class="badge bg-info text-dark fw-semibold rounded-pill px-3 py-2">
-                                                {{ $kelas->nama_kelas }}
+                                                {{ $kelas->nama_kelas_label }}
                                             </span>
                                         @endif
                                     @endforeach

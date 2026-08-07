@@ -82,7 +82,7 @@
                                     {{ $selectedKelas == $item->kelas_id ? 'selected' : '' }}
                                 >
 
-                                    {{ $item->kelas->nama_kelas }}
+                                    {{ $item->kelas->nama_kelas_label }}
 
                                     @if(isset($item->sumber) && $item->sumber === 'wali_kelas')
                                         (Wali Kelas)

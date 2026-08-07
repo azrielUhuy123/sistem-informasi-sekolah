@@ -110,7 +110,7 @@
 
                                 <span class="badge bg-success rounded-pill px-3 py-2">
 
-                                    {{ $guru->waliKelas->kelas->nama_kelas ?? '-' }}
+                                    {{ $guru->waliKelas->kelas->nama_kelas_label ?? '-' }}
 
                                 </span>
 

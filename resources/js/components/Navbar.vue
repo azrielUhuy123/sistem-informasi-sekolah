@@ -7,9 +7,7 @@
         <!-- Logo -->
         <div class="brand">
 
-            <img
-                src="http://127.0.0.1:8000/assets/images/logo-kolaan.png"
-                alt="Logo Sekolah"
+            <img :src="'/assets/images/logo-kolaan.png'" alt="Logo Sekolah"
                 class="brand-logo"
             >
 
@@ -21,31 +19,6 @@
 
         </div>
 
-        <!-- Menu -->
-        <div class="nav-links">
-
-            <router-link to="/">
-                Beranda
-            </router-link>
-
-            <router-link to="/informasi">
-                Informasi
-            </router-link>
-
-            <router-link to="/prestasi">
-                Prestasi
-            </router-link>
-
-            <router-link to="/ppdb">
-                PPDB
-            </router-link>
-
-            <router-link to="/kontak">
-                Kontak
-            </router-link>
-
-        </div>
-
         <!-- Action -->
         <div>
 
@@ -53,7 +26,7 @@
                 href="/login"
                 class="login-btn"
             >
-                Masuk Sistem
+                Masuk
             </a>
 
         </div>
@@ -147,12 +120,61 @@
     background:#1d4ed8;
 }
 
-@media(max-width:992px){
+@media (max-width: 992px) {
+
+    .navbar-container{
+        padding:12px 16px;
+    }
 
     .nav-links{
         display:none;
     }
 
+    .brand{
+        gap:10px;
+        flex:1;
+        min-width:0;
+    }
+
+    .brand-logo{
+        width:42px;
+        height:42px;
+    }
+
+    .brand-text h1{
+        margin-top:0;
+        font-size:14px;
+        line-height:1.2;
+    }
+
+    .login-btn{
+        padding:10px 14px;
+        font-size:13px;
+        white-space:nowrap;
+        border-radius:10px;
+    }
+
 }
 
+@media (max-width: 480px){
+
+    .navbar-container{
+        padding:10px 12px;
+    }
+
+    .brand-logo{
+        width:38px;
+        height:38px;
+    }
+
+    .brand-text h1{
+        font-size:12px;
+    }
+
+    .login-btn{
+        padding:8px 10px;
+        font-size:12px;
+    }
+
+}
 </style>

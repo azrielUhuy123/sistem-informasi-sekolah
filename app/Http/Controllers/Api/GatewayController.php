@@ -3,30 +3,18 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
-use App\Models\Berita;
+use App\Models\Siswa;
+use App\Models\Guru;
+use App\Models\Kelas;
 
 class GatewayController extends Controller
 {
-    public function berita()
+    public function statistik()
     {
-        return Berita::where('is_publish', true)
-            ->latest()
-            ->take(6)
-            ->get([
-                'id',
-                'judul',
-                'slug',
-                'ringkasan',
-                'gambar',
-                'created_at'
-            ]);
-    }
-
-    public function detailBerita($slug)
-    {
-        return Berita::where(
-            'slug',
-            $slug
-        )->firstOrFail();
+        return response()->json([
+            'siswa'  => Siswa::count(),
+            'guru'   => Guru::count(),
+            'kelas' => Kelas::count(),
+        ]);
     }
 }

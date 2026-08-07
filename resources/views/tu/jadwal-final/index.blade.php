@@ -151,7 +151,7 @@
 
                                                 <span class="fw-bold">
 
-                                                    {{ $k->nama_kelas }}
+                                                    {{ $k->nama_kelas_label }}
 
                                                 </span>
 

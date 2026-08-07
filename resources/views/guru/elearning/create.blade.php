@@ -198,7 +198,7 @@
 
                                     <option value="wali_{{ $mapel->id }}">
 
-                                        {{ $waliKelas->kelas->nama_kelas }}
+                                        {{ $waliKelas->kelas->nama_kelas_label }}
                                         -
                                         {{ $mapel->nama_mapel }}
 
@@ -220,7 +220,7 @@
 
                                         {{ $item->mapel->nama_mapel }}
                                         -
-                                        {{ $item->kelas->nama_kelas }}
+                                        {{ $item->kelas->nama_kelas_label }}
 
                                     </option>
 

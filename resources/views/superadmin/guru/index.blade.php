@@ -228,7 +228,7 @@
 
                                         <span class="badge bg-success-subtle text-success px-3 py-2">
 
-                                            {{ $guru->waliKelas->kelas->nama_kelas }}
+                                            {{ $guru->waliKelas->kelas->nama_kelas_label }}
 
                                         </span>
 
@@ -238,7 +238,7 @@
 
                                             <span class="badge bg-success-subtle text-success px-3 py-2 mb-1">
 
-                                                {{ $pengampu->kelas->nama_kelas }}
+                                                {{ $pengampu->kelas->nama_kelas_label }}
 
                                             </span>
 

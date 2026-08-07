@@ -334,7 +334,7 @@
 
                         <div class="fw-bold">
 
-                            {{ $item->kelas->nama_kelas ?? '-' }}
+                            {{ $item->kelas->nama_kelas_label ?? '-' }}
 
                         </div>
 

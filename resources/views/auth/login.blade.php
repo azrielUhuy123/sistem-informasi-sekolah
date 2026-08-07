@@ -8,14 +8,14 @@
     .login-box {
         background: #ffffff;
         width: 100%;
-        height: 100% ;
-        max-width: 1000px;
         min-height: 520px;
-        max-height: 560px ;
+        max-width: 1000px;
+        max-height: 560px;
         display: flex;
         border-radius: 22px;
         overflow: hidden;
-        box-shadow: 0 25px 55px rgba(0,0,0,.25);
+        box-shadow: 0 25px 55px rgba(0,0,0,.18);
+        margin: 0 auto;
     }
 
     .login-left {
@@ -154,13 +154,104 @@
     }
     
 
+    @media (max-width: 992px) {
+        .login-box {
+            max-width: 760px;
+        }
+    }
+
     @media (max-width: 768px) {
+        .login-box {
+            flex-direction: column;
+            min-height: auto;
+            max-height: none;
+            box-shadow: 0 18px 40px rgba(0,0,0,.15);
+            border-radius: 26px;
+        }
+
         .login-right {
             display: none;
         }
+
         .login-left {
             width: 100%;
-            padding: 40px;
+            padding: 36px 24px;
+        }
+
+        .login-header {
+            justify-content: center;
+            text-align: center;
+        }
+
+        .login-logo {
+            margin-bottom: 18px;
+        }
+
+        .login-school {
+            font-size: 13px;
+        }
+
+        .login-left h2 {
+            font-size: 24px;
+        }
+
+        .login-left p {
+            font-size: 15px;
+            margin-bottom: 26px;
+        }
+
+        .login-extra {
+            margin-bottom: 18px;
+        }
+
+        .login-input {
+            font-size: 15px;
+            padding: 15px 16px;
+        }
+
+        .btn-login {
+            padding: 15px;
+            border-radius: 16px;
+            font-size: 15px;
+        }
+
+        .password-wrapper .login-input {
+            padding-right: 46px;
+        }
+
+        .toggle-password {
+            display: none;
+        }
+    }
+
+    @media (max-width: 480px) {
+        .login-left {
+            padding: 28px 18px;
+        }
+
+        .login-left h2 {
+            font-size: 22px;
+        }
+
+        .login-left p {
+            font-size: 14px;
+        }
+
+        .login-school {
+            font-size: 12px;
+        }
+
+        .login-input {
+            padding: 14px 14px;
+        }
+
+        .btn-login {
+            padding: 14px;
+        }
+
+        .toggle-password {
+            right: 12px;
+            font-size: 14px;
         }
     }
 
@@ -212,7 +303,7 @@
                 type="text"
                 name="username"
                 class="login-input"
-                placeholder="Masukkan NIS atau NIP"
+                placeholder="NIS atau NIP"
                 value="{{ old('username') }}"
                 required
                 autofocus
@@ -225,11 +316,11 @@
                     name="password"
                     id="passwordInput"
                     class="login-input"
-                    placeholder="Masukkan Kata Sandi"
+                    placeholder="Kata Sandi"
                     required
                 >
                 <span class="toggle-password" onclick="togglePassword()">
-                    👁
+                    Lihat
                 </span>
             </div>
 

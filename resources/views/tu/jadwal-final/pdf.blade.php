@@ -41,7 +41,7 @@
 @foreach($kelas as $k)
 
     <h2>
-        Jadwal Kelas {{ $k->nama_kelas }}
+        Jadwal Kelas {{ $k->nama_kelas_label }}
     </h2>
 
     <table>

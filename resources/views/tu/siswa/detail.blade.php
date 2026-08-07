@@ -25,7 +25,7 @@
                                 >
 
                                 <div>
-                                    <h4 class="mb-1 fw-bold">{{ $siswa->nama }}</h4>
+                                    <h4 class="mb-1 fw-bold text-uppercase">{{ $siswa->nama }}</h4>
                                     <p class="text-muted mb-2">Siswa</p>
 
                                     <div class="d-flex flex-wrap gap-2 justify-content-center">
@@ -56,7 +56,7 @@
                                             <div class="border rounded-3 p-2 bg-white">
                                                 <div class="small text-muted">Rombel</div>
                                                 <div class="fw-semibold">
-                                                    <span class="badge bg-success">{{ $siswa->penempatanAktif?->kelas?->nama_kelas ?? '-' }}</span>
+                                                    <span class="badge bg-success">{{ $siswa->penempatanAktif?->kelas?->nama_kelas_label ?? '-' }}</span>
                                                 </div>
                                             </div>
                                         </div>
@@ -248,7 +248,7 @@
 
                                                     <td>
                                                         <span class="badge bg-secondary">
-                                                            {{ $item->kelas?->nama_kelas ?? '-' }}
+                                                            {{ $item->kelas?->nama_kelas_label ?? '-' }}
                                                         </span>
                                                     </td>
 

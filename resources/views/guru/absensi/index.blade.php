@@ -165,7 +165,7 @@
                                     value="{{ $j->id }}"
                                     {{ $jadwalId==$j->id?'selected':'' }}>
 
-                                    {{ $j->kelas->nama_kelas }}
+                                    {{ $j->kelas->nama_kelas_label }}
                                     •
                                     {{ $j->mapel->nama_mapel }}
                                     •
@@ -241,7 +241,7 @@
 
                     <small>Kelas</small>
 
-                    <h6>{{ $jadwal->kelas->nama_kelas }}</h6>
+                    <h6>{{ $jadwal->kelas->nama_kelas_label }}</h6>
 
                 </div>
 

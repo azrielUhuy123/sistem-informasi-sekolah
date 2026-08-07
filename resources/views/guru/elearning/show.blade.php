@@ -71,7 +71,7 @@
 
                             <i class="bi bi-mortarboard"></i>
 
-                            {{ $elearning->kelas?->nama_kelas }}
+                            {{ $elearning->kelas?->nama_kelas_label }}
 
                         </span>
 

@@ -40,12 +40,14 @@
         </div>
 
         <div class="d-flex justify-content-between mt-4">
-            <button type="button" class="btn btn-secondary" onclick="showStep(1)">
+            <button type="button" class="btn btn-outline-secondary" onclick="showStep(1)">
+                <i class="bi bi-arrow-left me-1"></i>
                 Sebelumnya
             </button>
 
             <button type="button" class="btn btn-primary" onclick="showStep(3)">
-                Selanjutnya
+                
+                Selanjutnya <i class="bi bi-arrow-right ms-1"></i>
             </button>
         </div>
     </div>

@@ -590,7 +590,7 @@ document.addEventListener("DOMContentLoaded", function () {
                         data.kelas.forEach(k => {
                             html += `
                                 <div class="p-2 search-item" onclick="window.location='/tu/kelas/${k.id}'">
-                                    <i class="bi bi-people me-2"></i> ${k.nama_kelas}
+                                    <i class="bi bi-people me-2"></i> ${k.nama_kelas_label}
                                 </div>
                             `;
                         });

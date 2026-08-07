@@ -137,7 +137,7 @@
 
                                     <h3>
 
-                                        {{ $siswa->penempatanAktif?->kelas?->nama_kelas ?? '-' }}
+                                        {{ $siswa->penempatanAktif?->kelas?->nama_kelas_label ?? '-' }}
 
                                     </h3>
 

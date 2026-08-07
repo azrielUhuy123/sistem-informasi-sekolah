@@ -39,7 +39,7 @@
 
                     <tr>
 
-                        <td>{{ $item->kelas->nama_kelas }}</td>
+                        <td>{{ $item->kelas->nama_kelas_label }}</td>
 
                         <td>{{ $item->mapel->nama_mapel }}</td>
 

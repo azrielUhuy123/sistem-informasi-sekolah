@@ -11,7 +11,7 @@
         <div class="card-body p-4 p-lg-5 text-white" style="background: linear-gradient(135deg, #0f4c81 0%, #2563eb 100%);">
             <div class="d-flex flex-column flex-lg-row justify-content-between align-items-lg-center gap-3">
                 <div>
-                    <h3 class="fw-bold mb-2">Kelas {{ $rombel->nama_kelas }}</h3>
+                    <h3 class="fw-bold mb-2">Kelas {{ $rombel->nama_kelas_label }}</h3>
                     <p class="mb-0 opacity-75">Angkatan {{ $rombel->kelasGrup->angkatan->tahun }}</p>
                 </div>
                 <div class="badge bg-white text-primary px-3 py-2 fs-6">
@@ -27,7 +27,7 @@
     <x-alert.flash key="error" type="danger"/>
 
     <x-table.card
-        title="Daftar Siswa {{ $rombel->nama_kelas }}"
+        title="Daftar Siswa {{ $rombel->nama_kelas_label }}"
         subtitle="{{ $totalLaki }} Pria - {{ $totalPerempuan }} Perempuan"
     >
         <x-slot:badge>

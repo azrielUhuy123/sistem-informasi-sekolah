@@ -302,7 +302,7 @@ $status='draft';
 
 <div class="fw-semibold">
 
-{{ $itemKelas->nama_kelas }}
+{{ $itemKelas->nama_kelas_label }}
 
 </div>
 

@@ -373,8 +373,15 @@ class PendaftarController extends Controller
             })
             ->paginate(20);
 
-        $kelas = Kelas::orderBy('nama_kelas')
-            ->get();
+        $kelas = Kelas::withCount([
+            'penempatan as jumlah_siswa' => function ($q) use ($tahunAktif) {
+                $q->where('tahun_ajaran_id', $tahunAktif->id)
+                ->whereNull('tanggal_keluar');
+            }
+        ])
+        ->tingkat('I')
+        ->orderBy('nama_kelas')
+        ->get();
 
         return view(
             'ppdb.pendaftar.penempatan-kelas',

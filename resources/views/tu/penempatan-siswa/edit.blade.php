@@ -83,7 +83,7 @@
                     <input
                         type="text"
                         class="form-control rounded-3"
-                        value="{{ $penempatan->kelas->nama_kelas }}"
+                        value="{{ $penempatan->kelas->nama_kelas_label }}"
                         readonly
                     >
 
@@ -115,7 +115,7 @@
                                 value="{{ $k->id }}"
                                 @selected(old('kelas_id') == $k->id)
                             >
-                                {{ $k->nama_kelas }}
+                                {{ $k->nama_kelas_label }}
                             </option>
 
                         @endforeach

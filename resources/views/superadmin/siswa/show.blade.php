@@ -200,7 +200,7 @@
 
                                 <h5>
 
-                                    {{ $siswa->penempatanAktif?->kelas?->nama_kelas ?? '-' }}
+                                    {{ $siswa->penempatanAktif?->kelas?->nama_kelas_label ?? '-' }}
 
                                 </h5>
 
@@ -396,7 +396,7 @@
 
                             <span class="badge bg-primary px-3 py-2">
 
-                                {{ $siswa->penempatanAktif?->kelas?->nama_kelas ?? '-' }}
+                                {{ $siswa->penempatanAktif?->kelas?->nama_kelas_label ?? '-' }}
 
                             </span>
 

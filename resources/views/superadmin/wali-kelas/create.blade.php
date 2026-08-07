@@ -134,7 +134,7 @@
 
                                 <option value="{{ $item->id }}">
 
-                                    {{ $item->nama_kelas }}
+                                    {{ $item->nama_kelas_label }}
 
                                 </option>
 

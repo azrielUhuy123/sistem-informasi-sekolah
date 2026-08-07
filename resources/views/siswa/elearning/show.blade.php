@@ -63,7 +63,7 @@
 
                                 <i class="bi bi-mortarboard"></i>
 
-                                {{ $forum->kelas?->nama_kelas }}
+                                {{ $forum->kelas?->nama_kelas_label }}
                                 <i></i>  -
 
                                 <i class="bi bi-clock-history"></i>

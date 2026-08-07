@@ -184,7 +184,7 @@
 
                                 <strong>
 
-                                    {{ $items->first()?->kelas?->nama_kelas }}
+                                    {{ $items->first()?->kelas?->nama_kelas_label }}
 
                                 </strong>
 

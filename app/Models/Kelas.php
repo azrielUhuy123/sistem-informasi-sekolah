@@ -91,4 +91,12 @@ class Kelas extends Model
     {
         return $this->hasMany(KeputusanKenaikan::class);
     }
+    public function getNamaKelasLabelAttribute()
+    {
+        return preg_replace(
+            '/^(I|II|III|IV|V|VI)([A-Z])$/',
+            '$1-$2',
+            $this->nama_kelas
+        );
+    }
 }

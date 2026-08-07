@@ -214,39 +214,12 @@ Route::get(
     [NomorSuratController::class, 'index']
 )->name('nomor-surat.index');
 
-Route::post(
-    '/nomor-surat/generate',
-    [NomorSuratController::class, 'generate']
-)->name('nomor-surat.generate');
-
         Route::get(
             '/monitoring-bentrok',
             function () {
                 return 'Monitoring Bentrok';
             }
         )->name('monitoring-bentrok.index');
-
-
-        Route::get(
-            '/akademik/mapel',
-            function () {
-                return 'Mapel';
-            }
-        )->name('mapel.index');
-
-        Route::get(
-            '/akademik/guru',
-            function () {
-                return 'Guru';
-            }
-        )->name('guru.index');
-
-        Route::get(
-            '/akademik/kelas',
-            function () {
-                return 'Kelas';
-            }
-        )->name('kelas.index');
 
         Route::get(
             '/monitoring-ekskul',

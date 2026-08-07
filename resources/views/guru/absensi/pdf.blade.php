@@ -52,7 +52,7 @@
 
         <p>
 
-            Kelas {{ $kelas->nama_kelas }}
+            Kelas {{ $kelas->nama_kelas_label }}
 
         </p>
 

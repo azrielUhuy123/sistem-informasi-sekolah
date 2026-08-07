@@ -126,7 +126,7 @@
                             </label>
 
                             <div class="fw-semibold">
-                                {{ $siswa->penempatanAktif?->kelas?->nama_kelas ?? '-' }}
+                                {{ $siswa->penempatanAktif?->kelas?->nama_kelas_label ?? '-' }}
                             </div>
 
                         </div>

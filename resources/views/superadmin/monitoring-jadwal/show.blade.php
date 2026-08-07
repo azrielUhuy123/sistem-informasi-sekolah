@@ -1,6 +1,6 @@
 @extends('layouts.app')
 
-@section('title', 'Monitoring Jadwal Kelas ' . $kelas->nama_kelas)
+@section('title', 'Monitoring Jadwal Kelas ' . $kelas->nama_kelas_label)
 
 @section('content')
 
@@ -25,7 +25,7 @@
                     <p class="mb-0 opacity-75">
 
                         Monitoring, validasi, persetujuan, dan publikasi jadwal pelajaran kelas
-                        <strong>{{ $kelas->nama_kelas }}</strong>.
+                        <strong>{{ $kelas->nama_kelas_label }}</strong>.
 
                     </p>
 
@@ -472,7 +472,7 @@
                     <small class="text-muted">
 
                         Monitoring seluruh jadwal kelas
-                        <strong>{{ $kelas->nama_kelas }}</strong>
+                        <strong>{{ $kelas->nama_kelas_label }}</strong>
 
                     </small>
 

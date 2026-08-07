@@ -65,7 +65,7 @@ class KelasExport implements FromCollection, WithHeadings, WithMapping
             $item->siswa?->nis,
             $item->siswa?->nisn,
             $item->siswa?->nama,
-            $item->kelas?->nama_kelas,
+            $item->kelas?->nama_kelas_label,
             $item->siswa?->jenis_kelamin,
             $item->siswa?->tempat_lahir,
             optional($item->siswa?->tanggal_lahir)->format('d/m/Y'),

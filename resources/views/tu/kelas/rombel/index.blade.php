@@ -75,7 +75,7 @@
                             </td>
                             <td>
                                 <span class="badge bg-info text-dark fw-semibold rounded-pill px-3 py-2 font-monospace">
-                                    {{ $rombel->nama_kelas }}
+                                    {{ $rombel->nama_kelas_label }}
                                 </span>
                             </td>
                             <td>

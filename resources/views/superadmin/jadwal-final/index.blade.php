@@ -236,13 +236,13 @@
 
                                                     <h5 class="fw-bold mb-1">
 
-                                                        {{ $k->nama_kelas }}
+                                                        {{ $k->nama_kelas_label }}
 
                                                     </h5>
 
                                                     <small class="text-muted">
 
-                                                        Jadwal resmi kelas {{ $k->nama_kelas }}
+                                                        Jadwal resmi kelas {{ $k->nama_kelas_label }}
 
                                                     </small>
 

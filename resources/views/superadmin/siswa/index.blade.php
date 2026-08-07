@@ -169,7 +169,7 @@
                                     value="{{ $k->id }}"
                                     {{ request('kelas')==$k->id?'selected':'' }}>
 
-                                    {{ $k->nama_kelas }}
+                                    {{ $k->nama_kelas_label }}
 
                                 </option>
 
@@ -386,7 +386,7 @@
 
                                 <span class="badge bg-primary-subtle text-primary px-3 py-2">
 
-                                    {{ $row->penempatanAktif?->kelas?->nama_kelas ?? '-' }}
+                                    {{ $row->penempatanAktif?->kelas?->nama_kelas_label ?? '-' }}
 
                                 </span>
 

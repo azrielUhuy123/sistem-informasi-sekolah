@@ -146,7 +146,7 @@
                                         </div>
 
                                         <div>
-                                            <div class="fw-bold">
+                                            <div class="fw-bold text-lowercase">
                                                 {{ $row->nama }}
                                             </div>
 
@@ -159,7 +159,7 @@
                                 <td>{{ $row->nisn ?? '-' }}</td>
                                 <td>
                                     <span class="badge bg-info text-dark fw-semibold rounded-pill px-3 py-2">
-                                        {{ $row->penempatanAktif?->kelas?->nama_kelas ?? '-' }}
+                                        {{ $row->penempatanAktif?->kelas?->nama_kelas_label ?? '-' }}
                                     </span>
                                 </td>
                                 <td>
@@ -197,11 +197,14 @@
                                                     <i class="bi bi-pencil-square me-2"></i> Edit
                                                 </a>
                                             </li>
-                                            <li>
-                                                <a class="dropdown-item" href="{{ route('tu.penempatan-siswa.edit', $row->penempatanAktif->id) }}">
-                                                    <i class="bi bi-door-open me-2"></i> Pindah Kelas
-                                                </a>
-                                            </li>
+                                            @if($row->penempatanAktif)
+                                                <li><hr class="dropdown-divider"></li>
+                                                <li>
+                                                    <a class="dropdown-item" href="{{ route('tu.penempatan-siswa.edit', $row->penempatanAktif->id) }}">
+                                                        <i class="bi bi-door-open me-2"></i> Pindah Kelas
+                                                    </a>
+                                                </li>
+                                            @endif
                                         </ul>
                                     </div>
                                 </td>

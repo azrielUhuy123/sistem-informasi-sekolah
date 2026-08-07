@@ -185,7 +185,7 @@
 
                                 <strong>
 
-                                    {{ $forum->kelas?->nama_kelas }}
+                                    {{ $forum->kelas?->nama_kelas_label }}
 
                                 </strong>
 

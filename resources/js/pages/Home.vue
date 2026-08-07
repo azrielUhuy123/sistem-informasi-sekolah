@@ -56,7 +56,7 @@
             </div>
 
             <div class="stat-card">
-                <h2>15+</h2>
+                <h2>20+</h2>
                 <p>Prestasi</p>
             </div>
 
@@ -135,35 +135,6 @@
 
         </section>
 
-        <!-- BERITA -->
-        <section class="section">
-
-            <div class="section-header">
-                <h2>Informasi Terbaru</h2>
-            </div>
-
-            <div class="news-grid">
-
-                <div
-                    v-for="item in berita"
-                    :key="item.id"
-                    class="news-card"
-                >
-
-                    <h4>
-                        {{ item.judul }}
-                    </h4>
-
-                    <p>
-                        {{ item.ringkasan }}
-                    </p>
-
-                </div>
-
-            </div>
-
-        </section>
-
 
     </PublicLayout>
 </template>
@@ -182,16 +153,6 @@ onMounted(async () => {
 
 })
 
-const berita = ref([])
-
-onMounted(async () => {
-
-    const response =
-        await fetch('/api/gateway/berita')
-
-    berita.value =
-        await response.json()
-})
 
 </script>
 

@@ -146,7 +146,7 @@
                         <input
                             type="text"
                             class="form-control rounded-3"
-                            value="{{ $kelas->nama_kelas }}"
+                            value="{{ $kelas->nama_kelas_label }}"
                             readonly>
 
                     </div>
@@ -233,7 +233,7 @@
                                         value="{{ $k->id }}"
                                         {{ $kelasId == $k->id ? 'selected' : '' }}>
 
-                                        {{ $k->nama_kelas }}
+                                        {{ $k->nama_kelas_label }}
 
                                     </option>
 

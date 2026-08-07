@@ -445,7 +445,7 @@
                         <input
                             type="text"
                             class="form-control"
-                            value="{{ $siswa->penempatanAktif?->kelas?->nama_kelas ?? '-' }}"
+                            value="{{ $siswa->penempatanAktif?->kelas?->nama_kelas_label ?? '-' }}"
                             readonly>
 
                     </div>
