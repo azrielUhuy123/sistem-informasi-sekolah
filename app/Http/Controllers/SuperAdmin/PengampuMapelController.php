@@ -7,6 +7,7 @@ use App\Models\Guru;
 use App\Models\Kelas;
 use App\Models\MataPelajaran;
 use App\Models\PengampuMapel;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Http\Request;
 
 class PengampuMapelController extends Controller
@@ -14,15 +15,34 @@ class PengampuMapelController extends Controller
     /**
      * LIST
      */
-    public function index()
+    public function index(Request $request)
     {
         $guru = Guru::with('pegawai')
-    ->get()
-    ->sortBy('pegawai.nama');
+            ->get()
+            ->sortBy('pegawai.nama');
 
         $kelas = Kelas::orderBy('nama_kelas')->get();
 
         $mapel = MataPelajaran::orderBy('nama_mapel')->get();
+
+        $guruTerpilih = null;
+        $pengampuGuru = collect();
+
+        if ($request->filled('guru_id')) {
+
+            $guruTerpilih = Guru::with('pegawai')
+                ->findOrFail($request->guru_id);
+
+            $pengampuGuru = PengampuMapel::where(
+                    'guru_id',
+                    $guruTerpilih->id
+                )
+                ->where(
+                    'tahun_ajaran_id',
+                    current_tahun_id()
+                )
+                ->get();
+        }
 
         $pengampu = PengampuMapel::with([
                 'guru',
@@ -34,7 +54,8 @@ class PengampuMapelController extends Controller
                 current_tahun_id()
             )
             ->latest()
-            ->get();
+            ->get()
+            ->groupBy('guru_id');
 
         return view(
             'superadmin.pengampu-mapel.index',
@@ -42,7 +63,9 @@ class PengampuMapelController extends Controller
                 'guru',
                 'kelas',
                 'mapel',
-                'pengampu'
+                'pengampu',
+                'guruTerpilih',
+                'pengampuGuru'
             )
         );
     }
@@ -53,44 +76,75 @@ class PengampuMapelController extends Controller
     public function store(Request $request)
     {
         $request->validate([
-
             'guru_id' => 'required|exists:guru,id',
-
-            'mata_pelajaran_id' => 'required|exists:mata_pelajaran,id',
-
-            'kelas_id' => 'required|array|min:1',
-
-            'kelas_id.*' => 'exists:kelas,id',
-
+            'pengampu' => 'nullable|array',
+            'pengampu.*' => 'array',
+            'pengampu.*.kelas_id' => 'nullable|array',
+            'pengampu.*.kelas_id.*' => 'exists:kelas,id',
         ]);
 
-        foreach ($request->kelas_id as $kelasId) {
+        $tahunAjaranId = current_tahun_id();
+        $guruId = $request->guru_id;
 
-            \App\Models\PengampuMapel::firstOrCreate(
+        $selected = collect($request->input('pengampu', []))
+            ->flatMap(function ($data, $mapelId) {
+                return collect($data['kelas_id'] ?? [])
+                    ->map(fn ($kelasId) => [
+                        'mata_pelajaran_id' => (int) $mapelId,
+                        'kelas_id' => (int) $kelasId,
+                    ]);
+            })
+            ->unique(fn ($assignment) => $assignment['mata_pelajaran_id'] . '-' . $assignment['kelas_id'])
+            ->values();
 
-                [
+        $validMapelIds = MataPelajaran::whereIn(
+            'id',
+            $selected->pluck('mata_pelajaran_id')
+        )->pluck('id');
+        abort_unless($validMapelIds->count() === $selected->pluck('mata_pelajaran_id')->unique()->count(), 422);
 
-                    'guru_id'            => $request->guru_id,
+        DB::transaction(function () use ($guruId, $tahunAjaranId, $selected) {
+            $existing = PengampuMapel::where('guru_id', $guruId)
+                ->where('tahun_ajaran_id', $tahunAjaranId)
+                ->get();
 
-                    'kelas_id'           => $kelasId,
+            $selectedKeys = $selected
+                ->map(fn ($assignment) => $assignment['mata_pelajaran_id'] . '-' . $assignment['kelas_id'])
+                ->all();
 
-                    'mata_pelajaran_id'  => $request->mata_pelajaran_id,
+            $existing
+                ->filter(fn ($assignment) => ! in_array(
+                    $assignment->mata_pelajaran_id . '-' . $assignment->kelas_id,
+                    $selectedKeys,
+                    true
+                ))
+                ->each
+                ->delete();
 
-                    'tahun_ajaran_id'    => current_tahun_id(),
+            $existingKeys = $existing
+                ->map(fn ($assignment) => $assignment->mata_pelajaran_id . '-' . $assignment->kelas_id)
+                ->all();
 
-                ]
+            foreach ($selected as $assignment) {
+                $key = $assignment['mata_pelajaran_id'] . '-' . $assignment['kelas_id'];
 
+                if (! in_array($key, $existingKeys, true)) {
+                    PengampuMapel::create([
+                        'guru_id' => $guruId,
+                        'mata_pelajaran_id' => $assignment['mata_pelajaran_id'],
+                        'kelas_id' => $assignment['kelas_id'],
+                        'tahun_ajaran_id' => $tahunAjaranId,
+                    ]);
+                }
+            }
+        });
+
+        return redirect()
+            ->route('superadmin.pengampu-mapel.index')
+            ->with(
+                'success',
+                'Penugasan guru berhasil disimpan.'
             );
-
-        }
-
-        return back()->with(
-
-            'success',
-
-            'Pengampu mata pelajaran berhasil disimpan.'
-
-        );
     }
 
     /**
@@ -98,7 +152,9 @@ class PengampuMapelController extends Controller
      */
     public function destroy(PengampuMapel $pengampuMapel)
     {
-        $pengampuMapel->delete();
+        PengampuMapel::where('guru_id', $pengampuMapel->guru_id)
+            ->where('tahun_ajaran_id', current_tahun_id())
+            ->delete();
 
         return back()->with(
             'success',

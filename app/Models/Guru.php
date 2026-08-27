@@ -4,7 +4,6 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
-use App\Models\MataPelajaran;
 
 class Guru extends Model
 {
@@ -13,13 +12,28 @@ class Guru extends Model
     protected $table = 'guru';
 
     protected $fillable = [
-        'user_id',
         'data_kepegawaian_id',
     ];
 
-    /**
-     * Relasi ke Mata Pelajaran
-     */
+    public function pegawai()
+    {
+        return $this->belongsTo(
+            DataKepegawaian::class,
+            'data_kepegawaian_id'
+        );
+    }
+
+    public function user()
+    {
+        return $this->hasOneThrough(
+            User::class,
+            DataKepegawaian::class,
+            'id',
+            'pegawai_id',
+            'data_kepegawaian_id',
+            'id'
+        );
+    }
 
     public function mapels()
     {
@@ -40,26 +54,12 @@ class Guru extends Model
     {
         return $this->hasMany(PengampuMapel::class);
     }
+
     public function pembinaEkskul()
     {
-        return $this->hasMany(
-            PembinaEkskul::class
-        );
-    }
-    public function pegawai()
-    {
-        return $this->belongsTo(
-            DataKepegawaian::class,
-            'data_kepegawaian_id'
-        );
+        return $this->hasMany(PembinaEkskul::class);
     }
 
-    public function user()
-    {
-        return $this->belongsTo(
-            User::class
-        );
-    }
     public function getNamaAttribute()
     {
         return $this->pegawai?->nama;

@@ -13,7 +13,7 @@
                     <p class="mb-0 opacity-75">Kelola data siswa sekolah</p>
                 </div>
                 <div class="badge bg-white text-primary px-3 py-2 fs-6">
-                    <i class="bi bi-shield-check me-2"></i> Sistem Terhubung
+                    <i class="bi bi-shield-check me-2"></i> Sinergi-MJ
                 </div>
             </div>
         </div>
@@ -26,8 +26,8 @@
         title="Daftar Seluruh Siswa"
         subtitle="Seluruh data siswa pada SDN Mekar Jaya">
         <x-slot:badge>
-            <span class="badge bg-primary rounded-pill px-3 py-2">
-                {{ $siswa->total() }} siswa
+            <span class="badge bg-primary rounded-pill px-2 py-1">
+                {{ $siswa->total() }} <span class="text-badge">siswa</span>
             </span>
         </x-slot:badge>
 
@@ -37,12 +37,11 @@
                 <form
                     action="{{ route('tu.siswa.index') }}"
                     method="GET"
-                    class="d-flex gap-2"
+                    class="siswa-filter-form"
                 >
                     <select
-                        name="status"
-                        class="form-select rounded-3"
-                        style="width:170px"
+                        name="status" 
+                        class="form-control siswa-filter-status"                        
                     >
                         <option value="">Semua Status</option>
                         <option
@@ -63,15 +62,15 @@
                         type="text"
                         id="search"
                         name="search"
-                        class="form-control rounded-3"
+                        class="form-control siswa-filter-search"
                         placeholder="Cari Nama / NIS..."
-                        value="{{ request('search') }}"
-                        style="width:300px;"
+                        value="{{ request('search') }}"                        "
                     >
                     <button
                         type="submit"
                         class="btn btn-primary rounded-3"
                     >
+                        <i class="bi bi-funnel me-1"></i>
                         Filter
                     </button>
                     @if(request()->filled('status') || request()->filled('search'))
@@ -89,23 +88,30 @@
 
         <form method="POST" action="{{ route('tu.siswa.bulk') }}" id="bulkForm">
             @csrf
-
-            <div class="d-flex justify-content-between align-items-center mb-3">
-                <div class="d-flex gap-2">
-                    <select name="action" class="form-select rounded-3 w-auto" required>
+            <div class="siswa-bulk-bar mb-3">
+                <div class="siswa-bulk-actions">
+                    <select
+                        name="action"
+                        class="form-control"
+                        required
+                    >
                         <option value="">Pilih Opsi</option>
                         <option value="nonaktifkan">Nonaktifkan</option>
                         <option value="aktifkan">Aktifkan</option>
                     </select>
-
-                    <button id="bulkButton" type="submit" class="btn btn-primary rounded-3" disabled>
+                    <button
+                        id="bulkButton"
+                        type="submit"
+                        class="btn btn-primary rounded-3"
+                        disabled
+                    >
                         Terapkan
                     </button>
                 </div>
-
-                <span class="badge bg-primary rounded-pill mb-0">
+                <span class="badge bg-primary rounded-pill">
                     <span id="selectedCount">0</span> siswa dipilih
                 </span>
+
             </div>
 
             <div class="table-responsive">
@@ -134,8 +140,8 @@
                                 <td>
                                     <input type="checkbox" name="ids[]" value="{{ $row->id }}" class="form-check-input row-checkbox">
                                 </td>
-                                <td class="text-center">
-                                    <span class="badge bg-light text-dark rounded-pill px-3 py-2">
+                                <td>
+                                    <span class="badge bg-light text-dark rounded-circle">
                                         {{ $loop->iteration + ($siswa->currentPage()-1) * $siswa->perPage() }}
                                     </span>
                                 </td>
@@ -146,7 +152,7 @@
                                         </div>
 
                                         <div>
-                                            <div class="fw-bold text-lowercase">
+                                            <div class="fw-semibold">
                                                 {{ $row->nama }}
                                             </div>
 
@@ -158,7 +164,7 @@
                                 </td>
                                 <td>{{ $row->nisn ?? '-' }}</td>
                                 <td>
-                                    <span class="badge bg-info text-dark fw-semibold rounded-pill px-3 py-2">
+                                    <span class="fw-semibold">
                                         {{ $row->penempatanAktif?->kelas?->nama_kelas_label ?? '-' }}
                                     </span>
                                 </td>
@@ -167,46 +173,36 @@
                                 </td>
                                 <td>
                                     @if($row->trashed())
-                                        <span class="badge bg-secondary rounded-pill px-3 py-2">
-                                            <i class="bi bi-x-circle me-1"></i> Nonaktif
-                                        </span>
+                                        <span class="badge-status nonaktif">
+                                            <i class="bi bi-circle-fill me-2"></i> Nonaktif
+                                        </span> 
                                     @else
-                                        <span class="badge bg-success rounded-pill px-3 py-2">
-                                            <i class="bi bi-check-circle me-1"></i> Aktif
+                                        <span class="badge-status aktif">
+                                            <i class="bi bi-circle-fill me-2"></i> Aktif
                                         </span>
                                     @endif
                                 </td>
                                 <td>
-                                    <div class="dropdown">
-                                        <button class="btn btn-sm btn-outline-primary"
-                                            type="button"
-                                            data-bs-toggle="dropdown"
-                                            aria-expanded="false">
-                                            <i class="bi bi-gear-fill"></i>
-                                            <i class="bi bi-caret-down-fill"></i>
-                                        </button>
-
-                                        <ul class="dropdown-menu dropdown-menu-end shadow-sm border-0">
+                                    <x-table.actions>
+                                        <li>
+                                            <a class="dropdown-item" href="{{ route('tu.siswa.show', $row->id) }}">
+                                                <i class="bi bi-eye me-2"></i> Detail
+                                            </a>
+                                        </li>
+                                        <li>
+                                            <a class="dropdown-item" href="{{ route('tu.siswa.edit', $row->id) }}">
+                                                <i class="bi bi-pencil-square me-2"></i> Edit
+                                            </a>
+                                        </li>
+                                        @if($row->penempatanAktif)
+                                            <li><hr class="dropdown-divider"></li>
                                             <li>
-                                                <a class="dropdown-item" href="{{ route('tu.siswa.show', $row->id) }}">
-                                                    <i class="bi bi-eye me-2"></i> Detail
+                                                <a class="dropdown-item" href="{{ route('tu.penempatan-siswa.edit', $row->penempatanAktif->id) }}">
+                                                    <i class="bi bi-door-open me-2"></i> Pindah Kelas
                                                 </a>
                                             </li>
-                                            <li>
-                                                <a class="dropdown-item" href="{{ route('tu.siswa.edit', $row->id) }}">
-                                                    <i class="bi bi-pencil-square me-2"></i> Edit
-                                                </a>
-                                            </li>
-                                            @if($row->penempatanAktif)
-                                                <li><hr class="dropdown-divider"></li>
-                                                <li>
-                                                    <a class="dropdown-item" href="{{ route('tu.penempatan-siswa.edit', $row->penempatanAktif->id) }}">
-                                                        <i class="bi bi-door-open me-2"></i> Pindah Kelas
-                                                    </a>
-                                                </li>
-                                            @endif
-                                        </ul>
-                                    </div>
+                                        @endif
+                                    </x-table.actions>                                                                      
                                 </td>
                             </tr>
                         @empty

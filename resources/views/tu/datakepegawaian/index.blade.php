@@ -15,48 +15,11 @@
                     <p class="mb-0 opacity-75">Kelola data pegawai sekolah</p>
                 </div>
                 <div class="badge bg-white text-primary px-3 py-2 fs-6">
-                    <i class="bi bi-shield-check me-2"></i> Sistem Terhubung
+                    <i class="bi bi-shield-check me-2"></i> Sinergi-MJ
                 </div>
             </div>
         </div>
-    </div>
-    <div class="d-flex justify-content-end align-items-center mb-4">
-
-        <div class="d-flex gap-2">
-
-            <a href="{{ route('tu.datakepegawaian.create') }}"
-            class="btn btn-primary">
-
-                <i class="bi bi-plus-lg me-1"></i>
-                Tambah Pegawai
-
-            </a>
-
-            @if($belumApprove > 0)
-
-                <button type="button"
-                        class="btn btn-success"
-                        onclick="showExportWarning()">
-
-                    Export Excel
-
-                </button>
-
-            @else
-
-                <a href="{{ route('tu.datakepegawaian.export.excel') }}"
-                class="d-flex btn btn-success gap-2">
-
-                    <i class="bi bi-file-earmark-excel"></i>    
-                    Export Excel
-
-                </a>
-
-            @endif
-
-        </div>
-
-    </div>
+    </div>    
 
     {{-- ALERT --}}
     <x-alert.flash key="success" type="success"/>
@@ -68,21 +31,22 @@
         subtitle="Seluruh pegawai pada SDN Mekar Jaya."
     >
         <x-slot:badge>
-            <span class="badge bg-primary rounded-pill px-3 py-2">
-                {{ $data->count() }} Pegawai
+            <span class="badge bg-primary rounded-pill px-2 py-1">
+                {{ $data->count() }} <span class="text-badge">Pegawai</span>
             </span>
         </x-slot:badge>
 
-        <x-slot:actions>
-            <div class="d-flex flex-column align-items-end gap-2">
-                <input
-                    type="text"
-                    id="searchInput"
-                    class="form-control rounded-3"
-                    placeholder="Cari pengguna..."
-                    style="width: 320px;"
-                >
-            </div>
+        <x-slot:actions>            
+            <input
+                type="text"
+                id="searchInput"
+                class="form-control table-search"
+                placeholder="Cari pegawai..."                
+            > 
+            <x-button.add
+                :href="route('tu.datakepegawaian.create')"
+                label="Tambah Dokumen Sekolah"
+            />            
 
         </x-slot:actions>
 
@@ -101,8 +65,8 @@
                 <tbody id="tablePegawai">
                     @forelse($data as $row)
                         <tr>
-                            <td class="text-center">
-                                <span class="badge bg-light text-dark rounded-pill px-3 py-2">
+                            <td>
+                                <span class="badge bg-light text-dark rounded-circle">
                                     {{ $loop->iteration }}
                                 </span>
                             </td>
@@ -113,7 +77,7 @@
                                     </div>
 
                                     <div>
-                                        <div class="fw-bold">
+                                        <div class="fw-semibold">
                                             {{ $row->nama }}
                                         </div>
 
@@ -125,16 +89,16 @@
                             </td>
                             <td>
                                 @if($row->approval_status == 'approved')
-                                    <span class="badge bg-success rounded-pill px-3 py-2">
-                                        <i class="bi bi-check-circle me-1"></i> Valid
+                                    <span class="badge-status aktif">
+                                        <i class="bi bi-check-circle-fill me-2"></i> Valid
                                     </span>
                                 @elseif($row->approval_status == 'rejected')
-                                    <span class="badge bg-danger rounded-pill px-3 py-2">
-                                        <i class="bi bi-x-circle me-1"></i> Ditolak
-                                    </span>
+                                    <span class="badge-status nonaktif">
+                                        <i class="bi bi-x-circle-fill me-2"></i> Ditolak
+                                    </span> 
                                 @else
-                                    <span class="badge bg-warning rounded-pill px-3 py-2">
-                                        <i class="bi bi-hourglass-split me-1"></i> Validasi
+                                    <span class="badge-status pending">
+                                        <i class="bi bi-hourglass-split me-2"></i> Validasi
                                     </span>
                                 @endif
                             </td>
@@ -147,13 +111,13 @@
                                             method="POST"
                                             class="d-inline">
                                             @csrf
-                                            <button class="btn btn-outline-success btn-sm">
-                                                <i class="bi bi-person-plus me-1"></i> Tambah Akun
+                                            <button class="btn btn-success rounded-pill btn-sm px-3 py-0">
+                                                <i class="bi bi-person-plus me-2"></i> Tambah Akun
                                             </button>
                                         </form>
                                     @else
-                                        <span class="badge bg-success-subtle text-success-emphasis border border-success-subtle">
-                                            <i class="bi bi-person-check me-1"></i> Sudah Ada Akun
+                                        <span class="badge-status selesai">
+                                            <i class="bi bi-person-check me-2"></i> Sudah Ada Akun
                                         </span>
                                     @endif
                                 @else
@@ -179,44 +143,35 @@
                             </td>
                             {{-- AKSI --}}
                             <td>
-                                <div class="dropdown">
-                                    <button class="btn btn-sm btn-outline-primary"
-                                            type="button"
-                                            data-bs-toggle="dropdown"
-                                            aria-expanded="false">
-                                        <i class="bi bi-gear-fill"></i>
-                                        <i class="bi bi-caret-down-fill"></i>
-                                    </button>
-                                    <ul class="dropdown-menu dropdown-menu-end shadow-sm border-0">
-                                        <li>
-                                            <a class="dropdown-item" href="{{ route('tu.datakepegawaian.show', $row->id) }}">
-                                                <i class="bi bi-eye me-2"></i> Detail
-                                            </a>
-                                        </li>
-                                        <li>
-                                            <a class="dropdown-item" href="{{ route('tu.datakepegawaian.edit', $row->id) }}">
-                                                <i class="bi bi-pencil-square me-2"></i> Edit
-                                            </a>
-                                        </li>
-                                        <li><hr class="dropdown-divider"></li>
-                                        <li>
-                                            <form action="{{ route('tu.datakepegawaian.destroy', $row->id) }}"
-                                                method="POST"
-                                                
-                                            >
-                                                @csrf
-                                                @method('DELETE')
-                                                <button type="submit" class="dropdown-item text-danger
-                                                btn-confirm"
-                                                data-title="HAPUS PEGAWAI INI?"
-                                                data-message="Pegawai ini akan dihapus dari sistem ini."
-                                                data-button="btn-danger">
-                                                    <i class="bi bi-trash me-2"></i> Hapus
-                                                </button>
-                                            </form>
-                                        </li>
-                                    </ul>
-                                </div>
+                                <x-table.actions>                                
+                                    <li>
+                                        <a class="dropdown-item" href="{{ route('tu.datakepegawaian.show', $row->id) }}">
+                                            <i class="bi bi-eye me-2"></i> Detail
+                                        </a>
+                                    </li>
+                                    <li>
+                                        <a class="dropdown-item" href="{{ route('tu.datakepegawaian.edit', $row->id) }}">
+                                            <i class="bi bi-pencil-square me-2"></i> Edit
+                                        </a>
+                                    </li>
+                                    <li><hr class="dropdown-divider"></li>
+                                    <li>
+                                        <form action="{{ route('tu.datakepegawaian.destroy', $row->id) }}"
+                                            method="POST"
+                                            
+                                        >
+                                            @csrf
+                                            @method('DELETE')
+                                            <button type="submit" class="dropdown-item text-danger
+                                            btn-confirm"
+                                            data-title="HAPUS PEGAWAI INI?"
+                                            data-message="Pegawai ini akan dihapus dari sistem ini."
+                                            data-button="btn-danger">
+                                                <i class="bi bi-trash me-2"></i> Hapus
+                                            </button>
+                                        </form>
+                                    </li>                               
+                                </x-table.actions>
                             </td>
                         </tr>
                     @empty
@@ -236,182 +191,148 @@
     </x-table.card>
 
     {{-- MODAL PESAN --}}
-    @foreach($data as $row)
+@foreach ($data as $row)
+    @if ($row->approval_status === 'rejected')
+        <div
+            class="modal fade"
+            id="messageModal{{ $row->id }}"
+            tabindex="-1"
+            aria-labelledby="messageModalLabel{{ $row->id }}"
+            aria-hidden="true"
+        >
+            <div class="modal-dialog modal-lg modal-dialog-centered">
+                <div class="modal-content border-0 shadow">
 
-        @if($row->approval_status == 'rejected')
+                    {{-- HEADER --}}
+                    <div class="modal-header border-0 bg-light">
+                        <h5
+                            class="modal-title text-muted small"
+                            id="messageModalLabel{{ $row->id }}"
+                        >
+                            Detail Pesan Penolakan
+                        </h5>
 
-            <div class="modal fade"
-                id="messageModal{{ $row->id }}"
-                tabindex="-1">
- 
-                <div class="modal-dialog modal-lg modal-dialog-centered">
+                        <button
+                            type="button"
+                            class="btn-close btn-close-dark"
+                            data-bs-dismiss="modal"
+                            aria-label="Tutup"
+                        ></button>
+                    </div>
 
-                    <div class="modal-content border-0 shadow">
+                    {{-- BODY --}}
+                    <div class="modal-body border-0">
 
-                        {{-- HEADER --}}
-                        <div class="modal-header bg-primary text-white">
-
-                            <h5 class="modal-title fw-bold">
-                                Detail Pesan Penolakan
+                        {{-- JUDUL --}}
+                        <div class="text-center mb-4">
+                            <h5 class="fw-bold text-primary mb-1">
+                                INFORMASI PENOLAKAN DATA
                             </h5>
 
-                            <button type="button"
-                                    class="btn-close btn-close-white"
-                                    data-bs-dismiss="modal">
-                            </button>
-
+                            <small class="text-muted">
+                                Sistem Informasi Sekolah
+                            </small>
                         </div>
 
-                        {{-- BODY --}}
-                        <div class="modal-body p-4">
+                        {{-- INFORMASI --}}
+                        <div class="row g-4 mb-4">
 
-                            {{-- JUDUL --}}
-                            <div class="text-center mb-4">
+                            {{-- INFORMASI PEGAWAI --}}
+                            <div class="col-md-6">
+                                <div class="d-flex flex-column gap-3">
 
-                                <h5 class="fw-bold mb-1">
-                                    INFORMASI PENOLAKAN DATA
-                                </h5>
+                                    <div class="row">
+                                        <div class="col-5 fw-semibold text-muted">
+                                            Pengirim
+                                        </div>
+                                        <div class="col-7">
+                                            Kepala Sekolah
+                                        </div>
+                                    </div>
 
-                                <small class="text-muted">
-                                    Sistem Informasi Sekolah
-                                </small>
+                                    <div class="row">
+                                        <div class="col-5 fw-semibold text-muted">
+                                            Nama Pegawai
+                                        </div>
+                                        <div class="col-7">
+                                            {{ $row->nama }}
+                                        </div>
+                                    </div>
 
+                                    <div class="row">
+                                        <div class="col-5 fw-semibold text-muted">
+                                            NIP
+                                        </div>
+                                        <div class="col-7">
+                                            {{ $row->nip ?? '-' }}
+                                        </div>
+                                    </div>
+
+                                </div>
                             </div>
 
-                            {{-- INFORMASI --}}
-                            <div class="row mb-4">
+                            {{-- INFORMASI PESAN --}}
+                            <div class="col-md-6">
+                                <div class="d-flex flex-column gap-3">
 
-                                <div class="col-md-6">
+                                    <div class="row">
+                                        <div class="col-5 fw-semibold text-muted">
+                                            Tanggal Pesan
+                                        </div>
+                                        <div class="col-7">
+                                            {{ $row->rejected_at
+                                                ? \Carbon\Carbon::parse($row->rejected_at)
+                                                    ->timezone('Asia/Jakarta')
+                                                    ->format('d F Y H:i')
+                                                : '-' }}
+                                        </div>
+                                    </div>
 
-                                    <table class="table table-borderless">
-
-                                        <tr>
-
-                                            <td width="170">
-                                                <strong>Pengirim</strong>
-                                            </td>
-
-                                            <td>
-                                                : Kepala Sekolah
-                                            </td>
-
-                                        </tr>
-
-                                        <tr>
-
-                                            <td>
-                                                <strong>Nama Pegawai</strong>
-                                            </td>
-
-                                            <td>
-                                                : {{ $row->nama }}
-                                            </td>
-
-                                        </tr>
-
-                                        <tr>
-
-                                            <td>
-                                                <strong>NIP</strong>
-                                            </td>
-
-                                            <td>
-                                                : {{ $row->nip ?? '-' }}
-                                            </td>
-
-                                        </tr>
-
-                                    </table>
+                                    <div class="row">
+                                        <div class="col-5 fw-semibold text-muted">
+                                            Status
+                                        </div>
+                                        <div class="col-7">
+                                            <span class="badge bg-danger">
+                                                Ditolak
+                                            </span>
+                                        </div>
+                                    </div>
 
                                 </div>
-
-                                <div class="col-md-6">
-
-                                    <table class="table table-borderless">
-
-                                        <tr>
-
-                                            <td width="170">
-                                                <strong>Tanggal Pesan</strong>
-                                            </td>
-
-                                            <td>
-
-                                                :
-
-                                                {{ $row->rejected_at
-                                                    ? \Carbon\Carbon::parse($row->rejected_at)->timezone('Asia/Jakarta')->format('d F Y H:i')
-                                                    : '-' }}
-
-                                            </td>
-
-                                        </tr>
-
-                                        <tr>
-
-                                            <td>
-                                                <strong>Status</strong>
-                                            </td>
-
-                                            <td>
-
-                                                :
-
-                                                <span class="badge bg-danger">
-                                                    Ditolak
-                                                </span>
-
-                                            </td>
-
-                                        </tr>
-
-                                    </table>
-
-                                </div>
-
-                            </div>
-
-                            {{-- ALASAN --}}
-                            <div>
-
-                                <label class="fw-bold mb-2">
-
-                                    Alasan Penolakan
-
-                                </label>
-
-                                <div class="alert alert-danger border-0 mb-0">
-
-                                    {{ $row->rejected_reason }}
-
-                                </div>
-
                             </div>
 
                         </div>
 
-                        {{-- FOOTER --}}
-                        <div class="modal-footer border-0">
+                        {{-- ALASAN PENOLAKAN --}}
+                        <div>
+                            <label class="fw-semibold mb-2">
+                                Alasan Penolakan
+                            </label>
 
-                            <button type="button"
-                                    class="btn btn-secondary"
-                                    data-bs-dismiss="modal">
-
-                                Tutup
-
-                            </button>
-
+                            <div class="alert alert-danger border-0 mb-0">
+                                {{ $row->rejected_reason ?: 'Tidak ada alasan penolakan.' }}
+                            </div>
                         </div>
+                    </div>
 
+                    {{-- FOOTER --}}
+                    <div class="modal-footer border-0">
+                        <button
+                            type="button"
+                            class="btn btn-secondary"
+                            data-bs-dismiss="modal"
+                        >
+                            Tutup
+                        </button>
                     </div>
 
                 </div>
-
             </div>
-
+        </div>
     @endif
-
 @endforeach
+
 
 @endsection
 

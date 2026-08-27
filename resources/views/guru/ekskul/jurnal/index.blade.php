@@ -15,7 +15,7 @@
                     <p class="mb-0 opacity-75">Kelola jurnal kegiatan ekstrakurikuler</p>
                 </div>
                 <div class="badge bg-white text-primary px-3 py-2 fs-6">
-                    <i class="bi bi-shield-check me-2"></i> Sistem Terhubung
+                    <i class="bi bi-shield-check me-2"></i> Sinergi-MJ
                 </div>
             </div>
         </div>

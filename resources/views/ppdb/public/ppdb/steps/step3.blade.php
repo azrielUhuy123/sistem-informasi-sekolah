@@ -179,8 +179,10 @@
         </div>
     </div>
 
+    <hr class="my-4">
+
     <div class="d-flex justify-content-between mt-4">
-        <button type="button" class="btn btn-outline-secondary btn-sm" onclick="showStep(2)">
+        <button type="button" class="btn btn-outline-secondary rounded-3 btn-sm" onclick="showStep(2)">
             <i class="bi bi-arrow-left me-1"></i>
             Sebelumnya
         </button>

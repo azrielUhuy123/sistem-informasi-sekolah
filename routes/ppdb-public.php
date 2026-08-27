@@ -2,7 +2,6 @@
 
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\PPDB\PublicController;
-use App\Http\Controllers\PPDB\PendaftarController;
 
 Route::prefix('ppdb')
     ->name('ppdb.')
@@ -53,5 +52,22 @@ Route::prefix('ppdb')
             [PublicController::class, 'simpanDaftarUlang']
         )->name('daftar-ulang.simpan');
 
+        Route::get(
+            '/status/{pendaftar}',
+            [PublicController::class, 'statusByLink']
+        )->name('status.link')
+        ->middleware('signed');
+
+        Route::get(
+            '/perbaikan/{pendaftar}',
+            [PublicController::class, 'formPerbaikan']
+        )->name('perbaikan.form')
+        ->middleware('signed');
         
+        Route::post(
+            '/perbaikan/{pendaftar}',
+            [PublicController::class, 'simpanPerbaikan']
+        )->name('perbaikan.simpan')
+        ->middleware('signed');
+
     });

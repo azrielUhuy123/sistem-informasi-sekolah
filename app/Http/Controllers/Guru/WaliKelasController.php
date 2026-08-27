@@ -10,12 +10,13 @@ use App\Models\PengajuanJadwal;
 use App\Models\PerkembanganSiswa;
 use App\Models\Siswa;
 use App\Models\WaliKelas;
+use Illuminate\Support\Facades\Auth;
 
 class WaliKelasController extends Controller
 {
     public function kelasSaya()
     {
-        $guru = auth()->user()->guru;
+        $guru = Auth::user()?->guru;
 
         if (!$guru) {
 
@@ -53,13 +54,20 @@ class WaliKelasController extends Controller
                 ->siswaAktif()
                 ->with('siswa')
                 ->get();
+            // Hitung total siswa laki-laki dan perempuan
+            $totalLaki = $penempatan->where('siswa.jenis_kelamin', 'L')->count();
+            $totalPerempuan = $penempatan->where('siswa.jenis_kelamin', 'P')->count();
+            $totalSiswa = $penempatan->count();
 
             return view(
                 'guru.kelas-saya.index',
                 compact(
                     'waliKelas',
                     'kelas',
-                    'penempatan'
+                    'penempatan',
+                    'totalSiswa',     // Tambahkan jika dibutuhkan view
+                    'totalLaki',      // <-- Tambahkan ini
+                    'totalPerempuan'
                 )
             );
         }

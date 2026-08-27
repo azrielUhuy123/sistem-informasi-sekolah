@@ -4,7 +4,7 @@
 
 @section('content')
 
-<div class="container-fluid">
+<div class="container-fluid py-4">
 
     {{-- STATUS --}}
     @if($tahunAktif->status !== 'aktif')
@@ -13,40 +13,19 @@
         </div>
     @endif
 
-    {{-- HEADER --}}
-    <div class="mb-4">
-        <h4 class="mb-1">Pindah Kelas Siswa</h4>
-
-        <div class="text-muted">
-            Memindahkan siswa ke rombel lain pada tahun ajaran aktif.
-        </div>
-
-        <div class="text-muted mt-1">
-            Tahun Ajaran :
-            <strong>{{ $tahunAktif->tahun }}</strong>
-
-            {!! match($tahunAktif->status) {
-                'aktif'    => '<span class="badge bg-success ms-2">AKTIF</span>',
-                'transisi' => '<span class="badge bg-warning text-dark ms-2">TRANSISI</span>',
-                'selesai'  => '<span class="badge bg-secondary ms-2">SELESAI</span>',
-            } !!}
-        </div>
-    </div>
-
-    {{-- ERROR --}}
-    @if ($errors->any())
-        <div class="alert alert-danger">
-            <ul class="mb-0">
-                @foreach($errors->all() as $error)
-                    <li>{{ $error }}</li>
-                @endforeach
-            </ul>
-        </div>
-    @endif
-
-    <div class="card shadow-sm">
+    <div class="card border-0 shadow-sm">
 
         <div class="card-body">
+            <div class="mb-4">
+                <h4 class="text-primary fw-bold text-center mb-1">Pindah Kelas Siswa</h4>
+                <p class="text-muted text-center">
+                    Tahun Ajaran :
+                    <strong>{{ $tahunAktif->tahun }}</strong>
+                </p>
+            </div>
+            {{-- ALERT --}}            
+
+            <x-alert.flash key="error" type="danger"/>
 
             <form
                 action="{{ route('tu.penempatan-siswa.update', $penempatan) }}"
@@ -66,7 +45,7 @@
 
                     <input
                         type="text"
-                        class="form-control rounded-3"
+                        class="form-control"
                         value="{{ $penempatan->siswa->nama }}"
                         readonly
                     >
@@ -82,7 +61,7 @@
 
                     <input
                         type="text"
-                        class="form-control rounded-3"
+                        class="form-control"
                         value="{{ $penempatan->kelas->nama_kelas_label }}"
                         readonly
                     >
@@ -90,7 +69,7 @@
                 </div>
 
                 {{-- Kelas tujuan --}}
-                <div class="mb-4">
+                <div class="mb-5">
 
                     <label class="form-label">
                         Pindah ke Kelas
@@ -98,7 +77,7 @@
 
                     <select
                         name="kelas_id"
-                        class="form-select rounded-3"
+                        class="form-control"
                         required
                         {{ $tahunAktif->status !== 'aktif' ? 'disabled' : '' }}
                     >
@@ -129,25 +108,25 @@
                 </div>
 
                 {{-- ACTION --}}
-                <div class="d-flex justify-content-between">
+                <div class="d-flex justify-content-between align-items-center mt-4">
 
                     <a
                         href="{{ route('tu.siswa.index') }}"
-                        class="btn btn-outline-secondary"
+                        class="btn btn-outline-secondary rounded-3"
                     >
-                        <i class="bi bi-arrow-left me-1"></i>
+                        <i class="bi bi-chevron-left me-1"></i>
                         Kembali
                     </a>
 
                     <button
                         type="submit"
-                        class="btn btn-primary px-4 btn-confirm"
+                        class="btn btn-primary rounded-3 btn-confirm"
                         data-title="Perbarui Kelas Siswa"
-                        data-message="Penempatan kelas Siswa akan diperbarui."
+                        data-message="Penempatan Kelas Siswa akan diperbarui."
                         data-button="btn-warning"
                         {{ $tahunAktif->status !== 'aktif' ? 'disabled' : '' }}
                     >
-                        <i class="bi bi-save me-1"></i> Simpan Data
+                        Simpan <i class="bi bi-save ms-1"></i>
                     </button>
 
                 </div>

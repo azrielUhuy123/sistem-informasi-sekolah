@@ -10,8 +10,13 @@ class DataKepegawaian extends Model
 
     protected $fillable = [
         // IDENTITAS
-        'nama','nip','nuptk','tempat_lahir','tanggal_lahir',
-        'agama','jenis_kelamin',
+        'nama',
+        'nip',
+        'nuptk',
+        'tempat_lahir',
+        'tanggal_lahir',
+        'agama',
+        'jenis_kelamin',
 
         // STATUS
         'status_kepegawaian',
@@ -20,29 +25,35 @@ class DataKepegawaian extends Model
         'ijazah_terakhir',
 
         // SK
-        'sk_terakhir_no','sk_terakhir_tmt',
-        'sk_berkala_no','sk_berkala_tmt',
+        'sk_terakhir_no',
+        'sk_terakhir_tmt',
+        'sk_berkala_no',
+        'sk_berkala_tmt',
         'sk_terakhir_pangkat',
         'sk_berkala_pangkat',
         'status_kawin',
 
         // PEKERJAAN
-        'jabatan','mulai_kerja',
-        'masa_kerja_golongan','masa_kerja_keseluruhan',
+        'jabatan',
+        'mulai_kerja',
+        'masa_kerja_golongan',
+        'masa_kerja_keseluruhan',
         'masa_kerja_gol_th',
         'masa_kerja_gol_bln',
         'masa_kerja_total_th',
         'masa_kerja_total_bln',
 
         // MENGAJAR
-        'mengajar_kelas','jam_mengajar',
+        'mengajar_kelas',
+        'jam_mengajar',
 
         // GAJI
         'gaji_pokok',
 
         // TAMBAHAN
         'tugas_tambahan',
-        'nomor_sertifikasi','tahun_sertifikasi',
+        'nomor_sertifikasi',
+        'tahun_sertifikasi',
         'keterangan',
 
         'approval_status',
@@ -51,9 +62,6 @@ class DataKepegawaian extends Model
         'rejected_at',
     ];
 
-    // =========================
-    // CASTING (PENTING)
-    // =========================
     protected $casts = [
         'tanggal_lahir' => 'date',
         'sk_terakhir_tmt' => 'date',
@@ -75,6 +83,7 @@ class DataKepegawaian extends Model
             'data_kepegawaian_id'
         );
     }
+
     public function user()
     {
         return $this->hasOne(

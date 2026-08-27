@@ -15,7 +15,7 @@
                     <p class="mb-0 opacity-75">Kelola data rombel sekolah</p>
                 </div>
                 <div class="badge bg-white text-primary px-3 py-2 fs-6">
-                    <i class="bi bi-shield-check me-2"></i> Sistem Terhubung
+                    <i class="bi bi-shield-check me-2"></i> Sinergi-MJ
                 </div>
             </div>
         </div>
@@ -29,19 +29,19 @@
     {{-- TABLE --}}
     <x-table.card
         title="Daftar Rombel"
-        subtitle="Kelas {{ $kelasGrup->kelasMaster->tingkat }} – Angkatan {{ $kelasGrup->angkatan->tahun }}"
+        subtitle="Kelas {{ $kelasGrup->kelasMaster->tingkat }} Angkatan {{ $kelasGrup->angkatan->tahun }}"
     > 
         <x-slot:badge>
-            <span class="badge bg-primary rounded-pill px-3 py-2">
-                {{ $rombels->count() }} Rombel
+            <span class="badge bg-primary rounded-pill px-2 py-1">
+                {{ $rombels->count() }} <span class="text-badge">Rombel</span>
             </span>
         </x-slot:badge>
 
         <x-slot:actions>
-            <a href="{{ route('tu.kelas.rombel.create', $kelasGrup->id) }}" 
-            class="btn btn-primary">
-                <i class="bi bi-plus-lg me-1"></i> Tambah Rombel
-            </a>
+            <x-button.add
+                :href="route('tu.kelas.rombel.create', $kelasGrup->id)"
+                label="Tambah Rombel"
+            />            
         </x-slot:actions>
         @if(session('import_report'))
             <div class="alert alert-info border-0 shadow-sm mb-4">
@@ -68,13 +68,13 @@
                 <tbody>
                     @forelse ($rombels as $rombel)
                         <tr>
-                            <td class="text-center">
-                                <span class="badge bg-light text-dark rounded-pill px-3 py-2">
+                            <td>
+                                <span class="badge bg-light text-dark rounded-circle">
                                     {{ $loop->iteration }}
                                 </span>
                             </td>
                             <td>
-                                <span class="badge bg-info text-dark fw-semibold rounded-pill px-3 py-2 font-monospace">
+                                <span class="fw-semibold">
                                     {{ $rombel->nama_kelas_label }}
                                 </span>
                             </td>
@@ -92,7 +92,10 @@
                                 </div>
                             </td>
                             <td>
-                                <span class="badge bg-light rounded-pill text-dark border px-3 py-2">
+                                @php
+                                    $siswaStatus = $rombel->siswa_count > 0 ? 'aktif' : 'draft';
+                                @endphp
+                                <span class="badge-status {{ $siswaStatus }}">                                    
                                     {{ $rombel->siswa_count }} Siswa
                                 </span>
                             </td>
@@ -101,11 +104,10 @@
                                     {{ $kelasGrup->angkatan->tahun }}
                                 </div>
                             </td>
-                            <td class="text-center">
+                            <td>
                                 <a href="{{ route('tu.kelas.rombel.show', $rombel->id) }}"
-                                class="btn btn-primary btn-sm rounded-pill d-inline-flex align-items-center gap-2 px-3">
-                                    <i class="bi bi-eye-fill"></i>
-                                    Detail
+                                class="btn btn-primary btn-sm rounded-pill px-3 py-0">                                    
+                                    Masuk <i class="bi bi-chevron-right ms-1"></i>
                                 </a>
                             </td>
                         </tr>
@@ -120,12 +122,13 @@
                 </tbody>
                 
             </table>
-            <div class="d-flex justify-content-between align-items-center mt-4">
-                <a href="{{ route('tu.kelas.index') }}" 
-                class="btn btn-outline-secondary rounded-pill px-4">
-                    Kembali
-                </a>    
-            </div>
+            
+        </div>
+        <div class="d-flex justify-content-between align-items-center mt-4">
+            <a href="{{ route('tu.kelas.index') }}" 
+            class="btn btn-outline-secondary rounded-3">
+                <i class="bi bi-chevron-left me-1"></i> Kembali
+            </a>    
         </div>
     </x-table.card>
 </div>

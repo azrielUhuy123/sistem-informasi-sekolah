@@ -1,0 +1,131 @@
+.badge-semester {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 5px 10px;
+    border-radius: 999px;
+    font-size: .75rem;
+    font-weight: 600;
+    line-height: 1;
+}
+
+.badge-semester.ganjil {
+    background: #d1ecf1;
+    color: #0c5460;
+}
+
+.badge-semester.genap {
+    background: #fff3cd;
+    color: #856404;
+}
+
+/* =========================
+   BADGE STATUS
+========================= */
+
+.badge-status {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+
+    padding: 5px 10px;
+    border-radius: 999px;
+
+    font-size: .75rem;
+    font-weight: 600;
+    line-height: 1;
+
+    white-space: nowrap;
+}
+
+
+/* AKTIF */
+.badge-status.aktif {
+    background: #d1e7dd;
+    color: #0f5132;
+    font-weight: 750;
+}
+
+.badge-status.aktif i {
+    font-size: .55rem;
+}
+
+/* DRAFT */
+.badge-status.draft {
+    background: #e2e3e5;
+    color: #41464b;
+}
+
+
+/* SELESAI */
+.badge-status.selesai {
+    background: #f1f3f5;
+    color: #495057;
+    border: 1px solid #dee2e6;
+}
+
+
+/* NONAKTIF */
+.badge-status.nonaktif {
+    background: #f8d7da;
+    color: #842029;
+}
+
+.badge-status.nonaktif i {
+    font-size: .55rem;
+}
+
+/* =========================
+   PENDING
+========================= */
+
+.badge-status.pending {
+    background: #fff3cd;
+    color: #856404;
+}
+
+.badge-status.verifikasi {
+    background: #cfe2ff;
+    color: #084298;
+}
+
+.role-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: .4rem;
+    padding: .35rem .65rem;
+    border-radius: 999px;
+    font-size: .75rem;
+    font-weight: 600;
+    line-height: 1;
+    white-space: nowrap;
+}
+
+.role-badge i {
+    font-size: .7rem;
+}
+
+.role-badge-superadmin {
+    background: #fef3c7;
+    color: #92400e;
+}
+
+.role-badge-tu {
+    background: #e0f2fe;
+    color: #0369a1;
+}
+
+.role-badge-guru {
+    background: #f1f5f9;
+    color: #475569;
+}
+
+.role-badge-siswa {
+    background: #f1f5f9;
+    color: #475569;
+}
+
+.role-badge-default {
+    background: #f1f5f9;
+    color: #64748b;
+}

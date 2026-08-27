@@ -48,7 +48,7 @@
         subtitle="Seluruh nilai mata pelajaran pada semester yang sedang berjalan."
     >
         <x-slot:badge>
-            <span class="badge bg-primary rounded-pill px-3 py-2">
+            <span class="badge bg-primary rounded-pill px-2 py-1">
                 {{ $totalMapel }} Mata Pelajaran
             </span>
         </x-slot:badge>
@@ -89,8 +89,8 @@
                             @endphp
 
                             <tr>
-                                <td class="text-center">
-                                    <span class="badge bg-light text-dark rounded-pill px-3 py-2">
+                                <td>
+                                    <span class="badge bg-light text-dark rounded-circle">
                                         {{ $i + 1 }}
                                     </span>
                                 </td>
@@ -106,27 +106,27 @@
                                     </div>
                                 </td>
                                 <td>{{ $n->guru->pegawai->nama ?? '-' }}</td>
-                                <td class="text-center">
+                                <td>
                                     <span class="badge bg-secondary rounded-pill px-3 py-2">
                                         {{ $n->nilai_tugas }}
                                     </span>
                                 </td>
-                                <td class="text-center">
+                                <td>
                                     <span class="badge bg-info rounded-pill px-3 py-2">
                                         {{ $n->nilai_uts }}
                                     </span>
                                 </td>
-                                <td class="text-center">
+                                <td>
                                     <span class="badge bg-warning text-dark rounded-pill px-3 py-2">
                                         {{ $n->nilai_uas }}
                                     </span>
                                 </td>
-                                <td class="text-center">
+                                <td>
                                     <span class="badge bg-{{ $warna }} rounded-pill px-3 py-2">
                                         {{ $akhir }}
                                     </span>
                                 </td>
-                                <td class="text-center">
+                                <td>
                                     <span class="badge bg-{{ $warna }} rounded-pill px-3 py-2">
                                         {{ $predikat }}
                                     </span>

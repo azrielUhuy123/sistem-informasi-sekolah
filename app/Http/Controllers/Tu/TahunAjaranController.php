@@ -28,7 +28,7 @@ class TahunAjaranController extends Controller
         // Data terbaru paling atas
         $tahun = $query
             ->orderByDesc('id')
-            ->paginate(10)
+            ->paginate(5)
             ->withQueryString();
 
         $tahunAktif = TahunAjaran::current();

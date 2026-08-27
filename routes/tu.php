@@ -19,7 +19,6 @@ use App\Http\Controllers\Tu\WaliKelasController;
 use App\Http\Controllers\Tu\ArsipDokumenController;
 use App\Http\Controllers\Tu\DataKepegawaianController;
 use App\Http\Controllers\Tu\MataPelajaranController;
-use App\Http\Controllers\Tu\KeuanganPemasukanController;
 use App\Http\Controllers\Tu\PenempatanSiswaController;
 use App\Http\Controllers\Tu\AngkatanController;
 use App\Http\Controllers\Tu\RombelController;
@@ -28,7 +27,6 @@ use App\Http\Controllers\Tu\DokumenController;
 use App\Http\Controllers\Tu\PengajuanSuratController;
 use App\Http\Controllers\Tu\NomorSuratTuController;
 use App\Http\Controllers\Tu\EkskulController;
-use App\Http\Controllers\Tu\BeritaController;
 use App\Http\Controllers\Tu\AkunController;
 use App\Http\Controllers\Tu\JadwalFinalController;
 
@@ -342,22 +340,7 @@ Route::get(
 )->name('kelas.export');
 
         
-        /*
-        |--------------------------------------------------------------------------
-        | KEUANGAN
-        |--------------------------------------------------------------------------
-        */
-        Route::prefix('keuangan')->name('keuangan.')->group(function () {
-
-            Route::get('/pemasukan', [KeuanganPemasukanController::class, 'index'])
-                ->name('pemasukan.index');
-
-            Route::get('/pemasukan/create', [KeuanganPemasukanController::class, 'create'])
-                ->name('pemasukan.create');
-
-            Route::post('/pemasukan', [KeuanganPemasukanController::class, 'store'])
-                ->name('pemasukan.store');
-        });
+        
         Route::resource(
             'ekskul',
             EkskulController::class

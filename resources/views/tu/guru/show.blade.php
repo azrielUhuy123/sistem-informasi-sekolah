@@ -20,8 +20,9 @@
                                 </div>
 
                                 <div>
-                                    <h4 class="mb-1 fw-bold">{{ $pegawai->pegawai?->nama }}</h4>
-                                    <p class="text-muted mb-2">{{ $pegawai->pegawai?->jabatan ?? 'Pegawai' }}</p>
+                                    <h4 class="mb-1 fw-bold">{{ $pegawai->pegawai?->nama }}</h4>    
+
+                                    <p class="text-muted mb-2">Guru</p>                                                                   
 
                                     <div class="d-flex flex-wrap gap-2 justify-content-center">
                                         <span class="badge bg-primary-subtle text-primary-emphasis border border-primary-subtle">
@@ -43,10 +44,10 @@
                                         </div>
                                         <div class="col-6">
                                             <div class="border rounded-3 p-2 bg-white">
-                                                <div class="small text-muted">Status Approval</div>
-                                                <div class="fw-semibold">
+                                                <div class="small text-muted">Status Persetujuan</div>
+                                                <div class="fw-semibold text-dark">
                                                     @if($pegawai->pegawai?->approval_status == 'approved')
-                                                        <span class="badge bg-success">Approved</span>
+                                                        <span class="small"><i class="bi bi-patch-check-fill text-success me-1"></i>Approved</span>
                                                     @elseif( $pegawai->pegawai?->approval_status == 'rejected')
                                                         <span class="badge bg-danger">Rejected</span>
                                                     @else
@@ -62,13 +63,11 @@
                     </div>
 
                     <div class="col-lg-8">
-                        <div class="card border-0 shadow-sm h-100">
+                        <div class="card border-0 h-100">
                             <div class="card-body">
                                 <div class="d-flex justify-content-between align-items-center mb-3">
                                     <h5 class="fw-bold mb-0">Profil Guru</h5>
-                                    <span class="badge bg-secondary-subtle text-secondary-emphasis border border-secondary-subtle">
-                                        <i class="bi bi-person-lines-fill me-1"></i> Master Data
-                                    </span>
+                                    <x-table.role-badge :role="$pegawai->pegawai?->jabatan ?? 'Pegawai'" /> 
                                 </div>
 
                                 <div class="row g-3">
@@ -88,7 +87,7 @@
                                             @if ($pegawai->pegawai?->status_kawin == 'K')
                                                 Kawin
                                             @elseif($pegawai->pegawai?->status_kawin == 'TK')
-                                                Tidak Kawin
+                                                Tidak Kawin 
                                             @else
                                                 -
                                             @endif
@@ -98,9 +97,15 @@
                                         <div class="small text-muted mb-1">Jenis Kelamin</div>
                                         <div class="fw-semibold">
                                             @if ($pegawai->pegawai?->jenis_kelamin == 'L')
-                                                <span class="badge bg-primary">Laki-laki</span>
+                                                <span class="badge bg-indigo rounded-pill px-2 py-1">
+                                                    <i class="bi bi-gender-male me-1"></i>
+                                                    Laki-laki
+                                                </span>
                                             @elseif($pegawai->pegawai?->jenis_kelamin == 'P')
-                                                <span class="badge bg-danger">Perempuan</span>
+                                                <span class="badge bg-rose rounded-pill px-2 py-1">
+                                                    <i class="bi bi-gender-female me-1"></i>
+                                                    Perempuan
+                                                </span>
                                             @else
                                                 -
                                             @endif
@@ -108,9 +113,152 @@
                                     </div>
                                 </div>
                             </div>
+                        </div>                    
+                        <div class="card border-0">
+                            <div class="card-body">
+                                <div class="d-flex justify-content-between align-items-center mb-3">
+                                    <h5 class="fw-bold mb-0">Akademik</h5>                                    
+                                </div>
+
+                                <div class="row g-3">
+                                    <div class="col-md-6">
+                                        <div class="small text-muted mb-1">Mata Pelajaran</div>
+                                        <div class="fw-semibold">
+                                            @if($pegawai->waliKelas)
+                                                @php
+                                                    $mapelInti = [
+                                                        'Bahasa Indonesia,',
+                                                        'Matematika,',
+                                                        'Pendidikan Pancasila,',
+                                                        'Ilmu Pengetahuan Alam dan Sosial,',
+                                                    ];
+                                                @endphp
+                                                @foreach($mapelInti as $mapel)
+                                                    <span class="small">
+                                                        {{ $mapel }}
+                                                    </span>
+                                                @endforeach
+                                            @else
+                                                @php
+                                                    $mapels = $pegawai->pengampuMapel
+                                                        ->filter(fn ($pengampu) => $pengampu->mapel)
+                                                        ->unique('mapel_id');
+                                                @endphp
+                                                @forelse($mapels as $pengampu)
+                                                    <span
+                                                        class="small"
+                                                        title="{{ $pengampu->mapel?->nama_mapel ?? '-' }}"
+                                                    >
+                                                        {{ Str::limit($pengampu->mapel?->nama_mapel ?? '-') }}
+                                                    </span>
+                                                @empty
+                                                    <span class="text-muted">
+                                                        Belum ada mapel
+                                                    </span>
+                                                @endforelse
+                                            @endif
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="small text-muted mb-1">Total kelas</div>
+                                        <div class="fw-semibold">
+                                            @php
+                                                $kelasWali = $pegawai->waliKelas?->kelas;
+
+                                                $kelasMengajar = $pegawai->pengampuMapel
+                                                    ->pluck('kelas')
+                                                    ->filter()
+                                                    ->unique('id');
+
+                                                $semuaKelas = collect();
+
+                                                if ($kelasWali) {
+                                                    $semuaKelas->push($kelasWali);
+                                                }
+
+                                                foreach ($kelasMengajar as $kelas) {
+                                                    if (!$kelasWali || $kelas->id != $kelasWali->id) {
+                                                        $semuaKelas->push($kelas);
+                                                    }
+                                                }
+
+                                                $jumlahKelas = $semuaKelas->count();
+                                            @endphp
+
+                                            @if($jumlahKelas == 0)
+
+                                                <span class="badge-status selesai">
+                                                    0 kelas
+                                                </span>
+
+                                            @elseif($jumlahKelas >= 15)
+
+                                                <span class="badge-status nonaktif">
+                                                    {{ $jumlahKelas }} Kelas
+                                                </span>
+
+                                            @elseif($jumlahKelas >= 8)
+
+                                                <span class="badge-status pending">
+                                                    {{ $jumlahKelas }} Kelas
+                                                </span>
+
+                                            @else
+
+                                                <span class="badge-status aktif">
+                                                    {{ $jumlahKelas }} Kelas
+                                                </span>
+
+                                            @endif
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="small text-muted mb-1">Mengajar Di Kelas</div>
+                                        <div class="fw-semibold">
+                                            @php
+                                                $kelasWali = $pegawai->waliKelas?->kelas;
+                                                $kelasMengajar = $pegawai->pengampuMapel
+                                                    ->pluck('kelas')
+                                                    ->filter()
+                                                    ->unique('id');
+                                            @endphp
+                                            {{-- Kelas Wali --}}
+                                            @if($kelasWali)
+                                                <span class="badge bg-purple rounded-3">
+                                                    {{ $kelasWali->nama_kelas_label ?? '-' }}
+                                                </span>
+                                            @endif
+                                            {{-- Kelas Mengajar --}}    
+                                            @foreach($kelasMengajar as $kelas)
+                                                @if(!$kelasWali || $kelas->id != $kelasWali->id)
+                                                    <span class="badge bg-purple rounded-3">
+                                                        {{ $kelas->nama_kelas_label ?? '-' }}
+                                                    </span>
+                                                @endif
+                                            @endforeach
+                                            @if($kelasMengajar->isEmpty() && !$kelasWali)
+                                                <span class="text-muted">-</span>
+                                            @endif                                                                                                                                                                                            
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="small text-muted mb-1">Status Akademik</div>
+                                        <div class="fw-semibold">
+                                            @if($pegawai->waliKelas)
+                                                <span class="text-gold">
+                                                    Wali Kelas
+                                                </span>
+                                            @else
+                                                <span class="text-teal">
+                                                    Guru Bidang
+                                                </span>
+                                            @endif                                                                                                                                                                                    
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
                     </div>
-
                 </div>
 
                 <hr class="my-4">
@@ -228,16 +376,10 @@
             </div>
         </div>
         <div class="sticky-bottom bg-white border border-light-subtle py-3 mt-4">
-            <div class="d-flex justify-content-between align-items-center">
-                 @if(request()->is('superadmin/*'))
-                    <a href="{{ route('superadmin.datakepegawaian.approval') }}" class="btn btn-outline-secondary ml-4">
-                        <i class="bi bi-arrow-left me-1"></i> Kembali
-                    </a>
-                @else
-                    <a href="{{ route('tu.guru.index') }}" class="btn btn-outline-secondary ml-4">
-                        <i class="bi bi-arrow-left me-1"></i> Kembali
-                    </a>
-                @endif
+            <div class="d-flex justify-content-between align-items-center">                
+                <a href="{{ route('tu.guru.index') }}" class="btn btn-outline-secondary rounded-3 ml-4">
+                    <i class="bi bi-chevron-left me-1"></i> Kembali
+                </a>                
             </div>
         </div>
 

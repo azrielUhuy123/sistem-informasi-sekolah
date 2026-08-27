@@ -45,8 +45,12 @@
                                                 <div class="small text-muted">Status Siswa</div>
                                                 <div class="fw-semibold">
                                                     @if($siswa->penempatanAktif)
+                                                        <span class="badge-status aktif">
+                                                        <i class="bi bi-circle-fill me-2"></i>
                                                         Aktif
                                                     @else
+                                                        <span class="badge-status nonaktif">
+                                                        <i class="bi bi-circle-fill me-2"></i>
                                                         Tidak Aktif
                                                     @endif
                                                 </div>
@@ -56,7 +60,7 @@
                                             <div class="border rounded-3 p-2 bg-white">
                                                 <div class="small text-muted">Rombel</div>
                                                 <div class="fw-semibold">
-                                                    <span class="badge bg-success">{{ $siswa->penempatanAktif?->kelas?->nama_kelas_label ?? '-' }}</span>
+                                                    <span class="badge bg-purple rounded-3">{{ $siswa->penempatanAktif?->kelas?->nama_kelas_label ?? '-' }}</span>
                                                 </div>
                                             </div>
                                         </div>
@@ -71,9 +75,7 @@
                             <div class="card-body">
                                 <div class="d-flex justify-content-between align-items-center mb-3">
                                     <h5 class="fw-bold mb-0">Profil Siswa</h5>
-                                    <span class="badge bg-secondary-subtle text-secondary-emphasis border border-secondary-subtle">
-                                        <i class="bi bi-person-lines-fill me-1"></i> Master Data
-                                    </span>
+                                    <x-table.role-badge :role="$siswa->user?->role" /> 
                                 </div>
 
                                 <div class="row g-3">
@@ -99,9 +101,15 @@
                                         <div class="small text-muted mb-1">Jenis Kelamin</div>
                                         <div class="fw-semibold">
                                             @if($siswa->jenis_kelamin == 'L')
-                                                <span class="badge bg-primary">Laki-laki</span>
+                                                <span class="badge bg-indigo rounded-pill px-2 py-1">
+                                                    <i class="bi bi-gender-male me-1"></i>
+                                                    Laki-laki
+                                                </span>
                                             @else
-                                                <span class="badge bg-danger">Perempuan</span>
+                                                <span class="badge bg-rose rounded-pill px-2 py-1">
+                                                    <i class="bi bi-gender-female me-1"></i>
+                                                    Perempuan
+                                                </span>
                                             @endif
                                         </div>
                                     </div>
@@ -247,7 +255,7 @@
                                                     </td>
 
                                                     <td>
-                                                        <span class="badge bg-secondary">
+                                                        <span class="badge bg-purple rounded-3">
                                                             {{ $item->kelas?->nama_kelas_label ?? '-' }}
                                                         </span>
                                                     </td>
@@ -266,13 +274,15 @@
 
                                                         @if($item->tanggal_keluar === null)
 
-                                                            <span class="badge bg-success">
+                                                            <span class="badge-status aktif">
+                                                                <i class="bi bi-circle-fill me-2"></i>
                                                                 Aktif
                                                             </span>
 
                                                         @else
 
-                                                            <span class="badge bg-secondary">
+                                                            <span class="badge-status selesai">
+                                                                <i class="bi bi-check-circle me-2"></i>
                                                                 Selesai
                                                             </span>
 
@@ -309,8 +319,8 @@
         </div>
         <div class="sticky-bottom bg-white border border-light-subtle py-3 mt-4">
             <div class="d-flex justify-content-between align-items-center">
-                <a href="{{ route('tu.siswa.index') }}" class="btn btn-outline-secondary ml-4">
-                    <i class="bi bi-arrow-left me-1"></i> Kembali
+                <a href="javascript:history.back()" class="btn btn-outline-secondary rounded-3 ms-4">
+                    <i class="bi bi-chevron-left me-1"></i> Kembali
                 </a>
             </div>
         </div>

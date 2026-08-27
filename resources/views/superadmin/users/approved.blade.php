@@ -3,571 +3,233 @@
 @section('title', 'User Aktif')
 
 @section('content')
-<div class="container-fluid py-3">
 
-    @php
+<div class="container-fluid">
 
-        $totalUser = $users->total();
-
-        $aktif = $users->where('is_active', true)->count();
-
-        $blokir = $users->where('is_active', false)->count();
-
-    @endphp
-
-    {{-- ================= HERO ================= --}}
+    {{-- HEADER --}}
     <div class="card border-0 shadow-sm rounded-4 overflow-hidden mb-4">
+        <div class="card-body p-4 p-lg-5 text-white" style="background: linear-gradient(135deg, #0f4c81 0%, #2563eb 100%);">
+            <div class="d-flex flex-column flex-lg-row justify-content-between align-items-lg-center gap-3">
 
-        <div
-            class="card-body p-4 p-lg-5 text-white"
-            style="background:linear-gradient(135deg,#0f4c81 0%,#2563eb 100%);"
-        >
-
-            <div class="row align-items-center">
-
-                <div class="col-lg-7">
-
-                    <h2 class="fw-bold mb-2">
-
+                <div>
+                    <h3 class="fw-bold mb-2">
                         User Aktif
-
-                    </h2>
+                    </h3>
 
                     <p class="mb-0 opacity-75">
-
                         Kelola seluruh akun pengguna yang telah disetujui,
                         lakukan aktivasi maupun pemblokiran akun sesuai kebutuhan
                         untuk menjaga keamanan sistem.
-
                     </p>
-
                 </div>
 
-                <div class="col-lg-5 mt-4 mt-lg-0">
-
-                    <div class="row g-3">
-
-                        <div class="col-4">
-
-                            <div class="bg-white rounded-4 p-3 text-center h-100">
-
-                                <h3 class="fw-bold text-primary mb-1">
-
-                                    {{ $totalUser }}
-
-                                </h3>
-
-                                <small class="text-muted">
-
-                                    Total
-
-                                </small>
-
-                            </div>
-
-                        </div>
-
-                        <div class="col-4">
-
-                            <div class="bg-white rounded-4 p-3 text-center h-100">
-
-                                <h3 class="fw-bold text-success mb-1">
-
-                                    {{ $aktif }}
-
-                                </h3>
-
-                                <small class="text-muted">
-
-                                    Aktif
-
-                                </small>
-
-                            </div>
-
-                        </div>
-
-                        <div class="col-4">
-
-                            <div class="bg-white rounded-4 p-3 text-center h-100">
-
-                                <h3 class="fw-bold text-danger mb-1">
-
-                                    {{ $blokir }}
-
-                                </h3>
-
-                                <small class="text-muted">
-
-                                    Diblokir
-
-                                </small>
-
-                            </div>
-
-                        </div>
-
-                    </div>
-
+                <div class="badge bg-white text-primary px-3 py-2 fs-6">
+                    <i class="bi bi-shield-check me-2"></i> Sinergi-MJ
                 </div>
 
             </div>
-
         </div>
-
     </div>
 
-    {{-- ================= TABLE ================= --}}
-    <div class="card border-0 shadow-sm rounded-4">
+    {{-- ALERT --}}
+    <x-alert.flash key="success" type="success"/>
+    <x-alert.flash key="error" type="danger"/>
 
-        <div class="card-header bg-white border-0 py-3">
+    {{-- TABLE --}}
+    <x-table.card
+        title="Daftar User Aktif"
+        subtitle="Pengguna yang telah memperoleh akses ke sistem"
+    >
 
-            <div class="d-flex justify-content-between align-items-center flex-wrap">
+        <x-slot:badge>
+            <span class="badge bg-primary rounded-pill px-2 py-1">
+                {{ $users->total() }}
+                <span class="text-badge">User</span>
+            </span>
+        </x-slot:badge>
 
-                <div>
+        <div class="table-responsive">
 
-                    <h5 class="fw-bold mb-1">
+            <table class="table table-hover align-middle mb-0">
 
-                        Daftar User Aktif
-
-                    </h5>
-
-                    <small class="text-muted">
-
-                        Pengguna yang telah memperoleh akses ke sistem.
-
-                    </small>
-
-                </div>
-
-            </div>
-
-        </div>
-
-        <div class="card-body p-0">
-
-            <div class="table-responsive">
-
-                <table class="table table-hover align-middle mb-0">
-
-                    <thead>
-
-                        <tr>
-
-                            <th width="70" class="text-center">
-
-                                No
-
-                            </th>
-
-                            <th>
-
-                                User
-
-                            </th>
-
-                            <th>
-
-                                Role
-
-                            </th>
-
-                            <th>
-
-                                Status
-
-                            </th>
-
-                            <th>
-
-                                Tanggal Approve
-
-                            </th>
-
-                            <th width="180" class="text-center">
-
-                                Aksi
-
-                            </th>
-
-                        </tr>
-
-                    </thead>
-
-                    <tbody>
+                <thead>
+                    <tr>
+                        <th width="70">No</th>
+                        <th>User</th>
+                        <th width="130">Role</th>
+                        <th width="140">Status</th>
+                        <th width="190">Tanggal Disetujui</th>
+                        <th width="140">Aksi</th>
+                    </tr>
+                </thead>
 
                 <tbody>
 
-    @forelse($users as $user)
+                    @forelse($users as $user)
+                        <tr>
+                            {{-- NO --}}
+                            <td>
+                                <span class="badge bg-light text-dark rounded-circle">
+                                    {{ $loop->iteration + ($users->firstItem() ?? 0) - 1 }}
+                                </span>
+                            </td>
+                            {{-- USER --}}
+                            <td>
 
-        @php
+                                <div class="d-flex align-items-center">
 
-            $roleColor = match($user->role){
+                                    <div
+                                        class="rounded-circle bg-primary-subtle text-primary d-flex align-items-center justify-content-center me-3"
+                                        style="width: 48px; height: 48px;"
+                                    >
+                                        <i class="bi bi-person-fill fs-4"></i>
+                                    </div>
 
-                'superadmin' => 'danger',
+                                    <div>
+
+                                        <div class="fw-semibold">
+                                            {{ $user->name }}
+                                        </div>
 
-                'admin' => 'primary',
+                                        <small class="text-muted">
+                                            {{ $user->username }}
+                                        </small>
 
-                'tu' => 'warning',
+                                    </div>
 
-                'guru' => 'success',
+                                </div>
 
-                'siswa' => 'secondary',
+                            </td>
 
-                default => 'dark'
+                            {{-- ROLE --}}
+                            <td>
+                                <x-table.role-badge :role="$user->role" />
+                            </td>
 
-            };
+                            {{-- STATUS --}}
+                            <td>
 
-        @endphp
+                                @if($user->is_active)
 
-        <tr>
+                                    <span class="badge-status aktif">
+                                        <i class="bi bi-circle-fill me-2"></i>
+                                        Aktif
+                                    </span>
 
-            <td class="text-center">
+                                @else
 
-                <span class="badge bg-light text-dark rounded-pill px-3 py-2">
+                                    <span class="badge-status nonaktif">
+                                        <i class="bi bi-lock-fill me-1"></i>
+                                        Diblokir
+                                    </span>
 
-                    {{ $loop->iteration + ($users->firstItem() ?? 0) - 1 }}
+                                @endif
 
-                </span>
+                            </td>
 
-            </td>
+                            {{-- TANGGAL APPROVE --}}
+                            <td>
 
-            <td>
+                                <div class="fw-semibold">
+                                    {{ $user->approved_at?->format('d F Y') ?? '-' }}
+                                </div>
 
-                <div class="d-flex align-items-center">
+                                @if($user->approved_at)
 
-                    <div class="avatar-circle me-3">
+                                    <small class="text-muted">
+                                        {{ $user->approved_at->format('H:i') }} WIB
+                                    </small>
 
-                        <i class="bi bi-person-fill"></i>
+                                @endif
 
-                    </div>
+                            </td>
 
-                    <div>
+                            {{-- AKSI --}}
+                            <td>
 
-                        <div class="fw-bold">
+                                @if($user->is_active)
 
-                            {{ $user->name }}
+                                    {{-- BLOKIR --}}
+                                    <form
+                                        action="{{ route('superadmin.users.block', $user) }}"
+                                        method="POST"
+                                    >
+                                        @csrf
 
-                        </div>
+                                        <button
+                                            type="submit"
+                                            class="btn btn-danger btn-sm rounded-pill px-3 py-0 btn-confirm"
+                                            data-title="Blokir User"
+                                            data-message="User ini akan diblokir dan tidak dapat mengakses sistem."
+                                            data-button="btn-danger"
+                                        >                                            
+                                            Blokir
+                                        </button>
 
-                        <small class="text-muted">
+                                    </form>
 
-                            {{ '@'.$user->username }}
+                                @else
 
-                        </small>
+                                    {{-- AKTIFKAN --}}
+                                    <form
+                                        action="{{ route('superadmin.users.unblock', $user) }}"
+                                        method="POST"
+                                    >
+                                        @csrf
 
-                    </div>
+                                        <button
+                                            type="submit"
+                                            class="btn btn-success btn-sm rounded-pill px-3 py-0 btn-confirm"
+                                            data-title="Aktifkan User"
+                                            data-message="User ini akan diaktifkan kembali dan dapat mengakses sistem."
+                                            data-button="btn-success"
+                                        >                                            
+                                            Aktifkan
+                                        </button>
 
-                </div>
+                                    </form>
 
-            </td>
+                                @endif
 
-            <td>
+                            </td>
 
-                <span class="badge bg-{{ $roleColor }} rounded-pill px-3 py-2">
+                        </tr>
 
-                    {{ ucfirst($user->role) }}
+                    @empty
 
-                </span>
+                        <tr>
 
-            </td>
+                            <td colspan="6" class="text-center py-5">
 
-            <td>
+                                <i class="bi bi-people display-5 text-secondary"></i>
 
-                @if($user->is_active)
+                                <p class="mt-3 mb-0 text-muted">
+                                    Tidak terdapat data user yang dapat ditampilkan.
+                                </p>
 
-                    <span class="badge bg-success rounded-pill px-3 py-2">
+                            </td>
 
-                        <i class="bi bi-check-circle-fill me-1"></i>
+                        </tr>
 
-                        Aktif
+                    @endforelse
 
-                    </span>
+                </tbody>
 
-                @else
+            </table>
 
-                    <span class="badge bg-danger rounded-pill px-3 py-2">
+        </div>
 
-                        <i class="bi bi-slash-circle-fill me-1"></i>
+        {{-- PAGINATION --}}
+        @if($users->hasPages())
 
-                        Diblokir
+            <div class="mt-4">
+                {{ $users->links() }}
+            </div>
 
-                    </span>
+        @endif
 
-                @endif
-
-            </td>
-
-            <td>
-
-                <i class="bi bi-calendar-event text-primary me-2"></i>
-
-                {{ $user->approved_at?->format('d M Y H:i') ?? '-' }}
-
-            </td>
-
-            <td class="text-center">
-
-                @if($user->is_active)
-
-                    <form
-                        action="{{ route('superadmin.users.block',$user) }}"
-                        method="POST"
-                        onsubmit="return confirm('Blokir user ini?')"
-                    >
-
-                        @csrf
-
-                        <button
-                            type="submit"
-                            class="btn btn-danger btn-sm rounded-pill px-4"
-                        >
-
-                            <i class="bi bi-lock-fill me-1"></i>
-
-                            Blokir
-
-                        </button>
-
-                    </form>
-
-                @else
-
-                    <form
-                        action="{{ route('superadmin.users.unblock',$user) }}"
-                        method="POST"
-                        onsubmit="return confirm('Aktifkan kembali user ini?')"
-                    >
-
-                        @csrf
-
-                        <button
-                            type="submit"
-                            class="btn btn-success btn-sm rounded-pill px-4"
-                        >
-
-                            <i class="bi bi-unlock-fill me-1"></i>
-
-                            Aktifkan
-
-                        </button>
-
-                    </form>
-
-                @endif
-
-            </td>
-
-        </tr>
-
-    @empty
-
-        <tr>
-
-            <td colspan="6">
-
-                <div class="text-center py-5">
-
-                    <i class="bi bi-people display-3 text-secondary"></i>
-
-                    <h5 class="mt-3 fw-bold">
-
-                        Belum Ada User
-
-                    </h5>
-
-                    <p class="text-muted mb-0">
-
-                        Tidak terdapat data user yang dapat ditampilkan.
-
-                    </p>
-
-                </div>
-
-            </td>
-
-        </tr>
-
-    @endforelse
-
-</tbody>
-
-</table>
+    </x-table.card>
 
 </div>
-
-<div class="px-4 py-3 border-top">
-
-    {{ $users->links() }}
-
-</div>
-
-</div>
-
-</div>
-
-</div>
-
-<style>
-
-.card{
-
-    transition:.25s;
-
-}
-
-.card:hover{
-
-    box-shadow:0 18px 45px rgba(37,99,235,.08)!important;
-
-}
-
-.table thead th{
-
-    background:#f8fafc;
-
-    color:#64748b;
-
-    text-transform:uppercase;
-
-    letter-spacing:.5px;
-
-    font-size:.82rem;
-
-    font-weight:700;
-
-    border:0;
-
-    padding:18px;
-
-}
-
-.table tbody td{
-
-    padding:18px;
-
-    border-color:#eef2f7;
-
-    vertical-align:middle;
-
-}
-
-.table-hover tbody tr{
-
-    transition:.2s;
-
-}
-
-.table-hover tbody tr:hover{
-
-    background:#f8fbff;
-
-}
-
-.avatar-circle{
-
-    width:48px;
-
-    height:48px;
-
-    border-radius:50%;
-
-    background:linear-gradient(135deg,#2563eb,#0f4c81);
-
-    color:#fff;
-
-    display:flex;
-
-    align-items:center;
-
-    justify-content:center;
-
-    font-size:1.15rem;
-
-    flex-shrink:0;
-
-}
-
-.badge{
-
-    font-weight:600;
-
-    letter-spacing:.3px;
-
-}
-
-.btn{
-
-    transition:.2s;
-
-}
-
-.btn:hover{
-
-    transform:translateY(-2px);
-
-}
-
-.btn-success{
-
-    border:none;
-
-    background:linear-gradient(135deg,#16a34a,#15803d);
-
-}
-
-.btn-danger{
-
-    border:none;
-
-    background:linear-gradient(135deg,#dc2626,#b91c1c);
-
-}
-
-.pagination{
-
-    justify-content:center;
-
-}
-
-.page-link{
-
-    border:none;
-
-    margin:0 3px;
-
-    border-radius:10px!important;
-
-    color:#2563eb;
-
-}
-
-.page-item.active .page-link{
-
-    background:#2563eb;
-
-}
-
-.page-link:hover{
-
-    background:#eff6ff;
-
-    color:#2563eb;
-
-}
-
-@media(max-width:768px){
-
-    .avatar-circle{
-
-        width:42px;
-
-        height:42px;
-
-    }
-
-}
-
-</style>
 
 @endsection

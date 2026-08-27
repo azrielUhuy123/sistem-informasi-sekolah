@@ -67,7 +67,7 @@
 
                     <input type="text"
                            name="kategori_surat"
-                           class="form-control rounded-3"
+                           class="form-control"
                            required>
 
                 </div>
@@ -81,7 +81,7 @@
 
                     <input type="text"
                            name="nama_surat"
-                           class="form-control rounded-3"
+                           class="form-control"
                            required>
 
                 </div>
@@ -96,7 +96,7 @@
                     <input
                         type="text"
                         name="perihal"
-                        class="form-control rounded-3"
+                        class="form-control"
                         placeholder="Masukkan perihal surat"
                         required
                     >
@@ -112,7 +112,7 @@
 
                     <input type="text"
                            name="tujuan_surat"
-                           class="form-control rounded-3"
+                           class="form-control"
                            required>
 
                 </div>
@@ -126,7 +126,7 @@
 
                     <input type="file"
                            name="file_surat"
-                           class="form-control rounded-3"
+                           class="form-control"
                            required>
 
                     <small class="text-muted">

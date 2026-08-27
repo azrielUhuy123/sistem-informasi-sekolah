@@ -4,672 +4,372 @@
 
 @section('content')
 
-    <div class="container-fluid py-3">
+    <div class="container-fluid">
 
-    {{-- ================= HERO ================= --}}
-    <div class="card border-0 shadow-sm rounded-4 overflow-hidden mb-4">
+        <div class="card shadow-sm border-0 overflow-hidden">
+            <div class="card-body p-4 p-lg-5">
 
-        <div
-            class="card-body p-4 p-lg-5 text-white"
-            style="background:linear-gradient(135deg,#0f4c81 0%,#2563eb 100%);"
-        >
+                <div class="row g-4 align-items-start">
 
-            <div class="d-flex justify-content-between align-items-center flex-wrap">
-
-                <div>
-
-                    <h2 class="fw-bold mb-2">
-
-                        Detail Data Pegawai
-
-                    </h2>
-
-                    <p class="mb-0 opacity-75">
-
-                        Informasi lengkap biodata, riwayat kepegawaian,
-                        masa kerja, serta data administrasi pegawai.
-
-                    </p>
-
-                </div>
-
-                <div class="mt-4 mt-lg-0">
-
-                    <a
-                        href="{{ route('superadmin.datakepegawaian.approval') }}"
-                        class="btn btn-light rounded-pill px-4 shadow-sm"
-                    >
-
-                        <i class="bi bi-arrow-left me-2"></i>
-
-                        Kembali
-
-                    </a>
-
-                </div>
-
-            </div>
-
-        </div>
-
-    </div>
-
-    {{-- ================= PROFILE ================= --}}
-    <div class="card border-0 shadow-sm rounded-4 mb-4">
-
-        <div class="card-body p-4">
-
-            <div class="row align-items-center">
-
-                <div class="col-lg-4">
-
-                    <div class="d-flex align-items-center">
-
-                        <div class="avatar-profile me-4">
-
-                            {{ strtoupper(substr($pegawai->nama,0,2)) }}
-
-                        </div>
-
-                        <div>
-
-                            <h3 class="fw-bold mb-1">
-
-                                {{ $pegawai->nama }}
-
-                            </h3>
-
-                            <div class="text-muted mb-2">
-
-                                Data Pegawai
-
-                            </div>
-
-                            <span class="badge bg-primary rounded-pill px-3 py-2">
-
-                                {{ $pegawai->status_kepegawaian ?? '-' }}
-
-                            </span>
-
-                        </div>
-
-                    </div>
-
-                </div>
-
-                <div class="col-lg-8 mt-4 mt-lg-0">
-
-                    <div class="row g-3">
-
-                        <div class="col-md-6">
-
-                            <div class="info-card">
-
-                                <small class="text-muted d-block">
-
-                                    NIP
-
-                                </small>
-
-                                <div class="fw-bold">
-
-                                    {{ $pegawai->nip ?? '-' }}
-
+                    <div class="col-lg-4">
+                        <div class="bg-primary bg-opacity-10 rounded-4 p-4 border h-100">
+                            <div class="d-flex flex-column align-items-center text-center gap-3">
+                                <div class="rounded-circle bg-primary text-white d-flex align-items-center justify-content-center fw-bold"
+                                     style="width:110px;height:110px;font-size:30px;">
+                                    {{ strtoupper(substr($pegawai->nama, 0, 2)) }}
                                 </div>
-
-                            </div>
-
-                        </div>
-
-                        <div class="col-md-6">
-
-                            <div class="info-card">
-
-                                <small class="text-muted d-block">
-
-                                    NUPTK
-
-                                </small>
-
-                                <div class="fw-bold">
-
-                                    {{ $pegawai->nuptk ?? '-' }}
-
-                                </div>
-
-                            </div>
-
-                        </div>
-
-                        <div class="col-md-6">
-
-                            <div class="info-card">
-
-                                <small class="text-muted d-block">
-
-                                    Tempat, Tanggal Lahir
-
-                                </small>
-
-                                <div class="fw-semibold">
-
-                                    {{ $pegawai->tempat_lahir ?? '-' }},
-                                    {{ $pegawai->tanggal_lahir ? $pegawai->tanggal_lahir->format('d-m-Y') : '-' }}
-
-                                </div>
-
-                            </div>
-
-                        </div>
-
-                        <div class="col-md-6">
-
-                            <div class="info-card">
-
-                                <small class="text-muted d-block">
-
-                                    Agama
-
-                                </small>
-
-                                <div class="fw-semibold">
-
-                                    {{ $pegawai->agama ?? '-' }}
-
-                                </div>
-
-                            </div>
-
-                        </div>
-
-                        <div class="col-md-6">
-
-                            <div class="info-card">
-
-                                <small class="text-muted d-block">
-
-                                    Status Perkawinan
-
-                                </small>
-
-                                <div class="fw-semibold">
-
-                                    @if($pegawai->status_kawin=='K')
-
-                                        Kawin
-
-                                    @elseif($pegawai->status_kawin=='TK')
-
-                                        Tidak Kawin
-
-                                    @else
-
-                                        -
-
-                                    @endif
-
-                                </div>
-
-                            </div>
-
-                        </div>
-
-                        <div class="col-md-6">
-
-                            <div class="info-card">
-
-                                <small class="text-muted d-block">
-
-                                    Jenis Kelamin
-
-                                </small>
 
                                 <div>
+                                    <h4 class="mb-1 fw-bold">{{ $pegawai->nama }}</h4>
+                                    <p class="text-muted mb-2">{{ $pegawai->jabatan ?? 'Pegawai' }}</p>
 
-                                    @if($pegawai->jenis_kelamin=='L')
-
-                                        <span class="badge bg-primary rounded-pill px-3 py-2">
-
-                                            Laki-laki
-
+                                    <div class="d-flex flex-wrap gap-2 justify-content-center">
+                                        <span class="badge bg-primary-subtle text-primary-emphasis border border-primary-subtle">
+                                            <i class="bi bi-person-badge me-1"></i> NIP {{ $pegawai->nip ?? '-' }}
                                         </span>
-
-                                    @elseif($pegawai->jenis_kelamin=='P')
-
-                                        <span class="badge bg-danger rounded-pill px-3 py-2">
-
-                                            Perempuan
-
+                                        <span class="badge bg-info-subtle text-info-emphasis border border-info-subtle">
+                                            <i class="bi bi-credit-card-2-front me-1"></i> NUPTK {{ $pegawai->nuptk ?? '-' }}
                                         </span>
-
-                                    @else
-
-                                        -
-
-                                    @endif
-
+                                    </div>
                                 </div>
 
+                                <div class="w-100">
+                                    <div class="row g-2">
+                                        <div class="col-6">
+                                            <div class="border rounded-3 p-2 bg-white">
+                                                <div class="small text-muted">Status Kepegawaian</div>
+                                                <div class="fw-semibold">{{ $pegawai->status_kepegawaian ?? '-' }}</div>
+                                            </div>
+                                        </div>
+                                        <div class="col-6">
+                                            <div class="border rounded-3 p-2 bg-white">
+                                                <div class="small text-muted">Status Approval</div>
+                                                <div class="fw-semibold">
+                                                    @if($pegawai->approval_status == 'approved')
+                                                        <span class="small"><i class="bi bi-patch-check-fill text-success me-1"></i>Approved</span>
+                                                    @elseif($pegawai->approval_status == 'rejected')
+                                                        <span class="small"><i class="bi bi-patch-exclamation-fill text-danger me-1"></i>Rejected</span>
+                                                    @else
+                                                        <span class="small"><i class="bi bi-patch-question-fill text-warning me-1"></i>Pending</span>
+                                                    @endif
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
                             </div>
-
                         </div>
+                    </div>
 
+                    <div class="col-lg-8">
+                        <div class="card border-0 shadow-sm h-100">
+                            <div class="card-body">
+                                <div class="d-flex justify-content-between align-items-center mb-3">
+                                    <h5 class="fw-bold mb-0">Profil Pegawai</h5>
+                                    <x-table.role-badge :role="$pegawai->jabatan ?? 'Pegawai'" /> 
+                                </div>
+
+                                <div class="row g-3">
+                                    <div class="col-md-6">
+                                        <div class="small text-muted mb-1">Tempat, Tanggal Lahir</div>
+                                        <div class="fw-semibold">
+                                            {{ $pegawai->tempat_lahir ?? '-' }}, {{ $pegawai->tanggal_lahir ? $pegawai->tanggal_lahir->format('d-m-Y') : '-' }}
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="small text-muted mb-1">Agama</div>
+                                        <div class="fw-semibold">{{ $pegawai->agama ?? '-' }}</div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="small text-muted mb-1">Status Kawin</div>
+                                        <div class="fw-semibold">
+                                            @if ($pegawai->status_kawin == 'K')
+                                                Kawin
+                                            @elseif($pegawai->status_kawin == 'TK')
+                                                Tidak Kawin
+                                            @else
+                                                -
+                                            @endif
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="small text-muted mb-1">Jenis Kelamin</div>
+                                        <div class="fw-semibold">
+                                            @if ($pegawai->jenis_kelamin == 'L')
+                                                <span class="badge bg-indigo rounded-pill px-2 py-1">
+                                                    <i class="bi bi-gender-male me-1"></i>
+                                                    Laki-laki
+                                                </span>
+                                            @elseif($pegawai->jenis_kelamin == 'P')
+                                                <span class="badge bg-rose rounded-pill px-2 py-1">
+                                                    <i class="bi bi-gender-female me-1"></i>
+                                                    Perempuan
+                                                </span>
+                                            @else
+                                                -
+                                            @endif
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+
+                <hr class="my-4">
+
+                <div class="row g-4">
+
+                    <div class="col-lg-6">
+                        <div class="card border-0 shadow-sm h-100">
+                            <div class="card-body">
+                                <div class="d-flex align-items-center mb-3">
+                                    <div class="rounded-circle bg-primary bg-opacity-10 p-2 me-2">
+                                        <i class="bi bi-file-earmark-text fs-5 text-primary"></i>
+                                    </div>
+                                    <h5 class="fw-bold mb-0">Informasi Utama</h5>
+                                </div>
+
+                                <div class="row g-3">
+                                    <div class="col-12">
+                                        <div class="small text-muted mb-1">Ijazah Terakhir</div>
+                                        <div class="fw-semibold">{{ $pegawai->ijazah_terakhir ?? '-' }}</div>
+                                    </div>
+                                    <div class="col-12">
+                                        <div class="small text-muted mb-1">Pangkat Terakhir</div>
+                                        <div class="fw-semibold">{{ $pegawai->sk_terakhir_pangkat ?? '-' }}</div>
+                                    </div>
+                                    <div class="col-12">
+                                        <div class="small text-muted mb-1">Pangkat Berkala</div>
+                                        <div class="fw-semibold">{{ $pegawai->sk_berkala_pangkat ?? '-' }}</div>
+                                    </div>
+                                    @if(auth()->user() && in_array(auth()->user()->role, ['tu','superadmin']))
+                                        <div class="col-12">
+                                            <div class="small text-muted mb-1">Gaji Pokok</div>
+                                            <div class="fw-semibold">{{ $pegawai->gaji_pokok ? 'Rp ' . number_format($pegawai->gaji_pokok, 0, ',', '.') : '-' }}</div>
+                                        </div>
+                                    @endif
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-lg-6">
+                        <div class="card border-0 shadow-sm h-100">
+                            <div class="card-body">
+                                <div class="d-flex align-items-center mb-3">
+                                    <div class="rounded-circle bg-info bg-opacity-10 p-2 me-2">
+                                        <i class="bi bi-briefcase fs-5 text-info"></i>
+                                    </div>
+                                    <h5 class="fw-bold mb-0">Riwayat Kepegawaian</h5>
+                                </div>
+
+                                <div class="row g-3">
+                                    <div class="col-12">
+                                        <div class="small text-muted mb-1">Jabatan</div>
+                                        <div class="fw-semibold">{{ $pegawai->jabatan ?? '-' }}</div>
+                                    </div>
+                                    <div class="col-12">
+                                        <div class="small text-muted mb-1">Mulai Kerja</div>
+                                        <div class="fw-semibold">{{ $pegawai->mulai_kerja ? $pegawai->mulai_kerja->format('d-m-Y') : '-' }}</div>
+                                    </div>
+                                    <div class="col-12">
+                                        <div class="small text-muted mb-1">Masa Kerja Golongan</div>
+                                        <div class="fw-semibold">{{ $pegawai->masa_kerja_gol_th ?? 0 }} Tahun {{ $pegawai->masa_kerja_gol_bln ?? 0 }} Bulan</div>
+                                    </div>
+                                    <div class="col-12">
+                                        <div class="small text-muted mb-1">Masa Kerja Keseluruhan</div>
+                                        <div class="fw-semibold">{{ $pegawai->masa_kerja_total_th ?? 0 }} Tahun {{ $pegawai->masa_kerja_total_bln ?? 0 }} Bulan</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-lg-6">
+                        <div class="card border-0 shadow-sm h-100">
+                            <div class="card-body">
+                                <div class="d-flex align-items-center mb-3">
+                                    <div class="rounded-circle bg-secondary bg-opacity-10 p-2 me-2">
+                                        <i class="bi bi-award fs-5 text-secondary"></i>
+                                    </div>
+                                    <h5 class="fw-bold mb-0">SK & Sertifikasi</h5>
+                                </div>
+
+                                <div class="row g-3">
+                                    <div class="col-12">
+                                        <div class="small text-muted mb-1">SK Terakhir</div>
+                                        <div class="fw-semibold">
+                                            Pangkat: {{ $pegawai->sk_terakhir_pangkat ?? '-' }}<br>
+                                            Nomor SK: {{ $pegawai->sk_terakhir_no ?? '-' }}<br>
+                                            TMT: {{ $pegawai->sk_terakhir_tmt ? $pegawai->sk_terakhir_tmt->format('d-m-Y') : '-' }}
+                                        </div>
+                                    </div>
+                                    <div class="col-12">
+                                        <div class="small text-muted mb-1">SK Berkala</div>
+                                        <div class="fw-semibold">
+                                            Pangkat: {{ $pegawai->sk_berkala_pangkat ?? '-' }}<br>
+                                            Nomor SK: {{ $pegawai->sk_berkala_no ?? '-' }}<br>
+                                            TMT: {{ $pegawai->sk_berkala_tmt ? $pegawai->sk_berkala_tmt->format('d-m-Y') : '-' }}
+                                        </div>
+                                    </div>
+                                    <div class="col-12">
+                                        <div class="small text-muted mb-1">Sertifikasi</div>
+                                        <div class="fw-semibold">
+                                            {{ $pegawai->nomor_sertifikasi ?? '-' }}
+                                            @if ($pegawai->tahun_sertifikasi)
+                                                <span class="text-muted">(Th. {{ $pegawai->tahun_sertifikasi }})</span>
+                                            @endif
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-lg-6">
+                        <div class="card border-0 shadow-sm h-100">
+                            <div class="card-body">
+                                <div class="d-flex align-items-center mb-3">
+                                    <div class="rounded-circle bg-warning bg-opacity-10 p-2 me-2">
+                                        <i class="bi bi-check2-square fs-5 text-warning"></i>
+                                    </div>
+                                    <h5 class="fw-bold mb-0">Approval</h5>
+                                </div>
+
+                                <div class="row g-3">
+                                    <div class="col-12">
+                                        <div class="small text-muted mb-1">Status Approval</div>
+                                        <div class="fw-semibold">
+                                            @if($pegawai->approval_status == 'approved')
+                                                        <span class="small"><i class="bi bi-patch-check-fill text-success me-1"></i>Approved</span>
+                                                    @elseif($pegawai->approval_status == 'rejected')
+                                                        <span class="small"><i class="bi bi-patch-exclamation-fill text-danger me-1"></i>Rejected</span>
+                                                    @else
+                                                        <span class="small"><i class="bi bi-patch-question-fill text-warning me-1"></i>Pending</span>
+                                                    @endif
+                                        </div>
+                                    </div>
+                                    <div class="col-12">
+                                        <div class="small text-muted mb-1">Disetujui Oleh</div>
+                                        <div class="fw-semibold">{{ $pegawai->approved_by ?? '-' }}</div>
+                                    </div>
+                                    <div class="col-12">
+                                        <div class="small text-muted mb-1">Tanggal Approval</div>
+                                        <div class="fw-semibold">{{ $pegawai->approved_at ? $pegawai->approved_at->format('d-m-Y H:i') : '-' }}</div>
+                                    </div>
+                                    <div class="col-12">
+                                        <div class="small text-muted mb-1">Alasan Penolakan</div>
+                                        <div class="fw-semibold">{{ $pegawai->rejected_reason ?? '-' }}</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-lg-6">
+                        <div class="card border-0 shadow-sm h-100">
+                            <div class="card-body">
+                                <div class="d-flex align-items-center mb-3">
+                                    <div class="rounded-circle bg-success bg-opacity-10 p-2 me-2">
+                                        <i class="bi bi-person-gear fs-5 text-success"></i>
+                                    </div>
+                                    <h5 class="fw-bold mb-0">Akun Sistem</h5>
+                                </div>
+
+                                @if($pegawai->user)
+                                    <div class="row g-3">
+                                        <div class="col-12">
+                                            <div class="small text-muted mb-1">Username</div>
+                                            <div class="fw-semibold">{{ $pegawai->user->username ?? $pegawai->user->email ?? '-' }}</div>
+                                        </div>
+                                        <div class="col-12">
+                                            <div class="small text-muted mb-1">Role</div>
+                                            <div class="fw-semibold">{{ ucfirst($pegawai->user->role ?? '-') }}</div>
+                                        </div>
+                                        <div class="col-12">
+                                            <div class="small text-muted mb-1">Status User</div>
+                                            <div class="fw-semibold">
+                                                @if($pegawai->approval_status == 'approved')
+                                                    <span class="small"><i class="bi bi-patch-check-fill text-success me-1"></i>Approved</span>
+                                                @elseif($pegawai->approval_status == 'rejected')
+                                                    <span class="small"><i class="bi bi-patch-exclamation-fill text-danger me-1"></i>Rejected</span>
+                                                @else
+                                                    <span class="small"><i class="bi bi-patch-question-fill text-warning me-1"></i>Pending</span>
+                                                @endif
+                                            </div>
+                                        </div>
+                                        <div class="col-12">
+                                            <div class="small text-muted mb-1">Tanggal Akun Dibuat</div>
+                                            <div class="fw-semibold">{{ $pegawai->user->created_at ? $pegawai->user->created_at->format('d-m-Y H:i') : '-' }}</div>
+                                        </div>
+                                    </div>
+                                @else
+                                    <div class="alert alert-light border mb-0">
+                                        <i class="bi bi-exclamation-circle me-2 text-warning"></i>
+                                        <span class="fw-semibold">Belum Memiliki Akun</span>
+                                    </div>
+                                @endif
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-12">
+                        <div class="card border-0 shadow-sm">
+                            <div class="card-body">
+                                <div class="d-flex align-items-center mb-3">
+                                    <div class="rounded-circle bg-secondary bg-opacity-10 p-2 me-2">
+                                        <i class="bi bi-clock-history fs-5 text-secondary"></i>
+                                    </div>
+                                    <h5 class="fw-bold mb-0">Riwayat Aktivitas</h5>
+                                </div>
+
+                                <div class="d-flex flex-column gap-3">
+                                    <div class="d-flex align-items-start gap-2">
+                                        <i class="bi bi-check-circle-fill text-success mt-1"></i>
+                                        <div>
+                                            <div class="fw-semibold">Data Pegawai Dibuat</div>
+                                            <div class="small text-muted">{{ $pegawai->created_at ? $pegawai->created_at->format('d-m-Y H:i') : '-' }}</div>
+                                        </div>
+                                    </div>
+                                    <div class="d-flex align-items-start gap-2">
+                                        <i class="bi bi-check-circle-fill text-success mt-1"></i>
+                                        <div>
+                                            <div class="fw-semibold">Menunggu Approval</div>
+                                            <div class="small text-muted">Status saat ini: {{ $pegawai->approval_status ?? 'Pending' }}</div>
+                                        </div>
+                                    </div>
+                                    <div class="d-flex align-items-start gap-2">
+                                        <i class="bi bi-check-circle-fill text-success mt-1"></i>
+                                        <div>
+                                            <div class="fw-semibold">Akun Dibuat</div>
+                                            <div class="small text-muted">{{ $pegawai->user ? 'Sudah tersedia' : 'Belum tersedia' }}</div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
                     </div>
 
                 </div>
 
             </div>
-
         </div>
-
-    </div>
-
-    {{-- ================= DETAIL ================= --}}
-    <div class="card border-0 shadow-sm rounded-4">
-
-        <div class="card-header bg-white border-0 py-3">
-
-            <h5 class="fw-bold mb-0">
-
-                Informasi Kepegawaian
-
-            </h5>
-
-        </div>
-
-        <div class="card-body">
-
-    <div class="row g-4">
-
-    {{-- ================= KOLOM KIRI ================= --}}
-    <div class="col-lg-6">
-
-        <div class="detail-card h-100">
-
-            <h5 class="section-title">
-
-                <i class="bi bi-person-vcard-fill me-2"></i>
-
-                Informasi Utama
-
-            </h5>
-
-            <table class="table table-borderless table-detail">
-
-                <tr>
-                    <th>Ijazah Terakhir</th>
-                    <td>{{ $pegawai->ijazah_terakhir ?? '-' }}</td>
-                </tr>
-
-                <tr>
-                    <th>SK Terakhir</th>
-                    <td>
-
-                        Pangkat/Gol :
-                        {{ $pegawai->sk_terakhir_pangkat ?? '-' }}
-
-                        <br>
-
-                        No :
-                        {{ $pegawai->sk_terakhir_no ?? '-' }}
-
-                        <br>
-
-                        TMT :
-                        {{ $pegawai->sk_terakhir_tmt ? $pegawai->sk_terakhir_tmt->format('d-m-Y') : '-' }}
-
-                    </td>
-                </tr>
-
-                <tr>
-                    <th>SK Berkala</th>
-                    <td>
-
-                        Pangkat/Gol :
-                        {{ $pegawai->sk_berkala_pangkat ?? '-' }}
-
-                        <br>
-
-                        No :
-                        {{ $pegawai->sk_berkala_no ?? '-' }}
-
-                        <br>
-
-                        TMT :
-                        {{ $pegawai->sk_berkala_tmt ? $pegawai->sk_berkala_tmt->format('d-m-Y') : '-' }}
-
-                    </td>
-                </tr>
-
-                <tr>
-
-                    <th>Gaji Pokok</th>
-
-                    <td>
-
-                        {{ $pegawai->gaji_pokok
-                            ? 'Rp '.number_format($pegawai->gaji_pokok,0,',','.')
-                            : '-' }}
-
-                    </td>
-
-                </tr>
-
-            </table>
-
-        </div>
-
-    </div>
-
-    {{-- ================= KOLOM KANAN ================= --}}
-        <div class="col-lg-6">
-
-            <div class="detail-card h-100">
-
-                <h5 class="section-title">
-
-                    <i class="bi bi-briefcase-fill me-2"></i>
-
-                    Informasi Kepegawaian
-
-                </h5>
-
-                <table class="table table-borderless table-detail">
-
-                    <tr>
-
-                        <th>Mulai Bekerja Di Sekolah Ini</th>
-
-                        <td>
-
-                            {{ $pegawai->mulai_kerja
-                                ? $pegawai->mulai_kerja->format('d-m-Y')
-                                : '-' }}
-
-                        </td>
-
-                    </tr>
-
-                    <tr>
-
-                        <th>Masa Kerja Gol</th>
-
-                        <td>
-
-                            {{ $pegawai->masa_kerja_gol_th ?? 0 }}
-                            Tahun
-
-                            {{ $pegawai->masa_kerja_gol_bln ?? 0 }}
-                            Bulan
-
-                        </td>
-
-                    </tr>
-
-                    <tr>
-
-                        <th>Masa Kerja Keseluruhan</th>
-
-                        <td>
-
-                            {{ $pegawai->masa_kerja_total_th ?? 0 }}
-                            Tahun
-
-                            {{ $pegawai->masa_kerja_total_bln ?? 0 }}
-                            Bulan
-
-                        </td>
-
-                    </tr>
-
-                    <tr>
-
-                        <th>Mengajar Di Kelas</th>
-
-                        <td>
-
-                            {{ $pegawai->mengajar_kelas ?? '-' }}
-
-                        </td>
-
-                    </tr>
-
-                    <tr>
-
-                        <th>Jam Mengajar</th>
-
-                        <td>
-
-                            {{ $pegawai->jam_mengajar ?? '-' }}
-                            Jam
-
-                        </td>
-
-                    </tr>
-
-                    <tr>
-
-                        <th>Tugas Tambahan</th>
-
-                        <td>
-
-                            {{ $pegawai->tugas_tambahan ?? '-' }}
-
-                        </td>
-
-                    </tr>
-
-                    <tr>
-
-                        <th>Nomor Sertifikasi</th>
-
-                        <td>
-
-                            {{ $pegawai->nomor_sertifikasi ?? '-' }}
-
-                            @if($pegawai->tahun_sertifikasi)
-
-                                (Th. {{ $pegawai->tahun_sertifikasi }})
-
-                            @endif
-
-                        </td>
-
-                    </tr>
-
-                    <tr>
-
-                        <th>Keterangan</th>
-
-                        <td>
-
-                            {{ $pegawai->keterangan ?? '-' }}
-
-                        </td>
-
-                    </tr>
-
-                </table>
-
+        <div class="sticky-bottom bg-white border border-light-subtle py-3 mt-4">
+            <div class="d-flex justify-content-between align-items-center">
+                 @if(request()->is('superadmin/*'))
+                    <a href="{{ route('superadmin.datakepegawaian.approval') }}" class="btn btn-outline-secondary rounded-3 ml-4">
+                        <i class="bi bi-chevron-left me-1"></i> Kembali
+                    </a>
+                @else
+                    <a href="{{ route('tu.datakepegawaian.index') }}" class="btn btn-outline-secondary rounded-3 ml-4">
+                        <i class="bi bi-chevron-left me-1"></i> Kembali
+                    </a>
+                @endif
             </div>
-
         </div>
 
     </div>
-
-</div>
-
-</div>
-
-</div>
-
-    <style>
-
-        .table-detail th{
-
-            width:40%;
-
-            color:#64748b;
-
-            font-weight:600;
-
-        }
-
-        .table-detail td{
-
-            color:#0f172a;
-
-        }
-
-    </style>
-
-<style>
-
-.card{
-
-    transition:.25s;
-
-}
-
-.card:hover{
-
-    box-shadow:0 18px 45px rgba(37,99,235,.08)!important;
-
-}
-
-.avatar-profile{
-
-    width:110px;
-
-    height:110px;
-
-    border-radius:50%;
-
-    background:linear-gradient(135deg,#2563eb,#0f4c81);
-
-    color:#fff;
-
-    display:flex;
-
-    align-items:center;
-
-    justify-content:center;
-
-    font-size:2rem;
-
-    font-weight:700;
-
-    flex-shrink:0;
-
-}
-
-.info-card{
-
-    background:#f8fbff;
-
-    border:1px solid #dbeafe;
-
-    border-radius:16px;
-
-    padding:18px;
-
-    height:100%;
-
-}
-
-.detail-card{
-
-    background:#fff;
-
-    border:1px solid #eef2f7;
-
-    border-radius:18px;
-
-    padding:24px;
-
-    height:100%;
-
-}
-
-.section-title{
-
-    font-weight:700;
-
-    color:#2563eb;
-
-    margin-bottom:20px;
-
-}
-
-.table-detail th{
-
-    width:42%;
-
-    color:#475569;
-
-    font-weight:600;
-
-    padding:.9rem 1rem;
-
-    border-bottom:1px solid #eef2f7;
-
-}
-
-.table-detail td{
-
-    padding:.9rem 1rem;
-
-    border-bottom:1px solid #eef2f7;
-
-    color:#0f172a;
-
-}
-
-.table-detail tr:last-child th,
-.table-detail tr:last-child td{
-
-    border-bottom:none;
-
-}
-
-.table-borderless td{
-
-    color:#0f172a;
-
-}
-
-.badge{
-
-    font-weight:600;
-
-}
-
-.btn{
-
-    transition:.2s;
-
-}
-
-.btn:hover{
-
-    transform:translateY(-2px);
-
-}
-
-@media(max-width:768px){
-
-    .avatar-profile{
-
-        width:90px;
-
-        height:90px;
-
-        font-size:1.6rem;
-
-    }
-
-}
-
-</style>
 
 @endsection

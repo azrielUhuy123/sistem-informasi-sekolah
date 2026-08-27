@@ -15,7 +15,7 @@
                     <p class="mb-0 opacity-75">Kelola pengajuan Surat atau Laporan untuk divalidasi kepala sekolah</p>
                 </div>
                 <div class="badge bg-white text-primary px-3 py-2 fs-6">
-                    <i class="bi bi-shield-check me-2"></i> Sistem Terhubung
+                    <i class="bi bi-shield-check me-2"></i> Sinergi-MJ
                 </div>
             </div>
         </div>
@@ -24,16 +24,7 @@
     {{-- ALERT --}}
     <x-alert.flash key="success" type="success"/>
 
-    <x-alert.flash key="error" type="danger"/>
-
-    <div class="d-flex justify-content-end align-items-center mb-4">
-
-        <a href="{{ route('tu.pengajuan-surat.create') }}" 
-           class="btn btn-primary">
-            <i class="bi bi-plus-lg me-1"></i>
-            Tambah Pengajuan
-        </a>
-    </div>
+    <x-alert.flash key="error" type="danger"/>    
 
     {{-- TABLE --}}
     <x-table.card
@@ -41,8 +32,8 @@
         subtitle="Seluruh Pengajuan Surat pada SDN Mekar Jaya"
     >
         <x-slot:badge>
-            <span class="badge bg-primary rounded-pill px-3 py-2">
-                {{ $pengajuan->count() }} Pengajuan Surat
+            <span class="badge bg-primary rounded-pill px-2 py-1">
+                {{ $pengajuan->count() }} <span class="text-badge">Pengajuan Surat</span>
             </span>
         </x-slot:badge>
  
@@ -50,9 +41,13 @@
             <input
                 type="text"
                 id="searchInput"
-                class="form-control rounded-3"
+                class="form-control table-search"
                 placeholder="Cari dokumen..."
             >
+            <x-button.add
+                :href="route('tu.pengajuan-surat.create')"
+                label="Tambah Dokumen Sekolah"
+            /> 
         </x-slot:actions>
         <div class="table-responsive">
             <table class="table table-hover align-middle mb-0">
@@ -68,16 +63,15 @@
                 <tbody id="tablePengajuan">
                     @forelse($pengajuan as $row)
                         <tr>
-                            <td class="text-center">
-                                <span class="badge bg-light text-dark rounded-pill px-3 py-2">
+                            <td>
+                                <span class="badge bg-light text-dark rounded-circle">
                                     {{ $loop->iteration }}
                                 </span>
                             </td>
                             <td>
-                                <div class="d-flex align-items-center">
-                                    <div class="surat-icon me-3"><i class="bi bi-file-earmark-text-fill"></i></div>
+                                <div class="d-flex align-items-center">                                    
                                     <div>
-                                        <div class="fw-bold">{{ $row->nama_surat }}</div>
+                                        <div class="fw-semibold">{{ $row->nama_surat }}</div>
                                     </div>
                                 </div>
                             </td>
@@ -88,57 +82,48 @@
                             </td>
                             <td>
                                 @if($row->status == 'draft')
-                                    <span class="badge bg-gold rounded-pill px-3 py-2">
-                                        <i class="bi bi-hourglass-split me-1"></i> Validasi
+                                    <span class="badge-status pending">
+                                        <i class="bi bi-hourglass-split me-2"></i> Validasi
                                     </span>
                                 @elseif($row->status == 'disetujui')
-                                    <span class="badge bg-success rounded-pill px-3 py-2">
-                                        <i class="bi bi-check-circle me-1"></i> Valid
+                                    <span class="badge-status aktif">
+                                        <i class="bi bi-check-circle-fill me-2"></i> Valid
                                     </span>
                                 @else
-                                    <span class="badge bg-danger rounded-pill px-3 py-2">
-                                        <i class="bi bi-x-circle me-1"></i> Ditolak
+                                    <span class="badge-status nonaktif">
+                                        <i class="bi bi-x-circle-fill me-2"></i> Ditolak
                                     </span>
                                 @endif
                             </td>
                             <td>
-                                <div class="dropdown">
-                                    <button class="btn btn-sm btn-outline-primary"
-                                            type="button"
-                                            data-bs-toggle="dropdown"
-                                            aria-expanded="false">
-                                        <i class="bi bi-gear-fill"></i>
-                                        <i class="bi bi-caret-down-fill"></i>
-                                    </button>
-                                    <ul class="dropdown-menu dropdown-menu-end shadow-sm border-0">
-                                        <li>
-                                            <a class="dropdown-item" href="{{ route('tu.pengajuan-surat.show', $row->id) }}">
-                                                <i class="bi bi-eye me-2"></i> Detail
-                                            </a>
-                                        </li>
-                                        <li>
-                                            <a class="dropdown-item" href="{{ route('tu.pengajuan-surat.edit', $row->id) }}">
-                                                <i class="bi bi-pencil-square me-2"></i> Edit
-                                            </a>
-                                        </li>
-                                        <li><hr class="dropdown-divider"></li>
-                                        <li>
-                                            <form action="{{ route('tu.pengajuan-surat.destroy', $row->id) }}"
-                                                method="POST"
-                                                >
-                                                @csrf
-                                                @method('DELETE')
-                                                <button type="submit" 
-                                                class="dropdown-item text-danger btn-confirm"
-                                                data-title="HAPUS PENGAJUAN SURAT?"
-                                                data-message="Pengajuan Surat akan dihapus secara permanen"
-                                                data-button="btn-danger">
-                                                    <i class="bi bi-trash me-2"></i> Hapus
-                                                </button>
-                                            </form>
-                                        </li>
-                                    </ul>
-                                </div>
+                                <x-table.actions>                                 
+                                    <li>
+                                        <a class="dropdown-item" href="{{ route('tu.pengajuan-surat.show', $row->id) }}">
+                                            <i class="bi bi-eye me-2"></i> Detail
+                                        </a>
+                                    </li>
+                                    <li>
+                                        <a class="dropdown-item" href="{{ route('tu.pengajuan-surat.edit', $row->id) }}">
+                                            <i class="bi bi-pencil-square me-2"></i> Edit
+                                        </a>
+                                    </li>
+                                    <li><hr class="dropdown-divider"></li>
+                                    <li>
+                                        <form action="{{ route('tu.pengajuan-surat.destroy', $row->id) }}"
+                                            method="POST"
+                                            >
+                                            @csrf
+                                            @method('DELETE')
+                                            <button type="submit" 
+                                            class="dropdown-item text-danger btn-confirm"
+                                            data-title="HAPUS PENGAJUAN SURAT?"
+                                            data-message="Pengajuan Surat akan dihapus secara permanen"
+                                            data-button="btn-danger">
+                                                <i class="bi bi-trash me-2"></i> Hapus
+                                            </button>
+                                        </form>
+                                    </li>                                   
+                                </x-table.actions>
                             </td>
                         </tr>
                     @empty

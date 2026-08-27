@@ -133,26 +133,7 @@
             </div>
 
         </a>
-
-        <a
-            class="menu-item
-            {{ request()->is('tu.ppdb/ditolak*') ? 'active' : '' }}"
-            href="{{ route('tu.ppdb.ditolak.index') }}"
-        >
-
-            <div class="menu-left">
-
-                <i class="bi bi-x-circle"></i>
-
-                <span>
-
-                    Data Ditolak
-
-                </span>
-
-            </div>
-
-        </a>
+        
 
         <a
             class="menu-item

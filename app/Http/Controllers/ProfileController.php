@@ -20,7 +20,7 @@ class ProfileController extends Controller
      */
     public function index()
     {
-        $user = auth()->user();
+        $user = Auth::user();
 
         /*
         |--------------------------------------------------------------------------
@@ -49,9 +49,11 @@ class ProfileController extends Controller
         */
 
         $status = '-';
+        $pegawai = null;
 
         if ($user->guru) {
 
+            $pegawai = $user->guru->pegawai;
             $waliKelas = WaliKelas::with('kelas')
                 ->where('guru_id', $user->guru->id)
                 ->where('tahun_ajaran_id', current_tahun_id())
@@ -59,7 +61,7 @@ class ProfileController extends Controller
 
             if ($waliKelas) {
 
-                $status = 'WALI KELAS ' . strtoupper($waliKelas->kelas->nama_kelas);
+                $status = 'Wali Kelas ' . ucfirst($waliKelas->kelas->nama_kelas_label);
 
             } else {
 
@@ -70,11 +72,11 @@ class ProfileController extends Controller
 
                 if ($pengampu) {
 
-                    $status = 'GURU ' . strtoupper($pengampu->mapel->nama_mapel);
+                    $status = 'Guru ' . ucfirst($pengampu->mapel->nama_mapel);
 
                 } else {
 
-                    $status = 'GURU';
+                    $status = '-';
                 }
             }
         }
@@ -83,6 +85,8 @@ class ProfileController extends Controller
             'profile.index',
             [
                 'user'   => $user,
+                'guru'    => $user->guru,    // Kirim juga variabel guru jika dibutuhkan di view
+                'pegawai' => $pegawai,
                 'status' => $status,
             ]
         );
@@ -93,7 +97,7 @@ class ProfileController extends Controller
      */
     public function detail(): View
     {
-        $user = auth()->user();
+        $user = Auth::user();
 
         /*
         |--------------------------------------------------------------------------
@@ -123,6 +127,7 @@ class ProfileController extends Controller
         |--------------------------------------------------------------------------
         */
 
+        $status = '-';
         $pegawai = null;
 
         if ($user->guru) {
@@ -134,6 +139,7 @@ class ProfileController extends Controller
             [
                 'user'    => $user,
                 'pegawai' => $pegawai,
+                'status'  => $status,
             ]
         );
     }
@@ -157,7 +163,8 @@ class ProfileController extends Controller
                 'nullable|string|max:1000',
         ]);
 
-        $user = auth()->user();
+        $user = Auth::user();
+        /** @var \App\Models\User $user */
 
         $user->update([
 
@@ -182,7 +189,8 @@ class ProfileController extends Controller
      */
     public function updateDetail(Request $request): RedirectResponse
     {
-        $user = auth()->user();
+        $user = Auth::user();
+        /** @var \App\Models\User $user */
 
         /*
         |--------------------------------------------------------------------------

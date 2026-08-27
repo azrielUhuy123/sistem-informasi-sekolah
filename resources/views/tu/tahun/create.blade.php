@@ -4,21 +4,26 @@
 
 @section('content')
 
-<div class="container-fluid">
-
-    <h4 class="mb-4">Tambah Tahun Ajaran</h4>
+<div class="container-fluid py-4">
 
     <div class="card shadow-sm border-0">
         <div class="card-body">
-
+            <div class="mb-4">
+                <h3 class="text-primary fw-bold text-center mb-1">
+                    Tambah Tahun Ajaran
+                </h3>
+                <p class="text-muted text-center">
+                    Tambahkan tahun ajaran baru untuk sistem sekolah
+                </p>
+            </div>
             <form action="{{ route('tu.tahun.store') }}" method="POST">
                 @csrf
 
                 <!-- 🔘 TOGGLE -->
-                <div class="form-check mb-3">
+                <div class="form-check mb-2">
                     <input type="checkbox" id="manualToggle" class="form-check-input">
                     <label class="form-check-label">
-                        Input manual (override sistem)
+                        Atur tahun ajaran secara manual
                     </label>
                 </div>
 
@@ -30,7 +35,7 @@
                         type="text"
                         name="tahun"
                         id="tahunInput"
-                        class="form-control rounded-3"
+                        class="form-control"
                         value="{{ $tahunAuto }}"
                         readonly
                         required
@@ -40,15 +45,15 @@
                         Otomatis mengikuti urutan sistem
                     </small>
                 </div>
-
+ 
                 <!-- 📘 SEMESTER -->
-                <div class="mb-3">
+                <div class="mb-5">
                     <label class="form-label fw-semibold">Semester</label>
 
                     <select
                         name="semester"
                         id="semesterInput"
-                        class="form-select rounded-3"
+                        class="form-control"
                         disabled
                     >
                         <option value="Ganjil" {{ $semesterAuto === 'Ganjil' ? 'selected' : '' }}>Ganjil</option>
@@ -61,12 +66,12 @@
 
                 <!-- 🔘 ACTION -->
                 <div class="d-flex justify-content-between">
-                    <a href="{{ route('tu.tahun.index') }}" class="btn btn-secondary">
-                        ← Kembali
+                    <a href="{{ route('tu.tahun.index') }}" class="btn btn-outline-secondary rounded-3">
+                        <i class="bi bi-chevron-left me-1"></i> Kembali
                     </a>
 
-                    <button type="submit" class="btn btn-primary">
-                        Simpan
+                    <button type="submit" class="btn btn-primary rounded-3">
+                        Simpan <i class="bi bi-save ms-1"></i>
                     </button>
                 </div>
 

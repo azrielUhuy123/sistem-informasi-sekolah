@@ -50,7 +50,7 @@
         subtitle="Seluruh kegiatan ekstrakurikuler yang sedang Anda ikuti."
     > 
         <x-slot:badge>
-            <span class="badge bg-primary rounded-pill px-3 py-2">
+            <span class="badge bg-primary rounded-pill px-2 py-1">
                 {{ $totalEkskul }} Ekskul
             </span>
         </x-slot:badge>
@@ -70,8 +70,8 @@
                     @php $aktif = $item->status == 'aktif'; @endphp
 
                     <tr>
-                        <td class="text-center">
-                            <span class="badge bg-light text-dark rounded-pill px-3 py-2">{{ $loop->iteration }}</span>
+                        <td>
+                            <span class="badge bg-light text-dark rounded-circle">{{ $loop->iteration }}</span>
                         </td>
                         <td>
                             <div class="d-flex align-items-center">

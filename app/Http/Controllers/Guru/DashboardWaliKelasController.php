@@ -7,13 +7,42 @@ use App\Models\AbsensiSiswa;
 use App\Models\NilaiSiswa;
 use App\Models\PerkembanganSiswa;
 use App\Models\WaliKelas;
+use App\Models\PengampuMapel; // Tambahkan namespace ini jika belum ada
 use Illuminate\Support\Facades\Auth;
 
 class DashboardWaliKelasController extends Controller
 {
     public function index()
     {
-        $guru = Auth::user()->guru;
+        $user = Auth::user(); // Ambil user yang sedang login
+        $guru = $user->guru;
+
+        /*
+        |--------------------------------------------------------------------------
+        | STATUS GURU (UNTUK MODAL PROFILE / TOPBAR)
+        |--------------------------------------------------------------------------
+        */
+        $status = '-';
+
+        if ($guru) {
+            $cekWaliKelas = WaliKelas::with('kelas')
+                ->where('guru_id', $guru->id)
+                ->where('tahun_ajaran_id', current_tahun_id())
+                ->first();
+
+            if ($cekWaliKelas) {
+                $status = 'Wali Kelas ' . ucfirst($cekWaliKelas->kelas->nama_kelas_label);
+            } else {
+                $pengampu = PengampuMapel::with('mapel')
+                    ->where('guru_id', $guru->id)
+                    ->where('tahun_ajaran_id', current_tahun_id())
+                    ->first();
+
+                if ($pengampu) {
+                    $status = 'Guru ' . ucfirst($pengampu->mapel->nama_mapel);
+                }
+            }
+        }
 
         /*
         |--------------------------------------------------------------------------
@@ -221,7 +250,8 @@ class DashboardWaliKelasController extends Controller
                 'rataNilai',
                 'belumPerkembangan',
                 'nilaiTerendah',
-                'alphaTerbanyak'
+                'alphaTerbanyak',
+                'status' // <-- Masukkan variabel status di sini
             )
         );
     }

@@ -3,527 +3,335 @@
 @section('title', 'Pengampu Mapel')
 
 @section('content')
-
 <div class="container-fluid">
-
-    {{-- ================= HEADER ================= --}}
     <div class="card border-0 shadow-sm rounded-4 overflow-hidden mb-4">
-
-        <div class="card-body p-4 p-lg-5 text-white"
-            style="background:linear-gradient(135deg,#0f4c81 0%,#2563eb 100%);">
-
-            <div class="d-flex flex-column flex-lg-row justify-content-between align-items-lg-center">
-
+        <div class="card-body p-4 p-lg-5 text-white" style="background: linear-gradient(135deg, #0f4c81 0%, #2563eb 100%);">
+            <div class="d-flex flex-column flex-lg-row justify-content-between align-items-lg-center gap-3">
                 <div>
-
-                    <h2 class="fw-bold mb-2">
-
-                        Pengampu Mata Pelajaran
-
-                    </h2>
-
-                    <p class="mb-0 opacity-75">
-
-                        Mengatur guru pengampu mata pelajaran pada setiap kelas di tahun ajaran aktif.
-
-                    </p>
-
+                    <h3 class="fw-bold mb-2">Pengampu Mapel</h3>
+                    <p class="mb-0 opacity-75">Kelola guru pengampu mata pelajaran.</p>
                 </div>
-
-                <div class="mt-4 mt-lg-0">
-
-                    <div class="bg-white rounded-4 px-4 py-3 text-center shadow-sm">
-
-                        <h3 class="fw-bold text-primary mb-0">
-
-                            {{ $pengampu->count() }}
-
-                        </h3>
-
-                        <small class="text-muted">
-
-                            Total Penempatan
-
-                        </small>
-
-                    </div>
-
+                <div class="badge bg-white text-primary px-3 py-2 fs-6">
+                    <i class="bi bi-shield-check me-2"></i> Sinergi-MJ
                 </div>
-
             </div>
-
         </div>
-
     </div>
 
-    {{-- ================= FORM ================= --}}
-    <div class="card border-0 shadow-sm rounded-4 mb-4">
+    <x-alert.flash key="success" type="success" />
+    <x-alert.flash key="error" type="danger" />
 
-        <div class="card-header bg-white border-0 pt-4 px-4">
-
-            <h5 class="fw-bold mb-1">
-
-                <i class="bi bi-person-plus-fill text-primary me-2"></i>
-
-                Penempatan Pengampu
-
-            </h5>
-
-            <small class="text-muted">
-
-                Pilih guru, mata pelajaran, lalu tentukan kelas yang diampu.
-
-            </small>
-
+    <div class="card border-0 shadow-sm mb-4">
+        <div class="card-header bg-white border-0 pt-4">
+            <h5 class="fw-bold mb-1">Penempatan Pengampu</h5>
+            <small class="text-muted">Pilih satu guru untuk mengelola seluruh mata pelajaran dan kelasnya.</small>
         </div>
 
         <div class="card-body pt-3">
-
-            <form
-                action="{{ route('superadmin.pengampu-mapel.store') }}"
-                method="POST">
-
-                @csrf
-
-                <div class="row">
-
-                    {{-- Guru --}}
-                    <div class="col-lg-6 mb-4">
-
-                        <label class="form-label fw-semibold">
-
-                            Guru
-
-                        </label>
-
-                        <select
-                            name="guru_id"
-                            class="form-select"
-                            required>
-
-                            <option value="">
-                                -- Pilih Guru --
-                            </option>
-
-                            @foreach($guru as $g)
-
-                                <option value="{{ $g->id }}">
-
-                                    {{ $g->nama }}
-
+            <form method="GET" action="{{ route('superadmin.pengampu-mapel.index') }}">
+                <div class="row align-items-end">
+                    <div class="col-lg-12 mb-5">
+                        <label for="guru_id" class="form-label fw-semibold">Pilih Guru</label>
+                        <select id="guru_id" name="guru_id" class="form-control" onchange="this.form.submit()" required>
+                            <option value="">-- Pilih Guru --</option>
+                            @foreach ($guru as $g)
+                                <option value="{{ $g->id }}" {{ $guruTerpilih?->id == $g->id ? 'selected' : '' }}>
+                                    {{ $g->pegawai?->nama ?? $g->nama }}
                                 </option>
-
                             @endforeach
-
                         </select>
-
                     </div>
-
-                    {{-- Mapel --}}
-                    <div class="col-lg-6 mb-4">
-
-                        <label class="form-label fw-semibold">
-
-                            Mata Pelajaran
-
-                        </label>
-
-                        <select
-                            name="mata_pelajaran_id"
-                            class="form-select"
-                            required>
-
-                            <option value="">
-                                -- Pilih Mata Pelajaran --
-                            </option>
-
-                            @foreach($mapel as $m)
-
-                                <option value="{{ $m->id }}">
-
-                                    {{ $m->nama_mapel }}
-
-                                </option>
-
-                            @endforeach
-
-                        </select>
-
-                    </div>
-
                 </div>
-
-                <hr>
-
-                <label class="form-label fw-bold mb-3">
-
-                    Pilih Kelas
-
-                </label>
-
-                <div class="d-flex justify-content-between align-items-center mb-3">
-
-                    <small class="text-muted">
-                        Guru dapat ditempatkan pada lebih dari satu kelas.
-                    </small>
-
-                    <div>
-
-                        <button
-                            type="button"
-                            class="btn btn-sm btn-outline-primary me-2"
-                            id="checkAll">
-
-                            Pilih Semua
-
-                        </button>
-
-                        <button
-                            type="button"
-                            class="btn btn-sm btn-outline-secondary"
-                            id="uncheckAll">
-
-                            Kosongkan
-
-                        </button>
-
-                    </div>
-
-                </div>
-
-                <div class="row g-3">
-
-                    @foreach($kelas as $k)
-
-                        <div class="col-lg-2 col-md-3 col-sm-4 col-6">
-
-                            <label class="kelas-item">
-
-                                <input
-                                    type="checkbox"
-                                    class="form-check-input kelas-checkbox"
-                                    name="kelas_id[]"
-                                    value="{{ $k->id }}">
-
-                                <span class="kelas-badge">
-
-                                    {{ $k->nama_kelas_label }}
-
-                                </span>
-
-                            </label>
-
-                        </div>
-
-                    @endforeach
-
-                </div>
-
-                <div class="mt-4">
-
-                    <button class="btn btn-primary rounded-pill px-4">
-
-                        <i class="bi bi-check-circle-fill me-2"></i>
-
-                        Simpan Penempatan
-
-                    </button>
-
-                </div>
-
             </form>
 
-        </div>
+            @if ($guruTerpilih)
+                @php
+                    $assignedMapelIds = $pengampuGuru->pluck('mata_pelajaran_id')->unique();
+                    $assignedKelasIds = $pengampuGuru->pluck('kelas_id')->unique();
+                @endphp
 
-    </div>
+                <form action="{{ route('superadmin.pengampu-mapel.store') }}" method="POST" class="mt-4">
+                    @csrf
+                    <input type="hidden" name="guru_id" value="{{ $guruTerpilih->id }}">                    
 
-    {{-- TABLE --}}
-    <div class="card border-0 shadow-sm rounded-4">
+                    <hr>
+                    <div class="d-flex flex-column flex-lg-row justify-content-between align-items-lg-center gap-3 mb-3">
+                        <div>
+                            <h6 class="fw-bold mb-1">Penugasan Mata Pelajaran &amp; Kelas</h6>
+                            <div class="text-muted" id="pengampu-global-summary">
+                                {{ $assignedMapelIds->count() }} Mapel ditugaskan &middot; {{ $assignedKelasIds->count() }} Kelas ditugaskan
+                            </div>
+                        </div>
+                        
+                    </div>
 
-        <div class="card-header bg-white border-0 pt-4 px-4">
+                    <div class="input-group mb-3">                        
+                        <input type="search" class="form-control" id="pengampu-mapel-search" placeholder="Cari mata pelajaran..." autocomplete="off">
+                    </div>
 
-            <div class="d-flex justify-content-between align-items-center">
+                    <div id="pengampu-mapel-list">
+                        @foreach ($mapel as $m)
+                            @php
+                                $selectedCount = $pengampuGuru->where('mata_pelajaran_id', $m->id)->count();
+                                $collapseId = 'pengampu-mapel-' . $m->id;
+                            @endphp
+                            <div class="border rounded-3 mb-3 pengampu-mapel-section" data-mapel-name="{{ strtolower($m->nama_mapel) }}">
+                                <button type="button"
+                                    class="btn btn-light w-100 text-start rounded-3 d-flex align-items-center justify-content-between gap-3 p-3"
+                                    data-bs-toggle="collapse"
+                                    data-bs-target="#{{ $collapseId }}"
+                                    aria-controls="{{ $collapseId }}"
+                                    aria-expanded="{{ $selectedCount > 0 ? 'true' : 'false' }}">
+                                    <span class="d-flex align-items-center gap-3 min-w-0">
+                                        <span class="badge bg-primary rounded-pill px-2 py-1">
+                                            {{ $m->kode_mapel ?? '-' }}
+                                        </span>
+                                        <span class="fw-semibold text-truncate">{{ $m->nama_mapel }}</span>
+                                    </span>
+                                    <span class="d-flex align-items-center gap-2 flex-shrink-0">
+                                        <small class="text-muted pengampu-count" data-mapel-count="{{ $m->id }}">{{ $selectedCount }} kelas</small>
+                                        <i class="bi {{ $selectedCount > 0 ? 'bi-chevron-up' : 'bi-chevron-down' }} collapse-chevron"></i>
+                                    </span>
+                                </button>
 
-                <div>
-
-                    <h5 class="fw-bold mb-1">
-                        <i class="bi bi-table text-primary me-2"></i>
-                        Data Pengampu Mata Pelajaran
-                    </h5>
-
-                    <small class="text-muted">
-                        Daftar guru beserta kelas dan mata pelajaran yang diampu.
-                    </small>
-
-                </div>
-
-                <span class="badge bg-primary rounded-pill px-3 py-2">
-                    {{ $pengampu->count() }} Data
-                </span>
-
-            </div>
-
-        </div>
-
-        <div class="card-body">
-
-            <div class="table-responsive">
-
-                <table class="table table-hover align-middle mb-0">
-
-                    <thead>
-
-                        <tr>
-
-                            <th>Guru</th>
-                            <th width="120">Kelas</th>
-                            <th>Mata Pelajaran</th>
-                            <th width="120" class="text-center">Aksi</th>
-
-                        </tr>
-
-                    </thead>
-
-                    <tbody>
-
-                        @forelse($pengampu as $p)
-
-                            <tr>
-
-                                <td>
-
-                                    <div class="d-flex align-items-center">
-
-                                        <div class="avatar-mini me-3">
-
-                                            {{ strtoupper(substr($p->guru->pegawai->nama,0,1)) }}
-
+                                <div id="{{ $collapseId }}" class="collapse {{ $selectedCount > 0 ? 'show' : '' }}">
+                                    <div class="border-top p-3">
+                                        <div class="row g-2">
+                                            @foreach ($kelas as $k)
+                                                <div class="col-lg-2 col-md-3 col-sm-4 col-6">
+                                                    <label class="d-flex align-items-center gap-2 border rounded-3 p-2 h-100">
+                                                        <input type="checkbox"
+                                                            class="form-check-input pengampu-kelas-checkbox"
+                                                            data-mapel-id="{{ $m->id }}"
+                                                            name="pengampu[{{ $m->id }}][kelas_id][]"
+                                                            value="{{ $k->id }}"
+                                                            @checked($pengampuGuru->contains(fn ($p) => $p->mata_pelajaran_id == $m->id && $p->kelas_id == $k->id))>
+                                                        <span>{{ $k->nama_kelas_label }}</span>
+                                                    </label>
+                                                </div>
+                                            @endforeach
                                         </div>
-
-                                        <div>
-
-                                            <div class="fw-semibold">
-
-                                                {{ $p->guru->pegawai->nama }}
-
-                                            </div>
-
-                                            <small class="text-muted">
-
-                                                {{ $p->guru->pegawai->nip ?? '-' }}
-
-                                            </small>
-
-                                        </div>
-
                                     </div>
-
-                                </td>
-
-                                <td>
-
-                                    <span class="badge bg-success-subtle text-success px-3 py-2">
-
-                                        {{ $p->kelas->nama_kelas_label }}
-
-                                    </span>
-
-                                </td>
-
-                                <td>
-
-                                    <span class="badge bg-primary-subtle text-primary border px-3 py-2">
-
-                                        {{ $p->mapel->nama_mapel }}
-
-                                    </span>
-
-                                </td>
-
-                                <td class="text-center">
-
-                                    <form
-                                        action="{{ route('superadmin.pengampu-mapel.destroy',$p->id) }}"
-                                        method="POST"
-                                        onsubmit="return confirm('Hapus data ini?')">
-
-                                        @csrf
-                                        @method('DELETE')
-
-                                        <button class="btn btn-danger rounded-pill btn-sm px-3">
-
-                                            <i class="bi bi-trash3-fill me-1"></i>
-
-                                            Hapus
-
-                                        </button>
-
-                                    </form>
-
-                                </td>
-
-                            </tr>
-
-                        @empty
-
-                            <tr>
-
-                                <td colspan="4">
-
-                                    <div class="empty-state">
-
-                                        <i class="bi bi-journal-x display-4 text-secondary"></i>
-
-                                    <h5 class="mt-3">
-
-                                        Belum Ada Pengampu Mapel
-
-                                    </h5>
-
-                                    <p class="text-muted mb-0">
-
-                                        Silakan tambahkan data pengampu mata pelajaran.
-
-                                    </p>
-
                                 </div>
+                            </div>
+                        @endforeach
+                    </div>
 
-                            </td>
-
-                        </tr>
-
-                    @endforelse
-
-                </tbody>
-
-            </table>
-
+                    <div id="pengampu-mapel-empty-search" class="text-center text-muted py-3 d-none">
+                        Mata pelajaran tidak ditemukan.
+                    </div>
+                    <div class="text-end">
+                        <button type="submit" class="btn btn-primary rounded-3">                        
+                            {{ $pengampuGuru->isEmpty() ? 'Simpan Penugasan' : 'Simpan Perubahan' }} <i class="bi bi-save ms-1"></i>
+                        </button>
+                    </div>                
+                </form>
+            @endif
         </div>
-
     </div>
 
+    <x-table.card
+        title="Data Pengampu Mata Pelajaran"
+        subtitle="Ringkasan guru beserta jumlah mata pelajaran dan kelas yang diampu"
+    >
+        <x-slot:badge>
+            <span class="badge bg-primary rounded-pill px-2 py-1">
+                {{ $pengampu->count() }} <span class="text-badge">Guru</span>
+            </span>
+        </x-slot:badge>
+
+        <div class="table-responsive">
+            <table class="table table-hover align-middle mb-0">
+                <thead>
+                    <tr>
+                        <th width="70">No</th>
+                        <th>Guru</th>
+                        <th>Mata Pelajaran</th>
+                        <th>Total Kelas</th>
+                        <th width="100">Aksi</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @forelse ($pengampu as $assignments)
+                        @php
+                            $first = $assignments->first();
+                            $uniqueMapel = $assignments->pluck('mapel')->filter()->unique('id');
+                            $totalKelas = $assignments->pluck('kelas_id')->unique()->count();
+                        @endphp
+                        <tr>
+                            <td><span class="badge bg-light text-dark rounded-circle">{{ $loop->iteration }}</span></td>
+                            <td>
+                                <div class="d-flex align-items-center">
+                                    <div class="rounded-circle bg-primary-subtle text-primary d-flex align-items-center justify-content-center me-3" style="width: 48px; height: 48px;">
+                                        <i class="bi bi-person-fill fs-4"></i>
+                                    </div>
+                                    <div>
+                                        <div class="fw-semibold">{{ $first->guru->pegawai?->nama ?? $first->guru->nama ?? '-' }}</div>
+                                        <small class="text-muted">NIP : {{ $first->guru->pegawai?->nip ?? '-' }}</small>
+                                    </div>
+                                </div>
+                            </td>
+                            <td>                            
+                                <div class="d-flex flex-wrap gap-1">
+                                    @foreach ($uniqueMapel as $mapelItem)
+                                        <span class="text-muted">{{ $mapelItem->nama_mapel }}</span>
+                                    @endforeach
+                                </div>
+                            </td>
+                            <td>                               
+                                @if($totalKelas  == 0)
+                                    <span class="badge-status selesai">
+                                        0 kelas
+                                    </span>
+                                @elseif($totalKelas  >= 15)
+                                    <span class="badge-status nonaktif">
+                                        {{ $jumlahKelas }} Kelas
+                                    </span>
+                                @elseif($totalKelas  >= 8)
+                                    <span class="badge-status pending">
+                                        {{ $totalKelas  }} Kelas
+                                    </span>
+                                @else
+                                    <span class="badge-status aktif">
+                                        {{ $totalKelas  }} Kelas
+                                    </span>
+                                @endif
+                            </td>                            
+                            <td>
+                                <form action="{{ route('superadmin.pengampu-mapel.destroy', $first->id) }}" method="POST">
+                                    @csrf
+                                    @method('DELETE')
+                                    <button type="submit" class="btn btn-danger btn-sm rounded-pill px-3 py-0 btn-confirm"
+                                        data-title="Hapus Pengampu Mapel"
+                                        data-message="Seluruh penugasan guru ini pada tahun ajaran aktif akan dihapus."
+                                        data-button="btn-danger">
+                                        Hapus <i class="bi bi-trash ms-2"></i>
+                                    </button>
+                                </form>
+                            </td>
+                        </tr>
+                    @empty
+                        <tr>
+                            <td colspan="5" class="text-center py-5">
+                                <i class="bi bi-journal-x display-5 text-secondary"></i>
+                                <p class="mt-3 mb-0 text-muted">Belum ada data pengampu mata pelajaran.</p>
+                            </td>
+                        </tr>
+                    @endforelse
+                </tbody>
+            </table>
+        </div>
+        
+    </x-table.card>
+    <div class="sticky-bottom bg-white border border-light-subtle py-3 mt-4">
+        <div class="d-flex justify-content-between align-items-center">                 
+            <a href="{{ route('superadmin.pengampu-mapel.index') }}" class="btn btn-outline-secondary rounded-3 ml-4">
+                <i class="bi bi-chevron-left me-1"></i> Kembali
+            </a>                            
+        </div>
+    </div>
 </div>
 
-</div>
+@if ($guruTerpilih)
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const assignmentCheckboxes = document.querySelectorAll('.pengampu-kelas-checkbox');
+            const mapelSections = document.querySelectorAll('.pengampu-mapel-section');
+            const globalSummary = document.getElementById('pengampu-global-summary');
+            const mapelSearch = document.getElementById('pengampu-mapel-search');
+            const emptySearch = document.getElementById('pengampu-mapel-empty-search');
 
-<style>
+            function updateMapelCount(mapelId) {
+                const counter = document.querySelector('[data-mapel-count="' + mapelId + '"]');
+                const total = document.querySelectorAll('.pengampu-kelas-checkbox[data-mapel-id="' + mapelId + '"]:checked').length;
 
-.avatar-mini{
-    width:48px;
-    height:48px;
-    border-radius:50%;
-    background:linear-gradient(135deg,#2563eb,#0f4c81);
-    color:#fff;
-    display:flex;
-    align-items:center;
-    justify-content:center;
-    font-weight:700;
-    font-size:1rem;
-    box-shadow:0 8px 20px rgba(37,99,235,.25);
-}
+                if (counter) {
+                    counter.textContent = total + ' kelas';
+                }
+            }
 
-.table thead th{
-    border:0;
-    color:#64748b;
-    text-transform:uppercase;
-    font-size:.82rem;
-    font-weight:700;
-    padding:16px;
-    letter-spacing:.5px;
-}
+            function updateGlobalSummary() {
+                const assignedMapel = new Set();
+                const assignedKelas = new Set();
 
-.table tbody td{
-    padding:18px 16px;
-    vertical-align:middle;
-}
+                assignmentCheckboxes.forEach(function (checkbox) {
+                    if (checkbox.checked) {
+                        assignedMapel.add(checkbox.dataset.mapelId);
+                        assignedKelas.add(checkbox.value);
+                    }
+                });
 
-.table-hover tbody tr{
-    transition:.25s;
-}
+                if (globalSummary) {
+                    globalSummary.textContent = assignedMapel.size + ' Mapel ditugaskan \u00b7 ' + assignedKelas.size + ' Kelas ditugaskan';
+                }
+            }
 
-.table-hover tbody tr:hover{
-    background:#f8fbff;
-}
+            function updateAllCounts() {
+                document.querySelectorAll('.pengampu-count').forEach(function (counter) {
+                    updateMapelCount(counter.dataset.mapelCount);
+                });
+                updateGlobalSummary();
+            }
 
-.card{
-    transition:.25s;
-}
+            assignmentCheckboxes.forEach(function (checkbox) {
+                checkbox.addEventListener('change', function () {
+                    updateMapelCount(checkbox.dataset.mapelId);
+                    updateGlobalSummary();
+                });
+            });
 
-.card:hover{
-    box-shadow:0 15px 40px rgba(15,76,129,.08)!important;
-}
+            const checkAllButton = document.getElementById('checkAllPengampu');
+            if (checkAllButton) {
+                checkAllButton.addEventListener('click', function () {
+                    assignmentCheckboxes.forEach(function (checkbox) { checkbox.checked = true; });
+                    updateAllCounts();
+                });
+            }
 
-.empty-state{
-    text-align:center;
-    padding:60px 20px;
-}
+            const uncheckAllButton = document.getElementById('uncheckAllPengampu');
+            if (uncheckAllButton) {
+                uncheckAllButton.addEventListener('click', function () {
+                    assignmentCheckboxes.forEach(function (checkbox) { checkbox.checked = false; });
+                    updateAllCounts();
+                });
+            }
 
-.badge{
-    font-weight:600;
-    border-radius:999px;
-}
+            if (mapelSearch) {
+                mapelSearch.addEventListener('input', function () {
+                    const query = mapelSearch.value.trim().toLowerCase();
+                    let visibleSections = 0;
 
-.form-select,
-.form-control{
+                    mapelSections.forEach(function (section) {
+                        const isVisible = section.dataset.mapelName.includes(query);
+                        section.classList.toggle('d-none', !isVisible);
+                        visibleSections += isVisible ? 1 : 0;
+                    });
 
-    border-radius:12px;
-    min-height:46px;
-    border:1px solid #dbe4f0;
+                    if (emptySearch) {
+                        emptySearch.classList.toggle('d-none', visibleSections > 0);
+                    }
+                });
+            }
 
-}
+            mapelSections.forEach(function (section) {
+                const collapse = section.querySelector('.collapse');
+                const trigger = section.querySelector('[data-bs-toggle="collapse"]');
+                const chevron = section.querySelector('.collapse-chevron');
 
-.form-select:focus,
-.form-control:focus{
+                if (collapse && trigger && chevron) {
+                    collapse.addEventListener('shown.bs.collapse', function () {
+                        trigger.setAttribute('aria-expanded', 'true');
+                        chevron.classList.replace('bi-chevron-down', 'bi-chevron-up');
+                    });
+                    collapse.addEventListener('hidden.bs.collapse', function () {
+                        trigger.setAttribute('aria-expanded', 'false');
+                        chevron.classList.replace('bi-chevron-up', 'bi-chevron-down');
+                    });
+                }
+            });
 
-    border-color:#2563eb;
-    box-shadow:0 0 0 .2rem rgba(37,99,235,.15);
-
-}
-
-.btn{
-
-    border-radius:12px;
-
-}
-
-.class-item{
-
-    transition:.2s;
-    cursor:pointer;
-
-}
-
-.class-item:hover{
-
-    border-color:#2563eb!important;
-    background:#f8fbff;
-
-}
-
-</style>
-
-<script>
-
-document.getElementById('checkAll').onclick = function(){
-
-    document.querySelectorAll('.kelas-checkbox').forEach(function(item){
-
-        item.checked = true;
-
-    });
-
-};
-
-document.getElementById('uncheckAll').onclick = function(){
-
-    document.querySelectorAll('.kelas-checkbox').forEach(function(item){
-
-        item.checked = false;
-
-    });
-
-};
-
-</script>
-
+            updateAllCounts();
+        });
+    </script>
+@endif
 @endsection

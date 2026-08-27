@@ -143,7 +143,7 @@
                                                 'mapel_id' => $item->mapel_id,
                                             ]
                                         ) }}"
-                                        class="btn btn-outline-secondary btn-sm"
+                                        class="btn btn-outline-secondary rounded-3 btn-sm"
                                     >
 
                                         Lihat Siswa

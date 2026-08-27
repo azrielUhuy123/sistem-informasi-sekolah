@@ -22,7 +22,7 @@
         </div>
 
     </a>
-        {{-- AKADEMIK --}}
+    {{-- AKADEMIK --}}
     <button
         class="menu-item border-0 bg-transparent text-start"
         onclick="toggleMenu('menuAkademik','arrowAkademik')"
@@ -81,6 +81,36 @@
 
         </a>
 
+    </div>
+
+    {{-- PENUGASAN GURU --}}
+    <button
+        class="menu-item border-0 bg-transparent text-start"
+        onclick="toggleMenu('menuPenugasanGuru','arrowPenugasanGuru')"
+    >
+
+        <div class="menu-left">
+            <i class="bi bi-person-check"></i>
+            <span>Penugasan Guru</span>
+        </div>
+
+        <i
+            class="bi bi-chevron-right dropdown-arrow"
+            id="arrowPenugasanGuru"
+        ></i>
+
+    </button>
+
+    <div
+        class="submenu
+        {{ request()->is('superadmin/pengampu-mapel*') ||
+        request()->is('superadmin/wali-kelas*') ||
+        request()->is('superadmin/pembina-ekskul*')
+            ? 'show'
+            : '' }}"
+        id="menuPenugasanGuru"
+    >
+
         <a
             class="menu-item {{ request()->is('superadmin/pengampu-mapel*') ? 'active' : '' }}"
             href="{{ route('superadmin.pengampu-mapel.index') }}"
@@ -106,8 +136,7 @@
         </a>
 
         <a
-            class="menu-item
-            {{ request()->is('superadmin/pembina-ekskul*') ? 'active' : '' }}"
+            class="menu-item {{ request()->is('superadmin/pembina-ekskul*') ? 'active' : '' }}"
             href="{{ route('superadmin.pembina-ekskul.index') }}"
         >
 
@@ -119,8 +148,6 @@
         </a>
 
     </div>
-
-    
 
     {{-- MONITORING AKADEMIK --}}
     <button

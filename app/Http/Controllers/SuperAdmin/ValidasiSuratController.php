@@ -4,7 +4,7 @@ namespace App\Http\Controllers\SuperAdmin;
 
 use App\Http\Controllers\Controller;
 use App\Models\PengajuanSurat;
-use illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Auth;
 
 
 class ValidasiSuratController extends Controller

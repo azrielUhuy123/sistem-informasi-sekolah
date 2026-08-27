@@ -12,9 +12,9 @@
                     <div>
                         <h3 class="fw-bold mb-2">Daftar Ulang Peserta Didik Baru</h3>
                         <p class="mb-0 opacity-75">Kelola daftar ulang peserta didik baru</p>
-                    </div>
+                    </div> 
                     <div class="badge bg-white text-primary px-3 py-2 fs-6">
-                        <i class="bi bi-shield-check me-2"></i> Sistem Terhubung
+                        <i class="bi bi-shield-check me-2"></i> Sinergi-MJ
                     </div>
                 </div>
             </div>
@@ -31,22 +31,18 @@
         subtitle="Seluruh pendaftar ulang peserta didik baru pada SDN Mekar Jaya."
     >
         <x-slot:badge>
-            <span class="badge bg-primary rounded-pill px-3 py-2">
-                {{ $data->count() }} Daftar Ulang
+            <span class="badge bg-primary rounded-pill px-2 py-1">
+                {{ $data->count() }} <span class="text-badge">Daftar Ulang</span>
             </span>
         </x-slot:badge>
 
-        <x-slot:actions>
-            <div class="d-flex flex-column align-items-end gap-2">
-                <input
-                    type="text"
-                    id="searchInput"
-                    class="form-control rounded-3"
-                    placeholder="Cari Pendaftar..."
-                    style="width: 320px;"
-                >
-            </div>
-
+        <x-slot:actions>            
+            <input
+                type="text"
+                id="searchInput"
+                class="form-control table-search"
+                placeholder="Cari Pendaftar...."                
+            >       
         </x-slot:actions>
 
         <div class="table-responsive">
@@ -76,12 +72,9 @@
                                     <i class="bi bi-person-fill fs-4"></i>
                                 </div>
                                 <div>
-                                    <div class="fw-bold text-lowercase">
+                                    <div class="fw-semibold">
                                         {{ $item->nama }}
-                                    </div>
-                                    <small class="text-muted">
-                                       NIK : {{ $item->nik }}
-                                    </small>
+                                    </div>                                    
                                 </div>
                             </div>
                             
@@ -98,32 +91,32 @@
                         </td>
                         <td>
                             @if($item->siswa?->user)
-                                <span class="badge bg-success-subtle text-success-emphasis border border-success-subtle rounded-pill px-3 py-2">
-                                    <i class="bi bi-person-check me-1"></i>
+                                <span class="badge-status aktif">
+                                    <i class="bi bi-person-check me-2"></i>
                                     Akun Terdaftar
                                 </span>
                             @else
-                                <span class="badge bg-warning-subtle text-warning-emphasis border border-warning-subtle rounded-pill px-3 py-2">
-                                    <i class="bi bi-person-x me-1"></i>
+                                <span class="badge-status nonaktif">
+                                    <i class="bi bi-person-x me-2"></i>
                                     Akun Belum Terdaftar
                                 </span>
                             @endif
                         </td>
                         <td>
-                            <span class="badge bg-light rounded-pill text-dark border px-3 py-2">
+                            <span class="text-muted">
                                 <i class="bi bi-calendar me-1"></i>
                                 {{ $item->tanggal_lahir  }}
                             </span>
                         </td>
                         <td>
                            @if($item->status_daftar_ulang == 'sudah')
-                                <span class="badge bg-secondary rounded-pill border px-3 py-2">
-                                    <i class="bi bi-check-circle me-1"></i>
+                                <span class="badge-status selesai">
+                                    <i class="bi bi-check-circle me-2"></i>
                                     Sudah Daftar Ulang
                                 </span>
                             @else
-                                <span class="badge bg-gold rounded-pill border px-3 py-2">
-                                    <i class="bi bi-clock-history me-1"></i>
+                                <span class="badge-status pending">
+                                    <i class="bi bi-clock-history me-2"></i>
                                     Belum Daftar Ulang
                                 </span>
                             @endif
@@ -139,7 +132,7 @@
                             @csrf
 
                             <button
-                                class="btn btn-success btn-sm badge rounded-pill border px-3 py-2 btn-confirm"
+                                class="btn btn-success btn-sm badge rounded-pill border px-2 py-1 btn-confirm"
                                 data-title="KONFIRMASI DAFTAR ULANG?"
                                 data-message="Daftar Ulang Peserta didik baru akan Terkonfirmasi"
                                 data-button="btn-primary"
@@ -157,7 +150,7 @@
 
                             <span class="text-success">
 
-                            <i class="bi bi-check-circle-fill"></i>
+                            <i class="bi bi-check-circle-fill me-1"></i>
 
                             Selesai
 

@@ -10,6 +10,7 @@ use Illuminate\Support\Facades\Hash;
 use Carbon\Carbon;
 use App\Enums\UserRole;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 
 class DataKepegawaianController extends Controller
 {
@@ -109,11 +110,58 @@ class DataKepegawaianController extends Controller
     // HAPUS DATA
     public function destroy($id)
     {
-        $pegawai = DataKepegawaian::findOrFail($id);
-        $pegawai->delete();
+        $pegawai = DataKepegawaian::with([
+            'guru.waliKelas',
+            'guru.pengampuMapel',
+            'guru.mapels',
+            'guru.pembinaEkskul',
+            'user',
+        ])->findOrFail($id);
 
-        return redirect()->route('tu.datakepegawaian.index')
-            ->with('success', 'Data pegawai berhasil dihapus!');
+        DB::transaction(function () use ($pegawai) {
+
+            // =========================
+            // GURU
+            // =========================
+            if ($pegawai->guru) {
+
+                $guru = $pegawai->guru;
+
+                // Wali kelas
+                $guru->waliKelas?->delete();
+
+                // Pengampu mapel
+                $guru->pengampuMapel()->delete();
+
+                // Relasi guru - mapel
+                $guru->mapels()->detach();
+
+                // Pembina ekskul
+                $guru->pembinaEkskul()->delete();
+
+                // Guru
+                $guru->delete();
+            }
+
+            // =========================
+            // USER / AKUN
+            // =========================
+            if ($pegawai->user) {
+                $pegawai->user->delete();
+            }
+
+            // =========================
+            // PEGAWAI
+            // =========================
+            $pegawai->delete();
+        });
+
+        return redirect()
+            ->route('tu.datakepegawaian.index')
+            ->with(
+                'success',
+                'Data pegawai beserta data terkait berhasil dihapus!'
+            );
     }
 
     // =========================

@@ -46,11 +46,11 @@
                                                 <div class="small text-muted">Status Approval</div>
                                                 <div class="fw-semibold">
                                                     @if($pegawai->approval_status == 'approved')
-                                                        <span class="badge bg-success">Approved</span>
+                                                        <span class="small"><i class="bi bi-patch-check-fill text-success me-1"></i>Approved</span>
                                                     @elseif($pegawai->approval_status == 'rejected')
-                                                        <span class="badge bg-danger">Rejected</span>
+                                                        <span class="small"><i class="bi bi-patch-exclamation-fill text-danger me-1"></i>Rejected</span>
                                                     @else
-                                                        <span class="badge bg-warning text-dark">Pending</span>
+                                                        <span class="small"><i class="bi bi-patch-question-fill text-warning me-1"></i>Pending</span>
                                                     @endif
                                                 </div>
                                             </div>
@@ -66,9 +66,7 @@
                             <div class="card-body">
                                 <div class="d-flex justify-content-between align-items-center mb-3">
                                     <h5 class="fw-bold mb-0">Profil Pegawai</h5>
-                                    <span class="badge bg-secondary-subtle text-secondary-emphasis border border-secondary-subtle">
-                                        <i class="bi bi-person-lines-fill me-1"></i> Master Data
-                                    </span>
+                                    <x-table.role-badge :role="$pegawai->jabatan ?? 'Pegawai'" /> 
                                 </div>
 
                                 <div class="row g-3">
@@ -98,9 +96,15 @@
                                         <div class="small text-muted mb-1">Jenis Kelamin</div>
                                         <div class="fw-semibold">
                                             @if ($pegawai->jenis_kelamin == 'L')
-                                                <span class="badge bg-primary">Laki-laki</span>
+                                                <span class="badge bg-indigo rounded-pill px-2 py-1">
+                                                    <i class="bi bi-gender-male me-1"></i>
+                                                    Laki-laki
+                                                </span>
                                             @elseif($pegawai->jenis_kelamin == 'P')
-                                                <span class="badge bg-danger">Perempuan</span>
+                                                <span class="badge bg-rose rounded-pill px-2 py-1">
+                                                    <i class="bi bi-gender-female me-1"></i>
+                                                    Perempuan
+                                                </span>
                                             @else
                                                 -
                                             @endif
@@ -239,11 +243,11 @@
                                         <div class="small text-muted mb-1">Status Approval</div>
                                         <div class="fw-semibold">
                                             @if($pegawai->approval_status == 'approved')
-                                                <span class="badge bg-success">Approved</span>
+                                                <span class="small"><i class="bi bi-patch-check-fill text-success me-1"></i>Approved</span>
                                             @elseif($pegawai->approval_status == 'rejected')
-                                                <span class="badge bg-danger">Rejected</span>
+                                                <span class="small"><i class="bi bi-patch-exclamation-fill text-danger me-1"></i>Rejected</span>
                                             @else
-                                                <span class="badge bg-warning text-dark">Pending</span>
+                                                <span class="small"><i class="bi bi-patch-question-fill text-warning me-1"></i>Pending</span>
                                             @endif
                                         </div>
                                     </div>
@@ -282,11 +286,19 @@
                                         </div>
                                         <div class="col-12">
                                             <div class="small text-muted mb-1">Role</div>
-                                            <div class="fw-semibold">{{ $pegawai->user->role ?? '-' }}</div>
+                                            <div class="fw-semibold">{{ ucfirst($pegawai->user->role ?? '-') }}</div>
                                         </div>
                                         <div class="col-12">
                                             <div class="small text-muted mb-1">Status User</div>
-                                            <div class="fw-semibold">{{ $pegawai->user->status ?? '-' }}</div>
+                                            <div class="fw-semibold">
+                                                @if($pegawai->approval_status == 'approved')
+                                                    <span class="small"><i class="bi bi-patch-check-fill text-success me-1"></i>Approved</span>
+                                                @elseif($pegawai->approval_status == 'rejected')
+                                                    <span class="small"><i class="bi bi-patch-exclamation-fill text-danger me-1"></i>Rejected</span>
+                                                @else
+                                                    <span class="small"><i class="bi bi-patch-question-fill text-warning me-1"></i>Pending</span>
+                                                @endif
+                                            </div>
                                         </div>
                                         <div class="col-12">
                                             <div class="small text-muted mb-1">Tanggal Akun Dibuat</div>
@@ -345,16 +357,10 @@
             </div>
         </div>
         <div class="sticky-bottom bg-white border border-light-subtle py-3 mt-4">
-            <div class="d-flex justify-content-between align-items-center">
-                 @if(request()->is('superadmin/*'))
-                    <a href="{{ route('superadmin.datakepegawaian.approval') }}" class="btn btn-outline-secondary ml-4">
-                        <i class="bi bi-arrow-left me-1"></i> Kembali
-                    </a>
-                @else
-                    <a href="{{ route('tu.datakepegawaian.index') }}" class="btn btn-outline-secondary ml-4">
-                        <i class="bi bi-arrow-left me-1"></i> Kembali
-                    </a>
-                @endif
+            <div class="d-flex justify-content-between align-items-center">                
+                <a href="{{ route('tu.datakepegawaian.index') }}" class="btn btn-outline-secondary rounded-3 ml-4">
+                    <i class="bi bi-chevron-left me-1"></i> Kembali
+                </a>              
             </div>
         </div>
 

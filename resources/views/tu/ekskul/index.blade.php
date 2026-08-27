@@ -15,24 +15,10 @@
                     <p class="mb-0 opacity-75">Kelola kegiatan ekstrakurikuler sekolah</p>
                 </div>
                 <div class="badge bg-white text-primary px-3 py-2 fs-6">
-                    <i class="bi bi-shield-check me-2"></i> Sistem Terhubung
+                    <i class="bi bi-shield-check me-2"></i> Sinergi-MJ
                 </div>
             </div>
         </div>
-    </div>
-    <div class="d-flex justify-content-end align-items-center mb-4">
-
-        <a
-            href="{{ route('tu.ekskul.create') }}"
-            class="btn btn-primary"
-        >
-
-            <i class="bi bi-plus-lg me-1"></i>
-
-            Tambah Ekskul
-
-        </a>
-
     </div>
 
     {{-- ALERT --}}
@@ -46,22 +32,23 @@
         subtitle="Seluruh kegiatan ekstrakurikuler."
     >
         <x-slot:badge>
-            <span class="badge bg-primary rounded-pill px-3 py-2">
-                {{ $ekskuls->count() }} Ekskul
+            <span class="badge bg-primary rounded-pill px-2 py-1">
+                {{ $ekskuls->count() }} <span class="text-badge">Ekskul</span>
             </span>
         </x-slot:badge>
 
-        <x-slot:actions>
-            <div class="d-flex flex-column align-items-end gap-2">
-                <input
-                    type="text"
-                    id="searchInput"
-                    class="form-control rounded-3"
-                    placeholder="Cari ekskul..."
-                    style="width: 320px;"
-                >
-            </div>
-
+        <x-slot:actions>   
+            <input
+                type="text"
+                id="searchInput"
+                class="form-control table-search"
+                placeholder="Cari ekskul..."                
+            >     
+            <x-button.add
+                :href="route('tu.ekskul.create')"
+                label="Tambah Ekskul"
+            />                      
+            
         </x-slot:actions>
 
         <div class="table-responsive">
@@ -70,7 +57,7 @@
                     <tr>
                         <th width="70">No</th>
                         <th>Nama Ekskul</th>
-                        <th width="400">Pembina</th>
+                        <th width="450">Pembina</th>
                         <th width="150">Jadwal</th>
                         <th width="150">Kuota</th>
                         <th width="150">Status</th>
@@ -82,17 +69,16 @@
                 <tbody id="tableEkskul">
                     @forelse($ekskuls as $i => $e)
                         <tr>
-                            <td class="text-center">
-                                <span class="badge bg-light text-dark rounded-pill px-3 py-2">
+                            <td>
+                                <span class="badge bg-light text-dark rounded-circle">
                                     {{ $loop->iteration }}
                                 </span>
                             </td>
                             <td>
-                                <div class="d-flex align-items-center">
-                                    <div class="ekskul-icon me-3"><i class="bi bi-trophy-fill"></i></div>
-
+                                <div class="d-flex align-items-center">   
+                                                                
                                     <div>
-                                        <div class="fw-bold">
+                                        <div class="fw-semibold">
                                             {{ $e->nama }}
                                         </div>
 
@@ -103,10 +89,17 @@
                                 </div>
                             </td>
                             <td>
-                                <div class="fw-semibold">
-                                    {{ $e->guru->pegawai->nama ?? '-' }}
-                                </div>
-                                <small class="text-muted">Pembina</small>
+                                <div class="d-flex align-items-center">
+                                    <div class="rounded-circle bg-primary-subtle text-primary d-flex align-items-center justify-content-center me-3" style="width: 48px; height: 48px;">
+                                        <i class="bi bi-person-fill fs-4"></i>
+                                    </div>    
+                                    <div>
+                                        <div class="fw-semibold">
+                                            {{ $e->guru->pegawai->nama ?? '-' }}
+                                        </div>
+                                        <small class="text-muted">Pembina</small>
+                                    </div>
+                                </div
                             </td>
                             <td>
                                 <div class="d-flex align-items-center">
@@ -130,50 +123,40 @@
                             </td>
                             <td>
                                 @if($e->status == 'aktif')
-                                    <span class="badge bg-success rounded-pill px-3 py-2">
-                                        <i class="bi bi-check-circle me-1"></i> Aktif
+                                    <span class="badge-status aktif">
+                                        <i class="bi bi-circle-fill me-2"></i> Aktif
                                     </span>
                                 @else
-                                    <span class="badge bg-danger rounded-pill px-3 py-2">
-                                        <i class="bi bi-x-circle me-1"></i> Nonaktif
+                                    <span class="badge-status nonaktif">
+                                        <i class="bi bi-circle-fill me-2"></i> Nonaktif
                                     </span>
                                 @endif
                             </td>
                             <td>
-                                <div class="dropdown">
-                                    <button class="btn btn-sm btn-outline-primary"
-                                            type="button"
-                                            data-bs-toggle="dropdown"
-                                            aria-expanded="false">
-                                        <i class="bi bi-gear-fill"></i>
-                                        <i class="bi bi-caret-down-fill"></i>
-                                    </button>
-                                    <ul class="dropdown-menu dropdown-menu-end shadow-sm border-0">
-                                        <li>
-                                            <a class="dropdown-item" href="{{ route('tu.ekskul.edit', $e->id) }}">
-                                                <i class="bi bi-pencil-square me-2"></i> Edit
-                                            </a>
-                                        </li>
-                                        <li><hr class="dropdown-divider"></li>
-                                        <li>
-                                            <form action="{{ route('tu.ekskul.destroy', $e->id) }}"
-                                                method="POST"
-                                                
-                                                @csrf
-                                                @method('DELETE')
-                                                <button type="submit" class="dropdown-item text-danger
-                                                text-danger
-                                                btn-confirm"
-                                                data-title="HAPUS EKSKUL INI?"
-                                                data-message="Ekskul ini akan dihapus dari sistem ini."
-                                                data-button="btn-danger">
-                                
-                                                    <i class="bi bi-trash me-2"></i> Hapus
-                                                </button>
-                                            </form>
-                                        </li>
-                                    </ul>
-                                </div>
+                                <x-table.actions>                                
+                                    <li>
+                                        <a class="dropdown-item" href="{{ route('tu.ekskul.edit', $e->id) }}">
+                                            <i class="bi bi-pencil-square me-2"></i> Edit
+                                        </a>
+                                    </li>
+                                    <li><hr class="dropdown-divider"></li>
+                                    <li>
+                                        <form action="{{ route('tu.ekskul.destroy', $e->id) }}"
+                                            method="POST">
+                                            
+                                            @csrf
+                                            @method('DELETE')
+                                            <button type="submit" class="dropdown-item text-danger
+                                            text-danger
+                                            btn-confirm"
+                                            data-title="HAPUS EKSKUL INI?"
+                                            data-message="Ekskul ini akan dihapus dari sistem ini."
+                                            data-button="btn-danger">                                
+                                                <i class="bi bi-trash me-2"></i> Hapus
+                                            </button>
+                                        </form>
+                                    </li>                                
+                                </x-table.actions>  
                             </td>
                         </tr>
                     @empty

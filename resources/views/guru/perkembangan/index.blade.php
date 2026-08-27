@@ -5,89 +5,49 @@
 @section('content')
 
 @php
-
     $totalSiswa = $penempatan->count();
 
-    $lengkap = $penempatan->where('status_perkembangan','Lengkap')->count();
+    $lengkap = $penempatan
+        ->where('status_perkembangan', 'Lengkap')
+        ->count();
 
-    $belumLengkap = $penempatan->where('status_perkembangan','Belum Lengkap')->count();
+    $belumLengkap = $penempatan
+        ->where('status_perkembangan', 'Belum Lengkap')
+        ->count();
 
-    $belumAda = $penempatan->where('status_perkembangan',null)->count();
-
+    $belumAda = $penempatan
+        ->where('status_perkembangan', null)
+        ->count();
 @endphp
 
-<div class="container-fluid py-4">
+<div class="container-fluid">
 
-    {{-- HERO --}}
+    {{-- HEADER --}}
     <div class="card border-0 shadow-sm rounded-4 overflow-hidden mb-4">
 
-        <div class="card-body p-4 p-lg-5 text-white"
-             style="background:linear-gradient(135deg,#0f4c81 0%,#2563eb 100%);">
+        <div
+            class="card-body p-4 p-lg-5 text-white"
+            style="background:linear-gradient(135deg,#0f4c81 0%,#2563eb 100%);"
+        >
 
-            <div class="row align-items-center">
+            <div class="d-flex flex-column flex-lg-row justify-content-between align-items-lg-center gap-3">
 
-                <div class="col-lg-8">
+                <div>
 
-                    <h2 class="fw-bold mb-2">
-
+                    <h3 class="fw-bold mb-2">
                         Perkembangan Siswa
-
-                    </h2>
+                    </h3>
 
                     <p class="mb-0 opacity-75">
-
-                        Kelola perkembangan karakter, sosial, disiplin, kebersihan, dan catatan umum setiap siswa.
-
+                        Kelola perkembangan karakter, sosial, disiplin, kebersihan,
+                        dan catatan umum setiap siswa.
                     </p>
 
                 </div>
 
-                <div class="col-lg-4 mt-4 mt-lg-0">
-
-                    <div class="row g-3">
-
-                        <div class="col-6">
-
-                            <div class="bg-white rounded-4 text-center p-3">
-
-                                <h4 class="fw-bold text-primary mb-1">
-
-                                    {{ $totalSiswa }}
-
-                                </h4>
-
-                                <small class="text-muted">
-
-                                    Siswa
-
-                                </small>
-
-                            </div>
-
-                        </div>
-
-                        <div class="col-6">
-
-                            <div class="bg-white rounded-4 text-center p-3">
-
-                                <h4 class="fw-bold text-success mb-1">
-
-                                    {{ $lengkap }}
-
-                                </h4>
-
-                                <small class="text-muted">
-
-                                    Lengkap
-
-                                </small>
-
-                            </div>
-
-                        </div>
-
-                    </div>
-
+                <div class="badge bg-white text-primary px-3 py-2 fs-6">
+                    <i class="bi bi-shield-check me-2"></i>
+                    Sinergi-MJ
                 </div>
 
             </div>
@@ -97,113 +57,24 @@
     </div>
 
     {{-- ALERT --}}
-    @if(session('success'))
+    <x-alert.flash key="success" type="success"/>
+    <x-alert.flash key="error" type="danger"/>
 
-        <div class="alert alert-success border-0 shadow-sm rounded-4">
-
-            <i class="bi bi-check-circle-fill me-2"></i>
-
-            {{ session('success') }}
-
-        </div>
-
-    @endif
-
-    @if(session('error'))
-
-        <div class="alert alert-danger border-0 shadow-sm rounded-4">
-
-            <i class="bi bi-exclamation-triangle-fill me-2"></i>
-
-            {{ session('error') }}
-
-        </div>
-
-    @endif
-
-    {{-- SUMMARY --}}
-    <div class="row g-3 mb-4">
-
-        <div class="col-lg-4">
-
-            <div class="summary-card">
-
-                <div class="summary-icon bg-success-subtle text-success">
-
-                    <i class="bi bi-check-circle-fill"></i>
-
-                </div>
-
-                <h3>{{ $lengkap }}</h3>
-
-                <small class="text-muted">
-
-                    Lengkap
-
-                </small>
-
-            </div>
-
-        </div>
-
-        <div class="col-lg-4">
-
-            <div class="summary-card">
-
-                <div class="summary-icon bg-warning-subtle text-warning">
-
-                    <i class="bi bi-pencil-square"></i>
-
-                </div>
-
-                <h3>{{ $belumLengkap }}</h3>
-
-                <small class="text-muted">
-
-                    Belum Lengkap
-
-                </small>
-
-            </div>
-
-        </div>
-
-        <div class="col-lg-4">
-
-            <div class="summary-card">
-
-                <div class="summary-icon bg-secondary-subtle text-secondary">
-
-                    <i class="bi bi-dash-circle-fill"></i>
-
-                </div>
-
-                <h3>{{ $belumAda }}</h3>
-
-                <small class="text-muted">
-
-                    Belum Ada
-
-                </small>
-
-            </div>
-
-        </div>
-
-    </div>
 
     {{-- FILTER --}}
     @if(isset($kelasPengampu) && $kelasPengampu->count())
 
         <div class="card border-0 shadow-sm rounded-4 mb-4">
 
-            <div class="card-header bg-white border-0 py-3">
+            <div class="card-header bg-white border-0 pt-4 px-4">
 
-                <h5 class="fw-bold mb-0">
-
+                <h5 class="fw-bold mb-1">
                     Filter Kelas
-
                 </h5>
+
+                <small class="text-muted">
+                    Pilih kelas untuk melihat perkembangan siswa.
+                </small>
 
             </div>
 
@@ -213,17 +84,17 @@
 
                     <select
                         name="kelas_id"
-                        class="form-select rounded-3"
-                        onchange="this.form.submit()">
+                        class="form-control"
+                        onchange="this.form.submit()"
+                    >
 
                         @foreach($kelasPengampu as $item)
 
                             <option
                                 value="{{ $item->kelas_id }}"
-                                {{ request('kelas_id',$kelas->id)==$item->kelas_id ? 'selected' : '' }}>
-
+                                {{ request('kelas_id', $kelas->id) == $item->kelas_id ? 'selected' : '' }}
+                            >
                                 {{ $item->kelas->nama_kelas_label }}
-
                             </option>
 
                         @endforeach
@@ -239,281 +110,282 @@
     @endif
 
     {{-- TABLE --}}
-    <div class="card border-0 shadow-sm rounded-4">
+    <x-table.card
+        title="Daftar Perkembangan Siswa"
+        subtitle="Klik tombol Isi / Edit untuk memperbarui perkembangan siswa."
+    >
 
-        <div class="card-header bg-white border-0 py-3">
+        <x-slot:badge>
 
-            <div class="d-flex justify-content-between align-items-center">
+            <span class="badge bg-primary rounded-pill px-2 py-1">
 
-                <div>
+                {{ $totalSiswa }}
 
-                    <h5 class="fw-bold mb-1">
-
-                        Daftar Perkembangan Siswa
-
-                    </h5>
-
-                    <small class="text-muted">
-
-                        Klik tombol <strong>Isi / Edit</strong> untuk memperbarui perkembangan siswa.
-
-                    </small>
-
-                </div>
-
-                <span class="badge bg-primary rounded-pill px-3 py-2">
-
-                    {{ $totalSiswa }} Siswa
-
+                <span class="text-badge">
+                    Siswa
                 </span>
 
-            </div>
+            </span>
 
-        </div>
+        </x-slot:badge>
 
-        <div class="card-body p-0">
+        <div class="table-responsive">
 
-            <div class="table-responsive">
+            <table class="table table-hover align-middle mb-0">
 
-                <table class="table table-hover align-middle mb-0">
+                <thead>
 
-                    <thead>
+                    <tr>
+
+                        <th width="70">
+                            No
+                        </th>
+
+                        <th>
+                            Nama Siswa
+                        </th>
+
+                        <th width="200">
+                            Status
+                        </th>
+
+                        <th width="170">
+                            Aksi
+                        </th>
+
+                    </tr>
+
+                </thead>
+
+                <tbody>
+
+                    @forelse($penempatan as $i => $p)
 
                         <tr>
 
-                            <th width="70">No</th>
+                            {{-- NO --}}
+                            <td>
 
-                            <th>Nama Siswa</th>
+                                <span class="badge bg-light text-dark rounded-circle">
+                                    {{ $i + 1 }}
+                                </span>
 
-                            <th width="200">Status</th>
+                            </td>
 
-                            <th width="170" class="text-center">
+                            {{-- SISWA --}}
+                            <td>
 
-                                Aksi
+                                <div class="d-flex align-items-center">
 
-                            </th>
+                                    <div
+                                        class="rounded-circle bg-primary-subtle text-primary d-flex align-items-center justify-content-center me-3"
+                                        style="width:48px;height:48px;"
+                                    >
+
+                                        <i class="bi bi-person-fill fs-4"></i>
+
+                                    </div>
+
+                                    <div>
+
+                                        <div class="fw-semibold">
+                                            {{ $p->siswa->nama }}
+                                        </div>
+
+                                        <small class="text-muted">
+                                            NIS : {{ $p->siswa->nis }}
+                                        </small>
+
+                                    </div>
+
+                                </div>
+
+                            </td>
+
+                            {{-- STATUS --}}
+                            <td>
+
+                                @if($p->status_perkembangan == 'Lengkap')
+
+                                    <span class="badge-status aktif">
+                                        <i class="bi bi-check-circle-fill me-2"></i>
+                                        Lengkap
+                                    </span>
+
+                                @elseif($p->status_perkembangan == 'Belum Lengkap')
+
+                                    <span class="badge-status pending">
+                                        <i class="bi bi-pencil-square me-2"></i>
+                                        Belum Lengkap
+                                    </span>
+
+                                @else
+
+                                    <span class="badge-status draft">
+                                        <i class="bi bi-dash-circle-fill me-2"></i>
+                                        Belum Ada
+                                    </span>
+
+                                @endif
+
+                            </td>
+
+                            {{-- AKSI --}}
+                            <td>
+
+                                <button
+                                    type="button"
+                                    class="btn btn-primary btn-sm rounded-pill px-3 py-0"
+                                    data-bs-toggle="modal"
+                                    data-bs-target="#modal-{{ $p->siswa->id }}"
+                                >                                    
+                                    Isi / Edit <i class="bi bi-pencil-square ms-1"></i>
+
+                                </button>
+
+                            </td>
 
                         </tr>
 
-                    </thead>
+                        {{-- MODAL --}}
+                        <div
+                            class="modal fade"
+                            id="modal-{{ $p->siswa->id }}"
+                            tabindex="-1"
+                        >
 
-                    <tbody>
+                            <div class="modal-dialog modal-xl modal-dialog-scrollable">
 
-    @forelse($penempatan as $i => $p)
+                                <div class="modal-content border-0 rounded-4">
 
-        <tr>
+                                    <form
+                                        action="{{ route('guru.perkembangan.store') }}"
+                                        method="POST"
+                                    >
 
-            <td>
+                                        @csrf
 
-                <span class="badge bg-light text-dark rounded-pill px-3 py-2">
+                                        <div class="modal-header bg-light text-white border-0">
 
-                    {{ $i + 1 }}
+                                            <div>
 
-                </span>
+                                                <h5 class="text-label fw-bold">
+                                                    {{ $p->siswa->nama }}
+                                                </h5>
 
-            </td>
+                                                <small class="text-label opacity-75">
+                                                    Form Perkembangan Siswa
+                                                </small>
 
-            <td>
+                                            </div>
 
-                <div class="d-flex align-items-center">
+                                            <button
+                                                type="button"
+                                                class="btn-close text-label"
+                                                data-bs-dismiss="modal"
+                                            ></button>
 
-                    <div class="student-avatar me-3">
+                                        </div>
 
-                        {{ strtoupper(substr($p->siswa->nama,0,1)) }}
+                                        <div class="modal-body">
 
-                    </div>
+                                            <div class="row g-4">
 
-                    <div>
+                                                <div class="col-md-6">
 
-                        <div class="fw-bold">
+                                                    <label class="form-label fw-semibold">
+                                                        Karakter
+                                                    </label>
 
-                            {{ $p->siswa->nama }}
+                                                    <textarea
+                                                        name="perkembangan[{{ $p->siswa->id }}][karakter]"
+                                                        class="form-control"
+                                                        rows="4"
+                                                    >{{ $p->perkembangan->karakter ?? '' }}</textarea>
 
-                        </div>
+                                                </div>
 
-                        <small class="text-muted">
+                                                <div class="col-md-6">
 
-                            {{ $p->siswa->nis }}
+                                                    <label class="form-label fw-semibold">
+                                                        Sosial
+                                                    </label>
 
-                        </small>
+                                                    <textarea
+                                                        name="perkembangan[{{ $p->siswa->id }}][sosial]"
+                                                        class="form-control"
+                                                        rows="4"
+                                                    >{{ $p->perkembangan->sosial ?? '' }}</textarea>
 
-                    </div>
+                                                </div>
 
-                </div>
+                                                <div class="col-md-6">
 
-            </td>
+                                                    <label class="form-label fw-semibold">
+                                                        Disiplin
+                                                    </label>
 
-            <td>
+                                                    <textarea
+                                                        name="perkembangan[{{ $p->siswa->id }}][disiplin]"
+                                                        class="form-control"
+                                                        rows="4"
+                                                    >{{ $p->perkembangan->disiplin ?? '' }}</textarea>
 
-                @if($p->status_perkembangan == 'Lengkap')
+                                                </div>
 
-                    <span class="badge bg-success rounded-pill px-3 py-2">
+                                                <div class="col-md-6">
 
-                        <i class="bi bi-check-circle-fill me-1"></i>
+                                                    <label class="form-label fw-semibold">
+                                                        Kebersihan
+                                                    </label>
 
-                        Lengkap
+                                                    <textarea
+                                                        name="perkembangan[{{ $p->siswa->id }}][kebersihan]"
+                                                        class="form-control"
+                                                        rows="4"
+                                                    >{{ $p->perkembangan->kebersihan ?? '' }}</textarea>
 
-                    </span>
+                                                </div>
 
-                @elseif($p->status_perkembangan == 'Belum Lengkap')
+                                                <div class="col-12">
 
-                    <span class="badge bg-warning text-dark rounded-pill px-3 py-2">
+                                                    <label class="form-label fw-semibold">
+                                                        Catatan Umum
+                                                    </label>
 
-                        <i class="bi bi-pencil-square me-1"></i>
+                                                    <textarea
+                                                        name="perkembangan[{{ $p->siswa->id }}][catatan]"
+                                                        class="form-control"
+                                                        rows="5"
+                                                    >{{ $p->perkembangan->catatan ?? '' }}</textarea>
 
-                        Belum Lengkap
+                                                </div>
 
-                    </span>
+                                            </div>
 
-                @else
+                                        </div>
 
-                    <span class="badge bg-secondary rounded-pill px-3 py-2">
+                                        <div class="modal-footer border-0">
 
-                        <i class="bi bi-dash-circle-fill me-1"></i>
+                                            <button
+                                                type="button"
+                                                class="btn btn-light rounded-3"
+                                                data-bs-dismiss="modal"
+                                            >
+                                                Tutup
+                                            </button>
 
-                        Belum Ada
+                                            <button
+                                                type="submit"
+                                                class="btn btn-success rounded-3"
+                                            >                                                
+                                                Simpan <i class="bi bi-save ms-1"></i>
 
-                    </span>
+                                            </button>                                        
 
-                @endif
+                                        </div>
 
-            </td>
-
-            <td class="text-center">
-
-                <button
-                    class="btn btn-primary btn-sm rounded-pill px-3"
-                    data-bs-toggle="modal"
-                    data-bs-target="#modal-{{ $p->siswa->id }}">
-
-                    <i class="bi bi-pencil-square me-1"></i>
-
-                    Isi / Edit
-
-                </button>
-
-            </td>
-
-        </tr>
-
-        {{-- MODAL --}}
-        <div
-            class="modal fade"
-            id="modal-{{ $p->siswa->id }}"
-            tabindex="-1">
-
-            <div class="modal-dialog modal-xl modal-dialog-scrollable">
-
-                <div class="modal-content border-0 rounded-4">
-
-                    <form
-                        action="{{ route('guru.perkembangan.store') }}"
-                        method="POST">
-
-                        @csrf
-
-                        <div class="modal-header bg-primary text-white border-0">
-
-                            <div>
-
-                                <h5 class="modal-title fw-bold">
-
-                                    {{ $p->siswa->nama }}
-
-                                </h5>
-
-                                <small class="opacity-75">
-
-                                    Form Perkembangan Siswa
-
-                                </small>
-
-                            </div>
-
-                            <button
-                                type="button"
-                                class="btn-close btn-close-white"
-                                data-bs-dismiss="modal">
-                            </button>
-
-                        </div>
-
-                        <div class="modal-body">
-
-                            <div class="row g-4">
-
-                                <div class="col-md-6">
-
-                                    <label class="form-label fw-semibold">
-
-                                        Karakter
-
-                                    </label>
-
-                                    <textarea
-                                        name="perkembangan[{{ $p->siswa->id }}][karakter]"
-                                        class="form-control rounded-3"
-                                        rows="4">{{ $p->perkembangan->karakter ?? '' }}</textarea>
-
-                                </div>
-
-                                <div class="col-md-6">
-
-                                    <label class="form-label fw-semibold">
-
-                                        Sosial
-
-                                    </label>
-
-                                    <textarea
-                                        name="perkembangan[{{ $p->siswa->id }}][sosial]"
-                                        class="form-control rounded-3"
-                                        rows="4">{{ $p->perkembangan->sosial ?? '' }}</textarea>
-
-                                </div>
-
-                                <div class="col-md-6">
-
-                                    <label class="form-label fw-semibold">
-
-                                        Disiplin
-
-                                    </label>
-
-                                    <textarea
-                                        name="perkembangan[{{ $p->siswa->id }}][disiplin]"
-                                        class="form-control rounded-3"
-                                        rows="4">{{ $p->perkembangan->disiplin ?? '' }}</textarea>
-
-                                </div>
-
-                                <div class="col-md-6">
-
-                                    <label class="form-label fw-semibold">
-
-                                        Kebersihan
-
-                                    </label>
-
-                                    <textarea
-                                        name="perkembangan[{{ $p->siswa->id }}][kebersihan]"
-                                        class="form-control rounded-3"
-                                        rows="4">{{ $p->perkembangan->kebersihan ?? '' }}</textarea>
-
-                                </div>
-
-                                <div class="col-12">
-
-                                    <label class="form-label fw-semibold">
-
-                                        Catatan Umum
-
-                                    </label>
-
-                                    <textarea
-                                        name="perkembangan[{{ $p->siswa->id }}][catatan]"
-                                        class="form-control rounded-3"
-                                        rows="5">{{ $p->perkembangan->catatan ?? '' }}</textarea>
+                                    </form>
 
                                 </div>
 
@@ -521,224 +393,46 @@
 
                         </div>
 
-                        <div class="modal-footer border-0">
+                    @empty
 
-                            <button
-                                type="button"
-                                class="btn btn-light rounded-pill px-4"
-                                data-bs-dismiss="modal">
+                        <tr>
 
-                                Tutup
+                            <td colspan="4" class="text-center py-5">
 
-                            </button>
+                                <div class="d-flex flex-column align-items-center">
 
-                            <button
-                                class="btn btn-success rounded-pill px-4">
+                                    <i class="bi bi-people display-4 text-secondary"></i>
 
-                                <i class="bi bi-check-circle-fill me-2"></i>
+                                    <h5 class="fw-bold mt-3">
+                                        Belum Ada Data Siswa
+                                    </h5>
 
-                                Simpan Perkembangan
+                                    <p class="text-muted mb-0">
+                                        Tidak ada data siswa yang dapat ditampilkan.
+                                    </p>
 
-                            </button>
+                                </div>
 
-                        </div>
+                            </td>
 
-                    </form>
+                        </tr>
 
-                </div>
+                    @endforelse
 
-            </div>
+                </tbody>
+
+            </table>
 
         </div>
 
-    @empty
-
-        <tr>
-
-            <td colspan="4">
-
-                <div class="text-center py-5">
-
-                    <i class="bi bi-people display-3 text-secondary"></i>
-
-                    <h5 class="fw-bold mt-3">
-
-                        Belum Ada Data Siswa
-
-                    </h5>
-
-                    <p class="text-muted mb-0">
-
-                        Tidak ada data siswa yang dapat ditampilkan.
-
-                    </p>
-
-                </div>
-
-            </td>
-
-        </tr>
-
-    @endforelse
-
-</tbody>
-
-</table>
-
-</div>
-
-</div>
+    </x-table.card>
 
 </div>
 
 <style>
 
-.card{
-
-    transition:.25s;
-
-}
-
-.card:hover{
-
-    box-shadow:0 18px 45px rgba(37,99,235,.08)!important;
-
-}
-
-.summary-card{
-
-    background:#fff;
-
-    border-radius:20px;
-
-    padding:24px;
-
-    text-align:center;
-
-    box-shadow:0 .125rem .5rem rgba(0,0,0,.05);
-
-    transition:.25s;
-
-    height:100%;
-
-}
-
-.summary-card:hover{
-
-    transform:translateY(-4px);
-
-}
-
-.summary-icon{
-
-    width:60px;
-
-    height:60px;
-
-    border-radius:18px;
-
-    display:flex;
-
-    align-items:center;
-
-    justify-content:center;
-
-    margin:0 auto 16px;
-
-    font-size:1.35rem;
-
-}
-
-.student-avatar{
-
-    width:46px;
-
-    height:46px;
-
-    border-radius:50%;
-
-    background:linear-gradient(135deg,#2563eb,#0f4c81);
-
-    color:#fff;
-
-    display:flex;
-
-    align-items:center;
-
-    justify-content:center;
-
-    font-weight:700;
-
-    flex-shrink:0;
-
-}
-
-.table thead th{
-
-    background:#f8fafc;
-
-    border:0;
-
-    color:#64748b;
-
-    font-size:.82rem;
-
-    text-transform:uppercase;
-
-    letter-spacing:.5px;
-
-    padding:18px;
-
-}
-
-.table tbody td{
-
-    padding:18px;
-
-    border-color:#eef2f7;
-
-    vertical-align:middle;
-
-}
-
-.table-hover tbody tr:hover{
-
-    background:#f8fbff;
-
-}
-
-.modal-content{
-
-    overflow:hidden;
-
-}
-
-.form-control{
-
-    border-radius:14px;
-
-}
-
-.form-control:focus{
-
-    border-color:#2563eb;
-
-    box-shadow:0 0 0 .2rem rgba(37,99,235,.15);
-
-}
-
-.btn{
-
-    font-weight:600;
-
-    transition:.2s;
-
-}
-
-.btn:hover{
-
-    transform:translateY(-2px);
-
+.modal-content {
+    overflow: hidden;
 }
 
 </style>

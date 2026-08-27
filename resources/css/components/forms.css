@@ -1,0 +1,138 @@
+/* =========================================================
+   FORM COMPONENTS
+   Sinergi-MJ
+========================================================= */
+
+
+/* =========================================================
+   FORM LABEL
+========================================================= */
+
+.form-label {
+    color: #64748b;
+    font-size: .83rem;
+    font-weight: 700;
+    margin-bottom: 7px;
+}
+
+
+/* =========================================================
+   FORM CONTROL
+========================================================= */
+
+.form-control.form-control,
+.form-select.form-select {
+    height: 50px;
+
+    border: 1px solid #dbe4ee;
+    border-radius: 14px;
+
+    background-color: #fff;
+    color: #1e293b;
+
+    font-size: .94rem;
+
+    box-shadow: none;
+
+    transition:
+        border-color .15s ease,
+        box-shadow .15s ease,
+        background-color .15s ease;
+}
+
+
+/* =========================================================
+   INPUT HOVER
+========================================================= */
+
+.form-control:hover,
+.form-select:hover {
+    border-color: #b7c7da;
+}
+
+
+/* =========================================================
+   INPUT FOCUS
+========================================================= */
+
+.form-control.form-control:focus,
+.form-select.form-select:focus {
+    border-color: #2563eb;
+
+    box-shadow:
+        0 0 0 .18rem rgba(37, 99, 235, .09);
+
+    outline: none;
+}
+
+
+/* =========================================================
+   PLACEHOLDER
+========================================================= */
+
+.form-control::placeholder {
+    color: #94a3b8;
+    opacity: 1;
+}
+
+
+/* =========================================================
+   TEXTAREA
+========================================================= */
+
+textarea.form-control {
+    height: auto;
+    min-height: 150px;
+
+    padding-top: 14px;
+
+    resize: vertical;
+}
+
+
+/* =========================================================
+   SELECT
+========================================================= */
+
+.form-select.form-select {
+    height: 50px;
+
+    border: 1px solid #dbe4ee;
+    border-radius: 14px;
+
+    background-color: #fff;
+    color: #1e293b;
+
+    font-size: .94rem;
+
+    box-shadow: none;
+
+    transition:
+        border-color .15s ease,
+        box-shadow .15s ease,
+        background-color .15s ease;
+}
+
+
+/* =========================================================
+   SELECT HOVER
+========================================================= */
+
+.form-select:hover {
+    border-color: #b7c7da;
+}
+
+
+
+/* =========================================================
+   DISABLED
+========================================================= */
+
+.form-control:disabled,
+.form-select:disabled {
+    background-color: #f8fafc;
+    border-color: #e2e8f0;
+    color: #94a3b8;
+
+    cursor: not-allowed;
+}

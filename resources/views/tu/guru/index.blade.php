@@ -15,7 +15,7 @@
                     <p class="mb-0 opacity-75">Kelola data guru dan wali kelas sekolah</p>
                 </div>
                 <div class="badge bg-white text-primary px-3 py-2 fs-6">
-                    <i class="bi bi-shield-check me-2"></i> Sistem Terhubung
+                    <i class="bi bi-shield-check me-2"></i> Sinergi-MJ
                 </div>
             </div>
         </div>
@@ -27,23 +27,20 @@
         subtitle="Daftar seluruh guru pada SDN Mekar Jaya"
     >
         <x-slot:badge>
-            <span class="badge bg-primary rounded-pill px-3 py-2">
-                {{ $gurus->count() }} Guru
+            <span class="badge bg-primary rounded-pill px-2 py-1">
+                {{ $gurus->count() }} <span class="text-badge">Guru</span>
             </span>
         </x-slot:badge>
 
-        <x-slot:actions>
-            <div class="d-flex flex-column align-items-end gap-2">
-                <input
-                    type="text"
-                    id="searchInput"
-                    class="form-control rounded-3"
-                    placeholder="Cari guru..."
-                    style="width: 320px;"
-                >
-            </div>
-
+        <x-slot:actions>        
+            <input
+                type="text"
+                id="searchInput"
+                class="form-control table-search"
+                placeholder="Cari guru..."                
+            >
         </x-slot:actions>
+
         <div class="table-responsive">
             <table class="table table-hover align-middle mb-0">
                 <thead>
@@ -59,8 +56,8 @@
                 <tbody id="tableGuru">
                     @forelse($gurus as $guru)
                         <tr>
-                            <td class="text-center">
-                                <span class="badge bg-light text-dark rounded-pill px-3 py-2">
+                            <td>
+                                <span class="badge bg-light text-dark rounded-circle">
                                     {{ $loop->iteration }}
                                 </span>
                             </td>
@@ -71,93 +68,76 @@
                                     </div>
 
                                     <div>
-                                        <div class="fw-bold">
-                                            {{ $guru->pegawai->nama }}
+                                        <div class="fw-semibold">
+                                            {{ $guru->pegawai?->nama ?? $guru->nama ?? '-' }}
                                         </div>
  
                                         <small class="text-muted">
-                                            NIP : {{ $guru->pegawai->nip ?? '-' }}
+                                            NIP : {{ $guru->pegawai?->nip ?? $guru->nip ?? '-' }}
                                         </small>
                                     </div>
                                 </div>
                             </td>
                             <td>
                                 @if($guru->waliKelas)
-                                    <span class="badge bg-gold rounded-pill px-3 py-2">
+                                    <span class="text-gold fw-semibold">
                                         Wali Kelas
                                     </span>
                                 @else
-                                    <span class="badge bg-teal rounded-pill px-3 py-2">
+                                    <span class="text-teal fw-semibold">
                                         Guru Bidang
                                     </span>
                                 @endif
                             </td>
                             <td>
-                                <div class="d-flex flex-wrap gap-1">
-                                    @if($guru->waliKelas)
-                                        @php
-                                            $mapelInti = [
-                                                'Bahasa Indonesia',
-                                                'Matematika',
-                                                'Pendidikan Pancasila',
-                                                'Ilmu Pengetahuan Alam dan Sosial',
-                                            ];
-                                        @endphp
-                                        @foreach($mapelInti as $mapel)
-                                            <span class="badge bg-light text-dark border">
-                                                {{ $mapel }}
-                                            </span>
-                                        @endforeach
-                                    @else
-                                        @php
-                                            $mapels = $guru->pengampuMapel->unique('mapel_id');
-                                        @endphp
-
-                                        @forelse($mapels as $pengampu)
-                                            <span class="badge bg-light text-dark border" title="{{ $pengampu->mapel->nama_mapel }}">
-                                                {{ Str::limit($pengampu->mapel->nama_mapel, 22) }}
-                                            </span>
-                                        @empty
-                                            <span class="text-muted">
-                                                Belum ada mapel
-                                            </span>
-                                        @endforelse
-                                    @endif
-                                </div>
+                                <div class="fw-semibold small mb-1">
+                                    {{ $guru->waliKelas ? 4 : $guru->pengampuMapel->filter(fn ($pengampu) => $pengampu->mapel)->unique('mapel_id')->count() }} Mapel
+                                </div>  
                             </td>
                             <td>
-                                <div class="d-flex flex-wrap gap-1">
+                                <div class="d-flex flex-wrap gap-1">                                    
+                                    {{-- Kelas Wali --}}
                                     @php
                                         $kelasWali = $guru->waliKelas?->kelas;
                                         $kelasMengajar = $guru->pengampuMapel
                                             ->pluck('kelas')
                                             ->filter()
                                             ->unique('id');
+
+                                        $semuaKelas = collect();
+                                        if ($kelasWali) {
+                                            $semuaKelas->push($kelasWali);
+                                        }
+                                        foreach ($kelasMengajar as $kelas) {
+                                            if (!$kelasWali || $kelas->id != $kelasWali->id) {
+                                                $semuaKelas->push($kelas);
+                                            }
+                                        }
+                                        $jumlahKelas = $semuaKelas->count();
                                     @endphp
-                                    {{-- Kelas Wali --}}
-                                    @if($kelasWali)
-                                        <span class="badge bg-info text-dark fw-semibold rounded-pill px-3 py-2">
-                                            {{ $kelasWali->nama_kelas_label }}
+                                    @if($jumlahKelas == 0)
+                                        <span class="badge-status selesai">
+                                            0 kelas
                                         </span>
-                                    @endif
-                                    {{-- Kelas Mengajar --}}    
-                                    @foreach($kelasMengajar as $kelas)
-                                        @if(!$kelasWali || $kelas->id != $kelasWali->id)
-                                            <span class="badge bg-info text-dark fw-semibold rounded-pill px-3 py-2">
-                                                {{ $kelas->nama_kelas_label }}
-                                            </span>
-                                        @endif
-                                    @endforeach
-                                    @if($kelasMengajar->isEmpty() && !$kelasWali)
-                                        <span class="text-muted">-</span>
+                                    @elseif($jumlahKelas >= 15)
+                                        <span class="badge-status nonaktif">
+                                            {{ $jumlahKelas }} Kelas
+                                        </span>
+                                    @elseif($jumlahKelas >= 8)
+                                        <span class="badge-status pending">
+                                            {{ $jumlahKelas }} Kelas
+                                        </span>
+                                    @else
+                                        <span class="badge-status aktif">
+                                            {{ $jumlahKelas }} Kelas
+                                        </span>
                                     @endif
                                 </div>
                             </td>
                             <td>
                                 <a href="{{ route('tu.guru.show', $guru) }}"
-                                class="btn btn-primary btn-sm rounded-pill d-inline-flex align-items-center gap-2 px-3">
-                                    <i class="bi bi-eye-fill"></i>
-                                    Detail
+                                class="btn btn-primary btn-sm rounded-pill px-3 py-0">
+                                    Detail <i class="bi bi-chevron-right ms-1"></i>
                                 </a>
                             </td>
                         </tr>

@@ -1,0 +1,141 @@
+/* ===========================
+   Modern Background Colors
+   =========================== */
+
+.text-indigo {
+    color: #4f46e5;    
+}
+
+.text-slate {
+    color: #334155;
+}
+
+.text-purple {
+    color: #7c3aed;
+}
+
+.text-pink {
+    color: #ec4899;
+}
+
+.text-orange {
+    color: #ea580c;
+}
+
+.text-teal {
+    color: #0f766e;
+}
+
+.text-emerald {
+    color: #10b981;
+}
+
+.text-cyan {
+    color: #06b6d4;
+}
+
+.text-sky {
+    color: #0ea5e9;
+}
+
+.text-violet {
+    color: #8b5cf6;
+}
+
+.text-fuchsia {
+    color: #d946ef;
+}
+
+.text-rose {
+    color: #e11d48;
+}
+
+.text-red-soft {
+    color: #ef4444;
+}
+
+.text-amber {
+    color: #f59e0b;
+}
+
+.text-lime {
+    color: #84cc16;
+}
+
+.text-green {
+    color: #22c55e;
+}
+
+.text-blue {
+    color: #2563eb;
+}
+
+.text-navy {
+    color: #1e3a8a;
+}
+
+.text-gray {
+    color: #6b7280;
+}
+
+.text-zinc {
+    color: #3f3f46;
+}
+
+.text-stone {
+    color: #57534e;
+}
+
+.text-black-soft {
+    color: #18181b;
+}
+
+.text-brown {
+    color: #8b5e3c;
+}
+
+.text-gold {
+    color: #d4af37;
+}
+
+.text-label {
+    color: #64748b;
+}
+
+/* ===========================
+   Gradient Backgrounds
+   =========================== */
+
+.text-blue-gradient {
+    color: linear-gradient(135deg, #2563eb, #1d4ed8);
+}
+
+.text-purple-gradient {
+    color: linear-gradient(135deg, #7c3aed, #5b21b6);
+
+}
+
+.text-green-gradient {
+    color: linear-gradient(135deg, #10b981, #059669);
+    color: #fff;
+}
+
+.text-orange-gradient {
+    color: linear-gradient(135deg, #f97316, #ea580c);    
+}
+
+.text-pink-gradient {
+    color: linear-gradient(135deg, #ec4899, #db2777);    
+}
+
+.text-teal-gradient {
+    color: linear-gradient(135deg, #14b8a6, #0f766e);    
+}
+
+.text-red-gradient {
+    color: linear-gradient(135deg, #ef4444, #b91c1c);   
+}
+
+.text-dark-gradient {
+    color: linear-gradient(135deg, #334155, #0f172a);  
+}

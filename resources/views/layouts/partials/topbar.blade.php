@@ -2,15 +2,25 @@
 <div class="topbar">
     <div class="d-flex align-items-center gap-2">
 
+        <button
+            id="mobileSidebarToggle"
+            class="btn btn-light d-md-none border-0 shadow-sm p-2"
+            type="button"
+            aria-label="Buka menu"
+            aria-expanded="false"
+        >
+            <i class="bi bi-list fs-5"></i>
+        </button>
+
         <img
             src="{{ asset('assets/images/logo-kolaan.png') }}"
             alt="Logo"
             width="40"
             height="40"
-            class="rounded-circle"
+            class="rounded-circle logo-image"
         >
 
-        <h3 class="mt-2">
+        <h3 class="text-primary school-name">
 
             SDN MEKAR JAYA
 
@@ -20,15 +30,14 @@
 
     <div class="topbar-right">
 
-        
-
         <div class="dropdown">
             <a
-                class="btn btn-light shadow-sm dropdown-toggle"
+                class="btn border rounded-3 p-2 dropdown-toggle text-primary d-flex align-items-center gap-2"
                 href="#"
                 data-bs-toggle="dropdown"
             >
-                {{ Auth::user()->name }}
+                <i class="bi bi-person-circle text-primary"></i>
+                <small class="mb-0 text-primary user-name">{{ Auth::user()->name }}</small>
             </a>
 
             <ul class="dropdown-menu dropdown-menu-end shadow-sm">

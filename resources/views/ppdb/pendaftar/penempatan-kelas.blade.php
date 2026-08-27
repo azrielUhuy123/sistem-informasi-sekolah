@@ -14,7 +14,7 @@
                         <p class="mb-0 opacity-75">Kelola data penempatan kelas siswa baru</p>
                     </div>
                     <div class="badge bg-white text-primary px-3 py-2 fs-6">
-                        <i class="bi bi-shield-check me-2"></i> Sistem Terhubung
+                        <i class="bi bi-shield-check me-2"></i> Sinergi-MJ
                     </div>
                 </div>
             </div>
@@ -31,22 +31,18 @@
         subtitle="Kelola data penempatan kelas siswa baru pada SDN Mekar Jaya."
     >
         <x-slot:badge>
-            <span class="badge bg-primary rounded-pill px-3 py-2">
-                {{ $data->total() }} Siswa belum ditempatkan
+            <span class="badge bg-primary rounded-pill px-2 py-1">
+                {{ $data->total() }} <span class="text-badge">Siswa belum ditempatkan</span>
             </span>
         </x-slot:badge>
 
         <x-slot:actions>
-            <div class="d-flex flex-column align-items-end gap-2">
-                <input
-                    type="text"
-                    id="searchInput"
-                    class="form-control rounded-3"
-                    placeholder="Cari Siswa..."
-                    style="width: 320px;"
-                >
-            </div>
-
+            <input
+                type="text"
+                id="searchInput"
+                class="form-control table-search"
+                placeholder="Cari Siswa..."                
+            >  
         </x-slot:actions>
 
         <div class="table-responsive">
@@ -72,12 +68,9 @@
                                     <i class="bi bi-person-fill fs-4"></i>
                                 </div>
                                 <div>
-                                    <div class="fw-bold text-lowercase">
+                                    <div class="fw-semibold">
                                         {{ $item->nama }}
-                                    </div>
-                                    <small class="text-muted">
-                                       NIS : {{ $item->siswa->nis }}
-                                    </small>
+                                    </div>                                    
                                 </div>
                             </div>                            
                         </td>                        
@@ -85,7 +78,7 @@
                             <form method="POST" action="{{ route('tu.ppdb.penempatan-kelas.simpan', $item) }}">
                                 @csrf
                                 <div class="d-flex gap-2">
-                                    <select name="kelas_id" class="form-select rounded-3" required>
+                                    <select name="kelas_id" class="form-control" required>
                                         <option value="">Pilih Kelas</option>
                                         @foreach ($kelas as $k)
                                             <option value="{{ $k->id }}">

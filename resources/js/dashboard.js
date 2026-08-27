@@ -3,6 +3,7 @@ document.addEventListener("DOMContentLoaded", () => {
     initDarkMode();
     initGlobalSearch();
     initActiveMenus();
+    initMobileSidebar();
 
 });
 
@@ -204,6 +205,61 @@ function initActiveMenus() {
         }
 
     });
+
+}
+
+/* =========================
+   MOBILE SIDEBAR
+========================= */
+function initMobileSidebar() {
+
+    const toggle = document.getElementById("mobileSidebarToggle");
+    const sidebar = document.querySelector(".sidebar");
+
+    if (!toggle || !sidebar) return;
+
+    const overlay = document.createElement("div");
+    overlay.className = "sidebar-overlay";
+    document.body.appendChild(overlay);
+
+    const closeSidebar = () => {
+        document.body.classList.remove("mobile-sidebar-open");
+        toggle.setAttribute("aria-expanded", "false");
+        toggle.setAttribute("aria-label", "Buka menu");
+    };
+
+    const openSidebar = () => {
+        document.body.classList.add("mobile-sidebar-open");
+        toggle.setAttribute("aria-expanded", "true");
+        toggle.setAttribute("aria-label", "Tutup menu");
+    };
+
+    toggle.addEventListener("click", () => {
+        const isOpen = document.body.classList.contains("mobile-sidebar-open");
+        isOpen ? closeSidebar() : openSidebar();
+    });
+
+    overlay.addEventListener("click", closeSidebar);
+
+    document.addEventListener("click", (event) => {
+        if (window.innerWidth > 768) return;
+
+        const clickedToggle = toggle.contains(event.target);
+        const clickedSidebar = sidebar.contains(event.target);
+
+        if (!clickedToggle && !clickedSidebar && document.body.classList.contains("mobile-sidebar-open")) {
+            closeSidebar();
+        }
+    });
+
+    const syncSidebarState = () => {
+        if (window.innerWidth > 768) {
+            closeSidebar();
+        }
+    };
+
+    window.addEventListener("resize", syncSidebarState);
+    syncSidebarState();
 
 }
 /* =========================

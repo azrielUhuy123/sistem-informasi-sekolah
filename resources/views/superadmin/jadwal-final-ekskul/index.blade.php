@@ -32,24 +32,8 @@
 
                 </div>
 
-                <div class="mt-4 mt-lg-0">
-
-                    <div class="bg-white rounded-4 px-4 py-3 text-center">
-
-                        <h2 class="fw-bold text-primary mb-0">
-
-                            {{ $hari->count() }}
-
-                        </h2>
-
-                        <small class="text-muted">
-
-                            Hari Aktif
-
-                        </small>
-
-                    </div>
-
+                <div class="badge bg-white text-primary px-3 py-2 fs-6">
+                    <i class="bi bi-shield-check me-2"></i> Sinergi-MJ
                 </div>
 
             </div>
@@ -65,11 +49,10 @@
 
             <div class="col-lg-4 col-md-6 mb-4">
 
-                <div class="card border-0 shadow-sm rounded-4 h-100 hari-card">
+                <div class="card border-0 shadow-sm rounded-3 h-100 hari-card">
 
                     <div
-                        class="card-header border-0 text-white fw-bold py-3"
-                        style="background:linear-gradient(135deg,#2563eb,#0f4c81);"
+                        class="card-header border-bottom text-center text-primary fw-bold py-3 bg-light"                        
                     >
 
                         <i class="bi bi-calendar-week-fill me-2"></i>
@@ -102,9 +85,9 @@
 
                                     </div>
 
-                                    <span class="badge bg-success rounded-pill">
-
-                                        Published
+                                    <span class="badge-status verifikasi">
+                                        <i class="bi bi-send-check-fill me-2"></i>
+                                        Publish
 
                                     </span>
 
@@ -180,12 +163,6 @@
 
 }
 
-.card:hover{
-
-    box-shadow:0 18px 45px rgba(37,99,235,.08)!important;
-
-}
-
 .hari-card{
 
     overflow:hidden;
@@ -193,8 +170,6 @@
 }
 
 .schedule-card{
-
-    background:linear-gradient(135deg,#f8fbff,#ffffff);
 
     border:1px solid #dbeafe;
 
@@ -206,13 +181,6 @@
 
 }
 
-.schedule-card:hover{
-
-    transform:translateY(-3px);
-
-    box-shadow:0 14px 35px rgba(37,99,235,.12);
-
-}
 
 .info-item{
 
@@ -262,11 +230,6 @@
 
 }
 
-.empty-state:hover{
-
-    background:#f8fafc;
-
-}
 
 @media(max-width:768px){
 

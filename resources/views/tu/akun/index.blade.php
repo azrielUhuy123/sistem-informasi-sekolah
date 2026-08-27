@@ -15,7 +15,7 @@
                     <p class="mb-0 opacity-75">Kelola akun pengguna sistem</p>
                 </div>
                 <div class="badge bg-white text-primary px-3 py-2 fs-6">
-                    <i class="bi bi-shield-check me-2"></i> Sistem Terhubung
+                    <i class="bi bi-shield-check me-2"></i> Sinergi-MJ
                 </div>
             </div>
         </div>
@@ -32,18 +32,17 @@
         subtitle="Seluruh pengguna sistem yang terdaftar."
     >
         <x-slot:badge>
-            <span class="badge bg-primary rounded-pill px-3 py-2">
-                {{ $data->total() }} Pengguna
+            <span class="badge bg-primary rounded-pill px-2 py-1">
+                {{ $data->total() }} <span class="text-badge">Pengguna</span>
             </span>
         </x-slot:badge>
 
         <x-slot:actions>
             <div class="d-flex flex-column align-items-center gap-2">
-                <form action="{{ route('tu.akun.index') }}" method="GET" class="d-flex align-items-center gap-2 flex-wrap">
+                <form action="{{ route('tu.akun.index') }}" method="GET" class="akun-filter-form">
                     <select
                         name="role"
-                        class="form-select rounded-3"
-                        style="width: 160px;"
+                        class="form-control akun-filter-status"                        
                     >
                         <option value="">Semua Role</option>
                         <option value="guru" @selected(request('role') == 'guru')>
@@ -55,8 +54,7 @@
                     </select>
                     <select
                         name="status"
-                        class="form-select rounded-3"
-                        style="width: 160px;"
+                        class="form-control akun-filter-status"                        
                     >
                         <option value="">Semua Status</option>
                         <option value="1" @selected(request('status') === '1')>
@@ -73,9 +71,8 @@
                 <input
                     type="text"
                     id="searchInput"
-                    class="form-control rounded-3"
-                    placeholder="Cari pengguna..."
-                    style="width: 320px;"
+                    class="form-control akun-filter-search"
+                    placeholder="Cari pengguna..."                   
                 >
             </div>
 
@@ -97,8 +94,8 @@
                 <tbody id="tablePengguna">
                     @forelse($data as $item)
                         <tr>
-                            <td class="text-center">
-                                <span class="badge bg-light text-dark rounded-pill px-3 py-2">
+                            <td>
+                                <span class="badge bg-light text-dark rounded-circle">
                                     {{ $loop->iteration }}
                                 </span>
                             </td>
@@ -109,7 +106,7 @@
                                     </div>
 
                                     <div>
-                                        <div class="fw-bold">
+                                        <div class="fw-semibold">
                                             {{ $item->name }}
                                         </div>
 
@@ -120,75 +117,64 @@
                                 </div>
                             </td>
                             <td>
-                                <span class="badge bg-light rounded-pill text-dark border px-3 py-2">
-                                    {{ strtoupper($item->role) }}
-                                </span>
+                                <x-table.role-badge :role="$item->role" />                                 
                             </td>
                             <td>
                                 @if($item->is_active)
-                                    <span class="badge bg-success rounded-pill px-3 py-2">
-                                        <i class="bi bi-check-circle me-1"></i> Aktif
+                                    <span class="badge-status aktif">
+                                        <i class="bi bi-circle-fill me-2"></i> Aktif
                                     </span>
                                 @else
-                                    <span class="badge bg-danger rounded-pill px-3 py-2">
-                                        <i class="bi bi-x-circle me-1"></i> Nonaktif
+                                    <span class="badge-status nonaktif">
+                                        <i class="bi bi-circle-fill me-2"></i> Nonaktif
                                     </span>
                                 @endif
                             </td>
                             <td>
-                                <div class="dropdown">
-                                    <button class="btn btn-sm btn-outline-primary"
-                                            type="button"
-                                            data-bs-toggle="dropdown"
-                                            aria-expanded="false">
-                                        <i class="bi bi-gear-fill"></i>
-                                        <i class="bi bi-caret-down-fill"></i>
-                                    </button>
-                                    <ul class="dropdown-menu dropdown-menu-end shadow-sm border-0">
-                                        <li>
-                                            <a class="dropdown-item" href="{{ route('tu.akun.show',$item) }}">
-                                                <i class="bi bi-eye me-2"></i> Detail
-                                            </a>
-                                        </li>
-                                        @if(in_array($item->role, ['guru', 'tu', 'siswa', 'superadmin']))
-                                            <form
-                                                method="POST"
-                                                action="{{ route('tu.akun.reset-password', $item) }}"
+                                <x-table.actions>                                
+                                      <li>
+                                        <a class="dropdown-item" href="{{ route('tu.akun.show',$item) }}">
+                                            <i class="bi bi-eye me-2"></i> Detail
+                                        </a>
+                                    </li>
+                                    @if(in_array($item->role, ['guru', 'tu', 'siswa', 'superadmin']))
+                                        <form
+                                            method="POST"
+                                            action="{{ route('tu.akun.reset-password', $item) }}"
+                                        >
+                                            @csrf
+                                            <button
+                                                type="submit"
+                                                class="dropdown-item
+                                                btn-confirm"
+                                                data-title="RESET PASSWORD AKUN INI?"
+                                                data-message="Akun ini passowrdnya akan direset kembali ke tanggal lahir."
+                                                data-button="btn-danger"
                                             >
-                                                @csrf
-                                                <button
-                                                    type="submit"
-                                                    class="dropdown-item
-                                                    btn-confirm"
-                                                    data-title="RESET PASSWORD AKUN INI?"
-                                                    data-message="Akun ini passowrdnya akan direset kembali ke tanggal lahir."
-                                                    data-button="btn-danger"
-                                                >
-                                                    <i class="bi bi-key me-2"></i>
-                                                    Reset Password
-                                                </button>
-                                            </form>
-                                        @endif
-                                        <li><hr class="dropdown-divider"></li>
-                                        <li>
-                                            <form
-                                                method="POST"
-                                                action="{{ route('tu.akun.toggle-status',$item) }}"
-                                            >
-                                                @csrf
-                                                <button type="submit" class="dropdown-item text-danger btn-confirm"
-                                                data-title="NONAKTIFKAN AKUN INI?"
-                                                data-message="Akun ini akan dinonaktifkan dari pengguna sistem ini."
-                                                data-button="btn-danger">
-                                                    <i class="bi bi-person-x me-2"></i>
-                                                    {{ $item->is_active
-                                                        ? 'Nonaktifkan'
-                                                        : 'Aktifkan' }}
-                                                </button>
-                                            </form>                                                
-                                        </li>
-                                    </ul>
-                                </div>
+                                                <i class="bi bi-key me-2"></i>
+                                                Reset Password
+                                            </button>
+                                        </form>
+                                    @endif
+                                    <li><hr class="dropdown-divider"></li>
+                                    <li>
+                                        <form
+                                            method="POST"
+                                            action="{{ route('tu.akun.toggle-status',$item) }}"
+                                        >
+                                            @csrf
+                                            <button type="submit" class="dropdown-item text-danger btn-confirm"
+                                            data-title="NONAKTIFKAN AKUN INI?"
+                                            data-message="Akun ini akan dinonaktifkan dari pengguna sistem ini."
+                                            data-button="btn-danger">
+                                                <i class="bi bi-person-x me-2"></i>
+                                                {{ $item->is_active
+                                                    ? 'Nonaktifkan'
+                                                    : 'Aktifkan' }}
+                                            </button>
+                                        </form>                                                
+                                    </li>
+                                </x-table.actions>
                             </td>
                         </tr>
                     @empty

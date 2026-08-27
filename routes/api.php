@@ -9,12 +9,3 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
     return $request->user();
 });
 
-Route::get(
-    '/gateway/berita',
-    [GatewayController::class, 'berita']
-);
-
-Route::get(
-    '/gateway/berita/{slug}',
-    [GatewayController::class, 'detailBerita']
-);

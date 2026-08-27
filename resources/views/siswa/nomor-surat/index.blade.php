@@ -58,7 +58,7 @@
         subtitle="Seluruh nomor surat yang pernah dibuat.">
 
         <x-slot:badge>
-            <span class="badge bg-primary rounded-pill px-3 py-2">{{ $totalNomor }} Nomor</span>
+            <span class="badge bg-primary rounded-pill px-2 py-1">{{ $totalNomor }} Nomor</span>
         </x-slot:badge>
 
         <x-slot:actions>
@@ -85,8 +85,8 @@
                 <tbody>
                     @forelse($nomorSurat as $row)
                     <tr>
-                        <td class="text-center">
-                            <span class="badge bg-light text-dark rounded-pill px-3 py-2">{{ $loop->iteration }}</span>
+                        <td>
+                            <span class="badge bg-light text-dark rounded-circle">{{ $loop->iteration }}</span>
                         </td>
 
                         <td>

@@ -16,7 +16,7 @@
                     <p class="mb-0 opacity-75">Kelola data nomor surat sekolah</p>
                 </div>
                 <div class="badge bg-white text-primary px-3 py-2 fs-6">
-                    <i class="bi bi-shield-check me-2"></i> Sistem Terhubung
+                    <i class="bi bi-shield-check me-2"></i> Sinergi-MJ
                 </div>
             </div>
         </div>
@@ -34,13 +34,13 @@
         subtitle="Seluruh nomor surat yang pernah dibuat.">
 
         <x-slot:badge>
-            <span class="badge bg-primary rounded-pill px-3 py-2">{{ $nomorSurat->count() }} Nomor</span>
+            <span class="badge bg-primary rounded-pill px-2 py-1">{{ $nomorSurat->count() }}<span class="text-badge"> Nomor</span></span>
         </x-slot:badge>
 
         <x-slot:actions>
            <form action="{{ route('tu.nomor-surat.generate') }}" method="POST">
                 @csrf
-                <button class="btn btn-primary rounded-pill px-4">
+                <button class="btn btn-primary rounded-3">
                     <i class="bi bi-plus-circle-fill me-2"></i>
                     Generate Nomor
                 </button>
@@ -59,35 +59,34 @@
                 </thead>
 
                 <tbody>
-                    @forelse($nomorSurat as $row)
+                    @forelse($nomorSurat as $item)
                     <tr>
-                        <td class="text-center">
-                            <span class="badge bg-light text-dark rounded-pill px-3 py-2">{{ $loop->iteration }}</span>
+                        <td>
+                            <span class="badge bg-light text-dark rounded-circle">{{ $nomorSurat->firstItem() + $loop->index }}</span>
                         </td>
 
                         <td>
-                            <div class="d-flex align-items-center">
-                                <div class="surat-icon me-3"><i class="bi bi-file-earmark-text-fill"></i></div>
+                            <div class="d-flex align-items-center">                                
                                 <div>
-                                    <div class="fw-bold">{{ $row->nomor_surat }}</div>
+                                    <div class="fw-semibold">{{ $item->nomor_surat }}</div>
                                     <small class="text-muted">Nomor Surat Resmi</small>
                                 </div>
                             </div>
                         </td>
 
                         <td>
-                            <div class="fw-semibold">{{ $row->created_at->translatedFormat('d F Y') }}</div>
-                            <small class="text-muted">{{ $row->created_at->format('H:i') }} WIB</small>
+                            <div class="fw-semibold">{{ $item->created_at->translatedFormat('d F Y') }}</div>
+                            <small class="text-muted">{{ $item->created_at->format('H:i') }} WIB</small>
                         </td>
 
                         <td>
-                            <span class="badge bg-success rounded-pill px-3 py-2">
-                                <i class="bi bi-check-circle-fill me-1"></i>
+                            <span class="badge-status aktif">
+                                <i class="bi bi-check-circle-fill me-2"></i>
                                 Digunakan
                             </span>
                         </td>
                     </tr>
-
+ 
                     @empty
                     <tr>
                         <td colspan="5">
@@ -102,72 +101,8 @@
                 </tbody>
             </table>
         </div>
+        <x-table.pagination :paginator="$nomorSurat" />
     </x-table.card>
 </div>
 
-<style>
-
-.surat-icon{
-
-    width:50px;
-
-    height:50px;
-
-    border-radius:16px;
-
-    background:linear-gradient(135deg,#2563eb,#0f4c81);
-
-    color:#fff;
-
-    display:flex;
-
-    align-items:center;
-
-    justify-content:center;
-
-    font-size:1.2rem;
-
-    flex-shrink:0;
-
-}
-
-.btn{
-
-    font-weight:600;
-
-}
-
-.btn-primary{
-
-    box-shadow:0 8px 20px rgba(37,99,235,.20);
-
-}
-
-.btn-primary:hover{
-
-    transform:translateY(-2px);
-
-}
-
-.alert{
-
-    border-radius:18px;
-
-}
-
-@media(max-width:768px){
-
-    .surat-icon{
-
-        width:42px;
-
-        height:42px;
-
-        font-size:1rem;
-
-    }
-
-}
-
-</style>
 @endsection

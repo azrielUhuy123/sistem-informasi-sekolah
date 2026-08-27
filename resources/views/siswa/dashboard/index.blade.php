@@ -283,7 +283,7 @@
 
                                     <td>
 
-                                        <span class="badge bg-primary rounded-pill px-3 py-2">
+                                        <span class="badge bg-primary rounded-pill px-2 py-1">
 
                                             {{ \Carbon\Carbon::parse($j->jam->mulai)->format('H:i') }}
 

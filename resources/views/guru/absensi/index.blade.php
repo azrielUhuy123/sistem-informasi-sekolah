@@ -4,14 +4,14 @@
 
 @section('content')
 
-@php
-
-    $totalSiswa = $penempatan->count();
-
-    $hadir = $penempatan->filter(function($p) use ($jadwal){
-
-        return optional(
-            \App\Models\AbsensiSiswa::where('jadwal_id',$jadwal?->id)
+    $totalSiswa = $penempatan->count();    
+    $hadir = $penempatan->filter(function ($p) use ($jadwal) {    
+        return optional(    
+            \App\Models\AbsensiSiswa::where('jadwal_id', $jadwal?->id)    
+                ->where('siswa_id', $p->siswa->id)    
+                ->where('tanggal', date('Y-m-d'))    
+                ->first()    
+        )->status == 'hadir';    
                 ->where('siswa_id',$p->siswa->id)
                 ->where('tanggal',date('Y-m-d'))
                 ->first()
@@ -26,73 +26,28 @@
     {{-- HERO --}}
     <div class="card border-0 shadow-sm rounded-4 overflow-hidden mb-4">
 
-        <div class="card-body p-4 p-lg-5 text-white"
-            style="background:linear-gradient(135deg,#0f4c81 0%,#2563eb 100%);">
+        <div
+            class="card-body p-4 p-lg-5 text-white"
+            style="background:linear-gradient(135deg,#0f4c81 0%,#2563eb 100%);"
+        >
 
-            <div class="row align-items-center">
+            <div class="d-flex flex-column flex-lg-row justify-content-between align-items-lg-center gap-3">
 
-                <div class="col-lg-8">
+                <div>
 
-                    <h2 class="fw-bold mb-2">
-
-                        Absensi Siswa
-
-                    </h2>
+                    <h3 class="fw-bold mb-2">
+                        Absensi Kelas
+                    </h3>
 
                     <p class="mb-0 opacity-75">
-
-                        Kelola kehadiran siswa berdasarkan jadwal pembelajaran hari ini.
-
+                        Kelola absensi harian siswa kelas
                     </p>
 
                 </div>
 
-                <div class="col-lg-4 mt-4 mt-lg-0">
-
-                    <div class="row g-3">
-
-                        <div class="col-6">
-
-                            <div class="bg-white rounded-4 text-center p-3">
-
-                                <h4 class="fw-bold text-primary mb-1">
-
-                                    {{ $jadwals->count() }}
-
-                                </h4>
-
-                                <small class="text-muted">
-
-                                    Jadwal
-
-                                </small>
-
-                            </div>
-
-                        </div>
-
-                        <div class="col-6">
-
-                            <div class="bg-white rounded-4 text-center p-3">
-
-                                <h4 class="fw-bold text-success mb-1">
-
-                                    {{ $totalSiswa }}
-
-                                </h4>
-
-                                <small class="text-muted">
-
-                                    Siswa
-
-                                </small>
-
-                            </div>
-
-                        </div>
-
-                    </div>
-
+                <div class="badge bg-white text-primary px-3 py-2 fs-6">
+                    <i class="bi bi-shield-check me-2"></i>
+                    Sinergi-MJ
                 </div>
 
             </div>
@@ -100,6 +55,7 @@
         </div>
 
     </div>
+
 
     {{-- ALERT --}}
 
@@ -156,7 +112,7 @@
 
                         <select
                             name="jadwal_id"
-                            class="form-select rounded-3"
+                            class="form-control"
                             onchange="this.form.submit()">
 
                             @forelse($jadwals as $j)
@@ -197,7 +153,7 @@
 
                         <input
                             type="date"
-                            class="form-control rounded-3"
+                            class="form-control"
                             value="{{ request('tanggal') ?? date('Y-m-d') }}"
                             disabled>
 
@@ -330,7 +286,7 @@
                         <div class="d-flex gap-2">
 
                             <select
-                                class="form-select rounded-pill"
+                                class="form-control"
                                 id="bulkAction"
                                 style="width:180px">
 
@@ -350,11 +306,9 @@
 
                             </select>
 
-                            <button class="btn btn-primary rounded-pill px-4">
+                            <button class="btn btn-success rounded-3">
 
-                                <i class="bi bi-check-circle-fill me-2"></i>
-
-                                Simpan
+                                Simpan <i class="bi bi-save ms-1"></i>
 
                             </button>
 
@@ -456,7 +410,7 @@
 
             <td>
 
-                <span class="badge bg-light text-dark rounded-pill px-3 py-2">
+                <span class="badge bg-light text-dark rounded-circle">
 
                     {{ $i+1 }}
 
@@ -467,16 +421,15 @@
             <td>
 
                 <div class="d-flex align-items-center">
-
-                    <div class="student-avatar me-3">
-
-                        {{ strtoupper(substr($p->siswa->nama,0,1)) }}
-
+                    <div
+                        class="rounded-circle bg-primary-subtle text-primary d-flex align-items-center justify-content-center me-3"
+                            style="width: 48px; height: 48px;"
+                        >
+                        <i class="bi bi-person-fill fs-4"></i>
                     </div>
-
                     <div>
 
-                        <div class="fw-bold">
+                        <div class="fw-semibold">
 
                             {{ $p->siswa->nama }}
 
@@ -709,159 +662,5 @@
     @endif
 
 </div>
-
-<style>
-
-.card{
-
-    transition:.25s;
-
-}
-
-.card:hover{
-
-    box-shadow:0 18px 45px rgba(37,99,235,.08)!important;
-
-}
-
-.summary-card{
-
-    background:#f8fafc;
-
-    border-radius:18px;
-
-    padding:18px;
-
-    text-align:center;
-
-}
-
-.summary-card h3{
-
-    font-weight:700;
-
-    margin-bottom:2px;
-
-}
-
-.info-card{
-
-    background:#fff;
-
-    border-radius:18px;
-
-    padding:20px;
-
-    box-shadow:0 .125rem .5rem rgba(0,0,0,.05);
-
-    height:100%;
-
-}
-
-.info-card small{
-
-    color:#6c757d;
-
-    display:block;
-
-    margin-bottom:6px;
-
-}
-
-.info-card h6{
-
-    margin:0;
-
-    font-weight:700;
-
-}
-
-.student-avatar{
-
-    width:46px;
-
-    height:46px;
-
-    border-radius:50%;
-
-    background:linear-gradient(135deg,#2563eb,#0f4c81);
-
-    color:#fff;
-
-    display:flex;
-
-    align-items:center;
-
-    justify-content:center;
-
-    font-weight:700;
-
-    flex-shrink:0;
-
-}
-
-.table thead th{
-
-    background:#f8fafc;
-
-    border:0;
-
-    color:#64748b;
-
-    text-transform:uppercase;
-
-    font-size:.82rem;
-
-    letter-spacing:.5px;
-
-    padding:18px;
-
-}
-
-.table tbody td{
-
-    padding:18px;
-
-    vertical-align:middle;
-
-    border-color:#eef2f7;
-
-}
-
-.table-hover tbody tr:hover{
-
-    background:#f8fbff;
-
-}
-
-.form-select:focus{
-
-    border-color:#2563eb;
-
-    box-shadow:0 0 0 .2rem rgba(37,99,235,.15);
-
-}
-
-.badge{
-
-    font-weight:600;
-
-}
-
-.btn{
-
-    font-weight:600;
-
-    transition:.2s;
-
-}
-
-.btn:hover{
-
-    transform:translateY(-2px);
-
-}
-
-</style>
 
 @endsection

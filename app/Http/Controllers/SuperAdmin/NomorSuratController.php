@@ -4,7 +4,8 @@ namespace App\Http\Controllers\SuperAdmin;
 
 use App\Http\Controllers\Controller;
 use App\Models\NomorSurat;
-use illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Http\Request;
 
 class NomorSuratController extends Controller
 {
@@ -13,14 +14,13 @@ class NomorSuratController extends Controller
     | INDEX
     |--------------------------------------------------------------------------
     */
-    public function index()
+    public function index(Request $request)
     {
-        $nomorSurat = NomorSurat::where(
-                'user_id',
-                Auth::id()
-            )
+        $nomorSurat = NomorSurat::query()
+            ->where('user_id', Auth::id())
             ->latest()
-            ->get();
+            ->paginate(5)
+            ->withQueryString();
 
         return view(
             'superadmin.nomor-surat.index',
@@ -46,7 +46,11 @@ class NomorSuratController extends Controller
 
         if ($last) {
 
-            preg_match('/421\.1\/(\d+)\//', $last->nomor_surat, $matches);
+            preg_match(
+                '/421\.1\/(\d+)\//',
+                $last->nomor_surat,
+                $matches
+            );
 
             if (isset($matches[1])) {
 

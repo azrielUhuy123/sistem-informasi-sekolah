@@ -29,7 +29,7 @@
 
             </div>
 
-            <div class="modal-body">
+            <div class="modal-body py-4">
 
                 <div class="text-center mb-4">
 
@@ -41,12 +41,10 @@
                     >
 
                     <h5 class="fw-bold mt-3 mb-1">
-                        {{ $user->name }}
+                        {{ $user->name }} <i class="bi bi-patch-check-fill text-success ms-1"></i>
                     </h5>
 
-                    <span class="badge bg-primary text-uppercase">
-                        {{ $user->role }}
-                    </span>
+                    <x-table.role-badge :role="$user->role" />                    
 
                 </div>
 
@@ -141,23 +139,12 @@
                     @php
                         $guru = $user->guru;
                     @endphp
-
-                    <div class="row g-3">
-
-                        <div class="col-6">
-                            <label class="small text-muted">NIP</label>
-                            <div class="fw-semibold">
+                    <div class="text-center">                        
+                        <div class="small text-muted">NIP :
+                            <span class="fw-semibold">
                                 {{ $guru->nip }}
-                            </div>
-                        </div>
-
-                        <div class="col-6">
-                            <label class="small text-muted">Mapel</label>
-                            <div class="fw-semibold">
-                                {{ $guru->mata_pelajaran ?? '-' }}
-                            </div>
-                        </div>
-
+                            </span>          
+                        </div>                                     
                     </div>
 
                 @endif

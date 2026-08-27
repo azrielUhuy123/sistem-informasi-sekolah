@@ -21,9 +21,9 @@
 
                                 <div>
                                     <p class="text-muted mb-2">Pendaftar</p>
-                                    <h4 class="mb-1 fw-bold text-uppercase">{{ $pendaftar->nama }}</h4>
+                                    <h4 class="mb-1 fw-bold">{{ $pendaftar->nama }}</h4>
 
-                                    <div class="d-flex flex-wrap gap-2 justify-content-center">
+                                    <div class="d-flex flex-wrap gap-2 justify-content-center mt-2">
                                         <span class="badge bg-light-subtle text-primary-emphasis border">
                                             NIK : {{ $pendaftar->nik }}
                                         </span>
@@ -33,15 +33,25 @@
                                     </div>
                                 </div>
 
-                                <div class="w-50">
+                                <div>
                                     <div class="row g-2">
                                         <div class="col-12">
                                             <div class="border rounded-3 p-2 bg-white">
                                                 <div class="small text-muted">Status Pendaftar</div>
-                                                <div class="fw-semibold">
-                                                    <span class="badge bg-success">
-                                                        {{ strtoupper($pendaftar->status) }}
-                                                    </span>
+                                                <div>
+                                                    @if($pendaftar->status == 'pending')
+                                                        <span class="badge-status pending">
+                                                           Pending
+                                                        </span>
+                                                    @elseif($pendaftar->status == 'verifikasi')
+                                                        <span class="badge-status verifikasi">                                                            
+                                                            Verifikasi
+                                                        </span>
+                                                    @elseif($pendaftar->status === 'diterima')
+                                                        <span class="badge-status aktif">                                                            
+                                                            Diterima
+                                                        </span>                                                    
+                                                    @endif
                                                 </div>
                                             </div>
                                         </div>
@@ -81,24 +91,30 @@
                                     </div>
                                     
                                     <div class="col-md-6">
-                                        <div class="small text-muted mb-1">Jenis Kelamin</div>
+                                        <div class="small text-muted mb-2">Jenis Kelamin</div>
                                         <div class="fw-semibold">
-                                            @if($pendaftar->jenis_kelamin == 'L')
-                                                <span class="badge bg-teal">Laki-laki</span>
+                                            @if($pendaftar->jenis_kelamin == 'L') 
+                                                <span class="badge bg-indigo rounded-pill px-2 py-1">
+                                                    <i class="bi bi-gender-male me-1"></i>
+                                                    Laki-Laki
+                                                </span>
                                             @else
-                                                <span class="badge bg-rose">Perempuan</span>
+                                                <span class="badge bg-rose rounded-pill px-2 py-1">
+                                                    <i class="bi bi-gender-female me-1"></i>
+                                                    Perempuan
+                                                </span>
                                             @endif
                                         </div>
-                                    </div>
-                                    <div class="col-md-12">
+                                    </div>   
+                                    <div class="col-md-8">
                                         <a
-                                            href="{{ route('tu.ppdb.pendaftar.form-verifikasi',$pendaftar) }}"
-                                            class="btn btn-primary rounded-pill px-4"
+                                        href="{{ route('tu.ppdb.pendaftar.form-verifikasi',$pendaftar) }}"
+                                        class="btn btn-primary rounded-3"
                                         >
-                                            <i class="bi bi-cloud-arrow-down me-2"></i>
-                                            Lihat Berkas
-                                        </a>
-                                    </div>
+                                            <i class="bi bi-file-earmark-text-fill me-1"></i>
+                                            Detail Berkas <span class="desc-add">{{ $pendaftar->nama }}</span>
+                                        </a>  
+                                    </div>                               
                                 </div>
                             </div>
                         </div>
@@ -223,53 +239,42 @@
                                 </div>
                             </div>
                         </div>
-                    </div>
-                    <div class="col-lg-12">
-                        @if($pendaftar->status == 'verifikasi')
-                        <hr class="my-4">
-                        <div class="d-flex gap-3 justify-content-end">
-                            <form
-                                action="{{ route('tu.ppdb.pendaftar.tolak',$pendaftar) }}"
-                                method="POST"
-                                class="d-inline"
-                            >
-                            @csrf
-                                <button
-                                class="btn btn-outline-danger rounded-pill px-10 btn-confirm"
-                                data-title="TOLAK PENDAFTAR?"
-                                data-message="Pendaftar akan dinyatakan ditolak."
-                                data-button="btn-danger"
-                                >
-                                    Tolak
-                                </button>
-                            </form>
-                            <form
-                                action="{{ route('tu.ppdb.pendaftar.terima',$pendaftar) }}"
-                                method="POST"
-                                class="d-inline"
-                            >
-                            @csrf                                                
-                                <button
-                                class="btn btn-success rounded-pill px-10 btn-confirm"
-                                data-title="TERIMA PENDAFTAR?"
-                                data-message="Pendaftar akan dinyatakan diterima."
-                                data-button="btn-primary"
-                                >
-                                    <i class="bi bi-check-circle me-2"></i> 
-                                    Terima
-                                </button>
-                            </form>
+                        
                         </div>
-                        @endif
-                    </div>
+                    </div>                    
                 </div>
             </div>
         </div>
         <div class="sticky-bottom bg-white border border-light-subtle py-3 mt-4">
             <div class="d-flex justify-content-between align-items-center">
-                <a href="{{ route('tu.ppdb.pendaftar.index') }}" class="btn btn-outline-secondary ml-4">
-                    <i class="bi bi-arrow-left me-1"></i> Kembali
+                <a href="{{ route('tu.ppdb.pendaftar.index') }}" class="btn btn-outline-secondary rounded-3 ms-4">
+                    <i class="bi bi-chevron-left me-1"></i> Kembali
                 </a>
+                @if($pendaftar->status == 'pending')
+                    <form
+                        action="{{ route('tu.ppdb.pendaftar.simpan-verifikasi', $pendaftar) }}"
+                        method="POST"
+                        class="d-inline"
+                    >
+                        @csrf
+                        <button
+                            type="submit"
+                            class="btn btn-primary rounded-3 me-4"
+                        >
+                            <i class="bi bi-search me-1"></i>
+                            Mulai Verifikasi
+                        </button>
+                    </form>     
+                @else
+                    <button 
+                        type="button" 
+                        class="btn btn-secondary rounded-3 me-4" 
+                        disabled
+                    >
+                            <i class="bi bi-search me-1"></i>
+                            Mulai Verifikasi
+                    </button>           
+                @endif
             </div>
         </div>
 

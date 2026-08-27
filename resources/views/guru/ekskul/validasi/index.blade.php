@@ -207,7 +207,7 @@
 
                 </div>
 
-                <span class="badge bg-primary rounded-pill px-3 py-2">
+                <span class="badge bg-primary rounded-pill px-2 py-1">
 
                     {{ $total }} Jadwal
 
@@ -319,7 +319,7 @@
 
             <td>
 
-                <span class="badge bg-light text-dark rounded-pill px-3 py-2">
+                <span class="badge bg-light text-dark rounded-circle">
 
                     <i class="bi bi-calendar3 me-1"></i>
 

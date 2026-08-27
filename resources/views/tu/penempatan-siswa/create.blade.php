@@ -11,36 +11,7 @@
         Assign siswa hanya bisa dilakukan saat <b>tahun aktif</b>.
     </div>
     @endif
-
-    {{-- 🔷 HEADER --}}
-    <div class="mb-4">
-        <h4 class="mb-1">Assign Siswa ke Kelas</h4>
-
-        <small class="text-muted">
-            Tahun Ajaran:
-            <strong>{{ $tahunAktif->tahun ?? '-' }}</strong>
-
-            @if($tahunAktif)
-                {!! match($tahunAktif->status) {
-                    'aktif'    => '<span class="badge bg-success ms-2">AKTIF</span>',
-                    'transisi' => '<span class="badge bg-warning text-dark ms-2">TRANSISI</span>',
-                    'selesai'  => '<span class="badge bg-secondary ms-2">SELESAI</span>',
-                } !!}
-            @endif
-        </small>
-    </div>
-
-    {{-- 🔴 ERROR --}}
-    @if ($errors->any())
-        <div class="alert alert-danger">
-            <ul class="mb-0">
-                @foreach ($errors->all() as $error)
-                    <li>{{ $error }}</li>
-                @endforeach
-            </ul>
-        </div>
-    @endif
-
+    
     {{-- 🟡 EMPTY STATE --}}
     @if($siswa->isEmpty())
         <div class="alert alert-info">
@@ -51,7 +22,13 @@
     {{-- 🔷 FORM --}}
     <div class="card shadow-sm">
         <div class="card-body">
-
+            <div class="mb-4">
+                <h4 class="text-primary fw-bold text-center mb-1">Pindahkan Siswa Ke Kelas</h4>
+                <p class="text-muted text-center">
+                    Tahun Ajaran :
+                    <strong>{{ $tahunAktif->tahun }}</strong>
+                </p>
+            </div>
             <form 
                 action="{{ route('tu.penempatan-siswa.store') }}" 
                 method="POST"
@@ -64,7 +41,7 @@
                     <label class="form-label">Siswa</label>
                     <select 
                         name="siswa_id" 
-                        class="form-select rounded-3"
+                        class="form-control"
                         required
                         {{ $tahunAktif->status !== 'aktif' ? 'disabled' : '' }}
                     >
@@ -82,11 +59,11 @@
                 </div>
 
                 {{-- Kelas --}}
-                <div class="mb-3">
+                <div class="mb-5">
                     <label class="form-label">Kelas</label>
                     <select 
                         name="kelas_id" 
-                        class="form-select rounded-3"
+                        class="form-control"
                         required
                         {{ $tahunAktif->status !== 'aktif' ? 'disabled' : '' }}
                     >
@@ -102,13 +79,13 @@
 
                 {{-- ACTION --}}
                 <div class="d-flex justify-content-between align-items-center mt-4">
-                    <a href="{{ route('tu.siswa.index') }}" class="btn btn-outline-secondary">
-                        <i class="bi bi-arrow-left me-1"></i> Kembali
+                    <a href="{{ route('tu.siswa.index') }}" class="btn btn-outline-secondary rounded-3">
+                        <i class="bi bi-chevron-left me-1"></i> Kembali
                     </a>
-                    <button type="submit" class="btn btn-primary px-4"
+                    <button type="submit" class="btn btn-primary rounded-3"
                         {{ $tahunAktif->status !== 'aktif' ? 'disabled' : '' }}
                     >
-                        <i class="bi bi-save me-1"></i> Simpan Data
+                        Simpan <i class="bi bi-save ms-1"></i>
                     </button>
                 </div>
             </form>

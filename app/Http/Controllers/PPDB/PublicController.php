@@ -9,6 +9,11 @@ use App\Models\TahunAjaran;
 use App\Models\PpdbOrangtua;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Mail;
+use Illuminate\Support\Facades\Storage;
+use App\Mail\PpdbPendaftaranMail;
+use Illuminate\Support\Facades\URL;
+
 
 class PublicController extends Controller
 {
@@ -61,6 +66,26 @@ class PublicController extends Controller
 
             'nama_ayah'         => 'required',
             'nama_ibu'          => 'required',
+
+            'email' => 'required|email|max:255',
+            'email_confirmation' => 'required|same:email',
+        ],
+        [
+            'email.required'
+                => 'Email wajib diisi.',
+
+            'email.email'
+                => 'Format email tidak valid.',
+
+            'email.max'
+                => 'Email maksimal 255 karakter.',
+
+            'email_confirmation.required'
+                => 'Konfirmasi email wajib diisi.',
+
+            'email_confirmation.same'
+                => 'Konfirmasi email tidak sama dengan email.',
+          
         ]);
 
         $pendaftar = DB::transaction(function () use ($request) {
@@ -170,6 +195,9 @@ class PublicController extends Controller
 
                 'hp_ibu'
                     => $request->hp_ibu,
+                
+                'email'
+                    => $request->email,
 
                 'tinggi_badan'
                     => $request->tinggi_badan,
@@ -257,6 +285,22 @@ class PublicController extends Controller
 
         });
 
+        $statusUrl = URL::temporarySignedRoute(
+            'ppdb.status.link',
+            now()->addDays(7),
+            [
+                'pendaftar' => $pendaftar->id,
+            ]
+        );
+
+        Mail::to($pendaftar->email)
+            ->send(
+                new PpdbPendaftaranMail(
+                    $pendaftar,
+                    $statusUrl
+                )
+            );
+
         return redirect()->route(
             'ppdb.bukti',
             $pendaftar->no_pendaftaran
@@ -276,6 +320,7 @@ class PublicController extends Controller
             compact('data')
         );
     }
+
     public function statusForm()
     {
         return view(
@@ -286,22 +331,29 @@ class PublicController extends Controller
     public function cekStatus(Request $request)
     {
         $request->validate([
-            'keyword' => 'required'
+            'keyword' => 'required|string',
         ]);
 
         $data = PpdbPendaftar::where(
-                'no_pendaftaran',
-                $request->keyword
-            )
-            ->orWhere(
-                'nik',
-                $request->keyword
-            )
-            ->first();
+            'no_pendaftaran',
+            $request->keyword
+        )->first();
+
+        if (!$data) {
+            return back()
+                ->withInput()
+                ->with(
+                    'error',
+                    'Nomor pendaftaran tidak ditemukan.'
+                );
+        }
 
         return view(
             'ppdb.public.status',
-            compact('data')
+            [
+                'data' => $data,
+                'viaLink' => false,
+            ]
         );
     }
 
@@ -378,5 +430,99 @@ class PublicController extends Controller
             'success',
             'Daftar ulang berhasil'
         );
+    }
+
+    public function statusByLink(PpdbPendaftar $pendaftar)
+    {
+        return view(
+            'ppdb.public.status',
+            [
+                'data' => $pendaftar,
+                'viaLink' => true,
+            ]
+        );
+    }
+
+    public function formPerbaikan(PpdbPendaftar $pendaftar)
+    {
+        return view(
+            'ppdb.public.perbaikan',
+            compact('pendaftar')
+        );
+    }
+
+    public function simpanPerbaikan(Request $request, PpdbPendaftar $pendaftar)
+    {
+        if (
+            $pendaftar->status !== 'pending' ||
+            empty($pendaftar->catatan_verifikasi)
+        ) {
+            abort(403, 'Pendaftaran ini tidak memerlukan perbaikan berkas.');
+        }
+
+        $request->validate([
+            'kartu_keluarga' => 'required|file|mimes:pdf,jpg,jpeg|max:2048',
+            'akta_lahir' => 'required|file|mimes:pdf,jpg,jpeg|max:2048',
+            'foto' => 'required|file|mimes:jpg,jpeg,png|max:2048',
+        ]);
+
+        $oldKartuKeluarga = $pendaftar->kartu_keluarga;
+        $oldAktaLahir = $pendaftar->akta_lahir;
+        $oldFoto = $pendaftar->foto;
+
+        $kartuKeluargaPath = $request
+            ->file('kartu_keluarga')
+            ->store('ppdb/kk', 'public');
+
+        $aktaLahirPath = $request
+            ->file('akta_lahir')
+            ->store('ppdb/akta', 'public');
+
+        $fotoPath = $request
+            ->file('foto')
+            ->store('ppdb/foto', 'public');
+
+        DB::transaction(function () use (
+            $pendaftar,
+            $kartuKeluargaPath,
+            $aktaLahirPath,
+            $fotoPath
+        ) {
+            $pendaftar->update([
+                'kartu_keluarga' => $kartuKeluargaPath,
+                'akta_lahir' => $aktaLahirPath,
+                'foto' => $fotoPath,
+                'catatan_verifikasi' => null,
+                'status' => 'pending',
+            ]);
+        });
+
+        if (
+            $oldKartuKeluarga &&
+            Storage::disk('public')->exists($oldKartuKeluarga)
+        ) {
+            Storage::disk('public')->delete($oldKartuKeluarga);
+        }
+
+        if (
+            $oldAktaLahir &&
+            Storage::disk('public')->exists($oldAktaLahir)
+        ) {
+            Storage::disk('public')->delete($oldAktaLahir);
+        }
+
+        if (
+            $oldFoto &&
+            Storage::disk('public')->exists($oldFoto)
+        ) {
+            Storage::disk('public')->delete($oldFoto);
+        }
+
+        return redirect()
+            ->route('ppdb.status')
+            ->with(
+                'success',
+                'Berkas berhasil diperbarui dan sedang menunggu pemeriksaan ulang oleh petugas PPDB.'
+            );
     }
 }

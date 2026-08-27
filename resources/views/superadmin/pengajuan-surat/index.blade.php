@@ -4,523 +4,245 @@
 
 @section('content')
 
-<div class="container-fluid py-3">
+<div class="container-fluid">
 
-    @php
-
-        $total = $pengajuan->count();
-
-        $pending = $pengajuan->where('status','pending')->count();
-
-        $valid = $pengajuan->where('status','disetujui')->count();
-
-        $ditolak = $pengajuan->where('status','ditolak')->count();
-
-    @endphp
-
-    {{-- ================= HERO ================= --}}
+    {{-- HEADER --}}
     <div class="card border-0 shadow-sm rounded-4 overflow-hidden mb-4">
-
-        <div
-            class="card-body p-4 p-lg-5 text-white"
-            style="background:linear-gradient(135deg,#0f4c81 0%,#2563eb 100%);"
-        >
-
-            <div class="row align-items-center">
-
-                <div class="col-lg-7">
-
-                    <h2 class="fw-bold mb-2">
-
-                        Validasi Pengajuan Surat
-
-                    </h2>
-
-                    <p class="mb-0 opacity-75">
-
-                        Kelola seluruh pengajuan surat dari Tata Usaha maupun Guru.
-                        Lakukan pemeriksaan dokumen sebelum proses persetujuan.
-
-                    </p>
-
-                </div>
-
-                <div class="col-lg-5 mt-4 mt-lg-0">
-
-                    <div class="row g-3">
-
-                        <div class="col-3">
-
-                            <div class="bg-white rounded-4 p-3 text-center">
-
-                                <h4 class="fw-bold text-primary mb-1">
-
-                                    {{ $total }}
-
-                                </h4>
-
-                                <small class="text-muted">
-
-                                    Total
-
-                                </small>
-
-                            </div>
-
-                        </div>
-
-                        <div class="col-3">
-
-                            <div class="bg-white rounded-4 p-3 text-center">
-
-                                <h4 class="fw-bold text-warning mb-1">
-
-                                    {{ $pending }}
-
-                                </h4>
-
-                                <small class="text-muted">
-
-                                    Pending
-
-                                </small>
-
-                            </div>
-
-                        </div>
-
-                        <div class="col-3">
-
-                            <div class="bg-white rounded-4 p-3 text-center">
-
-                                <h4 class="fw-bold text-success mb-1">
-
-                                    {{ $valid }}
-
-                                </h4>
-
-                                <small class="text-muted">
-
-                                    Valid
-
-                                </small>
-
-                            </div>
-
-                        </div>
-
-                        <div class="col-3">
-
-                            <div class="bg-white rounded-4 p-3 text-center">
-
-                                <h4 class="fw-bold text-danger mb-1">
-
-                                    {{ $ditolak }}
-
-                                </h4>
-
-                                <small class="text-muted">
-
-                                    Ditolak
-
-                                </small>
-
-                            </div>
-
-                        </div>
-
-                    </div>
-
-                </div>
-
-            </div>
-
-        </div>
-
-    </div>
-
-    {{-- ================= TABLE ================= --}}
-    <div class="card border-0 shadow-sm rounded-4">
-
-        <div class="card-header bg-white border-0 py-3">
-
-            <div class="d-flex justify-content-between align-items-center flex-wrap">
+        <div class="card-body p-4 p-lg-5 text-white" style="background: linear-gradient(135deg, #0f4c81 0%, #2563eb 100%);">
+            <div class="d-flex flex-column flex-lg-row justify-content-between align-items-lg-center gap-3">
 
                 <div>
+                    <h3 class="fw-bold mb-2">
+                        Validasi Pengajuan Surat
+                    </h3>
 
-                    <h5 class="fw-bold mb-1">
+                    <p class="mb-0 opacity-75">
+                        Kelola pengajuan surat dari Tata Usaha maupun Guru
+                        untuk proses validasi Kepala Sekolah.
+                    </p>
+                </div>
 
-                        Daftar Pengajuan Surat
-
-                    </h5>
-
-                    <small class="text-muted">
-
-                        Seluruh surat yang memerlukan proses validasi Kepala Sekolah.
-
-                    </small>
-
+                <div class="badge bg-white text-primary px-3 py-2 fs-6">
+                    <i class="bi bi-shield-check me-2"></i> Sinergi-MJ
                 </div>
 
             </div>
-
         </div>
+    </div>
 
-        <div class="card-body p-0">
+    {{-- ALERT --}}
+    <x-alert.flash key="success" type="success"/>
+    <x-alert.flash key="error" type="danger"/>
 
-            <div class="table-responsive">
+    {{-- TABLE --}}
+    <x-table.card
+        title="Daftar Pengajuan Surat"
+        subtitle="Seluruh pengajuan surat yang memerlukan proses validasi Kepala Sekolah"
+    >
 
-                <table class="table table-hover align-middle mb-0">
+        <x-slot:badge>
+            <span class="badge bg-primary rounded-pill px-2 py-1">
+                {{ $pengajuan->count() }}
+                <span class="text-badge">Pengajuan Surat</span>
+            </span>
+        </x-slot:badge>
 
-                    <thead>
+        <x-slot:actions>
+
+            <input
+                type="text"
+                id="searchInput"
+                class="form-control table-search"
+                placeholder="Cari dokumen..."
+            >
+
+        </x-slot:actions>
+
+        <div class="table-responsive">
+
+            <table class="table table-hover align-middle mb-0">
+
+                <thead>
+                    <tr>
+
+                        <th width="70">
+                            No
+                        </th>
+
+                        <th>
+                            Nama Dokumen
+                        </th>
+
+                        <th width="150">
+                            Kategori
+                        </th>
+
+                        <th width="150">
+                            Pengirim
+                        </th>
+
+                        <th width="150">
+                            Status
+                        </th>
+
+                        <th width="90">
+                            Aksi
+                        </th>
+
+                    </tr>
+                </thead>
+
+                <tbody id="tablePengajuan">
+
+                    @forelse($pengajuan as $row)
+
+                        @php
+
+                            $senderColor = strtolower($row->pengirim) == 'guru'
+                                ? 'success'
+                                : 'primary';
+
+                        @endphp
 
                         <tr>
 
-                            <th width="70" class="text-center">
+                            {{-- NOMOR --}}
+                            <td>
 
-                                No
+                                <span class="badge bg-light text-dark rounded-circle">
+                                    {{ $loop->iteration }}
+                                </span>
 
-                            </th>
+                            </td>
 
-                            <th>
+                            {{-- NAMA DOKUMEN --}}
+                            <td>
 
-                                Surat
+                                <div class="d-flex align-items-center">
 
-                            </th>
+                                    <div>
 
-                            <th>
+                                        <div class="fw-semibold">
+                                            {{ $row->nama_surat }}
+                                        </div>
 
-                                Kategori
+                                    </div>
 
-                            </th>
+                                </div>
 
-                            <th>
+                            </td>
 
-                                Pengirim
+                            {{-- KATEGORI --}}
+                            <td>
 
-                            </th>
+                                <span class="badge bg-teal rounded-pill px-3 py-2">
+                                    {{ $row->kategori_surat }}
+                                </span>
 
-                            <th>
+                            </td>
 
-                                Status
+                            {{-- PENGIRIM --}}
+                            <td>
 
-                            </th>
+                                <x-table.role-badge :role="$row->pengirim" />
 
-                            <th width="140" class="text-center">
+                            </td>
 
-                                Aksi
+                            {{-- STATUS --}}
+                            <td>
 
-                            </th>
+                                @if($row->status == 'draft')
+
+                                    <span class="badge-status pending">
+                                        <i class="bi bi-hourglass-split me-2"></i>
+                                        Validasi
+                                    </span>
+
+                                @elseif($row->status == 'disetujui')
+
+                                    <span class="badge-status aktif">
+                                        <i class="bi bi-check-circle-fill me-2"></i>
+                                        Valid
+                                    </span>
+
+                                @else
+
+                                    <span class="badge-status nonaktif">
+                                        <i class="bi bi-x-circle-fill me-2"></i>
+                                        Ditolak
+                                    </span>
+
+                                @endif
+
+                            </td>
+
+                            {{-- AKSI --}}
+                            <td>
+                                <a
+                                    class="btn btn-primary btn-sm rounded-pill px-3 py-0"
+                                    href="{{ route('superadmin.pengajuan-surat.show', $row->id) }}"
+                                >                                    
+                                    Validasi <i class="bi bi-chevron-right ms-1"></i>
+                                </a>                                                       
+                            </td>
 
                         </tr>
 
-                    </thead>
+                    @empty
 
-                    <tbody>
+                        <tr>
 
-    @forelse($pengajuan as $row)
+                            <td
+                                colspan="6"
+                                class="text-center py-4"
+                            >
+                                Belum ada pengajuan surat
+                            </td>
 
-        @php
+                        </tr>
 
-            $statusColor = match($row->status){
+                    @endforelse
 
-                'draft' => 'secondary',
+                </tbody>
 
-                'pending' => 'warning',
+            </table>
 
-                'disetujui' => 'success',
+        </div>
 
-                default => 'danger'
-
-            };
-
-            $statusIcon = match($row->status){
-
-                'draft' => 'bi-pencil-square',
-
-                'pending' => 'bi-hourglass-split',
-
-                'disetujui' => 'bi-check-circle-fill',
-
-                default => 'bi-x-circle-fill'
-
-            };
-
-            $statusLabel = match($row->status){
-
-                'draft' => 'Draft',
-
-                'pending' => 'Pending',
-
-                'disetujui' => 'Valid',
-
-                default => 'Ditolak'
-
-            };
-
-            $senderColor = strtolower($row->pengirim) == 'guru'
-                ? 'success'
-                : 'primary';
-
-        @endphp
-
-        <tr>
-
-            <td class="text-center">
-
-                <span class="badge bg-light text-dark rounded-pill px-3 py-2">
-
-                    {{ $loop->iteration }}
-
-                </span>
-
-            </td>
-
-            <td>
-
-                <div class="d-flex align-items-center">
-
-                    <div class="surat-icon me-3">
-
-                        <i class="bi bi-file-earmark-text-fill"></i>
-
-                    </div>
-
-                    <div>
-
-                        <div class="fw-bold">
-
-                            {{ $row->nama_surat }}
-
-                        </div>
-
-                        <small class="text-muted">
-
-                            Dokumen Pengajuan
-
-                        </small>
-
-                    </div>
-
-                </div>
-
-            </td>
-
-            <td>
-
-                <span class="badge bg-info-subtle text-info rounded-pill px-3 py-2">
-
-                    {{ $row->kategori_surat }}
-
-                </span>
-
-            </td>
-
-            <td>
-
-                <span class="badge bg-{{ $senderColor }} rounded-pill px-3 py-2">
-
-                    <i class="bi bi-person-fill me-1"></i>
-
-                    {{ strtoupper($row->pengirim) }}
-
-                </span>
-
-            </td>
-
-            <td>
-
-                <span class="badge bg-{{ $statusColor }} rounded-pill px-3 py-2">
-
-                    <i class="bi {{ $statusIcon }} me-1"></i>
-
-                    {{ $statusLabel }}
-
-                </span>
-
-            </td>
-
-            <td class="text-center">
-
-                <a
-                    href="{{ route('superadmin.pengajuan-surat.show',$row->id) }}"
-                    class="btn btn-primary btn-sm rounded-pill px-4"
-                >
-
-                    <i class="bi bi-eye-fill me-1"></i>
-
-                    Detail
-
-                </a>
-
-            </td>
-
-        </tr>
-
-    @empty
-
-        <tr>
-
-            <td colspan="6">
-
-                <div class="text-center py-5">
-
-                    <i class="bi bi-envelope-x display-3 text-secondary"></i>
-
-                    <h5 class="fw-bold mt-3">
-
-                        Belum Ada Pengajuan Surat
-
-                    </h5>
-
-                    <p class="text-muted mb-0">
-
-                        Belum terdapat surat yang diajukan.
-
-                    </p>
-
-                </div>
-
-            </td>
-
-        </tr>
-
-    @endforelse
-
-</tbody>
-
-</table>
+    </x-table.card>
 
 </div>
 
-</div>
+{{-- SEARCH --}}
+<script>
 
-</div>
+    const searchInput =
+        document.getElementById('searchInput');
 
-</div>
+    searchInput.addEventListener('keyup', function () {
 
-<style>
+        const keyword =
+            this.value.toLowerCase();
 
-.card{
+        const rows =
+            document.querySelectorAll(
+                '#tablePengajuan tr'
+            );
 
-    transition:.25s;
+        rows.forEach(row => {
 
-}
+            const text =
+                row.innerText.toLowerCase();
 
-.card:hover{
+            row.style.display =
+                text.includes(keyword)
+                    ? ''
+                    : 'none';
 
-    box-shadow:0 18px 45px rgba(37,99,235,.08)!important;
+        });
 
-}
+    });
 
-.table thead th{
-
-    background:#f8fafc;
-
-    color:#64748b;
-
-    text-transform:uppercase;
-
-    font-size:.82rem;
-
-    letter-spacing:.5px;
-
-    font-weight:700;
-
-    border:0;
-
-    padding:18px;
-
-}
-
-.table tbody td{
-
-    padding:18px;
-
-    vertical-align:middle;
-
-    border-color:#eef2f7;
-
-}
-
-.table-hover tbody tr{
-
-    transition:.2s;
-
-}
-
-.table-hover tbody tr:hover{
-
-    background:#f8fbff;
-
-}
-
-.surat-icon{
-
-    width:50px;
-
-    height:50px;
-
-    border-radius:16px;
-
-    background:linear-gradient(135deg,#2563eb,#0f4c81);
-
-    color:#fff;
-
-    display:flex;
-
-    align-items:center;
-
-    justify-content:center;
-
-    font-size:1.2rem;
-
-    flex-shrink:0;
-
-}
-
-.badge{
-
-    font-weight:600;
-
-    letter-spacing:.3px;
-
-}
-
-.btn{
-
-    transition:.2s;
-
-}
-
-.btn:hover{
-
-    transform:translateY(-2px);
-
-}
-
-.btn-primary{
-
-    border:none;
-
-    background:linear-gradient(135deg,#2563eb,#0f4c81);
-
-}
-
-@media(max-width:768px){
-
-    .surat-icon{
-
-        width:44px;
-
-        height:44px;
-
-        font-size:1rem;
-
-    }
-
-}
-
-</style>
+</script>
 
 @endsection

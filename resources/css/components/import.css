@@ -1,0 +1,54 @@
+.import-dropzone {
+    border: 2px dashed #dbe3ef;
+    border-radius: 14px;
+    background: #f8fafc;
+    transition: .2s ease;
+}
+
+.import-dropzone:hover {
+    border-color: #0d6efd;
+    background: #f5f9ff;
+}
+
+.import-dropzone-label {
+    min-height: 180px;
+    padding: 30px 20px;
+
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+
+    text-align: center;
+    cursor: pointer;
+}
+
+.import-icon {
+    width: 52px;
+    height: 52px;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    margin-bottom: 12px;
+
+    border-radius: 12px;
+
+    background: #e8f1ff;
+    color: #0d6efd;
+
+    font-size: 1.5rem;
+}
+
+.import-dropzone .badge {
+    font-size: .7rem;
+    font-weight: 500;
+    margin: 2px;
+}
+
+.import-file-name {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}

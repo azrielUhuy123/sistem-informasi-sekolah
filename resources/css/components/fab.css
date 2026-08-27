@@ -1,0 +1,61 @@
+/* =========================================================
+   ADD BUTTON
+   Desktop : normal button
+   Mobile  : floating action button
+========================================================= */
+
+.add-fab-mobile {
+    display: none;
+}
+
+/* =========================================================
+   MOBILE
+========================================================= */
+
+@media (max-width: 767.98px) {
+    .container-fluid {
+        padding-bottom: 80px;
+    }
+
+    .add-btn-desktop {
+        display: none !important;
+    }
+
+    .add-fab-mobile {
+        position: fixed;
+        right: 30px;
+        bottom: 50px;
+
+        z-index: 1030;
+
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 7px;
+
+        padding: 12px 17px;
+
+        background: #0d6efd;
+        color: #fff;
+
+        border-radius: 50px;
+
+        text-decoration: none;
+        font-size: 14px;
+        font-weight: 600;
+
+        box-shadow: 0 6px 18px rgba(0, 0, 0, .18);
+
+        transition:
+            transform .2s ease,
+            box-shadow .2s ease;
+    }
+
+    .add-fab-mobile i {
+        font-size: 17px;
+    }
+
+    .add-fab-mobile:active {
+        transform: scale(.96);
+    }
+}

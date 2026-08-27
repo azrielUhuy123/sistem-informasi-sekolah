@@ -1,15 +1,15 @@
-<div class="px-3 mb-3">
+<div>
 
-    <label class="small text-muted mb-2 d-block">
+    <div class="sidebar-title">
 
         Mode Aktif
 
-    </label>
+    </div>
 
-    <div class="dropdown w-100">
+    <div class="dropdown">
 
         <button
-            class="btn btn-light border w-100 text-start dropdown-toggle"
+            class="btn border w-100 text-center dropdown-toggle mb-4"
             data-bs-toggle="dropdown"
         >
 

@@ -4,8 +4,8 @@
 
 <div class="px-3 mb-3">
 
-    <div class="border rounded-3 bg-light px-3 py-2">
-
+    <div class=" border rounded-3 p-2 d-flex flex-column align-items-center justify-content-center gap-1">
+ 
         <div class="small text-muted mb-1">
             Tahun Ajaran
         </div>
@@ -19,5 +19,5 @@
         </div>
 
     </div>
-
+    
 </div>

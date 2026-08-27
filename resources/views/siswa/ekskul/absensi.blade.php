@@ -228,7 +228,7 @@
 
             </div>
 
-            <span class="badge bg-primary rounded-pill px-3 py-2">
+            <span class="badge bg-primary rounded-pill px-2 py-1">
 
                 {{ $absensi->total() }} Data
 
@@ -306,9 +306,9 @@
 
         <tr>
 
-            <td class="text-center">
+            <td>
 
-                <span class="badge bg-light text-dark rounded-pill px-3 py-2">
+                <span class="badge bg-light text-dark rounded-circle">
 
                     {{ $absensi->firstItem() + $loop->index }}
 

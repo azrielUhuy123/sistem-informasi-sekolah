@@ -14,7 +14,7 @@
                         <p class="mb-0 opacity-75">Kelola verifikasi berkas pendaftar</p>
                     </div>
                     <div class="badge bg-white text-primary px-3 py-2 fs-6">
-                        <i class="bi bi-shield-check me-2"></i> Sistem Terhubung
+                        <i class="bi bi-shield-check me-2"></i> Sinergi-MJ
                     </div>
                 </div>
             </div>
@@ -31,22 +31,18 @@
         subtitle="Memverifikasi berkas peserta didik baru pada SDN Mekar Jaya."
     >
         <x-slot:badge>
-            <span class="badge bg-primary rounded-pill px-3 py-2">
-                {{ $data->count() }} Berkas
+            <span class="badge bg-primary rounded-pill px-2 py-1">
+                {{ $data->count() }} <span class="text-badge">Berkas</span>
             </span>
         </x-slot:badge>
 
         <x-slot:actions>
-            <div class="d-flex flex-column align-items-end gap-2">
-                <input
-                    type="text"
-                    id="searchInput"
-                    class="form-control rounded-3"
-                    placeholder="Cari Pendaftar..."
-                    style="width: 320px;"
-                >
-            </div>
-
+            <input
+                type="text"
+                id="searchInput"
+                class="form-control table-search"
+                placeholder="Cari Pendaftar..."                
+            >  
         </x-slot:actions>
 
         <div class="table-responsive">
@@ -75,33 +71,53 @@
                                     <i class="bi bi-person-fill fs-4"></i>
                                 </div>
                                 <div>
-                                    <div class="fw-bold text-lowercase">
+                                    <div class="fw-semibold">
                                         {{ $item->nama }}
-                                    </div>
-                                    <small class="text-muted">
-                                        NIK : {{ $item->nik }}
-                                    </small>
+                                    </div>                                    
                                 </div>
                             </div>
                             
                         </td>
                         
                         <td>
-                            <span class="badge bg-teal rounded-pill px-3 py-2">
-                                {{ $item->jenis_kelamin }}
+                            @if($item->jenis_kelamin == 'L')                    
+                                <span class="badge bg-indigo rounded-pill px-2 py-1">
+                                    <i class="bi bi-gender-male me-1"></i>
+                                    Laki-Laki
+                                </span>
+                            @else
+                                <span class="badge bg-rose rounded-pill px-2 py-1">
+                                    <i class="bi bi-gender-female me-1"></i>
+                                    Perempuan
+                                </span>
+                            @endif
+                        </td>
+                        <td>
+                            <span class="text-muted">
+                                {{ $item->tanggal_pendaftaran }}
                             </span>
                         </td>
-                        <td>{{ $item->tanggal_pendaftaran }}</td>
                         <td>
-                           <span class="badge bg-secondary rounded-pill px-3 py-2">
-                                {{ strtoupper($item->status) }}
-                            </span>
+                            @if($item->status == 'pending')
+                                <span class="badge-status pending">
+                                    <i class="bi bi-hourglass-split me-2"></i> Pending
+                                </span>
+                            @elseif($item->status == 'verifikasi')
+                                <span class="badge-status verifikasi">
+                                    <i class="bi bi-search me-2"></i>
+                                    Verifikasi
+                                </span>
+                            @elseif($item->status === 'diterima')
+                                <span class="badge-status aktif">
+                                    <i class="bi bi-check-circle-fill me-2"></i>
+                                    Diterima
+                                </span>
+                            @endif
                         </td>
                         <td>
-                            <a href="{{ route('tu.ppdb.pendaftar.form-verifikasi',$item) }}"
-                            class="btn btn-primary btn-sm rounded-pill d-inline-flex align-items-center gap-2 px-3">
-                                <i class="bi bi-cloud-arrow-down"></i>
-                                Verifikasi
+                            <a href="{{ route('tu.ppdb.pendaftar.show', $item) }}"
+                            class="btn btn-primary btn-sm rounded-pill px-3 py-0">                                
+                                Verifikasi <i class="bi bi-chevron-right ms-2"></i>
                             </a>
                         </td>
                     </tr>

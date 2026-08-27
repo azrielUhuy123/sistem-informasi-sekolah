@@ -1,0 +1,153 @@
+/* =====================================================
+   TABLE PAGINATION
+===================================================== */
+
+.table-pagination-wrapper {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+
+    gap: 16px;
+
+    margin-top: 20px;
+    padding-top: 16px;
+
+}
+
+
+/* Information */
+
+.table-pagination-info {
+    color: #64748b;
+
+    font-size: .78rem;
+    font-weight: 500;
+
+    white-space: nowrap;
+}
+
+.table-pagination-info strong {
+    color: #334155;
+    font-weight: 600;
+}
+
+
+/* Pagination */
+
+.table-pagination {
+    display: flex;
+    align-items: center;
+
+    gap: 5px;
+}
+
+
+/* Button */
+
+.table-pagination-btn {
+    width: 34px;
+    height: 34px;
+
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+
+    border: 1px solid #e2e8f0;
+    border-radius: 8px;
+
+    background: #ffffff;
+    color: #64748b;
+
+    font-size: .78rem;
+    font-weight: 600;
+
+    text-decoration: none;
+
+    transition:
+        background-color .2s ease,
+        border-color .2s ease,
+        color .2s ease,
+        transform .15s ease;
+}
+
+
+/* Hover */
+
+.table-pagination-btn:hover:not(.disabled):not(.active) {
+    background: #f8fafc;
+    border-color: #cbd5e1;
+    color: #3f51f5;
+
+    transform: translateY(-1px);
+}
+
+
+/* Active */
+
+.table-pagination-btn.active {
+    background: #3f51f5;
+    border-color: #3f51f5;
+
+    color: #ffffff;
+
+    box-shadow: 0 3px 8px rgba(63, 81, 245, .18);
+}
+
+
+/* Disabled */
+
+.table-pagination-btn.disabled {
+    background: #f8fafc;
+    border-color: #eef2f7;
+
+    color: #cbd5e1;
+
+    cursor: not-allowed;
+}
+
+
+/* Icon */
+
+.table-pagination-btn i {
+    font-size: .75rem;
+}
+
+
+
+/* =====================================================
+   MOBILE
+===================================================== */
+
+@media (max-width: 576px) {
+
+    .table-pagination-wrapper {
+        flex-direction: column;
+        align-items: stretch;
+
+        gap: 12px;
+
+        margin-top: 16px;
+        padding-top: 14px;
+    }
+
+    .table-pagination-info {
+        text-align: center;
+
+        font-size: .75rem;
+    }
+
+    .table-pagination {
+        justify-content: center;
+
+        gap: 4px;
+    }
+
+    .table-pagination-btn {
+        width: 32px;
+        height: 32px;
+
+        border-radius: 7px;
+
+        font-size: .75rem;
+    }
+}

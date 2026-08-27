@@ -258,7 +258,7 @@
 
             <td>
 
-                <span class="badge bg-light text-dark rounded-pill px-3 py-2">
+                <span class="badge bg-light text-dark rounded-circle">
 
                     {{ $i + 1 }}
 

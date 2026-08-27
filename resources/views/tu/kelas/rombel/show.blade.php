@@ -15,7 +15,7 @@
                     <p class="mb-0 opacity-75">Angkatan {{ $rombel->kelasGrup->angkatan->tahun }}</p>
                 </div>
                 <div class="badge bg-white text-primary px-3 py-2 fs-6">
-                    <i class="bi bi-shield-check me-2"></i> Sistem Terhubung
+                    <i class="bi bi-shield-check me-2"></i> Sinergi-MJ
                 </div>
             </div>
         </div>
@@ -31,17 +31,23 @@
         subtitle="{{ $totalLaki }} Pria - {{ $totalPerempuan }} Perempuan"
     >
         <x-slot:badge>
-            <span class="badge bg-primary rounded-pill px-3 py-2">
-                {{ $totalSiswa }} Siswa
+            <span class="badge bg-primary rounded-pill px-2 py-1">
+                {{ $totalSiswa }} <span class="text-badge">Siswa</span>
             </span>
         </x-slot:badge>
 
         <x-slot:actions>
-            <a href="{{ route('tu.penempatan-siswa.create', ['kelas_id' => $rombel->id]) }}"
-            class="btn btn-primary">
-                <i class="bi bi-plus-lg me-1"></i>
-                Tambah Siswa ke Rombel
-            </a>
+            <input
+                type="text"
+                id="searchInput"
+                class="form-control table-search"
+                placeholder="Cari siswa..."                
+            >
+            <x-button.add
+                :href="route('tu.penempatan-siswa.create', ['kelas_id' => $rombel->id])"
+                label="Tambah Siswa ke Rombel"
+            />
+            
         </x-slot:actions>
         <div class="table-responsive">
             @if($siswa->count())
@@ -53,15 +59,15 @@
                             <th width="150">NISN</th>
                             <th width="150">Jenis Kelamin</th>
                             <th width="150">Tanggal Lahir</th>
-                            <th width="180">Wali</th>
+                            <th width="250">Wali</th>
                             <th width="90">Aksi</th>
                         </tr>
                     </thead>
-                    <tbody>
+                    <tbody id="tableSiswaKelas">
                         @foreach($siswa as $item)
                             <tr>
                                 <td>
-                                    <span class="badge bg-light text-dark rounded-pill px-3 py-2">
+                                    <span class="badge bg-light text-dark rounded-circle">
                                         {{ $loop->iteration }}
                                     </span>
                                 </td>
@@ -72,7 +78,7 @@
                                         </div>
 
                                         <div>
-                                            <div class="fw-bold text-lowercase">
+                                            <div class="fw-semibold">
                                                 {{ $item->siswa->nama ?? '-' }}
                                             </div>
                                             <small class="text-muted">
@@ -84,14 +90,20 @@
                                 <td>{{ $item->siswa->nisn ?? '-' }}</td>
                                 <td>
                                     @if(optional($item->siswa)->jenis_kelamin == 'L')
-                                        <span class="badge bg-teal rounded-pill px-3 py-2">Pria</span>
+                                        <span class="badge bg-indigo rounded-pill px-2 py-1">
+                                            <i class="bi bi-gender-male me-1"></i>
+                                            Laki-Laki
+                                        </span>
                                     @else
-                                        <span class="badge bg-rose rounded-pill px-3 py-2">Perempuan</span>
+                                        <span class="badge bg-rose rounded-pill px-2 py-1">
+                                            <i class="bi bi-gender-female me-1"></i>
+                                            Perempuan
+                                        </span>
                                     @endif
                                 </td>
                                 <td>
-                                    <span class="badge bg-light rounded-pill text-dark border px-3 py-2 d-flex gap-2">
-                                        <i class="bi bi-calendar"></i>
+                                    <span class="text-muted">
+                                        <i class="bi bi-calendar me-1"></i>
                                         {{ optional($item->siswa)->tanggal_lahir
                                         ? \Carbon\Carbon::parse($item->siswa->tanggal_lahir)->format('d M Y')
                                         : '-' }}
@@ -100,12 +112,12 @@
                                 <td>
                                     <div class="d-flex align-items-center">
                                         <div>
-                                            <div class="text-lowercase">
+                                            <div class="fw-semibold">
                                                 {{ $item->siswa->nama_wali ?? '-' }}
                                             </div>
                                             <div class="mt-1">
-                                                <span class="badge bg-emerald rounded-pill d-flex gap-2">
-                                                    <i class="bi bi-telephone-fill"></i>
+                                                <span class="text-muted">
+                                                    <i class="bi bi-telephone-fill me-1"></i>
                                                     {{ $item->siswa->telepon_wali ?? '-' }}
                                                 </span>
                                             </div>
@@ -113,49 +125,51 @@
                                     </div>
                                 </td>
                                 <td>
-                                    <div class="dropdown">
-                                        <button class="btn btn-sm btn-outline-primary"
-                                                type="button"
-                                                data-bs-toggle="dropdown"
-                                                aria-expanded="false">
-                                            <i class="bi bi-gear-fill"></i>
-                                            <i class="bi bi-caret-down-fill"></i>
-                                        </button>
-                                        <ul class="dropdown-menu dropdown-menu-end shadow-sm border-0">
-                                            <li>
-                                                <a class="dropdown-item" href="{{ route('tu.siswa.show', $item->siswa->id) }}">
-                                                    <i class="bi bi-eye me-2"></i> Detail
-                                                </a>
-                                            </li>
-                                            <li>
-                                                <a class="dropdown-item" href="{{ route('tu.siswa.edit', $item->siswa->id) }}">
-                                                    <i class="bi bi-pencil-square me-2"></i> Edit
-                                                </a>
-                                            </li>
-                                            <li><hr class="dropdown-divider"></li>
-                                            <li>
-                                                <form
-                                                    action="{{ route('tu.penempatan-siswa.keluarkan', $item->id) }}"
-                                                    method="POST">
+                                    <x-table.actions>
+                                        <li>
+                                            <a
+                                                class="dropdown-item"
+                                                href="{{ route('tu.siswa.show', $item->siswa->id) }}"
+                                            >
+                                                <i class="bi bi-eye"></i>
+                                                Detail
+                                            </a>
+                                        </li>
 
-                                                    @csrf
+                                        <li>
+                                            <a
+                                                class="dropdown-item"
+                                                href="{{ route('tu.siswa.edit', $item->siswa->id) }}"
+                                            >
+                                                <i class="bi bi-pencil-square"></i>
+                                                Edit
+                                            </a>
+                                        </li>
 
-                                                    <button
-                                                        type="submit"
-                                                        class="dropdown-item text-danger btn-confirm"
-                                                        data-title="KELUARKAN SISWA INI?"
-                                                        data-message="Siswa akan dikeluarkan dari rombel ini."
-                                                        data-button="btn-danger">
+                                        <li>
+                                            <hr class="dropdown-divider">
+                                        </li>
 
-                                                        <i class="bi bi-box-arrow-right me-2"></i>
-                                                        Keluarkan
+                                        <li>
+                                            <form
+                                                action="{{ route('tu.penempatan-siswa.keluarkan', $item->id) }}"
+                                                method="POST"
+                                            >
+                                                @csrf
 
-                                                    </button>
-
-                                                </form>                                            
-                                            </li>
-                                        </ul>
-                                    </div>
+                                                <button
+                                                    type="submit"
+                                                    class="dropdown-item text-danger btn-confirm"
+                                                    data-title="KELUARKAN SISWA INI?"
+                                                    data-message="Siswa akan dikeluarkan dari rombel ini."
+                                                    data-button="btn-danger"
+                                                >
+                                                    <i class="bi bi-box-arrow-right"></i>
+                                                    Keluarkan
+                                                </button>
+                                            </form>
+                                        </li>
+                                    </x-table.actions>                                    
                                 </td>
                             </tr>
                         @endforeach
@@ -166,14 +180,44 @@
                 <div class="text-muted text-center py-4">
                     Belum ada siswa di rombel ini
                 </div>
-            @endif
-            <div class="d-flex justify-content-between align-items-center mt-4">
-                <a href="{{ route('tu.kelas.rombel.index', $rombel->kelas_grup_id) }}" 
-                class="btn btn-outline-secondary rounded-pill px-4">
-                    Kembali
-                </a>    
-            </div>
+            @endif             
+        </div>
+        <div class="d-flex justify-content-between align-items-center mt-4">
+            <a href="{{ route('tu.kelas.rombel.index', $rombel->kelas_grup_id) }}" 
+            class="btn btn-outline-secondary rounded-3">
+                <i class="bi bi-chevron-left me-1"></i> Kembali
+            </a>    
         </div>
     </x-table.card>
 </div>
+{{-- SEARCH --}}
+<script>
+
+    const searchInput =
+        document.getElementById('searchInput');
+
+    searchInput.addEventListener('keyup', function () {
+
+        const keyword =
+            this.value.toLowerCase();
+
+        const rows =
+            document.querySelectorAll(
+                '#tableSiswaKelas tr'
+            );
+
+        rows.forEach(row => {
+
+            const text =
+                row.innerText.toLowerCase();
+
+            row.style.display =
+                text.includes(keyword)
+                ? ''
+                : 'none';
+
+        });
+    });
+
+</script>
 @endsection

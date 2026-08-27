@@ -13,8 +13,11 @@ use App\Models\PenempatanSiswa;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Mail;
+use Illuminate\Support\Facades\URL;
 use App\Exports\RekapPpdbExport;
 use App\Services\PpdbReportService;
+use App\Mail\PpdbPendaftaranMail;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Maatwebsite\Excel\Facades\Excel;
 
@@ -74,21 +77,6 @@ class PendaftarController extends Controller
         );
     }
 
-    public function ditolak()
-    {
-        $data = PpdbPendaftar::where(
-            'status',
-            'ditolak'
-        )
-        ->latest()
-        ->paginate(20);
-
-        return view(
-            'ppdb.pendaftar.ditolak',
-            compact('data')
-        );
-    }
-
     public function terima(PpdbPendaftar $pendaftar)
     {
         if ($pendaftar->status != 'verifikasi') {
@@ -108,20 +96,6 @@ class PendaftarController extends Controller
         );
     }
 
-
-    public function tolak(
-        PpdbPendaftar $pendaftar
-    )
-    {
-        $pendaftar->update([
-            'status' => 'ditolak'
-        ]);
-
-        return back()->with(
-            'success',
-            'Pendaftar ditolak'
-        );
-    }
     public function formVerifikasi(
         PpdbPendaftar $pendaftar
     )
@@ -158,7 +132,7 @@ class PendaftarController extends Controller
                 => 'verifikasi',
 
             'catatan_verifikasi'
-                => $request->catatan_verifikasi
+                => null
         ]);
 
         return redirect()
@@ -168,7 +142,43 @@ class PendaftarController extends Controller
             )
             ->with(
                 'success',
-                'Berkas berhasil diverifikasi'
+                'Berkas beralih ke fase verifikasi'
+            );
+    }
+
+    public function tolakBerkas(
+        Request $request,
+        PpdbPendaftar $pendaftar
+    )
+    {
+        $request->validate([
+            'catatan_verifikasi' => 'required|string'
+        ]);
+
+        $pendaftar->update([
+            'status' => 'pending',
+            'catatan_verifikasi' => $request->catatan_verifikasi
+        ]);
+
+        if (!empty($pendaftar->email)) {
+            $repairUrl = URL::temporarySignedRoute(
+                'ppdb.perbaikan.form',
+                now()->addHours(48),
+                ['pendaftar' => $pendaftar->id]
+            );
+
+            Mail::to($pendaftar->email)
+                ->send(new PpdbPendaftaranMail($pendaftar, $repairUrl));
+        }
+
+        return redirect()
+            ->route(
+                'tu.ppdb.pendaftar.show',
+                $pendaftar
+            )
+            ->with(
+                'success',
+                'Berkas ditandai untuk diperbaiki. Pendaftar dapat mengajukan ulang berkas.'
             );
     }
     private function generateNis()

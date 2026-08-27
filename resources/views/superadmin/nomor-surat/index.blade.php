@@ -4,533 +4,220 @@
 
 @section('content')
 
-<div class="container-fluid py-3">
+<div class="container-fluid">
 
-    @php
-
-        $total = $nomorSurat->count();
-
-    @endphp
-
-    {{-- ================= HERO ================= --}}
+    {{-- HEADER --}}
     <div class="card border-0 shadow-sm rounded-4 overflow-hidden mb-4">
+        <div class="card-body p-4 p-lg-5 text-white" style="background: linear-gradient(135deg, #0f4c81 0%, #2563eb 100%);">
 
-        <div class="card-body p-4 p-lg-5 text-white"
-             style="background:linear-gradient(135deg,#0f4c81 0%,#2563eb 100%);">
-
-            <div class="d-flex justify-content-between align-items-center flex-wrap">
+            <div class="d-flex flex-column flex-lg-row justify-content-between align-items-lg-center gap-3">
 
                 <div>
 
-                    <h2 class="fw-bold mb-2">
-
-                        Manajemen Nomor Surat
-
-                    </h2>
+                    <h3 class="fw-bold mb-2">
+                        Data Nomor Surat
+                    </h3>
 
                     <p class="mb-0 opacity-75">
-
-                        Kelola seluruh nomor surat resmi sekolah yang telah diterbitkan
-                        dan digunakan pada administrasi surat menyurat.
-
+                        Kelola data nomor surat sekolah
                     </p>
 
                 </div>
 
-                <div class="mt-4 mt-lg-0">
-
-                    <form action="{{ route('superadmin.nomor-surat.generate') }}"
-                          method="POST">
-
-                        @csrf
-
-                        <button
-                            type="submit"
-                            class="btn btn-light rounded-pill px-4 shadow-sm">
-
-                            <i class="bi bi-plus-circle-fill me-2"></i>
-
-                            Generate Nomor
-
-                        </button>
-
-                    </form>
-
+                <div class="badge bg-white text-primary px-3 py-2 fs-6">
+                    <i class="bi bi-shield-check me-2"></i>
+                    Sinergi-MJ
                 </div>
 
             </div>
 
         </div>
-
     </div>
 
     {{-- ALERT --}}
-    @if(session('success'))
+    <x-alert.flash key="success" type="success"/>
+    <x-alert.flash key="error" type="danger"/>
 
-        <div class="alert alert-success border-0 shadow-sm rounded-4 mb-4">
+    {{-- TABLE --}}
+    <x-table.card
+        title="Riwayat Nomor Surat"
+        subtitle="Seluruh nomor surat yang pernah dibuat."
+    >
 
-            <i class="bi bi-check-circle-fill me-2"></i>
+        <x-slot:badge>
+            <span class="badge bg-primary rounded-pill px-2 py-1">
+                {{ $nomorSurat->count() }}
+                <span class="text-badge"> Nomor</span>
+            </span>
+        </x-slot:badge>
 
-            {{ session('success') }}
+        <x-slot:actions>
 
-        </div>
+            <form
+                action="{{ route('superadmin.nomor-surat.generate') }}"
+                method="POST"
+            >
 
-    @endif
+                @csrf
 
-    {{-- ================= SUMMARY ================= --}}
-    <div class="row g-4 mb-4">
+                <button
+                    type="submit"
+                    class="btn btn-primary rounded-3"
+                >
 
-        <div class="col-md-4">
+                    <i class="bi bi-plus-circle-fill me-2"></i>
 
-            <div class="card border-0 shadow-sm rounded-4 h-100">
+                    Generate Nomor
 
-                <div class="card-body">
+                </button>
 
-                    <div class="d-flex align-items-center">
+            </form>
 
-                        <div class="summary-icon bg-primary-subtle text-primary me-3">
+        </x-slot:actions>
 
-                            <i class="bi bi-hash"></i>
+        <div class="table-responsive">
 
-                        </div>
+            <table class="table table-hover align-middle mb-0">
 
-                        <div>
+                <thead>
 
-                            <small class="text-muted">
+                    <tr>
 
-                                Total Nomor Surat
+                        <th width="70" class="text-center">
+                            No
+                        </th>
 
-                            </small>
+                        <th>
+                            Nomor Surat
+                        </th>
 
-                            <h3 class="fw-bold mb-0">
+                        <th width="220">
+                            Tanggal Dibuat
+                        </th>
 
-                                {{ $total }}
+                        <th width="170">
+                            Status
+                        </th>
 
-                            </h3>
+                    </tr>
 
-                        </div>
-
-                    </div>
-
-                </div>
-
-            </div>
-
-        </div>
-
-        <div class="col-md-4">
-
-            <div class="card border-0 shadow-sm rounded-4 h-100">
-
-                <div class="card-body">
-
-                    <div class="d-flex align-items-center">
-
-                        <div class="summary-icon bg-success-subtle text-success me-3">
-
-                            <i class="bi bi-patch-check-fill"></i>
-
-                        </div>
-
-                        <div>
-
-                            <small class="text-muted">
-
-                                Status
-
-                            </small>
-
-                            <h5 class="fw-bold mb-0">
-
-                                Seluruh Nomor Aktif
-
-                            </h5>
-
-                        </div>
-
-                    </div>
-
-                </div>
-
-            </div>
-
-        </div>
-
-        <div class="col-md-4">
-
-            <div class="card border-0 shadow-sm rounded-4 h-100">
-
-                <div class="card-body">
-
-                    <div class="d-flex align-items-center">
-
-                        <div class="summary-icon bg-warning-subtle text-warning me-3">
-
-                            <i class="bi bi-calendar-event-fill"></i>
-
-                        </div>
-
-                        <div>
-
-                            <small class="text-muted">
-
-                                Terakhir Dibuat
-
-                            </small>
-
-                            <h6 class="fw-bold mb-0">
-
-                                {{ $nomorSurat->first()?->created_at?->translatedFormat('d F Y') ?? '-' }}
-
-                            </h6>
-
-                        </div>
-
-                    </div>
-
-                </div>
-
-            </div>
-
-        </div>
-
-    </div>
-
-    {{-- ================= TABLE ================= --}}
-    <div class="card border-0 shadow-sm rounded-4">
-
-        <div class="card-header bg-white border-0 py-3">
-
-            <div class="d-flex justify-content-between align-items-center flex-wrap">
-
-                <div>
-
-                    <h5 class="fw-bold mb-1">
-
-                        Riwayat Nomor Surat
-
-                    </h5>
-
-                    <small class="text-muted">
-
-                        Daftar seluruh nomor surat yang telah dibuat oleh sistem.
-
-                    </small>
-
-                </div>
-
-            </div>
-
-        </div>
-
-        <div class="card-body p-0">
-
-            <div class="table-responsive">
-
-                <table class="table table-hover align-middle mb-0">
-
-                    <thead>
-
-                        <tr>
-
-                            <th width="70" class="text-center">
-
-                                No
-
-                            </th>
-
-                            <th>
-
-                                Nomor Surat
-
-                            </th>
-
-                            <th>
-
-                                Tanggal Dibuat
-
-                            </th>
-
-                            <th width="180">
-
-                                Status
-
-                            </th>
-
-                        </tr>
-
-                    </thead>
+                </thead>
 
                 <tbody>
 
-    @forelse($nomorSurat as $row)
+                    @forelse($nomorSurat as $item)
 
-        <tr>
+                        <tr>
 
-            <td class="text-center">
+                            {{-- NO --}}
+                            <td>
 
-                <span class="badge bg-light text-dark rounded-pill px-3 py-2">
+                                <span class="badge bg-light text-dark rounded-circle">
 
-                    {{ $loop->iteration }}
+                                    {{ $nomorSurat->firstItem() + $loop->index }}
 
-                </span>
+                                </span>
 
-            </td>
+                            </td>
 
-            <td>
+                            {{-- NOMOR SURAT --}}
+                            <td>
 
-                <div class="d-flex align-items-center">
+                                <div class="d-flex align-items-center">
 
-                    <div class="surat-icon me-3">
+                                    <div>
 
-                        <i class="bi bi-hash"></i>
+                                        <div class="fw-semibold">
 
-                    </div>
+                                            {{ $item->nomor_surat }}
 
-                    <div>
+                                        </div>
 
-                        <div class="fw-bold">
+                                        <small class="text-muted">
 
-                            {{ $row->nomor_surat }}
+                                            Nomor Surat Resmi
 
-                        </div>
+                                        </small>
 
-                        <small class="text-muted">
+                                    </div>
 
-                            Nomor Surat Resmi Sekolah
+                                </div>
 
-                        </small>
+                            </td>
 
-                    </div>
+                            {{-- TANGGAL --}}
+                            <td>
 
-                </div>
+                                <div class="fw-semibold">
 
-            </td>
+                                    {{ $item->created_at->translatedFormat('d F Y') }}
 
-            <td>
+                                </div>
 
-                <div class="fw-semibold">
+                                <small class="text-muted">
 
-                    {{ $row->created_at->translatedFormat('d F Y') }}
+                                    {{ $item->created_at->format('H:i') }} WIB
 
-                </div>
+                                </small>
 
-                <small class="text-muted">
+                            </td>
 
-                    {{ $row->created_at->format('H:i') }} WIB
+                            {{-- STATUS --}}
+                            <td>
 
-                </small>
+                                <span class="badge-status aktif">
 
-            </td>
+                                    <i class="bi bi-check-circle-fill me-2"></i>
 
-            <td>
+                                    Digunakan
 
-                <span class="badge bg-success rounded-pill px-3 py-2">
+                                </span>
 
-                    <i class="bi bi-check-circle-fill me-1"></i>
+                            </td>
 
-                    Digunakan
+                        </tr>
 
-                </span>
+                    @empty
 
-            </td>
+                        <tr>
 
-        </tr>
+                            <td colspan="4">
 
-    @empty
+                                <div class="text-center py-5">
 
-        <tr>
+                                    <i class="bi bi-file-earmark-x display-3 text-secondary"></i>
 
-            <td colspan="4">
+                                    <h5 class="fw-bold mt-3">
 
-                <div class="text-center py-5">
+                                        Belum Ada Nomor Surat
 
-                    <i class="bi bi-folder2-open display-3 text-secondary"></i>
+                                    </h5>
 
-                    <h5 class="fw-bold mt-3">
+                                    <p class="text-muted mb-0">
 
-                        Belum Ada Nomor Surat
+                                        Silakan generate nomor surat baru untuk mulai melakukan administrasi surat.
 
-                    </h5>
+                                    </p>
 
-                    <p class="text-muted mb-0">
+                                </div>
 
-                        Klik tombol <strong>Generate Nomor</strong> untuk membuat nomor surat baru.
+                            </td>
 
-                    </p>
+                        </tr>
 
-                </div>
+                    @endforelse
 
-            </td>
+                </tbody>
 
-        </tr>
+            </table>
 
-    @endforelse
+        </div>
 
-</tbody>
+        {{-- PAGINATION --}}
+        <x-table.pagination :paginator="$nomorSurat" />
 
-</table>
+    </x-table.card>
 
 </div>
-
-</div>
-
-</div>
-
-</div>
-
-<style>
-
-.card{
-
-    transition:.25s;
-
-}
-
-.card:hover{
-
-    box-shadow:0 18px 45px rgba(37,99,235,.08)!important;
-
-}
-
-.summary-icon{
-
-    width:60px;
-
-    height:60px;
-
-    border-radius:18px;
-
-    display:flex;
-
-    align-items:center;
-
-    justify-content:center;
-
-    font-size:1.35rem;
-
-    flex-shrink:0;
-
-}
-
-.surat-icon{
-
-    width:50px;
-
-    height:50px;
-
-    border-radius:16px;
-
-    background:linear-gradient(135deg,#2563eb,#0f4c81);
-
-    color:#fff;
-
-    display:flex;
-
-    align-items:center;
-
-    justify-content:center;
-
-    font-size:1.2rem;
-
-    flex-shrink:0;
-
-}
-
-.table thead th{
-
-    background:#f8fafc;
-
-    color:#64748b;
-
-    text-transform:uppercase;
-
-    font-size:.82rem;
-
-    letter-spacing:.5px;
-
-    font-weight:700;
-
-    border:0;
-
-    padding:18px;
-
-}
-
-.table tbody td{
-
-    padding:18px;
-
-    vertical-align:middle;
-
-    border-color:#eef2f7;
-
-}
-
-.table-hover tbody tr{
-
-    transition:.2s;
-
-}
-
-.table-hover tbody tr:hover{
-
-    background:#f8fbff;
-
-}
-
-.badge{
-
-    font-weight:600;
-
-    letter-spacing:.3px;
-
-}
-
-.btn{
-
-    transition:.2s;
-
-}
-
-.btn:hover{
-
-    transform:translateY(-2px);
-
-}
-
-.btn-primary{
-
-    border:none;
-
-    background:linear-gradient(135deg,#2563eb,#0f4c81);
-
-}
-
-@media(max-width:768px){
-
-    .summary-icon{
-
-        width:52px;
-
-        height:52px;
-
-        font-size:1.15rem;
-
-    }
-
-    .surat-icon{
-
-        width:44px;
-
-        height:44px;
-
-        font-size:1rem;
-
-    }
-
-}
-
-</style>
 
 @endsection

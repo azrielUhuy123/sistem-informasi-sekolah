@@ -14,7 +14,7 @@
                         <p class="mb-0 opacity-75">Kelola data pendaftar yang diterima.</p>
                     </div>
                     <div class="badge bg-white text-primary px-3 py-2 fs-6">
-                        <i class="bi bi-shield-check me-2"></i> Sistem Terhubung
+                        <i class="bi bi-shield-check me-2"></i> Sinergi-MJ
                     </div>
                 </div>
             </div>
@@ -31,22 +31,18 @@
         subtitle="Seluruh pendaftar peserta didik baru yang diterima pada SDN Mekar Jaya."
     >
         <x-slot:badge>
-            <span class="badge bg-primary rounded-pill px-3 py-2">
-                {{ $data->count() }} Pendaftar
+            <span class="badge bg-primary rounded-pill px-2 py-1">
+                {{ $data->count() }} <span class="text-badge">Pendaftar</span>
             </span>
         </x-slot:badge>
 
         <x-slot:actions>
-            <div class="d-flex flex-column align-items-end gap-2">
-                <input
-                    type="text"
-                    id="searchInput"
-                    class="form-control rounded-3"
-                    placeholder="Cari Pendaftar..."
-                    style="width: 320px;"
-                >
-            </div>
-
+            <input
+                type="text"
+                id="searchInput"
+                class="form-control table-search"
+                placeholder="Cari Pendaftar..."                    
+            >            
         </x-slot:actions>
 
         <div class="table-responsive">
@@ -56,8 +52,7 @@
                         <th width="180">No Pendaftaran</th>
                         <th>Nama</th>
                         <th width="150">Jenis Kelamin</th>
-                        <th width="250">Tanggal Pendaftaran</th>
-                        <th width="150">Alasan</th>
+                        <th width="250">Tanggal Pendaftaran</th>                        
                         <th width="130">Aksi</th>
                     </tr>
                 </thead>
@@ -75,32 +70,36 @@
                                     <i class="bi bi-person-fill fs-4"></i>
                                 </div>
                                 <div>
-                                    <div class="fw-bold text-lowercase">
+                                    <div class="fw-semibold">
                                         {{ $item->nama }}
-                                    </div>
-                                    <small class="text-muted">
-                                       NIK : {{ $item->nik }}
-                                    </small>
+                                    </div>                                   
                                 </div>
                             </div>
                             
                         </td>
                         
                         <td>
-                            <span class="badge bg-teal rounded-pill px-3 py-2">
-                                {{ $item->jenis_kelamin }}
-                            </span>
+                            @if($item->jenis_kelamin == 'L')                    
+                                <span class="badge bg-indigo rounded-pill px-2 py-1">
+                                    <i class="bi bi-gender-male me-1"></i>
+                                    Laki-Laki
+                                </span>
+                            @else
+                                <span class="badge bg-rose rounded-pill px-2 py-1">
+                                    <i class="bi bi-gender-female me-1"></i>
+                                    Perempuan
+                                </span>
+                            @endif
                         </td>
-                        <td>{{ $item->tanggal_pendaftaran }}</td>
                         <td>
-                           <span class="fw-semibold">
-                                {{ $item->catatan_verifikasi }}
+                            <span class="text-muted">
+                                {{ $item->tanggal_pendaftaran }}
                             </span>
-                        </td>
+                        </td>                        
                         <td>
                             <a href="{{ route('tu.ppdb.pendaftar.show', $item) }}"
-                            class="btn btn-primary btn-sm rounded-pill d-inline-flex align-items-center gap-2 px-3">
-                                <i class="bi bi-eye-fill"></i>
+                            class="btn btn-primary btn-sm rounded-pill px-3 py-0">
+                                <i class="bi bi-eye-fill me-2"></i>
                                 Detail
                             </a>
                         </td>

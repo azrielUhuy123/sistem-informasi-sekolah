@@ -71,7 +71,7 @@
                 </div>
 
                 <a href="{{ route('guru.pengajuan-surat.index') }}"
-                    class="btn btn-outline-secondary rounded-pill">
+                    class="btn btn-outline-secondary rounded-3 rounded-pill">
 
                     <i class="bi bi-arrow-left me-2"></i>
 
@@ -106,7 +106,7 @@
                         <input
                             type="text"
                             name="nama_surat"
-                            class="form-control rounded-3"
+                            class="form-control"
                             value="{{ old('nama_surat',$pengajuan->nama_surat) }}"
                             required>
 
@@ -123,7 +123,7 @@
                         <input
                             type="text"
                             name="kategori_surat"
-                            class="form-control rounded-3"
+                            class="form-control"
                             value="{{ old('kategori_surat',$pengajuan->kategori_surat) }}"
                             required>
 
@@ -140,7 +140,7 @@
                         <input
                             type="text"
                             name="perihal"
-                            class="form-control rounded-3"
+                            class="form-control"
                             value="{{ old('perihal',$pengajuan->perihal) }}"
                             required>
 
@@ -157,7 +157,7 @@
                         <input
                             type="text"
                             name="tujuan_surat"
-                            class="form-control rounded-3"
+                            class="form-control"
                             value="{{ old('tujuan_surat',$pengajuan->tujuan_surat) }}"
                             required>
 
@@ -224,7 +224,7 @@
                         <input
                             type="file"
                             name="file_surat"
-                            class="form-control rounded-3">
+                            class="form-control">
 
                         <small class="text-muted">
 
@@ -241,7 +241,7 @@
                         <div class="d-flex justify-content-end gap-2">
 
                             <a href="{{ route('guru.pengajuan-surat.index') }}"
-                                class="btn btn-outline-secondary rounded-pill px-4">
+                                class="btn btn-outline-secondary rounded-3 rounded-pill px-4">
 
                                 Batal
 

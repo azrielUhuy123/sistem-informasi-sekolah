@@ -110,7 +110,7 @@
 
                         <select
                             name="mapel_id"
-                            class="form-select rounded-3">
+                            class="form-control">
 
                             <option value="">
 
@@ -145,7 +145,7 @@
                         <input
                             type="month"
                             name="bulan"
-                            class="form-control rounded-3"
+                            class="form-control"
                             value="{{ $bulanInput ?? now()->format('Y-m') }}">
 
                     </div>
@@ -435,9 +435,9 @@
 
         <tr>
 
-            <td class="text-center">
+            <td>
 
-                <span class="badge bg-light text-dark rounded-pill px-3 py-2">
+                <span class="badge bg-light text-dark rounded-circle">
 
                     {{ $i+1 }}
 

@@ -4,13 +4,15 @@
 
 @section('content')
 
-    <div class="container-fluid">
+    <div class="container-fluid py-4">
 
-        <div class="d-flex justify-content-between align-items-center mb-4">
-            <div>
-                <h4 class="mb-1">Tambah Data Pegawai</h4>
-                <p class="text-muted mb-0">Form input cepat untuk pencatatan pegawai baru</p>
-            </div>
+        <div class="mb-4">
+            <h3 class="text-primary fw-bold text-center mb-1">
+                Tambah Data Pegawai
+            </h3>
+            <p class="text-muted text-center">
+                Form input cepat untuk pencatatan pegawai baru
+            </p>
         </div>
 
         @if ($errors->any())
@@ -42,32 +44,34 @@
                             <div class="row g-3">
                                 <div class="col-md-6 col-lg-4">
                                     <label class="form-label">Nama <span class="text-danger">*</span></label>
-                                    <input type="text" name="nama" class="form-control rounded-3" required>
+                                    <input type="text" name="nama" class="form-control" 
+                                    oninput="this.value = this.value.replace(/\s+/g, ' ').replace(/(^|\s)\S/g, c => c.toUpperCase())"
+                                    required>
                                 </div>
 
                                 <div class="col-md-6 col-lg-4">
                                     <label class="form-label">NIP</label>
-                                    <input type="text" name="nip" class="form-control rounded-3">
+                                    <input type="text" name="nip" class="form-control">
                                 </div>
 
                                 <div class="col-md-6 col-lg-4">
                                     <label class="form-label">NUPTK</label>
-                                    <input type="text" name="nuptk" class="form-control rounded-3">
+                                    <input type="text" name="nuptk" class="form-control">
                                 </div>
 
                                 <div class="col-md-6 col-lg-4">
                                     <label class="form-label">Tempat Lahir</label>
-                                    <input type="text" name="tempat_lahir" class="form-control rounded-3">
+                                    <input type="text" name="tempat_lahir" class="form-control">
                                 </div>
 
                                 <div class="col-md-6 col-lg-4">
                                     <label class="form-label">Tanggal Lahir <span class="text-danger">*</span></label>
-                                    <input type="date" name="tanggal_lahir" class="form-control rounded-3" required>
+                                    <input type="date" name="tanggal_lahir" class="form-control" required>
                                 </div>
 
                                 <div class="col-md-6 col-lg-4">
                                     <label class="form-label">Jenis Kelamin</label>
-                                    <select name="jenis_kelamin" class="form-select">
+                                    <select name="jenis_kelamin" class="form-control">
                                         <option value="">-- Pilih --</option>
                                         <option value="L">Laki-laki</option>
                                         <option value="P">Perempuan</option>
@@ -76,7 +80,7 @@
 
                                 <div class="col-md-6 col-lg-4">
                                     <label class="form-label">Agama</label>
-                                    <select name="agama" class="form-select">
+                                    <select name="agama" class="form-control">
                                         <option value="">-- Pilih --</option>
                                         <option value="Islam">Islam</option>
                                         <option value="Kristen">Kristen</option>
@@ -89,7 +93,7 @@
 
                                 <div class="col-md-6 col-lg-4">
                                     <label class="form-label">Status Kawin</label>
-                                    <select name="status_kawin" class="form-select">
+                                    <select name="status_kawin" class="form-control">
                                         <option value="">-- Pilih --</option>
                                         <option value="K">Kawin</option>
                                         <option value="TK">Tidak Kawin</option>
@@ -114,7 +118,7 @@
                             <div class="row g-3">
                                 <div class="col-md-6 col-lg-3">
                                     <label class="form-label">Jabatan</label>
-                                    <select name="jabatan" class="form-select">
+                                    <select name="jabatan" class="form-control">
                                         <option value="">-- Pilih --</option>
                                         <option value="Kepala Sekolah">Kepala Sekolah</option>
                                         <option value="Operator Sekolah">Operator Sekolah</option>
@@ -126,7 +130,7 @@
 
                                 <div class="col-md-6 col-lg-3">
                                     <label class="form-label">Status Kepegawaian</label>
-                                    <select name="status_kepegawaian" class="form-select">
+                                    <select name="status_kepegawaian" class="form-control">
                                         <option value="">-- Pilih --</option>
                                         <option value="PNS">PNS</option>
                                         <option value="NON_PNS">Non PNS</option>
@@ -135,12 +139,12 @@
 
                                 <div class="col-md-6 col-lg-3">
                                     <label class="form-label">Mulai Kerja</label>
-                                    <input type="date" name="mulai_kerja" class="form-control rounded-3">
+                                    <input type="date" name="mulai_kerja" class="form-control">
                                 </div>
 
                                 <div class="col-md-6 col-lg-3">
                                     <label class="form-label">Ijazah Terakhir</label>
-                                    <input type="text" name="ijazah_terakhir" class="form-control rounded-3">
+                                    <input type="text" name="ijazah_terakhir" class="form-control">
                                 </div>
                             </div>
                         </div>
@@ -165,15 +169,15 @@
                                         <div class="row g-3">
                                             <div class="col-md-6">
                                                 <label class="form-label">Pangkat/Gol</label>
-                                                <input type="text" name="sk_terakhir_pangkat" class="form-control rounded-3">
+                                                <input type="text" name="sk_terakhir_pangkat" class="form-control">
                                             </div>
                                             <div class="col-md-6">
                                                 <label class="form-label">Nomor SK</label>
-                                                <input type="text" name="sk_terakhir_no" class="form-control rounded-3">
+                                                <input type="text" name="sk_terakhir_no" class="form-control">
                                             </div>
                                             <div class="col-12">
                                                 <label class="form-label">TMT</label>
-                                                <input type="date" name="sk_terakhir_tmt" class="form-control rounded-3">
+                                                <input type="date" name="sk_terakhir_tmt" class="form-control">
                                             </div>
                                         </div>
                                     </div>
@@ -185,15 +189,15 @@
                                         <div class="row g-3">
                                             <div class="col-md-6">
                                                 <label class="form-label">Pangkat/Gol</label>
-                                                <input type="text" name="sk_berkala_pangkat" class="form-control rounded-3">
+                                                <input type="text" name="sk_berkala_pangkat" class="form-control">
                                             </div>
                                             <div class="col-md-6">
                                                 <label class="form-label">Nomor SK</label>
-                                                <input type="text" name="sk_berkala_no" class="form-control rounded-3">
+                                                <input type="text" name="sk_berkala_no" class="form-control">
                                             </div>
                                             <div class="col-12">
                                                 <label class="form-label">TMT</label>
-                                                <input type="date" name="sk_berkala_tmt" class="form-control rounded-3">
+                                                <input type="date" name="sk_berkala_tmt" class="form-control">
                                             </div>
                                         </div>
                                     </div>
@@ -222,14 +226,14 @@
                                             <div class="col-md-6">
                                                 <label class="form-label">Tahun</label>
                                                 <div class="input-group">
-                                                    <input type="number" name="masa_kerja_gol_th" class="form-control rounded-3" min="0">
+                                                    <input type="number" name="masa_kerja_gol_th" class="form-control" min="0">
                                                     <span class="input-group-text">Tahun</span>
                                                 </div>
                                             </div>
                                             <div class="col-md-6">
                                                 <label class="form-label">Bulan</label>
                                                 <div class="input-group">
-                                                    <input type="number" name="masa_kerja_gol_bln" class="form-control rounded-3" min="0" max="11">
+                                                    <input type="number" name="masa_kerja_gol_bln" class="form-control" min="0" max="11">
                                                     <span class="input-group-text">Bln</span>
                                                 </div>
                                             </div>
@@ -244,14 +248,14 @@
                                             <div class="col-md-6">
                                                 <label class="form-label">Tahun</label>
                                                 <div class="input-group">
-                                                    <input type="number" name="masa_kerja_total_th" class="form-control rounded-3" min="0">
+                                                    <input type="number" name="masa_kerja_total_th" class="form-control" min="0">
                                                     <span class="input-group-text">Tahun</span>
                                                 </div>
                                             </div>
                                             <div class="col-md-6">
                                                 <label class="form-label">Bulan</label>
                                                 <div class="input-group">
-                                                    <input type="number" name="masa_kerja_total_bln" class="form-control rounded-3" min="0" max="11">
+                                                    <input type="number" name="masa_kerja_total_bln" class="form-control" min="0" max="11">
                                                     <span class="input-group-text">Bln</span>
                                                 </div>
                                             </div>
@@ -277,11 +281,11 @@
                             <div class="row g-3">
                                 <div class="col-md-6">
                                     <label class="form-label">Nomor Sertifikasi</label>
-                                    <input type="text" name="nomor_sertifikasi" class="form-control rounded-3">
+                                    <input type="text" name="nomor_sertifikasi" class="form-control">
                                 </div>
                                 <div class="col-md-6">
                                     <label class="form-label">Tahun Sertifikasi</label>
-                                    <input type="number" name="tahun_sertifikasi" class="form-control rounded-3" min="2000">
+                                    <input type="number" name="tahun_sertifikasi" class="form-control" min="2000">
                                 </div>
                             </div>
                         </div>
@@ -304,7 +308,7 @@
                                     <label class="form-label">Gaji Pokok</label>
                                     <div class="input-group">
                                         <span class="input-group-text">Rp</span>
-                                        <input type="text" name="gaji_pokok" class="form-control rounded-3" placeholder="contoh: 4000000" inputmode="numeric">
+                                        <input type="text" name="gaji_pokok" class="form-control" placeholder="contoh: 4000000" inputmode="numeric">
                                     </div>
                                 </div>
                             </div>
@@ -325,7 +329,7 @@
 
                             <div class="mb-0">
                                 <label class="form-label">Catatan Tambahan</label>
-                                <textarea name="keterangan" class="form-control rounded-3" rows="4"></textarea>
+                                <textarea name="keterangan" class="form-control" rows="4"></textarea>
                             </div>
                         </div>
                     </div>
@@ -333,7 +337,7 @@
 
             </div>
 
-            <div class="alert alert-info mt-4">
+            <div class="alert alert-info mt-4"> 
                 <div class="fw-semibold mb-2">Info</div>
                 <ul class="mb-0 ps-3">
                     <li>Status pegawai akan menjadi Pending setelah data disimpan.</li>
@@ -345,11 +349,11 @@
 
             <div class="sticky-bottom bg-white border border-light-subtle py-3 mt-4">
                 <div class="d-flex justify-content-between align-items-center">
-                    <a href="{{ route('tu.datakepegawaian.index') }}" class="btn btn-outline-secondary ml-4">
-                        <i class="bi bi-arrow-left me-1"></i> Kembali
+                    <a href="{{ route('tu.datakepegawaian.index') }}" class="btn btn-outline-secondary rounded-3 ms-4">
+                        <i class="bi bi-chevron-left me-1"></i> Kembali
                     </a>
-                    <button type="submit" class="btn btn-primary mr-4 px-4">
-                        <i class="bi bi-save me-1"></i> Simpan Data
+                    <button type="submit" class="btn btn-primary me-4">
+                        Simpan <i class="bi bi-save ms-1"></i>
                     </button>
                 </div>
             </div>

@@ -40,13 +40,13 @@
         subtitle="Pilih kategori untuk mempermudah pencarian dokumen.">
 
         <x-slot:badge>
-            <span class="badge bg-primary rounded-pill px-3 py-2">
+            <span class="badge bg-primary rounded-pill px-2 py-1">
                 {{ $totalDokumen }} Dokumen
             </span>
         </x-slot:badge>
 
         <x-slot:actions>
-            <select class="form-select rounded-3 d-inline-block" id="filterKategori" style="max-width:280px;">
+            <select class="form-control d-inline-block" id="filterKategori" style="max-width:280px;">
                 <option value="">Semua Kategori</option>
                 @foreach($dokumen->unique('kategori_surat') as $item)
                 <option value="{{ $item->kategori_surat }}">{{ $item->kategori_surat }}</option>
@@ -68,8 +68,8 @@
                 <tbody id="tableDokumen">
                     @forelse($dokumen as $row)
                     <tr data-kategori="{{ $row->kategori_surat }}">
-                        <td class="text-center">
-                            <span class="badge bg-light text-dark rounded-pill px-3 py-2">{{ $loop->iteration }}</span>
+                        <td>
+                            <span class="badge bg-light text-dark rounded-circle">{{ $loop->iteration }}</span>
                         </td>
 
                         <td>
@@ -83,10 +83,10 @@
                         </td>
 
                         <td>
-                            <span class="badge bg-primary rounded-pill px-3 py-2">{{ $row->kategori_surat }}</span>
+                            <span class="badge bg-primary rounded-pill px-2 py-1">{{ $row->kategori_surat }}</span>
                         </td>
 
-                        <td class="text-center">
+                        <td>
                             <a href="{{ asset('uploads/dokumen/'.$row->file) }}" class="btn btn-success rounded-pill btn-sm px-3" download>
                                 <i class="bi bi-cloud-arrow-down-fill me-1"></i>
                                 Download

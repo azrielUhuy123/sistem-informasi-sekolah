@@ -52,8 +52,8 @@
 
                     <div class="alert alert-success">
                         <strong>Pendaftaran Berhasil!</strong>
-                        Simpan nomor pendaftaran berikut untuk
-                        pengecekan status dan daftar ulang.
+                        Simpan Nomor Pendaftaran berikut
+                        untuk mengecek status pendaftaran.
                     </div>
 
                     <div class="text-center mb-4">
@@ -115,10 +115,14 @@
                         </h6>
                         <ol class="mb-0">
                             <li>
-                                Simpan nomor pendaftaran.
+                                Simpan Nomor Pendaftaran Anda.
                             </li>
                             <li>
-                                Cek status secara berkala melalui menu
+                                Informasi perkembangan pendaftaran juga akan dikirim ke email
+                                yang Anda daftarkan.
+                            </li>
+                            <li>
+                                Gunakan Nomor Pendaftaran tersebut untuk mengecek status melalui menu
                                 <b>Cek Status PPDB</b>.
                             </li>
                             <li>

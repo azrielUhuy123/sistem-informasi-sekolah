@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Tu;
 use App\Http\Controllers\Controller;
 use App\Models\Guru;
 use App\Models\MataPelajaran;
+use App\Models\DataKepegawaian;
 use Illuminate\Http\Request;
 use App\Models\User;
 use Illuminate\Support\Facades\Hash;
@@ -15,8 +16,10 @@ class GuruController extends Controller
     public function index()
     {
         $gurus = Guru::with([
+            'pegawai',
             'waliKelas.kelas',
-            'mapels'
+            'pengampuMapel.mapel',
+            'pengampuMapel.kelas',
         ])
         ->latest()
         ->get();
@@ -35,69 +38,35 @@ class GuruController extends Controller
 
     public function store(Request $request)
     {
-        $data = $request->only([
-            'nama',
-            'nip',
-            'jenis_kelamin',
-            'email',
-            'telepon',
-            'alamat'
+        $request->validate([
+            'data_kepegawaian_id' => 'required|exists:data_kepegawaian,id',
+            'mapel_ids' => 'nullable|array',
+            'mapel_ids.*' => 'exists:mata_pelajaran,id',
         ]);
 
-        // =========================
-        // HANDLE FOTO
-        // =========================
-        if ($request->hasFile('foto')) {
+        $pegawai = DataKepegawaian::findOrFail(
+            $request->data_kepegawaian_id
+        );
 
-            $file = $request->file('foto');
-
-            $namaFile =
-                time() . '.' .
-                $file->getClientOriginalExtension();
-
-            $file->move(
-                public_path('foto-guru'),
-                $namaFile
-            );
-
-            $data['foto'] = $namaFile;
+        if ($pegawai->guru) {
+            return back()
+                ->withInput()
+                ->with('error', 'Pegawai tersebut sudah terdaftar sebagai guru.');
         }
 
-        // =========================
-        // CREATE USER LOGIN
-        // =========================
-        $user = User::create([
-            'name' => $request->nama,
-            'email' => $request->email,
-            'password' => Hash::make('password123'),
-            'role' => 'guru',
+        $guru = Guru::create([
+            'data_kepegawaian_id' => $pegawai->id,
         ]);
 
-        // =========================
-        // RELASI USER
-        // =========================
-        $data['user_id'] = $user->id;
-
-        // =========================
-        // SIMPAN GURU
-        // =========================
-        $guru = Guru::create($data);
-
-        // =========================
-        // SIMPAN MAPEL
-        // =========================
-        if ($request->has('mapel_ids')) {
-
-            $guru->mapels()->sync(
-                $request->mapel_ids
-            );
-        }
+        $guru->mapels()->sync(
+            $request->mapel_ids ?? []
+        );
 
         return redirect()
             ->route('tu.guru.index')
             ->with(
                 'success',
-                'Data guru berhasil ditambahkan'
+                'Data guru berhasil ditambahkan.'
             );
     }
 

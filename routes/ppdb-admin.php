@@ -81,11 +81,6 @@ Route::middleware([
             [PendaftarController::class, 'terima']
         )->name('pendaftar.terima');
 
-        Route::post(
-            '/pendaftar/{pendaftar}/tolak',
-            [PendaftarController::class, 'tolak']
-        )->name('pendaftar.tolak');
-
         Route::get(
             '/pendaftar/{pendaftar}/verifikasi',
             [PendaftarController::class, 'formVerifikasi']
@@ -101,6 +96,10 @@ Route::middleware([
             [PendaftarController::class, 'simpanVerifikasi'
         ])->name('pendaftar.simpan-verifikasi');
 
+        Route::post(
+            '/pendaftar/{pendaftar}/tolak-berkas',
+            [PendaftarController::class, 'tolakBerkas']
+        )->name('pendaftar.tolak-berkas');
         /*
         |--------------------------------------------------------------------------
         | FILTER STATUS
@@ -111,11 +110,6 @@ Route::middleware([
             '/diterima',
             [PendaftarController::class, 'diterima']
         )->name('diterima.index');
-
-        Route::get(
-            '/ditolak',
-            [PendaftarController::class, 'ditolak']
-        )->name('ditolak.index');
 
         Route::get(
             '/verifikasi',

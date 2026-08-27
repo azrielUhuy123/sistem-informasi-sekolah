@@ -5,84 +5,134 @@
 @section('content')
 
 <div class="container-fluid py-4">
-    <div class="d-flex justify-content-between align-items-center mb-4">
-        <div>
-            <h4 class="mb-1">Buat Pengajuan Surat</h4>
-            <p class="text-muted mb-0">Upload draft surat untuk divalidasi kepala sekolah</p>
-        </div>
-    </div>
 
-    <div class="card border-0 shadow-sm">
+    <div class="card shadow-sm border-0">
         <div class="card-body">
-            @if ($errors->any())
-                <div class="alert alert-danger">
-                    <ul class="mb-0">
-                        @foreach ($errors->all() as $error)
-                            <li>{{ $error }}</li>
-                        @endforeach
-                    </ul>
-                </div>
-            @endif
-           <form action="{{ route('tu.pengajuan-surat.store') }}" method="POST" enctype="multipart/form-data">
-                
+
+            <div class="mb-4">
+                <h3 class="text-primary fw-bold text-center mb-1">
+                    Buat Pengajuan Surat
+                </h3>
+
+                <p class="text-muted text-center">
+                    Upload draft surat untuk divalidasi kepala sekolah
+                </p>
+            </div>
+
+            {{-- ALERT --}}
+            <x-alert.flash key="error" type="danger"/>
+
+            <form action="{{ route('tu.pengajuan-surat.store') }}"
+                  method="POST"
+                  enctype="multipart/form-data">
+
                 @csrf
 
-                <div class="row g-4">
-                    <div>
-                        <label class="form-label">Kategori Surat</label>
-                        <input type="text"
+                {{-- Kategori Surat --}}
+                <div class="mb-3">
+
+                    <label class="form-label fw-semibold">
+                        Kategori Surat
+                    </label>
+
+                    <input type="text"
                            name="kategori_surat"
-                           class="form-control rounded-3"
+                           class="form-control"
+                           placeholder="Contoh: Surat Tugas, Surat Edaran, Surat Keputusan"
+                           oninput="this.value = this.value.replace(/\s+/g, ' ').replace(/(^|\s)\S/g, c => c.toUpperCase())"
                            required>
-                    </div>
-                    <div>
-                        <label class="form-label">Nama Surat</label>
-                        <input type="text"
-                           name="nama_surat"
-                           class="form-control rounded-3"
-                           required>
-                    </div>
-                    <div>
-                        <label class="form-label">Perihal</label>
-                        <input
-                            type="text"
-                            name="perihal"
-                            class="form-control rounded-3"
-                            placeholder="Masukkan perihal surat"
-                            required
-                        >
-                    </div>
-                    <div>
-                        <label class="form-label">Tujuan Surat</label>
-                        <input type="text"
-                           name="tujuan_surat"
-                           class="form-control rounded-3"
-                           required>
-                    </div>
-                    <div>
-                        <label class="form-label">Upload Draft Surat</label>
-                        <input type="file"
-                           name="file_surat"
-                           class="form-control rounded-3"
-                           required>
-                           <small class="text-muted">
-                                Format file: PDF, DOC, DOCX
-                            </small>
-                    </div>
+
                 </div>
 
-                <div class="d-flex justify-content-between align-items-center mt-4">
-                    <a href="{{ route('tu.pengajuan-surat.index') }}" class="btn btn-outline-secondary">
-                        <i class="bi bi-arrow-left me-1"></i> Kembali
-                    </a>
-                    <button type="submit" class="btn btn-primary px-4">
-                        <i class="bi bi-save me-1"></i> Simpan Data
-                    </button>
+                {{-- Nama Surat --}}
+                <div class="mb-3">
+
+                    <label class="form-label fw-semibold">
+                        Nama Surat
+                    </label>
+
+                    <input type="text"
+                           name="nama_surat"
+                           class="form-control"
+                           placeholder="Masukkan nama surat"
+                           oninput="this.value = this.value.replace(/\s+/g, ' ').replace(/(^|\s)\S/g, c => c.toUpperCase())"
+                           required>
+
                 </div>
+
+                {{-- Perihal --}}
+                <div class="mb-3">
+
+                    <label class="form-label fw-semibold">
+                        Perihal
+                    </label>
+
+                    <input type="text"
+                           name="perihal"
+                           class="form-control"
+                           placeholder="Masukkan perihal surat"
+                           oninput="this.value = this.value.replace(/\s+/g, ' ').replace(/(^|\s)\S/g, c => c.toUpperCase())"
+                           required>
+
+                </div>
+
+                {{-- Tujuan Surat --}}
+                <div class="mb-3">
+
+                    <label class="form-label fw-semibold">
+                        Tujuan Surat
+                    </label>
+
+                    <input type="text"
+                           name="tujuan_surat"
+                           class="form-control"
+                           placeholder="Masukkan tujuan surat"
+                           oninput="this.value = this.value.replace(/\s+/g, ' ').replace(/(^|\s)\S/g, c => c.toUpperCase())"
+                           required>
+
+                </div>
+
+                {{-- Upload Draft Surat --}}
+                <div class="mb-5">
+
+                    <label class="form-label fw-semibold">
+                        Upload Draft Surat
+                    </label>
+
+                    <input type="file"
+                           name="file_surat"
+                           class="form-control"
+                           accept=".pdf,.doc,.docx"
+                           required>
+
+                    <small class="text-muted">
+                        Format file: PDF, DOC, DOCX
+                    </small>
+
+                </div>
+
+                {{-- BUTTON --}}
+                <div class="d-flex justify-content-between align-items-center mt-4">
+
+                    <a href="{{ route('tu.pengajuan-surat.index') }}"
+                       class="btn btn-outline-secondary rounded-3">
+                        <i class="bi bi-chevron-left me-1"></i>
+                        Kembali
+                    </a>
+
+                    <button type="submit"
+                            class="btn btn-primary px-4">
+                        Simpan
+                        <i class="bi bi-save ms-1"></i>
+                    </button>
+
+                </div>
+
             </form>
+
         </div>
     </div>
+
 </div>
 
 @endsection
-            

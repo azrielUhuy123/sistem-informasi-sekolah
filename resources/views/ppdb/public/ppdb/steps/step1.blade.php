@@ -117,9 +117,11 @@
         </div>
     </div>
 
+    <hr class="my-4">
+
     <div class="d-flex justify-content-between align-items-center mt-4">
-        <a href="{{ route('ppdb.informasi') }}" class="btn btn-outline-secondary btn-sm">
-            <i class="bi bi-arrow-left me-1"></i> Kembali
+        <a href="{{ route('ppdb.informasi') }}" class="btn btn-outline-secondary rounded-3 btn-sm">
+            <i class="bi bi-chevron-left me-1"></i> Kembali
         </a>
 
         <button type="button" id="step1NextButton" class="btn btn-primary btn-sm">

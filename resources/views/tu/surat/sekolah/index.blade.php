@@ -15,7 +15,7 @@
                     <p class="mb-0 opacity-75">Kelola template dokumen internal sekolah yang dapat diakses oleh guru dan kepsek</p>
                 </div>
                 <div class="badge bg-white text-primary px-3 py-2 fs-6">
-                    <i class="bi bi-shield-check me-2"></i> Sistem Terhubung
+                    <i class="bi bi-shield-check me-2"></i> Sinergi-MJ
                 </div>
             </div>
         </div>
@@ -26,23 +26,14 @@
 
     <x-alert.flash key="error" type="danger"/>
 
-    <div class="d-flex justify-content-end align-items-center mb-4">
-
-        <a href="{{ route('tu.dokumen.create', 'sekolah') }}" 
-           class="btn btn-primary">
-            <i class="bi bi-plus-lg me-1"></i>
-            Tambah Dokumen
-        </a>
-    </div>
-
     {{-- TABLE --}}
     <x-table.card
         title="Daftar Dokumen Sekolah"
         subtitle="Seluruh Dokumen Sekolah pada SDN Mekar Jaya"
     >
-        <x-slot:badge>
-            <span class="badge bg-primary rounded-pill px-3 py-2">
-                {{ $dokumen->count() }} Dokumen Sekolah
+        <x-slot:badge> 
+            <span class="badge bg-primary rounded-pill px-2 py-1">
+                {{ $dokumen->count() }} <span class="text-badge">Dokumen</span>
             </span>
         </x-slot:badge>
  
@@ -50,9 +41,13 @@
             <input
                 type="text"
                 id="searchInput"
-                class="form-control rounded-3"
+                class="form-control table-search"
                 placeholder="Cari Dokumen..."
             >
+            <x-button.add
+                :href="route('tu.dokumen.create', 'sekolah')"
+                label="Tambah Dokumen Sekolah"
+            />  
         </x-slot:actions>
         <div class="table-responsive">
             <table class="table table-hover align-middle mb-0">
@@ -67,7 +62,7 @@
                         <th width="150">
                             Kategori
                         </th>
-                        <th width="150">
+                        <th width="100">
                             Preview
                         </th>
                         <th width="90">
@@ -79,17 +74,16 @@
                     @forelse($dokumen as $row)
                         <tr>
                             {{-- NOMOR --}}
-                            <td class="text-center">
-                                <span class="badge bg-light text-dark rounded-pill px-3 py-2">
+                            <td>
+                                <span class="badge bg-light text-dark rounded-circle">
                                     {{ $loop->iteration }}
                                 </span>
                             </td>
                             {{-- NAMA SURAT --}}            
                             <td>
-                                <div class="d-flex align-items-center">
-                                    <div class="surat-icon me-3"><i class="bi bi-file-earmark-text-fill"></i></div>
+                                <div class="d-flex align-items-center">                                    
                                     <div>
-                                        <div class="fw-bold">{{ $row->nama_surat }}</div>
+                                        <div class="fw-semibold">{{ $row->nama_surat }}</div>
                                     </div>
                                 </div>
                             </td>
@@ -110,9 +104,9 @@
                                     <a
                                         href="{{ asset('uploads/dokumen/' . $row->file) }}"
                                         target="_blank"
-                                        class="badge bg-primary rounded-pill px-3 py-2"
+                                        class="btn btn-primary rounded-pill"
                                     >
-                                        <i class="bi bi-cloud-arrow-down"></i>
+                                        <i class="bi bi-file-earmark-text-fill"></i>  
                                         
                                     </a>
                                 @else
@@ -123,42 +117,33 @@
                             </td>
                             {{-- AKSI --}}
                             <td>
-                                <div class="dropdown">
-                                    <button class="btn btn-sm btn-outline-primary"
-                                        type="button"
-                                        data-bs-toggle="dropdown"
-                                        aria-expanded="false">
-                                        <i class="bi bi-gear-fill"></i>
-                                        <i class="bi bi-caret-down-fill"></i>
-                                    </button>
-                                    <ul class="dropdown-menu dropdown-menu-end shadow-sm border-0">
-                                        <li>
-                                            <a class="dropdown-item" href="{{ asset('uploads/dokumen/' . $row->file) }}" download>
-                                                <i class="bi bi-download me-2"></i> Download
-                                            </a>
-                                        </li>    
-                                        <li>
-                                            <a class="dropdown-item" href="{{ route('tu.dokumen.edit', $row->id) }}">
-                                                <i class="bi bi-pencil-square me-2"></i> Edit
-                                            </a>
-                                        </li>
-                                        <li><hr class="dropdown-divider"></li>
-                                        <li>
-                                            <form action="{{ route('tu.dokumen.destroy', $row->id) }}"
-                                                method="POST"
-                                                onsubmit="return confirm('Hapus data ini?')">
-                                                @csrf
-                                                @method('DELETE')
-                                                <button type="submit" class="dropdown-item text-danger btn-confirm"
-                                                data-title="HAPUS DOKUMEN INI?"
-                                                data-message="Dokumen ini akan dihapus secara permanen"
-                                                data-button="btn-danger">
-                                                    <i class="bi bi-trash me-2"></i> Hapus
-                                                </button>
-                                            </form>
-                                        </li>
-                                    </ul>
-                                </div>
+                                <x-table.actions>              
+                                    <li>
+                                        <a class="dropdown-item" href="{{ asset('uploads/dokumen/' . $row->file) }}" download>
+                                            <i class="bi bi-download me-2"></i> Download
+                                        </a>
+                                    </li>    
+                                    <li>
+                                        <a class="dropdown-item" href="{{ route('tu.dokumen.edit', $row->id) }}">
+                                            <i class="bi bi-pencil-square me-2"></i> Edit
+                                        </a>
+                                    </li>
+                                    <li><hr class="dropdown-divider"></li>
+                                    <li>
+                                        <form action="{{ route('tu.dokumen.destroy', $row->id) }}"
+                                            method="POST"
+                                            >
+                                            @csrf
+                                            @method('DELETE')
+                                            <button type="submit" class="dropdown-item text-danger btn-confirm"
+                                            data-title="HAPUS DOKUMEN INI?"
+                                            data-message="Dokumen ini akan dihapus secara permanen"
+                                            data-button="btn-danger">
+                                                <i class="bi bi-trash me-2"></i> Hapus
+                                            </button>
+                                        </form>
+                                    </li>
+                                </x-table.actions>
                             </td>
                         </tr>
                     @empty

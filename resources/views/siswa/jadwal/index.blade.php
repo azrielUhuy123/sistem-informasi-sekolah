@@ -63,7 +63,7 @@
             subtitle="Seluruh mata pelajaran berdasarkan hari dan jam pelajaran."
         >
             <x-slot:badge>
-                <span class="badge bg-primary rounded-pill px-3 py-2">
+                <span class="badge bg-primary rounded-pill px-2 py-1">
                     {{ $penempatan->kelas->nama_kelas_label ?? '-' }}
                 </span>
             </x-slot:badge>

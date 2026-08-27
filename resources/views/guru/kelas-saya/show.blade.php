@@ -210,7 +210,7 @@
 
                 </div>
 
-                <span class="badge bg-primary rounded-pill px-3 py-2">
+                <span class="badge bg-primary rounded-pill px-2 py-1">
 
                     {{ $totalNilai }} Mata Pelajaran
 
@@ -280,7 +280,7 @@
 
             </td>
 
-            <td class="text-center">
+            <td>
 
                 <span class="badge bg-primary-subtle text-primary rounded-pill px-3 py-2">
 
@@ -290,7 +290,7 @@
 
             </td>
 
-            <td class="text-center">
+            <td>
 
                 <span class="badge bg-warning-subtle text-warning rounded-pill px-3 py-2">
 
@@ -300,7 +300,7 @@
 
             </td>
 
-            <td class="text-center">
+            <td>
 
                 <span class="badge bg-info-subtle text-info rounded-pill px-3 py-2">
 
@@ -310,7 +310,7 @@
 
             </td>
 
-            <td class="text-center">
+            <td>
 
                 <span class="badge bg-success rounded-pill px-3 py-2">
 

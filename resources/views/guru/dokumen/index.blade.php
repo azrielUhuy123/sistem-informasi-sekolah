@@ -117,7 +117,7 @@
 
                         <select
                             name="kategori"
-                            class="form-select rounded-3"
+                            class="form-control"
                             onchange="this.form.submit()">
 
                             <option value="">
@@ -173,7 +173,7 @@
 
                 </div>
 
-                <span class="badge bg-primary rounded-pill px-3 py-2">
+                <span class="badge bg-primary rounded-pill px-2 py-1">
 
                     {{ $totalDokumen }} Dokumen
 
@@ -229,7 +229,7 @@
 
             <td>
 
-                <span class="badge bg-light text-dark rounded-pill px-3 py-2">
+                <span class="badge bg-light text-dark rounded-circle">
 
                     {{ $i + 1 }}
 
@@ -277,7 +277,7 @@
 
             </td>
 
-            <td class="text-center">
+            <td>
 
                 <a
                     href="{{ asset('uploads/dokumen/' . $row->file) }}"

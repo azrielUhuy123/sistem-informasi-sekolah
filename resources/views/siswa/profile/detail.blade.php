@@ -20,7 +20,7 @@
 
         </div>
 
-        <a href="{{ route('siswa.profile') }}" class="btn btn-outline-secondary">
+        <a href="{{ route('siswa.profile') }}" class="btn btn-outline-secondary rounded-3">
             <i class="bi bi-arrow-left me-1"></i>
             Kembali
         </a>
@@ -921,7 +921,7 @@
         <div class="text-end">
 
             <button
-                class="btn btn-primary px-4">
+                class="btn btn-primary rounded-3">
 
                 <i class="bi bi-check-circle me-1"></i>
                 Simpan Perubahan

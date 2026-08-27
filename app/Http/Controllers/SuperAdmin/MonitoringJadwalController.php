@@ -77,17 +77,7 @@ class MonitoringJadwalController extends Controller
 
         foreach ($jadwals as $jadwal) {
 
-            $bentrok = PengajuanJadwal::where('guru_id', $jadwal->guru_id)
-                ->where('hari_id', $jadwal->hari_id)
-                ->where('jam_pelajaran_id', $jadwal->jam_pelajaran_id)
-                ->where('id', '!=', $jadwal->id)
-                ->where(
-                    'tahun_ajaran_id',
-                    current_tahun_id()
-                )
-                ->exists();
-
-            $conflicts[$jadwal->id] = $bentrok;
+            $conflicts[$jadwal->id] = $this->hasConflict($jadwal);
         }
 
         return view(
@@ -106,12 +96,25 @@ class MonitoringJadwalController extends Controller
 
     public function approve(Kelas $kelas)
     {
-        PengajuanJadwal::where('kelas_id', $kelas->id)
+        $query = PengajuanJadwal::where('kelas_id', $kelas->id)
             ->where('tahun_ajaran_id', current_tahun_id())
-            ->where('status', 'submitted')
-            ->update([
-                'status' => 'approved'
-            ]);
+            ->where('status', 'submitted');
+
+        $jadwals = $query->get();
+
+        if ($jadwals->isEmpty()) {
+            return back()->with('error', 'Tidak ada jadwal submitted untuk di-approve.');
+        }
+
+        foreach ($jadwals as $jadwal) {
+            if ($this->hasConflict($jadwal)) {
+                return back()->with('error', 'Jadwal bentrok tidak dapat di-approve.');
+            }
+        }
+
+        $query->update([
+            'status' => 'approved'
+        ]);
 
         return redirect()->back()->with('success', 'Jadwal berhasil di-approve.');
     }
@@ -119,29 +122,45 @@ class MonitoringJadwalController extends Controller
     public function reject(Request $request, Kelas $kelas)
     {
         $request->validate([
-            'hari' => 'required',
-            'jam' => 'required'
+            'alasan' => 'required|string',
+            'hari' => 'required|integer|exists:hari_sekolah,id',
+            'jam' => 'required|integer|exists:jam_pelajaran,id',
+            'catatan_tambahan' => 'nullable|string',
         ]);
 
-        PengajuanJadwal::where('kelas_id', $kelas->id)
+        $jadwals = PengajuanJadwal::where('kelas_id', $kelas->id)
             ->where('tahun_ajaran_id', current_tahun_id())
+            ->where('hari_id', $request->integer('hari'))
+            ->where('jam_pelajaran_id', $request->integer('jam'))
             ->where('status', 'submitted')
-            ->update([
-                'status' => 'rejected',
-                'catatan' =>
+            ->get();
 
-                    ($request->alasan
-                        ? "Alasan: " . $request->alasan . "\n"
-                        : '') .
+        if ($jadwals->isEmpty()) {
+            return back()->with('error', 'Jadwal submitted pada slot tersebut tidak ditemukan.');
+        }
 
-                    "Hari: " . $request->hari . "\n" .
+        if ($jadwals->count() > 1) {
+            return back()->with('error', 'Slot reject memiliki lebih dari satu jadwal. Data tidak diubah.');
+        }
 
-                    "Jam: " . $request->jam .
+        $hari = HariSekolah::findOrFail($request->integer('hari'));
+        $jam = JamPelajaran::findOrFail($request->integer('jam'));
 
-                    ($request->catatan_tambahan
-                        ? "\nCatatan: " . $request->catatan_tambahan
-                        : '')
-            ]);
+        $jadwals->first()->update([
+            'status' => 'rejected',
+            'catatan' =>
+
+                "Alasan: " . $request->string('alasan') . "\n" .
+
+                "Hari: " . ($hari->nama ?? $hari->nama_hari) . "\n" .
+
+                "Jam: Jam " . $jam->jam_ke . " (" . substr($jam->mulai, 0, 5) .
+                    " - " . substr($jam->selesai, 0, 5) . ")" .
+
+                ($request->filled('catatan_tambahan')
+                    ? "\nCatatan: " . $request->string('catatan_tambahan')
+                    : ''),
+        ]);
 
         return redirect()
             ->back()
@@ -150,50 +169,54 @@ class MonitoringJadwalController extends Controller
 
     public function publish(Kelas $kelas)
     {
-        $masihBelumFinal =
-            PengajuanJadwal::where(
-                'kelas_id',
-                $kelas->id
-            )
-            ->where(
-                'tahun_ajaran_id',
-                current_tahun_id()
-            )
-            ->whereIn('status', [
-                'draft',
-                'submitted',
-                'rejected'
-            ])
-            ->exists();
+        $query = PengajuanJadwal::where('kelas_id', $kelas->id)
+            ->where('tahun_ajaran_id', current_tahun_id());
 
-        if ($masihBelumFinal) {
+        $jadwalCount = (clone $query)->count();
+        $approvedCount = (clone $query)->where('status', 'approved')->count();
+
+        if ($jadwalCount === 0 || $approvedCount !== $jadwalCount) {
 
             return back()->with(
                 'error',
-                'Masih ada jadwal yang belum final.'
+                'Semua jadwal harus berstatus approved sebelum dipublish.'
             );
 
         }
 
-        PengajuanJadwal::where(
-                'kelas_id',
-                $kelas->id
-            )
-            ->where(
-                'tahun_ajaran_id',
-                current_tahun_id()
-            )
-            ->where(
-                'status',
-                'approved'
-            )
-            ->update([
-                'status' => 'published'
-            ]);
+        $approved = (clone $query)->where('status', 'approved')->get();
+
+        if ($approved->isEmpty()) {
+            return back()->with('error', 'Tidak ada jadwal approved untuk dipublish.');
+        }
+
+        foreach ($approved as $jadwal) {
+            if ($this->hasConflict($jadwal)) {
+                return back()->with('error', 'Jadwal bentrok tidak dapat dipublish.');
+            }
+        }
+
+        $updated = (clone $query)
+            ->where('status', 'approved')
+            ->update(['status' => 'published']);
+
+        if ($updated === 0) {
+            return back()->with('error', 'Tidak ada jadwal yang berhasil dipublish.');
+        }
 
         return back()->with(
             'success',
             'Jadwal berhasil dipublish.'
         );
+    }
+
+    private function hasConflict(PengajuanJadwal $jadwal): bool
+    {
+        return PengajuanJadwal::where('guru_id', $jadwal->guru_id)
+            ->where('hari_id', $jadwal->hari_id)
+            ->where('jam_pelajaran_id', $jadwal->jam_pelajaran_id)
+            ->where('id', '!=', $jadwal->id)
+            ->where('tahun_ajaran_id', current_tahun_id())
+            ->exists();
     }
 }

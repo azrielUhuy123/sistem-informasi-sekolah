@@ -15,43 +15,14 @@
                     <p class="mb-0 opacity-75">Kelola siklus akademik sistem</p>
                 </div>
                 <div class="badge bg-white text-primary px-3 py-2 fs-6">
-                    <i class="bi bi-shield-check me-2"></i> Sistem Terhubung
+                    <i class="bi bi-shield-check me-2"></i> Sinergi-MJ
                 </div>
             </div>
         </div>
     </div>
-    <div class="d-flex justify-content-end align-items-center mb-4">
 
-        <a href="{{ route('tu.tahun.create') }}" 
-           class="btn btn-primary">
-            <i class="bi bi-plus-lg me-1"></i>
-            Tambah Tahun Ajaran
-        </a>
-    </div>
-
-    {{-- ALERT SUCCESS --}}
-    @if(session('success'))
-
-        <div class="alert alert-success border-0 shadow-sm">
-
-            <i class="bi bi-check-circle-fill me-2"></i>
-            {{ session('success') }}
-
-        </div>
-
-    @endif
-
-    {{-- ALERT ERROR --}}
-    @if(session('error'))
-
-        <div class="alert alert-danger border-0 shadow-sm">
-
-            <i class="bi bi-exclamation-circle-fill me-2"></i>
-            {{ session('error') }}
-
-        </div>
-
-    @endif
+    <x-alert.flash key="success" type="success" />
+    <x-alert.flash key="error" type="danger" />
 
 
     <!-- 🔷 STATUS SISTEM -->
@@ -59,10 +30,13 @@
         <div class="card-header bg-light border-0 p-4">
             <div class="d-flex justify-content-between align-items-center flex-wrap gap-3">
                 <div>
-                    <h5 class="fw-semibold mb-1">Status Sistem</h5>
-                    <span class="text-muted small">Informasi tahun ajaran aktif saat ini</span>
+                    <h5 class="fw-semibold mb-1">Tahun Ajaran</h5>                    
                 </div>
-            </div>
+                <x-button.add
+                    :href="route('tu.tahun.create')"
+                    label="Tambah Tahun Ajaran"
+                />
+            </div>            
         </div>
 
         <div class="card-body p-4">
@@ -94,10 +68,9 @@
                 <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-2">
                     <div class="d-flex align-items-center flex-wrap gap-2">
                         <h3 class="fw-semibold mb-0">{{ $tahunAktif->tahun }}</h3>
-                        <span class="badge bg-success-subtle text-success-emphasis border border-success-subtle">
+                        <span class="badge-semester {{ strtolower($tahunAktif->semester) }}">
                             {{ $tahunAktif->semester }}
-                        </span>
-                        <span class="badge {{ $statusBadgeClass }}">{{ $statusLabel }}</span>
+                        </span>                        
                     </div>
                     <div class="small text-muted">{{ $statusSubtitle }}</div>
                 </div>
@@ -122,10 +95,12 @@
                         </div>
 
                         <form method="POST"
-                              action="{{ route('tu.tahun.tutup') }}"
-                              onsubmit="return confirm('Tutup tahun ajaran ini?')">
+                              action="{{ route('tu.tahun.tutup') }}">
                             @csrf
-                            <button class="btn btn-danger">
+                            <button class="btn btn-secondary btn-sm btn-confirm"
+                                    data-title="Tutup Tahun Ajaran"
+                                    data-message="Apakah Anda yakin ingin menutup tahun ajaran ini? Setelah ditutup, tahun ajaran tidak dapat diubah."
+                                    data-button="btn-danger">
                                 <i class="bi bi-door-closed me-1"></i>
                                 Tutup Tahun Ajaran
                             </button>
@@ -199,8 +174,8 @@
         subtitle="Seluruh Tahun Ajaran yang terdata pada sistem ini"
     >
         <x-slot:badge>
-            <span class="badge bg-primary rounded-pill px-3 py-2">
-                {{ $tahun->count() }} Dokumen Sekolah
+            <span class="badge bg-primary rounded-pill px-2 py-1">
+                {{ $tahun->count() }} <span class="text-badge">Tahun Ajaran</span>
             </span>
         </x-slot:badge>
  
@@ -208,7 +183,7 @@
             <input
                 type="text"
                 id="searchInput"
-                class="form-control rounded-3"
+                class="form-control table-search"
                 placeholder="Cari Tahun..."
             >
         </x-slot:actions>
@@ -226,28 +201,33 @@
                 <tbody id="tableTahun">
                     @forelse($tahun as $row)
                         <tr>
-                            <td class="text-center">
-                                <span class="badge bg-light rounded-pill text-dark border px-3 py-2 d-flex gap-2">
-                                    <i class="bi bi-calendar"></i>
+                            <td>
+                                <span class="d-flex align-items-center gap-2 small text-muted">                                    
                                     {{ $row->updated_at->format('d M Y') }}
                                 </span>
                             </td>
                             <td>
-                                <span class="fw-bold">
+                                <span class="fw-semibold">
                                     {{ $row->tahun }}
                                 </span>
                             </td>
                             <td>
-                                <span class="badge bg-teal fw-bold rounded-pill px-3 py-2">
+                                <span class="badge-semester {{ strtolower($row->semester) }}">
                                     {{ $row->semester }}
                                 </span>
                             </td>
                             <td>
-                                {!! match($row->status) {
-                                    'aktif'   => '<span class="badge bg-success fw-bold rounded-pill px-3 py-2"><i class="bi bi-check-circle me-1"></i>Aktif</span>',
-                                    'draft'   => '<span class="badge bg-secondary fw-bold rounded-pill px-3 py-2"><i class="bi bi-archive me-1"></i>Draft</span>',
-                                    'selesai' => '<span class="badge bg-light border fw-bold text-dark rounded-pill px-3 py-2"><i class="bi bi-check-circle me-1"></i>Selesai</span>',
-                                } !!}
+                                <span class="badge-status {{ $row->status }}">
+                                    @if($row->status === 'aktif')
+                                        <i class="bi bi-circle-fill me-2"></i>
+                                    @elseif($row->status === 'draft')
+                                        <i class="bi bi-pencil-square me-2"></i>
+                                    @elseif($row->status === 'selesai')
+                                        <i class="bi bi-check-circle me-2"></i>
+                                    @endif
+
+                                    {{ ucfirst($row->status) }}
+                                </span>
                             </td>
                             
                         </tr>
@@ -259,11 +239,9 @@
                         </tr>
                     @endforelse
                 </tbody>
-            </table>
-            <div class="mt-4 d-flex justify-content-end">
-                {{ $tahun->links() }}
-            </div>
+            </table>  
         </div>
+        <x-table.pagination :paginator="$tahun" />
     </x-table.card>
 
 </div>

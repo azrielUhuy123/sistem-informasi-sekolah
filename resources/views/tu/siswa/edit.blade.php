@@ -5,37 +5,24 @@
 @section('content')
 
 <div class="container-fluid py-4">
-
-    <div class="d-flex justify-content-between align-items-center mb-4">
-        <div>
-            <h4 class="mb-1">Edit Siswa</h4>
-            <p class="text-muted mb-0">
-                Perbarui Data Siswa
-            </p>
-        </div>
-    </div>
-    @if ($errors->any())
-    <div class="alert alert-danger">
-        <ul class="mb-0">
-            @foreach ($errors->all() as $error)
-                <li>{{ $error }}</li>
-            @endforeach
-        </ul>
-    </div>
-@endif
-
     <div class="card border-0 shadow-sm">
-
         <div class="card-body">
+            <div class="mb-4">
+                <h4 class="text-primary fw-bold text-center mb-1">Edit Siswa</h4>
+                <p class="text-muted text-center">
+                    Perbarui Data Siswa
+                </p>
+            </div>
+            {{-- ALERT --}}            
+
+            <x-alert.flash key="error" type="danger"/>
 
             <form
                 action="{{ route('tu.siswa.update', $siswa->id) }}"
                 method="POST"
             >
-
                 @csrf
                 @method('PUT')
-
                 <input
                     type="hidden"
                     name="redirect_to"
@@ -52,9 +39,10 @@
                         <input
                             type="text"
                             name="nama"
-                            class="form-control rounded-3"
-                            value="{{ old('nama', $siswa->nama) }}"
-                            required
+                            class="form-control"
+                            value="{{ old('nama', $siswa->nama) }}"                            
+                            oninput="this.value = this.value.replace(/\s+/g, ' ').replace(/(^|\s)\S/g, c => c.toUpperCase())"
+                            required                        
                         >
                     </div>
 
@@ -66,8 +54,9 @@
                         <input
                             type="text"
                             name="nis"
-                            class="form-control rounded-3"
+                            class="form-control"
                             value="{{ old('nis', $siswa->nis) }}"
+                            inputmode="numeric"                            
                             required
                         >
                     </div>
@@ -80,8 +69,9 @@
                         <input
                             type="text"
                             name="nisn"
-                            class="form-control rounded-3"
+                            class="form-control"
                             value="{{ old('nisn', $siswa->nisn) }}"
+                            inputmode="numeric"                            
                         >
                     </div>
 
@@ -92,7 +82,7 @@
 
                         <select
                             name="jenis_kelamin"
-                            class="form-select rounded-3"
+                            class="form-control"
                             required
                         >
                             <option value="L" @selected(old('jenis_kelamin', $siswa->jenis_kelamin) == 'L')>
@@ -113,7 +103,7 @@
                         <input
                             type="date"
                             name="tanggal_lahir"
-                            class="form-control rounded-3"
+                            class="form-control"
                             value="{{ old('tanggal_lahir', $siswa->tanggal_lahir) }}"
                         >
                     </div>
@@ -126,7 +116,7 @@
                         <textarea
                             name="alamat"
                             rows="3"
-                            class="form-control rounded-3"
+                            class="form-control"
                         >{{ old('alamat', $siswa->alamat) }}</textarea>
                     </div>
 
@@ -138,12 +128,13 @@
                         <input
                             type="text"
                             name="nama_wali"
-                            class="form-control rounded-3"
+                            class="form-control"
                             value="{{ old('nama_wali', $siswa->nama_wali) }}"
+                            oninput="this.value = this.value.replace(/\s+/g, ' ').replace(/(^|\s)\S/g, c => c.toUpperCase())"
                         >
                     </div>
 
-                    <div class="col-md-6">
+                    <div class="col-md-6 mb-5">
                         <label class="form-label">
                             Telepon Wali
                         </label>
@@ -151,8 +142,10 @@
                         <input
                             type="text"
                             name="telepon_wali"
-                            class="form-control rounded-3"
+                            class="form-control"
                             value="{{ old('telepon_wali', $siswa->telepon_wali) }}"
+                            inputmode="tel"
+                            oninput="this.value = this.value.replace(/\D/g, '')"
                         >
                     </div>
 
@@ -162,18 +155,16 @@
 
                     <a
                         href="{{ url()->previous() }}"
-                        class="btn btn-outline-secondary"
+                        class="btn btn-outline-secondary rounded-3"
                     >
-                        <i class="bi bi-arrow-left me-1"></i>
-                        Kembali
+                        <i class="bi bi-chevron-left me-1"></i> Kembali                        
                     </a>
 
                     <button
                         type="submit"
-                        class="btn btn-primary px-4"
+                        class="btn btn-primary rounded-3"
                     >
-                        <i class="bi bi-save me-1"></i>
-                        Simpan Perubahan
+                        Simpan <i class="bi bi-save ms-1"></i>
                     </button>
 
                 </div>

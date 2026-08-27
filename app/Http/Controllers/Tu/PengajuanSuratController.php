@@ -6,7 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\PengajuanSurat;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\File;
-use illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Auth;
 
 class PengajuanSuratController extends Controller
 {

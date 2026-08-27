@@ -262,7 +262,7 @@
                         </a>
 
                         <a href="{{ route('guru.pengajuan-surat.index') }}"
-                            class="btn btn-outline-secondary rounded-pill">
+                            class="btn btn-outline-secondary rounded-3 rounded-pill">
 
                             <i class="bi bi-arrow-left me-2"></i>
 

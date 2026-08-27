@@ -5,7 +5,7 @@
 
     @include('layouts.partials.tahun-ajaran')
     @include('layouts.partials.tu-mode')
-
+  
     <div class="sidebar-title">
         MAIN OPERATOR
     </div>
@@ -18,51 +18,25 @@
 
         <div class="menu-left">
             <i class="bi bi-speedometer2"></i>
-            <span>Dashboard</span>
+            <span>Dashboard Operator</span>
         </div>
 
     </a>
 
     {{-- PROSES AKADEMIK --}}
-    <button
-        class="menu-item border-0 bg-transparent text-start"
-        onclick="toggleMenu('menuProses','arrowProses')"
+
+    <a
+        class="menu-item"
+        href="{{ route('tu.tahun.index') }}"
     >
 
         <div class="menu-left">
-            <i class="bi bi-arrow-repeat"></i>
-            <span>Proses Akademik</span>
+            <i class="bi bi-calendar3"></i>
+            <span>Kelola Tahun Ajaran</span>
         </div>
 
-        <i
-            class="bi bi-chevron-right dropdown-arrow"
-            id="arrowProses"
-        ></i>
-
-    </button>
-
-    <div
-        class="submenu
-            {{ request()->is('tu/tahun*') ||
-               request()->is('tu/penempatan-siswa*')
-               ? 'show'
-               : '' }}"
-        id="menuProses"
-    >
-
-        <a
-            class="menu-item"
-            href="{{ route('tu.tahun.index') }}"
-        >
-
-            <div class="menu-left">
-                <i class="bi bi-calendar3"></i>
-                <span>Tahun Ajaran</span>
-            </div>
-
-        </a>
-
-    </div>
+    </a>
+    
 
     {{-- MANAJEMEN SEKOLAH --}}
     <button
@@ -72,7 +46,7 @@
 
         <div class="menu-left">
             <i class="bi bi-building"></i>
-            <span>Manajemen Sekolah</span>
+            <span>Kelola Akademik</span>
         </div>
 
         <i
@@ -171,11 +145,6 @@
 
         </a>
 
-        
-
-
-        
-
     </div>
 
     {{-- ARSIP & DOKUMEN --}}
@@ -242,18 +211,6 @@
 
             </a>
 
-            {{-- DATA KEPEGAWAIAN --}}
-            <a
-                class="menu-item"
-                href="{{ route('tu.datakepegawaian.index') }}">
-
-                <div class="menu-left">
-                    <i class="bi bi-people-fill"></i>
-                    <span>Data Kepegawaian</span>
-                </div>
-
-            </a>
-
             <a
             class="menu-item"
             href="{{ route('tu.nomor-surat.index') }}">
@@ -266,6 +223,17 @@
         </a>
 
     </div>
+
+    {{-- DATA KEPEGAWAIAN --}}
+    <a
+        class="menu-item"
+        href="{{ route('tu.datakepegawaian.index') }}">
+
+        <div class="menu-left">
+            <i class="bi bi-people-fill"></i>
+            <span>Data Kepegawaian</span>
+        </div>
+    </a>
 
     {{-- AKUN --}}
     <a

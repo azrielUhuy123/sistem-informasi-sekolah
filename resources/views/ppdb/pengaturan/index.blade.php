@@ -4,24 +4,32 @@
 
 @section('content')
 
-<div class="container-fluid">
+<div class="container-fluid py-4">
 
-    <div class="card shadow-sm">
+{{-- HEADER --}}        
 
-        <div class="card-header">
+    {{-- ALERT --}}
+    <x-alert.flash key="success" type="success"/>
 
-            <h5 class="mb-0">
-                Pengaturan PPDB
-            </h5>
+    <x-alert.flash key="error" type="danger"/>
 
-        </div>
+    <div class="card border-0 shadow-sm">
 
         <div class="card-body">
-
+            <div class="mb-4">
+                <h3 class="text-primary fw-bold text-center mb-1">
+                    Pengaturan PPDB
+                </h3>
+                <p class="text-muted text-center"></p>
+            </div>
+            {{-- ALERT --}}            
+ 
+            <x-alert.flash key="error" type="danger"/>
             <form
                 action="{{ route('tu.ppdb.pengaturan.store') }}"
                 method="POST"
             >
+                
 
                 @csrf
 
@@ -35,7 +43,7 @@
 
                     <select
                         name="tahun_ajaran_id"
-                        class="form-select"
+                        class="form-control"
                         required
                     >
 
@@ -112,7 +120,7 @@
 
                 </div>
 
-                <div class="mb-3">
+                <div class="mb-5">
 
                     <label class="form-label">
 
@@ -122,11 +130,7 @@
 
                     <select
                         name="status"
-                        class="form-select"
-                    >
-
-                        <option
-                            value="dibuka"
+                        class="form-control"
                             @selected(
                                 optional($setting)->status == 'dibuka'
                             )
@@ -146,16 +150,15 @@
                     </select>
 
                 </div>
+                <div class="text-end mb-4">
+                    <button
+                        type="submit"
+                        class="btn btn-primary rounded-3">
 
-                <button
-                    type="submit"
-                    class="btn btn-primary"
-                >
+                        Simpan <i class="bi bi-save ms-1"></i>
 
-                    Simpan Pengaturan
-
-                </button>
-
+                    </button>
+                </div>
             </form>
 
         </div>

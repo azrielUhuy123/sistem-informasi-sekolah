@@ -32,9 +32,11 @@ class GuruController extends Controller
             'pengampuMapel.mapel',
         ]);
 
+        $pegawai = $guru;
+
         return view(
             'superadmin.guru.show',
-            compact('guru')
+            compact('pegawai')
         );
     }
 }
