@@ -30,7 +30,7 @@ Route::prefix('ppdb')
         Route::get(
             '/bukti/{no}',
             [PublicController::class, 'bukti']
-        )->name('bukti');
+        )->where('no', '.*')->name('bukti');
 
         Route::get(
             '/status',
@@ -56,18 +56,6 @@ Route::prefix('ppdb')
             '/status/{pendaftar}',
             [PublicController::class, 'statusByLink']
         )->name('status.link')
-        ->middleware('signed');
-
-        Route::get(
-            '/perbaikan/{pendaftar}',
-            [PublicController::class, 'formPerbaikan']
-        )->name('perbaikan.form')
-        ->middleware('signed');
-        
-        Route::post(
-            '/perbaikan/{pendaftar}',
-            [PublicController::class, 'simpanPerbaikan']
-        )->name('perbaikan.simpan')
         ->middleware('signed');
 
     });

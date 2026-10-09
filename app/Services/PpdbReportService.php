@@ -85,11 +85,7 @@ class PpdbReportService
             'total' => (clone $query)->count(),
 
             'pending' => (clone $query)
-                ->where('status', 'pending')
-                ->count(),
-
-            'verifikasi' => (clone $query)
-                ->where('status', 'verifikasi')
+                ->whereIn('status', ['pending', 'verifikasi'])
                 ->count(),
 
             'diterima' => (clone $query)

@@ -11,7 +11,10 @@ class PengaturanController extends Controller
 {
     public function index()
     {
-        $setting = PpdbSetting::first();
+        $tahunAjaranId = request('tahun_ajaran_id') ?? current_tahun_id();
+        $setting = PpdbSetting::where('tahun_ajaran_id', $tahunAjaranId)
+            ->orderBy('id')
+            ->first() ?? new PpdbSetting(['tahun_ajaran_id' => $tahunAjaranId]);
 
         $tahunAjaran = TahunAjaran::orderByDesc('id')
             ->get();
@@ -49,7 +52,7 @@ class PengaturanController extends Controller
 
         PpdbSetting::updateOrCreate(
             [
-                'id' => 1
+                'tahun_ajaran_id' => $request->tahun_ajaran_id,
             ],
             [
                 'tahun_ajaran_id'
@@ -69,9 +72,10 @@ class PengaturanController extends Controller
             ]
         );
 
-        return back()->with(
-            'success',
-            'Pengaturan PPDB berhasil disimpan'
-        );
+        return redirect()
+            ->route('tu.ppdb.pengaturan.index', [
+                'tahun_ajaran_id' => $request->tahun_ajaran_id,
+            ])
+            ->with('success', 'Pengaturan PPDB berhasil disimpan');
     }
 }

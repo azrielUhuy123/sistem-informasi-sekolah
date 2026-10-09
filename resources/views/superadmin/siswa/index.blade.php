@@ -124,9 +124,9 @@
                             </td>
                             <td>{{ $row->nisn ?? '-' }}</td>
                             <td>
-                                <span class="fw-semibold">
+                                <div class="fw-bold border text-label text-center bg-light rounded-3 px-2 py-2">
                                     {{ $row->penempatanAktif?->kelas?->nama_kelas_label ?? '-' }}
-                                </span>
+                                </div>
                             </td>
                             <td>
                                 {{ $row->penempatanAktif?->kelas?->kelasGrup?->angkatan?->tahun ?? '-' }}

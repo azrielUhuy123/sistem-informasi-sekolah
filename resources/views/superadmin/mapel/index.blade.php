@@ -74,9 +74,10 @@
 
                             {{-- Nama --}}
                             <td>
-                                <span class="fw-semibold">
+                                <div class="d-flex align-items-center text-muted">
+                                    <i class="bi bi-book-half text-primary me-2"></i>
                                     {{ $row->nama_mapel }}
-                                </span>
+                                </div>
                             </td>                        
 
                         </tr>

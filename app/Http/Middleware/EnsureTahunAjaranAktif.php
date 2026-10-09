@@ -10,7 +10,7 @@ class EnsureTahunAjaranAktif
 {
     public function handle(Request $request, Closure $next)
     {
-        $tahun = TahunAjaran::current()->first();
+        $tahun = TahunAjaran::current();
 
         if (!$tahun) {
             return redirect()

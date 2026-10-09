@@ -2,6 +2,7 @@
 
 namespace Tests\Feature\Auth;
 
+use App\Models\Siswa;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
@@ -19,23 +20,23 @@ class AuthenticationTest extends TestCase
 
     public function test_users_can_authenticate_using_the_login_screen(): void
     {
-        $user = User::factory()->create();
+        $user = $this->makeStudentUser();
 
         $response = $this->post('/login', [
-            'email' => $user->email,
+            'username' => $user->siswa->nis,
             'password' => 'password',
         ]);
 
-        $this->assertAuthenticated();
-        $response->assertRedirect(route('dashboard', absolute: false));
+        $this->assertAuthenticatedAs($user);
+        $response->assertRedirect(route('siswa.dashboard.index'));
     }
 
     public function test_users_can_not_authenticate_with_invalid_password(): void
     {
-        $user = User::factory()->create();
+        $user = $this->makeStudentUser();
 
         $this->post('/login', [
-            'email' => $user->email,
+            'username' => $user->siswa->nis,
             'password' => 'wrong-password',
         ]);
 
@@ -50,5 +51,26 @@ class AuthenticationTest extends TestCase
 
         $this->assertGuest();
         $response->assertRedirect('/');
+    }
+
+    private function makeStudentUser(): User
+    {
+        $user = User::factory()->create([
+            'role' => 'siswa',
+            'approval_status' => 'approved',
+            'is_active' => true,
+        ]);
+
+        $siswa = Siswa::create([
+            'user_id' => $user->id,
+            'nama' => $user->name,
+            'nis' => (string) random_int(10000000, 99999999),
+            'jenis_kelamin' => 'L',
+            'tanggal_lahir' => '2018-01-01',
+        ]);
+
+        $user->update(['siswa_id' => $siswa->id]);
+
+        return $user->fresh('siswa');
     }
 }

@@ -7,9 +7,11 @@ use App\Models\PpdbPendaftar;
 use App\Models\PpdbSetting;
 use App\Models\TahunAjaran;
 use App\Models\PpdbOrangtua;
+use App\Services\BusinessNotificationService;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Mail;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
 use App\Mail\PpdbPendaftaranMail;
 use Illuminate\Support\Facades\URL;
@@ -25,7 +27,10 @@ class PublicController extends Controller
 
     public function create()
     {
-        $setting = PpdbSetting::first();
+        $tahunAjaranId = current_tahun_id();
+        $setting = PpdbSetting::where('tahun_ajaran_id', $tahunAjaranId)
+            ->orderBy('id')
+            ->first();
 
         if (
             !$setting ||
@@ -45,89 +50,148 @@ class PublicController extends Controller
     }
     public function store(Request $request)
     {
+        $schoolRequired = $request->input('jenis_pendidikan_asal') !== 'Belum Pernah Sekolah';
+
         $request->validate([
+            'nama' => ['required', 'string', 'max:100'],
+            'jenis_kelamin' => ['required', 'in:L,P'],
+            'nik' => ['required', 'digits:16'],
+            'nomor_kk' => ['required', 'digits:16'],
+            'tempat_lahir' => ['required', 'string', 'max:100'],
+            'tanggal_lahir' => ['required', 'date', 'before_or_equal:today'],
+            'nomor_akta' => ['nullable', 'string', 'max:30'],
+            'agama' => ['required', 'in:Islam,Kristen Protestan,Kristen Katolik,Hindu,Buddha,Konghucu'],
+            'kewarganegaraan' => ['required', 'in:Indonesia,WNA'],
 
-            'nama'              => 'required',
-            'jenis_kelamin'     => 'required',
-            'nik'               => 'required',
-            'nomor_kk'          => 'required',
+            'provinsi' => ['required', 'string', 'max:100'],
+            'kabupaten' => ['required', 'string', 'max:100'],
+            'kecamatan' => ['required', 'string', 'max:100'],
+            'desa' => ['required', 'string', 'max:100'],
+            'rt' => ['required', 'digits_between:1,3'],
+            'rw' => ['required', 'digits_between:1,3'],
+            'alamat' => ['required', 'string', 'max:255'],
 
-            'tempat_lahir'      => 'required',
-            'tanggal_lahir'     => 'required',
+            'jenis_pendidikan_asal' => ['required', 'in:TK,RA,SPS,KB,TPA,Lainnya,Belum Pernah Sekolah'],
+            'nama_sekolah_asal' => [$schoolRequired ? 'required' : 'nullable', 'string', 'max:150'],
+            'nisn_sekolah_asal' => [$schoolRequired ? 'required' : 'nullable', 'digits:10'],
 
-            'agama'             => 'required',
+            'nama_ayah' => ['required', 'string', 'max:100', 'regex:/^[\pL\s\'.-]+$/u'],
+            'nik_ayah' => ['nullable', 'digits:16'],
+            'tempat_lahir_ayah' => ['required', 'string', 'max:100'],
+            'tanggal_lahir_ayah' => ['required', 'date'],
+            'agama_ayah' => ['required', 'in:Islam,Kristen Protestan,Kristen Katolik,Hindu,Buddha,Konghucu'],
+            'pendidikan_ayah' => ['required', 'in:Tidak/Belum Sekolah,SD,SMP,SMA/SMK,Diploma I,Diploma II,Diploma III,Diploma IV,Sarjana (S1),Magister (S2),Doktor (S3)'],
+            'pekerjaan_ayah' => ['required', 'in:Tidak/Belum Bekerja,Mengurus Rumah Tangga (IRT),Petani,Nelayan,Buruh,Pedagang,Wiraswasta,Pegawai Swasta,Pegawai BUMN,PNS,TNI,POLRI,Guru,Dosen,Tenaga Kesehatan,Pengemudi/Ojek Online,Pensiunan,Lainnya'],
+            'penghasilan_ayah' => ['nullable', 'in:<500.000,500.000-999.999,1.000.000-1.999.999,2.000.000-4.999.999,>5.000.000'],
 
-            'alamat'            => 'required',
+            'nama_ibu' => ['required', 'string', 'max:100', 'regex:/^[\pL\s\'.-]+$/u'],
+            'nik_ibu' => ['nullable', 'digits:16'],
+            'tempat_lahir_ibu' => ['required', 'string', 'max:100'],
+            'tanggal_lahir_ibu' => ['required', 'date'],
+            'agama_ibu' => ['required', 'in:Islam,Kristen Protestan,Kristen Katolik,Hindu,Buddha,Konghucu'],
+            'pendidikan_ibu' => ['required', 'in:Tidak/Belum Sekolah,SD,SMP,SMA/SMK,Diploma I,Diploma II,Diploma III,Diploma IV,Sarjana (S1),Magister (S2),Doktor (S3)'],
+            'pekerjaan_ibu' => ['required', 'in:Tidak/Belum Bekerja,Mengurus Rumah Tangga (IRT),Petani,Nelayan,Buruh,Pedagang,Wiraswasta,Pegawai Swasta,Pegawai BUMN,PNS,TNI,POLRI,Guru,Dosen,Tenaga Kesehatan,Pengemudi/Ojek Online,Pensiunan,Lainnya'],
+            'penghasilan_ibu' => ['nullable', 'in:<500.000,500.000-999.999,1.000.000-1.999.999,2.000.000-4.999.999,>5.000.000'],
 
-            'desa'              => 'required',
-            'kecamatan'         => 'required',
-            'kabupaten'         => 'required',
-            'provinsi'          => 'required',
+            'nomor_hp' => ['required', 'regex:/^08\d{8,11}$/'],
+            'email' => ['required', 'email', 'max:255'],
+            'email_confirmation' => ['required', 'same:email'],
 
-            'nama_ayah'         => 'required',
-            'nama_ibu'          => 'required',
+            'tinggi_badan' => ['required', 'numeric', 'decimal:0,1', 'min:30', 'max:250'],
+            'berat_badan' => ['required', 'numeric', 'decimal:0,1', 'min:5', 'max:150'],
+            'anak_ke' => ['required', 'integer', 'min:1', 'max:20'],
+            'jumlah_saudara' => ['required', 'integer', 'min:0', 'max:20'],
 
-            'email' => 'required|email|max:255',
-            'email_confirmation' => 'required|same:email',
-        ],
-        [
-            'email.required'
-                => 'Email wajib diisi.',
-
-            'email.email'
-                => 'Format email tidak valid.',
-
-            'email.max'
-                => 'Email maksimal 255 karakter.',
-
-            'email_confirmation.required'
-                => 'Konfirmasi email wajib diisi.',
-
-            'email_confirmation.same'
-                => 'Konfirmasi email tidak sama dengan email.',
-          
+            'kartu_keluarga' => ['required', 'file', 'mimes:pdf,jpg,jpeg', 'max:2048'],
+            'ktp' => ['required', 'file', 'mimes:pdf,jpg,jpeg', 'max:2048'],
+            'ijazah' => ['nullable', 'file', 'mimes:pdf,jpg,jpeg', 'max:2048'],
+            'akta_lahir' => ['nullable', 'file', 'mimes:pdf,jpg,jpeg', 'max:2048'],
+            'kartu_kip' => ['nullable', 'file', 'mimes:pdf,jpg,jpeg', 'max:2048'],
+            'foto' => ['required', 'file', 'mimes:jpg,jpeg,png', 'max:2048'],
+            'declaration' => ['accepted'],
+        ], [
+            'nama.required' => 'Nama lengkap wajib diisi.',
+            'jenis_kelamin.required' => 'Jenis kelamin wajib dipilih.',
+            'nik.required' => 'NIK wajib diisi.',
+            'nik.digits' => 'NIK harus terdiri dari 16 digit angka.',
+            'nomor_kk.required' => 'Nomor KK wajib diisi.',
+            'nomor_kk.digits' => 'Nomor KK harus terdiri dari 16 digit angka.',
+            'tempat_lahir.required' => 'Tempat lahir wajib diisi.',
+            'tanggal_lahir.required' => 'Tanggal lahir wajib diisi.',
+            'agama.required' => 'Agama wajib dipilih.',
+            'kewarganegaraan.required' => 'Kewarganegaraan wajib dipilih.',
+            'provinsi.required' => 'Provinsi wajib dipilih.',
+            'kabupaten.required' => 'Kabupaten/Kota wajib dipilih.',
+            'kecamatan.required' => 'Kecamatan wajib dipilih.',
+            'desa.required' => 'Kelurahan/Desa wajib dipilih.',
+            'rt.required' => 'RT wajib diisi.',
+            'rw.required' => 'RW wajib diisi.',
+            'alamat.required' => 'Alamat lengkap wajib diisi.',
+            'jenis_pendidikan_asal.required' => 'Jenis pendidikan asal wajib dipilih.',
+            'nama_sekolah_asal.required' => 'Nama sekolah asal wajib diisi.',
+            'nisn_sekolah_asal.required' => 'NISN sekolah asal wajib diisi.',
+            'nisn_sekolah_asal.digits' => 'NISN harus terdiri dari 10 digit angka.',
+            'nama_ayah.required' => 'Nama ayah wajib diisi.',
+            'nama_ibu.required' => 'Nama ibu wajib diisi.',
+            'tempat_lahir_ayah.required' => 'Tempat lahir ayah wajib diisi.',
+            'tanggal_lahir_ayah.required' => 'Tanggal lahir ayah wajib diisi.',
+            'agama_ayah.required' => 'Agama ayah wajib dipilih.',
+            'pendidikan_ayah.required' => 'Pendidikan ayah wajib dipilih.',
+            'pekerjaan_ayah.required' => 'Pekerjaan ayah wajib dipilih.',
+            'tempat_lahir_ibu.required' => 'Tempat lahir ibu wajib diisi.',
+            'tanggal_lahir_ibu.required' => 'Tanggal lahir ibu wajib diisi.',
+            'agama_ibu.required' => 'Agama ibu wajib dipilih.',
+            'pendidikan_ibu.required' => 'Pendidikan ibu wajib dipilih.',
+            'pekerjaan_ibu.required' => 'Pekerjaan ibu wajib dipilih.',
+            'nomor_hp.required' => 'Nomor HP/WhatsApp wajib diisi.',
+            'nomor_hp.regex' => 'Nomor HP/WhatsApp harus diawali 08 dan terdiri dari 10-13 digit.',
+            'email.required' => 'Email wajib diisi.',
+            'email.email' => 'Format email tidak valid.',
+            'email.max' => 'Email maksimal 255 karakter.',
+            'email_confirmation.required' => 'Konfirmasi email wajib diisi.',
+            'email_confirmation.same' => 'Konfirmasi email tidak sama dengan email.',
+            'anak_ke.required' => 'Anak ke wajib diisi.',
+            'jumlah_saudara.required' => 'Jumlah saudara wajib diisi.',
+            'tinggi_badan.required' => 'Tinggi badan wajib diisi.',
+            'berat_badan.required' => 'Berat badan wajib diisi.',
+            'kartu_keluarga.required' => 'Kartu keluarga wajib diunggah.',
+            'ktp.required' => 'KTP orang tua wajib diunggah.',
+            'foto.required' => 'Foto wajib diunggah.',
+            'declaration.accepted' => 'Pernyataan wajib disetujui.',
         ]);
 
         $pendaftar = DB::transaction(function () use ($request) {
 
-            $foto = null;
-            $akta = null;
-            $kk = null;
+            $tahunAjaran = TahunAjaran::whereKey(current_tahun_id())
+                ->lockForUpdate()
+                ->firstOrFail();
 
-            if ($request->hasFile('foto')) {
+            $setting = PpdbSetting::where('tahun_ajaran_id', $tahunAjaran->id)
+                ->lockForUpdate()
+                ->first();
 
-                $foto = $request
-                    ->file('foto')
-                    ->store(
-                        'ppdb/foto',
-                        'public'
-                    );
+            if (!$setting || $setting->status !== 'dibuka') {
+                abort(403, 'PPDB sedang ditutup');
             }
 
-            if ($request->hasFile('akta_lahir')) {
-
-                $akta = $request
-                    ->file('akta_lahir')
-                    ->store(
-                        'ppdb/akta',
-                        'public'
-                    );
-            }
-
-            if ($request->hasFile('kartu_keluarga')) {
-
-                $kk = $request
-                    ->file('kartu_keluarga')
-                    ->store(
-                        'ppdb/kk',
-                        'public'
-                    );
+            $uploadedFiles = [];
+            foreach ([
+                'kartu_keluarga' => 'ppdb/kk',
+                'ktp' => 'ppdb/ktp',
+                'ijazah' => 'ppdb/ijazah',
+                'akta_lahir' => 'ppdb/akta',
+                'kartu_kip' => 'ppdb/kip',
+                'foto' => 'ppdb/foto',
+            ] as $field => $directory) {
+                if ($request->hasFile($field)) {
+                    $uploadedFiles[$field] = $request->file($field)->store($directory, 'public');
+                }
             }
 
             $pendaftar = PpdbPendaftar::create([
 
                 'no_pendaftaran'
-                    => $this->generateNoPendaftaran(),
+                    => $this->generateNoPendaftaran($tahunAjaran),
 
                 'tanggal_pendaftaran'
                     => now(),
@@ -136,7 +200,7 @@ class PublicController extends Controller
                     => 'pending',
 
                 'tahun_ajaran_id'
-                    => current_tahun_id(),
+                    => $tahunAjaran->id,
 
                 'nama'
                     => $request->nama,
@@ -166,6 +230,15 @@ class PublicController extends Controller
                 'nik'
                     => $request->nik,
 
+                'jenis_pendidikan_asal'
+                    => $request->jenis_pendidikan_asal,
+
+                'nama_sekolah_asal'
+                    => $request->nama_sekolah_asal,
+
+                'nisn_sekolah_asal'
+                    => $request->nisn_sekolah_asal,
+
                 'alamat'
                     => $request->alamat,
 
@@ -187,15 +260,9 @@ class PublicController extends Controller
                 'provinsi'
                     => $request->provinsi,
 
-                'telepon_rumah'
-                    => $request->telepon_rumah,
+                'nomor_hp'
+                    => $request->nomor_hp,
 
-                'hp_ayah'
-                    => $request->hp_ayah,
-
-                'hp_ibu'
-                    => $request->hp_ibu,
-                
                 'email'
                     => $request->email,
 
@@ -212,13 +279,22 @@ class PublicController extends Controller
                     => $request->jumlah_saudara,
 
                 'foto'
-                    => $foto,
+                    => $uploadedFiles['foto'] ?? null,
 
                 'akta_lahir'
-                    => $akta,
+                    => $uploadedFiles['akta_lahir'] ?? null,
 
                 'kartu_keluarga'
-                    => $kk,
+                    => $uploadedFiles['kartu_keluarga'] ?? null,
+
+                'ktp'
+                    => $uploadedFiles['ktp'] ?? null,
+
+                'ijazah'
+                    => $uploadedFiles['ijazah'] ?? null,
+
+                'kartu_kip'
+                    => $uploadedFiles['kartu_kip'] ?? null,
             ]);
 
             PpdbOrangtua::create([
@@ -240,6 +316,9 @@ class PublicController extends Controller
 
                 'tanggal_lahir'
                     => $request->tanggal_lahir_ayah,
+
+                'agama'
+                    => $request->agama_ayah,
 
                 'pendidikan'
                     => $request->pendidikan_ayah,
@@ -271,6 +350,9 @@ class PublicController extends Controller
                 'tanggal_lahir'
                     => $request->tanggal_lahir_ibu,
 
+                'agama'
+                    => $request->agama_ibu,
+
                 'pendidikan'
                     => $request->pendidikan_ibu,
 
@@ -293,18 +375,34 @@ class PublicController extends Controller
             ]
         );
 
-        Mail::to($pendaftar->email)
-            ->send(
-                new PpdbPendaftaranMail(
-                    $pendaftar,
-                    $statusUrl
-                )
-            );
+        $emailSent = $this->sendPpdbEmail($pendaftar, $statusUrl);
 
-        return redirect()->route(
+        if ($pendaftar->status === 'pending') {
+            try {
+                app(BusinessNotificationService::class)
+                    ->notifyPendingPpdbRegistration($pendaftar);
+            } catch (\Throwable $exception) {
+                Log::error('Notifikasi internal PPDB gagal dibuat.', [
+                    'pendaftar_id' => $pendaftar->id,
+                    'no_pendaftaran' => $pendaftar->no_pendaftaran,
+                    'error' => $exception->getMessage(),
+                ]);
+            }
+        }
+
+        $response = redirect()->route(
             'ppdb.bukti',
             $pendaftar->no_pendaftaran
         );
+
+        if (!$emailSent) {
+            $response->with(
+                'warning',
+                'Pendaftaran berhasil disimpan, tetapi email konfirmasi tidak dapat dikirim.'
+            );
+        }
+
+        return $response;
     }
 
 
@@ -332,11 +430,15 @@ class PublicController extends Controller
     {
         $request->validate([
             'keyword' => 'required|string',
+            'tanggal_lahir' => 'required|date',
         ]);
 
         $data = PpdbPendaftar::where(
             'no_pendaftaran',
             $request->keyword
+        )->whereDate(
+            'tanggal_lahir',
+            $request->tanggal_lahir
         )->first();
 
         if (!$data) {
@@ -344,7 +446,7 @@ class PublicController extends Controller
                 ->withInput()
                 ->with(
                     'error',
-                    'Nomor pendaftaran tidak ditemukan.'
+                    'Nomor pendaftaran atau tanggal lahir tidak sesuai.'
                 );
         }
 
@@ -357,25 +459,31 @@ class PublicController extends Controller
         );
     }
 
-    private function generateNoPendaftaran()
+    private function generateNoPendaftaran(TahunAjaran $tahunAjaran)
     {
-        $last = PpdbPendaftar::max('id') + 1;
+        $prefix = 'PPDB-' . $tahunAjaran->tahun . '-';
+        $lastSequence = PpdbPendaftar::query()
+            ->where('tahun_ajaran_id', $tahunAjaran->id)
+            ->where('no_pendaftaran', 'like', $prefix . '%')
+            ->pluck('no_pendaftaran')
+            ->map(function ($registrationNumber) use ($prefix) {
+                $sequence = substr($registrationNumber, strlen($prefix));
 
-        return 'PPDB-'
-            . now()->year
-            . '-'
-            . str_pad(
-                $last,
-                5,
-                '0',
-                STR_PAD_LEFT
-            );
+                return ctype_digit($sequence) ? (int) $sequence : 0;
+            })
+            ->max() ?? 0;
+
+        return $prefix . str_pad($lastSequence + 1, 3, '0', STR_PAD_LEFT);
     }
     public function informasi()
     {
+        $tahunAjaranId = current_tahun_id();
         $setting = PpdbSetting::with(
             'tahunAjaran'
-        )->first();
+        )
+            ->where('tahun_ajaran_id', $tahunAjaranId)
+            ->orderBy('id')
+            ->first();
 
         return view(
             'ppdb.public.informasi',
@@ -395,36 +503,87 @@ class PublicController extends Controller
     )
     {
         $request->validate([
-            'no_pendaftaran'
-                => 'required'
+                'no_pendaftaran' => ['required', 'string'],
+                'tanggal_lahir' => ['required', 'date'],
         ]);
 
-        $pendaftar = PpdbPendaftar::where(
-            'no_pendaftaran',
-            $request->no_pendaftaran
-        )
-        ->where(
-            'status',
-            'diterima'
-        )
-        ->first();
+            $noPendaftaran = $request->input('no_pendaftaran');
+            $tanggalLahir = $request->input('tanggal_lahir');
 
-        if (!$pendaftar) {
+            $updated = DB::transaction(function () use ($noPendaftaran, $tanggalLahir) {
+            $updated = PpdbPendaftar::where(
+                'no_pendaftaran',
+                    $noPendaftaran
+                )
+                ->whereDate(
+                    'tanggal_lahir',
+                    $tanggalLahir
+            )
+            ->where(
+                'status',
+                'diterima'
+            )
+            ->where(function ($query) {
+                $query
+                    ->whereNull('status_daftar_ulang')
+                    ->orWhere('status_daftar_ulang', '!=', 'sudah');
+            })
+            ->update([
+                'status_daftar_ulang' => 'sudah',
+                'tanggal_daftar_ulang' => now(),
+            ]);
 
-            return back()->with(
+            if ($updated > 0) {
+                $pendaftar = PpdbPendaftar::where(
+                    'no_pendaftaran',
+                    $noPendaftaran
+                )
+                ->whereDate(
+                    'tanggal_lahir',
+                    $tanggalLahir
+                )
+                ->where('status', 'diterima')
+                ->where('status_daftar_ulang', 'sudah')
+                ->firstOrFail();
+
+                app(BusinessNotificationService::class)
+                    ->notifyPpdbDaftarUlangSubmitted($pendaftar);
+            }
+
+            return $updated;
+        });
+
+        if ($updated === 0) {
+            $alreadyConfirmed = PpdbPendaftar::where(
+                'no_pendaftaran',
+                $noPendaftaran
+            )
+            ->whereDate(
+                'tanggal_lahir',
+                $tanggalLahir
+            )
+            ->where(
+                'status',
+                'diterima'
+            )
+            ->where(
+                'status_daftar_ulang',
+                'sudah'
+            )
+            ->exists();
+
+            if ($alreadyConfirmed) {
+                return back()->with(
+                    'error',
+                    'Daftar ulang sudah pernah dikonfirmasi.'
+                );
+            }
+
+            return back()->withInput()->with(
                 'error',
-                'Data tidak ditemukan'
+                'Nomor pendaftaran atau tanggal lahir tidak sesuai, atau pendaftar belum memenuhi syarat daftar ulang.'
             );
         }
-
-        $pendaftar->update([
-
-            'status_daftar_ulang'
-                => 'sudah',
-
-            'tanggal_daftar_ulang'
-                => now(),
-        ]);
 
         return back()->with(
             'success',
@@ -443,86 +602,29 @@ class PublicController extends Controller
         );
     }
 
-    public function formPerbaikan(PpdbPendaftar $pendaftar)
+    private function sendPpdbEmail(
+        PpdbPendaftar $pendaftar,
+        string $statusUrl
+    ): bool
     {
-        return view(
-            'ppdb.public.perbaikan',
-            compact('pendaftar')
-        );
-    }
-
-    public function simpanPerbaikan(Request $request, PpdbPendaftar $pendaftar)
-    {
-        if (
-            $pendaftar->status !== 'pending' ||
-            empty($pendaftar->catatan_verifikasi)
-        ) {
-            abort(403, 'Pendaftaran ini tidak memerlukan perbaikan berkas.');
+        if (empty($pendaftar->email)) {
+            return false;
         }
 
-        $request->validate([
-            'kartu_keluarga' => 'required|file|mimes:pdf,jpg,jpeg|max:2048',
-            'akta_lahir' => 'required|file|mimes:pdf,jpg,jpeg|max:2048',
-            'foto' => 'required|file|mimes:jpg,jpeg,png|max:2048',
-        ]);
+        try {
+            Mail::to($pendaftar->email)
+                ->send(new PpdbPendaftaranMail($pendaftar, $statusUrl));
 
-        $oldKartuKeluarga = $pendaftar->kartu_keluarga;
-        $oldAktaLahir = $pendaftar->akta_lahir;
-        $oldFoto = $pendaftar->foto;
-
-        $kartuKeluargaPath = $request
-            ->file('kartu_keluarga')
-            ->store('ppdb/kk', 'public');
-
-        $aktaLahirPath = $request
-            ->file('akta_lahir')
-            ->store('ppdb/akta', 'public');
-
-        $fotoPath = $request
-            ->file('foto')
-            ->store('ppdb/foto', 'public');
-
-        DB::transaction(function () use (
-            $pendaftar,
-            $kartuKeluargaPath,
-            $aktaLahirPath,
-            $fotoPath
-        ) {
-            $pendaftar->update([
-                'kartu_keluarga' => $kartuKeluargaPath,
-                'akta_lahir' => $aktaLahirPath,
-                'foto' => $fotoPath,
-                'catatan_verifikasi' => null,
-                'status' => 'pending',
+            return true;
+        } catch (\Throwable $exception) {
+            Log::error('Email PPDB gagal dikirim.', [
+                'pendaftar_id' => $pendaftar->id,
+                'email' => $pendaftar->email,
+                'status' => $pendaftar->status,
+                'error' => $exception->getMessage(),
             ]);
-        });
 
-        if (
-            $oldKartuKeluarga &&
-            Storage::disk('public')->exists($oldKartuKeluarga)
-        ) {
-            Storage::disk('public')->delete($oldKartuKeluarga);
+            return false;
         }
-
-        if (
-            $oldAktaLahir &&
-            Storage::disk('public')->exists($oldAktaLahir)
-        ) {
-            Storage::disk('public')->delete($oldAktaLahir);
-        }
-
-        if (
-            $oldFoto &&
-            Storage::disk('public')->exists($oldFoto)
-        ) {
-            Storage::disk('public')->delete($oldFoto);
-        }
-
-        return redirect()
-            ->route('ppdb.status')
-            ->with(
-                'success',
-                'Berkas berhasil diperbarui dan sedang menunggu pemeriksaan ulang oleh petugas PPDB.'
-            );
     }
 }

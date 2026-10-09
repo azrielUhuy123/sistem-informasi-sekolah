@@ -1,168 +1,268 @@
 <div id="step4" class="wizard-step d-none">
-    <h4 class="mb-4">Kontak</h4>
+    <h4 class="mb-4">Data Orang Tua/Wali</h4>
 
-    <div class="row">
-        <div class="col-md-4 mb-3">
-            <label for="telepon_rumah" class="form-label">
-                Nomor Telepon Rumah <span class="text-danger">*</span>
-            </label>
+    <div class="row g-3">
+        <div class="col-12 col-md-6">
+            <h5 class="card-title">Data Ayah</h5>
 
-            <input
-                id="telepon_rumah"
-                name="telepon_rumah"
-                type="text"
-                class="form-control"
-                maxlength="15"
-                inputmode="numeric"
-                autocomplete="tel"
-                required
-            >
+            <div class="mb-3">
+                <label for="nama_ayah" class="form-label">Nama Lengkap Ayah <span class="text-danger">*</span></label>
+                <input id="nama_ayah" name="nama_ayah" type="text" class="form-control" placeholder="Masukkan nama lengkap ayah" maxlength="100" autocomplete="name">
+                <div class="invalid-feedback"></div>
+            </div>
 
-            <small class="text-muted">
-                Masukkan nomor telepon yang dapat dihubungi.
-            </small>
+            <div class="mb-3">
+                <label for="nik_ayah" class="form-label">NIK Ayah</label>
+                <input id="nik_ayah" name="nik_ayah" type="text" inputmode="numeric" maxlength="16" class="form-control" autocomplete="off" placeholder="16 digit NIK (opsional)">
+                <small class="text-muted">Opsional. Jika diisi, harus 16 digit angka.</small>
+                <div class="invalid-feedback"></div>
+            </div>
 
-            <div class="invalid-feedback"></div>
+            <div class="mb-3">
+                <label for="tempat_lahir_ayah" class="form-label">Tempat Lahir Ayah <span class="text-danger">*</span></label>
+                <input id="tempat_lahir_ayah" name="tempat_lahir_ayah" type="text" class="form-control" placeholder="Tempat lahir ayah" autocomplete="address-level2" required>
+                <div class="invalid-feedback"></div>
+            </div>
+
+            <div class="mb-3">
+                <label for="tanggal_lahir_ayah" class="form-label">Tanggal Lahir Ayah <span class="text-danger">*</span></label>
+                <input id="tanggal_lahir_ayah" name="tanggal_lahir_ayah" type="date" class="form-control" autocomplete="bday" required>
+                <div class="invalid-feedback"></div>
+            </div>
+
+            <div class="mb-3">
+                <label for="agama_ayah" class="form-label">
+                    Agama <span class="text-danger">*</span>
+                </label>
+                <select id="agama_ayah" name="agama_ayah" class="form-select" required>
+                    <option value="">-- Pilih Agama --</option>
+                    <option value="Islam">Islam</option>
+                    <option value="Kristen Protestan">Kristen Protestan</option>
+                    <option value="Kristen Katolik">Kristen Katolik</option>
+                    <option value="Hindu">Hindu</option>
+                    <option value="Buddha">Buddha</option>
+                    <option value="Konghucu">Konghucu</option>
+                </select>
+                <div class="invalid-feedback"></div>
+            </div>
+
+            <div class="mb-3">
+                <label for="pendidikan_ayah" class="form-label">Pendidikan Ayah <span class="text-danger">*</span></label>
+                <select id="pendidikan_ayah" name="pendidikan_ayah" class="form-select" required>
+                    <option value="" selected>Pilih Pendidikan Terakhir</option>
+                    <option>Tidak/Belum Sekolah</option>
+                    <option>SD</option>
+                    <option>SMP</option>
+                    <option>SMA/SMK</option>
+                    <option>Diploma I</option>
+                    <option>Diploma II</option>
+                    <option>Diploma III</option>
+                    <option>Diploma IV</option>
+                    <option>Sarjana (S1)</option>
+                    <option>Magister (S2)</option>
+                    <option>Doktor (S3)</option>
+                </select>
+                <div class="invalid-feedback"></div>
+            </div>
+
+            <div class="mb-3">
+                <label for="pekerjaan_ayah" class="form-label">Pekerjaan Ayah <span class="text-danger">*</span></label>
+                <select id="pekerjaan_ayah" name="pekerjaan_ayah" class="form-select" required>
+                    <option value="" selected>Pilih Pekerjaan</option>
+                    <option>Tidak/Belum Bekerja</option>
+                    <option>Mengurus Rumah Tangga (IRT)</option>
+                    <option>Petani</option>
+                    <option>Nelayan</option>
+                    <option>Buruh</option>
+                    <option>Pedagang</option>
+                    <option>Wiraswasta</option>
+                    <option>Pegawai Swasta</option>
+                    <option>Pegawai BUMN</option>
+                    <option>PNS</option>
+                    <option>TNI</option>
+                    <option>POLRI</option>
+                    <option>Guru</option>
+                    <option>Dosen</option>
+                    <option>Tenaga Kesehatan</option>
+                    <option>Pengemudi/Ojek Online</option>
+                    <option>Pensiunan</option>
+                    <option>Lainnya</option>
+                </select>
+                <div class="invalid-feedback"></div>
+            </div>
+
+            <div class="mb-0">
+                <label for="penghasilan_ayah" class="form-label">Penghasilan Ayah</label>
+                <select id="penghasilan_ayah" name="penghasilan_ayah" class="form-select">
+                    <option value="" selected>Pilih Rentang Penghasilan</option>
+                    <option value="<500.000">&lt; Rp500.000</option>
+                    <option value="500.000-999.999">Rp500.000 – Rp999.999</option>
+                    <option value="1.000.000-1.999.999">Rp1.000.000 – Rp1.999.999</option>
+                    <option value="2.000.000-4.999.999">Rp2.000.000 – Rp4.999.999</option>
+                    <option value=">5.000.000">>Rp5.000.000</option>
+                </select>
+                <div class="invalid-feedback"></div>
+            </div>
         </div>
 
-        <div class="col-md-4 mb-3">
-            <label for="hp_ayah" class="form-label">
-                Nomor HP/WhatsApp Ayah <span class="text-danger">*</span>
-            </label>
+        <div class="col-12 col-md-6">
+            <h5 class="card-title">Data Ibu</h5>
 
-            <input
-                id="hp_ayah"
-                name="hp_ayah"
-                type="text"
-                class="form-control"
-                maxlength="13"
-                inputmode="numeric"
-                autocomplete="tel-national"
-                required
-            >
+            <div class="mb-3">
+                <label for="nama_ibu" class="form-label">Nama Lengkap Ibu <span class="text-danger">*</span></label>
+                <input id="nama_ibu" name="nama_ibu" type="text" class="form-control" placeholder="Masukkan nama lengkap ibu" maxlength="100" autocomplete="name">
+                <div class="invalid-feedback"></div>
+            </div>
 
-            <small class="text-muted">
-                Masukkan nomor WhatsApp Ayah yang aktif.
-            </small>
+            <div class="mb-3">
+                <label for="nik_ibu" class="form-label">NIK Ibu</label>
+                <input id="nik_ibu" name="nik_ibu" type="text" inputmode="numeric" maxlength="16" class="form-control" autocomplete="off" placeholder="16 digit NIK (opsional)">
+                <small class="text-muted">Opsional. Jika diisi, harus 16 digit angka.</small>
+                <div class="invalid-feedback"></div>
+            </div>
 
-            <div class="invalid-feedback"></div>
-        </div>
+            <div class="mb-3">
+                <label for="tempat_lahir_ibu" class="form-label">Tempat Lahir Ibu <span class="text-danger">*</span></label>
+                <input id="tempat_lahir_ibu" name="tempat_lahir_ibu" type="text" class="form-control" placeholder="Tempat lahir ibu" autocomplete="address-level2" required>
+                <div class="invalid-feedback"></div>
+            </div>
 
-        <div class="col-md-4 mb-3">
-            <label for="hp_ibu" class="form-label">
-                Nomor HP/WhatsApp Ibu <span class="text-danger">*</span>
-            </label>
+            <div class="mb-3">
+                <label for="tanggal_lahir_ibu" class="form-label">Tanggal Lahir Ibu <span class="text-danger">*</span></label>
+                <input id="tanggal_lahir_ibu" name="tanggal_lahir_ibu" type="date" class="form-control" autocomplete="bday" required>
+                <div class="invalid-feedback"></div>
+            </div>
 
-            <input
-                id="hp_ibu"
-                name="hp_ibu"
-                type="text"
-                class="form-control"
-                maxlength="13"
-                inputmode="numeric"
-                autocomplete="tel-national"
-                required
-            >
+            <div class="mb-3">
+                <label for="agama_ibu" class="form-label">
+                    Agama <span class="text-danger">*</span>
+                </label>
+                <select id="agama_ibu" name="agama_ibu" class="form-select" required>
+                    <option value="">-- Pilih Agama --</option>
+                    <option value="Islam">Islam</option>
+                    <option value="Kristen Protestan">Kristen Protestan</option>
+                    <option value="Kristen Katolik">Kristen Katolik</option>
+                    <option value="Hindu">Hindu</option>
+                    <option value="Buddha">Buddha</option>
+                    <option value="Konghucu">Konghucu</option>
+                </select>
+                <div class="invalid-feedback"></div>
+            </div>
 
-            <small class="text-muted">
-                Masukkan nomor WhatsApp Ibu yang aktif.
-            </small>
+            <div class="mb-3">
+                <label for="pendidikan_ibu" class="form-label">Pendidikan Ibu <span class="text-danger">*</span></label>
+                <select id="pendidikan_ibu" name="pendidikan_ibu" class="form-select" required>
+                    <option value="" selected>Pilih Pendidikan Terakhir</option>
+                    <option>Tidak/Belum Sekolah</option>
+                    <option>SD</option>
+                    <option>SMP</option>
+                    <option>SMA/SMK</option>
+                    <option>Diploma I</option>
+                    <option>Diploma II</option>
+                    <option>Diploma III</option>
+                    <option>Diploma IV</option>
+                    <option>Sarjana (S1)</option>
+                    <option>Magister (S2)</option>
+                    <option>Doktor (S3)</option>
+                </select>
+                <div class="invalid-feedback"></div>
+            </div>
 
-            <div class="invalid-feedback"></div>
-        </div>
-    </div>
+            <div class="mb-3">
+                <label for="pekerjaan_ibu" class="form-label">Pekerjaan Ibu <span class="text-danger">*</span></label>
+                <select id="pekerjaan_ibu" name="pekerjaan_ibu" class="form-select" required>
+                    <option value="" selected>Pilih Pekerjaan</option>
+                    <option>Tidak/Belum Bekerja</option>
+                    <option>Mengurus Rumah Tangga (IRT)</option>
+                    <option>Petani</option>
+                    <option>Nelayan</option>
+                    <option>Buruh</option>
+                    <option>Pedagang</option>
+                    <option>Wiraswasta</option>
+                    <option>Pegawai Swasta</option>
+                    <option>Pegawai BUMN</option>
+                    <option>PNS</option>
+                    <option>TNI</option>
+                    <option>POLRI</option>
+                    <option>Guru</option>
+                    <option>Dosen</option>
+                    <option>Tenaga Kesehatan</option>
+                    <option>Pengemudi/Ojek Online</option>
+                    <option>Pensiunan</option>
+                    <option>Lainnya</option>
+                </select>
+                <div class="invalid-feedback"></div>
+            </div>
 
-    <div class="row">
-        <div class="col-md-6 mb-3">
-            <label for="email" class="form-label">
-                Email <span class="text-danger">*</span>
-            </label>
-
-            <input
-                id="email"
-                name="email"
-                type="email"
-                class="form-control"
-                value="{{ old('email') }}"
-                maxlength="255"
-                autocomplete="email"
-                placeholder="contoh@email.com"
-                required
-            >
-
-            <small class="text-muted">
-                Digunakan untuk menerima informasi perkembangan pendaftaran.
-            </small>
-
-            <div class="invalid-feedback"></div>
-        </div>
-
-        <div class="col-md-6 mb-3">
-            <label for="email_confirmation" class="form-label">
-                Konfirmasi Email <span class="text-danger">*</span>
-            </label>
-
-            <input
-                id="email_confirmation"
-                name="email_confirmation"
-                type="email"
-                class="form-control"
-                value="{{ old('email_confirmation') }}"
-                maxlength="255"
-                autocomplete="email"
-                placeholder="Masukkan kembali email"
-                required
-            >
-
-            <small class="text-muted">
-                Pastikan alamat email sama dengan kolom sebelumnya.
-            </small>
-
-            <div class="invalid-feedback"></div>
+            <div class="mb-0">
+                <label for="penghasilan_ibu" class="form-label">Penghasilan Ibu</label>
+                <select id="penghasilan_ibu" name="penghasilan_ibu" class="form-select">
+                    <option value="" selected>Pilih Rentang Penghasilan</option>
+                    <option value="<500.000">&lt; Rp500.000</option>
+                    <option value="500.000-999.999">Rp500.000 – Rp999.999</option>
+                    <option value="1.000.000-1.999.999">Rp1.000.000 – Rp1.999.999</option>
+                    <option value="2.000.000-4.999.999">Rp2.000.000 – Rp4.999.999</option>
+                    <option value=">5.000.000">>Rp5.000.000</option>
+                </select>
+                <div class="invalid-feedback"></div>
+            </div>
         </div>
     </div>
 
     <hr class="my-4">
 
     <div class="d-flex justify-content-between mt-4">
-        <button
-            type="button"
-            class="btn btn-outline-secondary rounded-3 btn-sm"
-            onclick="showStep(3)"
-        >
+        <button type="button" class="btn btn-outline-secondary rounded-3 btn-sm" onclick="showStep(3)">
             <i class="bi bi-arrow-left me-1"></i>
             Sebelumnya
         </button>
 
-        <button
-            type="button"
-            class="btn btn-primary btn-sm"
-            id="step4-next"
-        >
-            Selanjutnya
-            <i class="bi bi-arrow-right ms-1"></i>
+        <button type="button" class="btn btn-primary btn-sm" onclick="showStep(5)">
+            Selanjutnya <i class="bi bi-arrow-right ms-1"></i>
         </button>
     </div>
+</div>
 
-    <script>
+<script>
     document.addEventListener('DOMContentLoaded', function () {
         const step4Fields = {
-            telepon_rumah: document.getElementById('telepon_rumah'),
-            hp_ayah: document.getElementById('hp_ayah'),
-            hp_ibu: document.getElementById('hp_ibu'),
-            email: document.getElementById('email'),
-            email_confirmation: document.getElementById('email_confirmation'),
+            nama_ayah: document.getElementById('nama_ayah'),
+            nik_ayah: document.getElementById('nik_ayah'),
+            tempat_lahir_ayah: document.getElementById('tempat_lahir_ayah'),
+            tanggal_lahir_ayah: document.getElementById('tanggal_lahir_ayah'),
+            agama_ayah: document.getElementById('agama_ayah'),
+            pendidikan_ayah: document.getElementById('pendidikan_ayah'),
+            pekerjaan_ayah: document.getElementById('pekerjaan_ayah'),
+            penghasilan_ayah: document.getElementById('penghasilan_ayah'),
+
+            nama_ibu: document.getElementById('nama_ibu'),
+            nik_ibu: document.getElementById('nik_ibu'),
+            tempat_lahir_ibu: document.getElementById('tempat_lahir_ibu'),
+            tanggal_lahir_ibu: document.getElementById('tanggal_lahir_ibu'),
+            agama_ibu: document.getElementById('agama_ibu'),
+            pendidikan_ibu: document.getElementById('pendidikan_ibu'),
+            pekerjaan_ibu: document.getElementById('pekerjaan_ibu'),
+            penghasilan_ibu: document.getElementById('penghasilan_ibu')
         };
 
-        const nextButton = document.getElementById('step4-next');
+        const formatTitleCase = (value) => {
+            return value
+                .trim()
+                .replace(/\s+/g, ' ')
+                .toLowerCase()
+                .split(' ')
+                .map(word => word.charAt(0).toUpperCase() + word.slice(1))
+                .join(' ');
+        };
 
         const sanitizeDigits = (value) => value.replace(/\D/g, '');
 
-        const getFeedback = (input) => input.closest('.mb-3')?.querySelector('.invalid-feedback');
-
         const setInvalid = (input, message) => {
             input.classList.add('is-invalid');
-            const feedback = getFeedback(input);
+
+            const wrapper = input.closest('.mb-3, .mb-0');
+            const feedback = wrapper ? wrapper.querySelector('.invalid-feedback') : null;
+
             if (feedback) {
                 feedback.textContent = message;
             }
@@ -170,159 +270,203 @@
 
         const clearInvalid = (input) => {
             input.classList.remove('is-invalid');
-            const feedback = getFeedback(input);
+
+            const wrapper = input.closest('.mb-3, .mb-0');
+            const feedback = wrapper ? wrapper.querySelector('.invalid-feedback') : null;
+
             if (feedback) {
                 feedback.textContent = '';
             }
         };
 
         const validateField = (input) => {
-            if (!input) {
+            clearInvalid(input);
+
+            const value = input.value ? input.value.trim() : '';
+
+            // Field wajib Ayah
+            if (
+                input.id === 'nama_ayah' ||
+                input.id === 'tempat_lahir_ayah' ||
+                input.id === 'tanggal_lahir_ayah' ||
+                input.id === 'agama_ayah' ||
+                input.id === 'pendidikan_ayah' ||
+                input.id === 'pekerjaan_ayah'
+            ) {
+                if (!value) {
+                    const labels = {
+                        nama_ayah: 'Nama lengkap Ayah',
+                        tempat_lahir_ayah: 'Tempat lahir Ayah',
+                        tanggal_lahir_ayah: 'Tanggal lahir Ayah',
+                        agama_ayah: 'Agama Ayah',
+                        pendidikan_ayah: 'Pendidikan Ayah',
+                        pekerjaan_ayah: 'Pekerjaan Ayah'
+                    };
+
+                    setInvalid(input, `${labels[input.id]} wajib diisi.`);
+                    return false;
+                }
+            }
+
+            // Validasi khusus nama Ayah
+            if (input.id === 'nama_ayah') {
+                if (!/^[\p{L}\s'\.-]+$/u.test(value)) {
+                    setInvalid(input, 'Nama hanya boleh berisi huruf.');
+                    return false;
+                }
+
                 return true;
             }
 
-            clearInvalid(input);
+            // NIK Ayah opsional, tetapi jika diisi harus 16 digit
+            if (input.id === 'nik_ayah') {
+                if (value && !/^\d{16}$/.test(value)) {
+                    setInvalid(input, 'NIK Ayah harus 16 digit angka.');
+                    return false;
+                }
 
-            const value = input.value.trim();
-
-            switch (input.name) {
-                case 'telepon_rumah':
-                    if (!value) {
-                        setInvalid(input, 'Nomor telepon rumah wajib diisi.');
-                        return false;
-                    }
-
-                    if (!/^\d{8,15}$/.test(value)) {
-                        setInvalid(input, 'Nomor telepon rumah harus terdiri dari 8–15 digit.');
-                        return false;
-                    }
-
-                    return true;
-
-                case 'hp_ayah':
-                    if (!value) {
-                        setInvalid(input, 'Nomor HP Ayah wajib diisi.');
-                        return false;
-                    }
-
-                    if (!/^08\d{8,11}$/.test(value)) {
-                        setInvalid(input, 'Nomor HP Ayah tidak valid.');
-                        return false;
-                    }
-
-                    return true;
-
-                case 'hp_ibu':
-                    if (!value) {
-                        setInvalid(input, 'Nomor HP Ibu wajib diisi.');
-                        return false;
-                    }
-
-                    if (!/^08\d{8,11}$/.test(value)) {
-                        setInvalid(input, 'Nomor HP Ibu tidak valid.');
-                        return false;
-                    }
-
-                    return true;
-
-                case 'email':
-                    if (!value) {
-                        setInvalid(input, 'Email wajib diisi.');
-                        return false;
-                    }
-
-                    if (value.length > 255) {
-                        setInvalid(input, 'Email maksimal 255 karakter.');
-                        return false;
-                    }
-
-                    if (!input.checkValidity()) {
-                        setInvalid(input, 'Format email tidak valid.');
-                        return false;
-                    }
-
-                    return true;
-
-                case 'email_confirmation':
-                    if (!value) {
-                        setInvalid(input, 'Konfirmasi email wajib diisi.');
-                        return false;
-                    }
-
-                    if (value.toLowerCase() !== step4Fields.email.value.trim().toLowerCase()) {
-                        setInvalid(input, 'Konfirmasi email tidak sama dengan email.');
-                        return false;
-                    }
-
-                    return true;
-
-                default:
-                    return true;
+                return true;
             }
+
+            // Field wajib Ibu
+            if (
+                input.id === 'nama_ibu' ||
+                input.id === 'tempat_lahir_ibu' ||
+                input.id === 'tanggal_lahir_ibu' ||
+                input.id === 'agama_ibu' ||
+                input.id === 'pendidikan_ibu' ||
+                input.id === 'pekerjaan_ibu'
+            ) {
+                if (!value) {
+                    const labels = {
+                        nama_ibu: 'Nama lengkap Ibu',
+                        tempat_lahir_ibu: 'Tempat lahir Ibu',
+                        tanggal_lahir_ibu: 'Tanggal lahir Ibu',
+                        agama_ibu: 'Agama Ibu',
+                        pendidikan_ibu: 'Pendidikan Ibu',
+                        pekerjaan_ibu: 'Pekerjaan Ibu'
+                    };
+
+                    setInvalid(input, `${labels[input.id]} wajib diisi.`);
+                    return false;
+                }
+            }
+
+            // Validasi khusus nama Ibu
+            if (input.id === 'nama_ibu') {
+                if (!/^[\p{L}\s'\.-]+$/u.test(value)) {
+                    setInvalid(input, 'Nama hanya boleh berisi huruf.');
+                    return false;
+                }
+
+                return true;
+            }
+
+            // NIK Ibu opsional, tetapi jika diisi harus 16 digit
+            if (input.id === 'nik_ibu') {
+                if (value && !/^\d{16}$/.test(value)) {
+                    setInvalid(input, 'NIK Ibu harus 16 digit angka.');
+                    return false;
+                }
+
+                return true;
+            }
+
+            // Penghasilan Ayah dan Ibu opsional
+            if (
+                input.id === 'penghasilan_ayah' ||
+                input.id === 'penghasilan_ibu'
+            ) {
+                return true;
+            }
+
+            return true;
         };
 
         const handleBlurFormatting = (input) => {
-            if (input.name === 'email' || input.name === 'email_confirmation') {
-                input.value = input.value.trim().toLowerCase();
-                return;
+            if (
+                input.tagName.toLowerCase() === 'input' ||
+                input.tagName.toLowerCase() === 'textarea'
+            ) {
+                input.value = input.value.trim().replace(/\s+/g, ' ');
             }
 
-            input.value = input.value.trim().replace(/\s+/g, ' ');
+            // Format nama seperti Step 1
+            if (
+                input.id === 'nama_ayah' ||
+                input.id === 'nama_ibu'
+            ) {
+                input.value = formatTitleCase(input.value);
+            }
+
+            if (
+                input.id === 'nik_ayah' ||
+                input.id === 'nik_ibu'
+            ) {
+                input.value = sanitizeDigits(input.value).slice(0, 16);
+            }
         };
 
         const fieldOrder = [
-            step4Fields.telepon_rumah,
-            step4Fields.hp_ayah,
-            step4Fields.hp_ibu,
-            step4Fields.email,
-            step4Fields.email_confirmation,
+            step4Fields.nama_ayah,
+            step4Fields.nik_ayah,
+            step4Fields.tempat_lahir_ayah,
+            step4Fields.tanggal_lahir_ayah,
+            step4Fields.agama_ayah,
+            step4Fields.pendidikan_ayah,
+            step4Fields.pekerjaan_ayah,
+            step4Fields.penghasilan_ayah,
+
+            step4Fields.nama_ibu,
+            step4Fields.nik_ibu,
+            step4Fields.tempat_lahir_ibu,
+            step4Fields.tanggal_lahir_ibu,
+            step4Fields.agama_ibu,
+            step4Fields.pendidikan_ibu,
+            step4Fields.pekerjaan_ibu,
+            step4Fields.penghasilan_ibu
         ];
 
         Object.values(step4Fields).forEach((input) => {
-            if (!input) {
-                return;
-            }
+            if (!input) return;
 
-            input.addEventListener('blur', () => {
+            const eventType =
+                input.tagName.toLowerCase() === 'select'
+                    ? 'change'
+                    : 'blur';
+
+            input.addEventListener(eventType, () => {
                 handleBlurFormatting(input);
                 validateField(input);
             });
 
-            input.addEventListener('input', () => {
-                if (['telepon_rumah', 'hp_ayah', 'hp_ibu'].includes(input.name)) {
-                    const sanitized = sanitizeDigits(input.value).slice(0, input.maxLength || 15);
-                    if (sanitized !== input.value) {
-                        input.value = sanitized;
+            if (input.tagName.toLowerCase() === 'input') {
+                input.addEventListener('input', () => {
+                    if (
+                        input.id === 'nik_ayah' ||
+                        input.id === 'nik_ibu'
+                    ) {
+                        const sanitized = sanitizeDigits(input.value);
+
+                        if (sanitized !== input.value) {
+                            input.value = sanitized;
+                        }
                     }
-                }
 
-                if (['email', 'email_confirmation'].includes(input.name)) {
-                    clearInvalid(input);
-                }
-            });
-        });
+                    // Batasi karakter nama seperti Step 1
+                    if (
+                        input.id === 'nama_ayah' ||
+                        input.id === 'nama_ibu'
+                    ) {
+                        const sanitized = input.value.replace(/[^\p{L}\s'-.]/gu, '');
 
-        nextButton.addEventListener('click', () => {
-            let firstInvalid = null;
-            let isValid = true;
-
-            fieldOrder.forEach((field) => {
-                if (field && !validateField(field)) {
-                    isValid = false;
-                    if (!firstInvalid) {
-                        firstInvalid = field;
+                        if (sanitized !== input.value) {
+                            input.value = sanitized;
+                        }
                     }
-                }
-            });
-
-            if (firstInvalid) {
-                firstInvalid.focus();
-            }
-
-            if (isValid) {
-                showStep(5);
+                });
             }
         });
     });
-    </script>
-</div>
+</script>
+

@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Guru;
 
 use App\Http\Controllers\Controller;
 use App\Models\NomorSurat;
+use Illuminate\Support\Facades\Auth;
 
 class NomorSuratGuruController extends Controller
 {
@@ -16,10 +17,11 @@ class NomorSuratGuruController extends Controller
     {
         $nomorSurat = NomorSurat::where(
                 'user_id',
-                auth()->id()
+                Auth::id()
             )
             ->latest()
-            ->get();
+            ->paginate(5)
+            ->withQueryString();
 
         return view(
             'guru.nomor-surat.index',
@@ -98,9 +100,9 @@ class NomorSuratGuruController extends Controller
         */
         NomorSurat::create([
 
-            'user_id' => auth()->id(),
+            'user_id' => Auth::id(),
 
-            'pengirim' => auth()->user()->role,
+            'pengirim' => Auth::user()->role,
 
             'nomor_surat' => $nomorSurat,
 

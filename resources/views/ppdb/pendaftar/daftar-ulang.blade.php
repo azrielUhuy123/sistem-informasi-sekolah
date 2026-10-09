@@ -109,20 +109,25 @@
                             </span>
                         </td>
                         <td>
-                           @if($item->status_daftar_ulang == 'sudah')
+                           @if($item->status_daftar_ulang !== 'sudah')
+                                <span class="badge-status pending">
+                                    <i class="bi bi-clock-history me-2"></i>
+                                    Menunggu Daftar Ulang
+                                </span>
+                            @elseif($item->siswa_id)
+                                <span class="badge-status selesai">
+                                    <i class="bi bi-check-circle me-2"></i>
+                                    Sudah Dikonfirmasi
+                                </span>
+                            @else
                                 <span class="badge-status selesai">
                                     <i class="bi bi-check-circle me-2"></i>
                                     Sudah Daftar Ulang
                                 </span>
-                            @else
-                                <span class="badge-status pending">
-                                    <i class="bi bi-clock-history me-2"></i>
-                                    Belum Daftar Ulang
-                                </span>
                             @endif
                         </td>
                         <td>
-                            @if($item->status_daftar_ulang != 'sudah')
+                            @if($item->status_daftar_ulang === 'sudah' && !$item->siswa_id)
 
                             <form
                                 action="{{ route('tu.ppdb.daftar-ulang.konfirmasi',$item) }}"
@@ -132,7 +137,7 @@
                             @csrf
 
                             <button
-                                class="btn btn-success btn-sm badge rounded-pill border px-2 py-1 btn-confirm"
+                                class="btn btn-outline-success btn-sm px-2 py-1 btn-confirm"
                                 data-title="KONFIRMASI DAFTAR ULANG?"
                                 data-message="Daftar Ulang Peserta didik baru akan Terkonfirmasi"
                                 data-button="btn-primary"

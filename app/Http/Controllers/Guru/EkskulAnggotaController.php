@@ -7,8 +7,9 @@ use App\Models\Ekskul;
 use App\Models\EkskulSiswa;
 use App\Models\PembinaEkskul;
 use App\Models\Siswa;
-use App\Models\TahunAjaran;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Auth;
 
 class EkskulAnggotaController extends Controller
 {
@@ -20,7 +21,7 @@ class EkskulAnggotaController extends Controller
         |--------------------------------------------------------------------------
         */
 
-        $guru = auth()->user()->guru;
+        $guru = Auth::user()->guru;
 
         /*
         |--------------------------------------------------------------------------
@@ -64,7 +65,8 @@ class EkskulAnggotaController extends Controller
 
             ->orderBy('nama')
 
-            ->paginate(10);
+            ->paginate(10)
+            ->appends($request->query());
 
         /*
         |--------------------------------------------------------------------------
@@ -92,7 +94,6 @@ class EkskulAnggotaController extends Controller
 
     public function store(Request $request)
     {
-        
         /*
         |--------------------------------------------------------------------------
         | VALIDASI
@@ -100,8 +101,19 @@ class EkskulAnggotaController extends Controller
         */
 
         $request->validate([
-            'siswa_id' => 'required|array'
+            'siswa_id' => ['required', 'array', 'min:1'],
+            'siswa_id.*' => ['integer', 'distinct', 'exists:siswa,id'],
         ]);
+
+        $siswaIds = collect($request->siswa_id)
+            ->map(fn ($id) => (int) $id)
+            ->unique()
+            ->values()
+            ->all();
+
+        if (empty($siswaIds)) {
+            return back()->with('error', 'Pilih minimal satu siswa.');
+        }
 
         /*
         |--------------------------------------------------------------------------
@@ -109,7 +121,7 @@ class EkskulAnggotaController extends Controller
         |--------------------------------------------------------------------------
         */
 
-        $guru = auth()->user()->guru;
+        $guru = Auth::user()->guru;
 
         /*
         |--------------------------------------------------------------------------
@@ -128,33 +140,33 @@ class EkskulAnggotaController extends Controller
             $pembina->ekskul_id
         );
 
-        /*
-        |--------------------------------------------------------------------------
-        | KUOTA
-        |--------------------------------------------------------------------------
-        */
-
         $jumlahSekarang = EkskulSiswa::where(
             'ekskul_id',
             $ekskul->id
         )->count();
 
-        $akanDitambah = count(
-            $request->siswa_id
-        );
+        $siswaYangSudahJoin = EkskulSiswa::where(
+                'ekskul_id',
+                $ekskul->id
+            )
+            ->whereIn('siswa_id', $siswaIds)
+            ->pluck('siswa_id')
+            ->toArray();
 
-        if (
-            ($jumlahSekarang + $akanDitambah)
-            >
-            $ekskul->kuota
-        ) {
+        $siswaBaru = array_values(array_diff($siswaIds, $siswaYangSudahJoin));
 
+        if (empty($siswaBaru)) {
+            return back()->with('error', 'Siswa yang dipilih sudah menjadi anggota ekskul ini.');
+        }
+
+        $tersedia = max($ekskul->kuota - $jumlahSekarang, 0);
+
+        if (count($siswaBaru) > $tersedia) {
             return back()->with(
                 'error',
                 'Kuota ekskul tidak mencukupi'
             );
         }
-
 
         /*
         |--------------------------------------------------------------------------
@@ -162,20 +174,20 @@ class EkskulAnggotaController extends Controller
         |--------------------------------------------------------------------------
         */
 
-        foreach ($request->siswa_id as $id) {
-
-            EkskulSiswa::firstOrCreate(
-                [
-                    'ekskul_id'       => $ekskul->id,
-                    'siswa_id'        => $id,
-                    'tahun_ajaran_id' => $pembina->tahun_ajaran_id,
-                ],
-                [
-                    'status' => 'aktif'
-                ]
-            );
-            
-        }
+        DB::transaction(function () use ($ekskul, $pembina, $siswaBaru) {
+            foreach ($siswaBaru as $id) {
+                EkskulSiswa::firstOrCreate(
+                    [
+                        'ekskul_id'       => $ekskul->id,
+                        'siswa_id'        => $id,
+                        'tahun_ajaran_id' => $pembina->tahun_ajaran_id,
+                    ],
+                    [
+                        'status' => 'aktif'
+                    ]
+                );
+            }
+        });
 
         return back()->with(
             'success',
@@ -190,7 +202,7 @@ class EkskulAnggotaController extends Controller
         |--------------------------------------------------------------------------
         */
 
-        $guru = auth()->user()->guru;
+        $guru = Auth::user()->guru;
 
         /*
         |--------------------------------------------------------------------------
@@ -230,6 +242,13 @@ class EkskulAnggotaController extends Controller
                 $ekskul->id
             )
 
+            ->whereHas(
+                'siswa',
+                function ($query) {
+                    $query->whereNull('deleted_at');
+                }
+            )
+
             ->when($search, function ($q) use ($search) {
 
                 $q->whereHas(
@@ -267,7 +286,26 @@ class EkskulAnggotaController extends Controller
     }
     public function destroy($id)
     {
+        $guru = Auth::user()->guru;
+
+        abort_if(!$guru, 403);
+
+        $ekskulIds = PembinaEkskul::where(
+                'guru_id',
+                $guru->id
+            )
+            ->pluck('ekskul_id')
+            ->toArray();
+
+        if (empty($ekskulIds)) {
+            abort(403);
+        }
+
         $anggota = EkskulSiswa::findOrFail($id);
+
+        if (!in_array((int) $anggota->ekskul_id, array_map('intval', $ekskulIds), true)) {
+            abort(403);
+        }
 
         $anggota->delete();
 

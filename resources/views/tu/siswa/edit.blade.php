@@ -53,11 +53,9 @@
 
                         <input
                             type="text"
-                            name="nis"
                             class="form-control"
-                            value="{{ old('nis', $siswa->nis) }}"
-                            inputmode="numeric"                            
-                            required
+                            value="{{ $siswa->nis }}"
+                            readonly
                         >
                     </div>
 

@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>@yield('title') - Admin</title>
 
     <!-- Bootstrap + Icons -->
@@ -245,7 +246,7 @@
 <div class="layout-wrapper">
 
     <!-- TOPBAR -->
-    <div class="topbar">
+    <div class="topbar admin-topbar">
 
         <!-- KIRI -->
         <h4>SDN MEKAR JAYA</h4>
@@ -262,6 +263,8 @@
 
             <!-- DARK MODE -->
             <button id="darkToggle" class="btn">🌙</button>
+
+            @include('layouts.partials.notifications')
 
             <!-- PROFIL -->
             <div class="dropdown">

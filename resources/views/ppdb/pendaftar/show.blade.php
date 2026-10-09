@@ -41,16 +41,20 @@
                                                 <div>
                                                     @if($pendaftar->status == 'pending')
                                                         <span class="badge-status pending">
-                                                           Pending
+                                                           Belum Diputuskan
                                                         </span>
                                                     @elseif($pendaftar->status == 'verifikasi')
                                                         <span class="badge-status verifikasi">                                                            
-                                                            Verifikasi
+                                                            Tahap Verifikasi (Data Lama)
                                                         </span>
                                                     @elseif($pendaftar->status === 'diterima')
                                                         <span class="badge-status aktif">                                                            
                                                             Diterima
                                                         </span>                                                    
+                                                    @elseif($pendaftar->status === 'ditolak')
+                                                        <span class="badge-status nonaktif">
+                                                            Ditolak
+                                                        </span>
                                                     @endif
                                                 </div>
                                             </div>
@@ -162,6 +166,34 @@
                         <div class="card border h-100">
                             <div class="card-body">
                                 <div class="d-flex align-items-center mb-3">
+                                    <div class="rounded-circle bg-primary bg-opacity-10 p-2 me-2">
+                                        <i class="bi bi-book fs-5 text-primary"></i>
+                                    </div>
+                                    <h5 class="fw-bold mb-0">Asal Sekolah</h5>
+                                </div>
+
+                                <div class="row g-3">
+                                    <div class="col-12">
+                                        <div class="small text-muted mb-1">Jenis Pendidikan Asal</div>
+                                        <div class="fw-semibold">{{ $pendaftar->jenis_pendidikan_asal }}</div>
+                                    </div>
+                                    <div class="col-12">
+                                        <div class="small text-muted mb-1">Nama Sekolah Asal</div>
+                                        <div class="fw-semibold">{{ $pendaftar->nama_sekolah_asal }}</div>
+                                    </div>
+                                    <div class="col-12">
+                                        <div class="small text-muted mb-1">NISN Sekolah Asal</div>
+                                        <div class="fw-semibold">{{ $pendaftar->nisn_sekolah_asal }}</div>
+                                    </div>                                    
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-lg-6">
+                        <div class="card border h-100">
+                            <div class="card-body">
+                                <div class="d-flex align-items-center mb-3">
                                     <div class="rounded-circle bg-info bg-opacity-10 p-2 me-2">
                                         <i class="bi bi-briefcase fs-5 text-info"></i>
                                     </div>
@@ -170,12 +202,32 @@
 
                                 <div class="row g-3">
                                     <div class="col-12">
-                                        <div class="small text-muted mb-1">Nama Ayah</div>
+                                        <div class="small text-muted mb-1">Nama Lengkap</div>
                                         <div class="fw-semibold">{{ optional($pendaftar->ayah)->nama }}</div>
                                     </div>
                                     <div class="col-12">
-                                        <div class="small text-muted mb-1">Pekerjaan Ayah</div>
-                                        <div class="fw-semibold">{{ optional($pendaftar->ayah)->pekerjaan  }}</div>
+                                        <div class="small text-muted mb-1">NIK</div>
+                                        <div class="fw-semibold">{{ optional($pendaftar->ayah)->nik }}</div>
+                                    </div>
+                                    <div class="col-12">
+                                        <div class="small text-muted mb-1">Tempat Lahir</div>
+                                        <div class="fw-semibold">{{ optional($pendaftar->ayah)->tempat_lahir }}</div>
+                                    </div>
+                                    <div class="col-12">
+                                        <div class="small text-muted mb-1">Tanggal Lahir</div>
+                                        <div class="fw-semibold">{{ optional($pendaftar->ayah)->tanggal_lahir }}</div>
+                                    </div>
+                                    <div class="col-12">
+                                        <div class="small text-muted mb-1">Agama</div>
+                                        <div class="fw-semibold">{{ optional($pendaftar->ayah)->agama }}</div>
+                                    </div>
+                                    <div class="col-12">
+                                        <div class="small text-muted mb-1">Pendidikan</div>
+                                        <div class="fw-semibold">{{ optional($pendaftar->ayah)->pendidikan }}</div>
+                                    </div>
+                                    <div class="col-12">
+                                        <div class="small text-muted mb-1">Pekerjaan</div>
+                                        <div class="fw-semibold">{{ optional($pendaftar->ayah)->pekerjaan }}</div>
                                     </div>
                                     <div class="col-12">
                                         <div class="small text-muted mb-1">Penghasilan</div>
@@ -197,11 +249,31 @@
 
                                 <div class="row g-3">
                                     <div class="col-12">
-                                        <div class="small text-muted mb-1">Nama Ibu</div>
+                                        <div class="small text-muted mb-1">Nama Lengkap</div>
                                         <div class="fw-semibold">{{ optional($pendaftar->ibu)->nama }}</div>
                                     </div>
                                     <div class="col-12">
-                                        <div class="small text-muted mb-1">Pekerjaan Ibu</div>
+                                        <div class="small text-muted mb-1">NIK</div>
+                                        <div class="fw-semibold">{{ optional($pendaftar->ibu)->nik }}</div>
+                                    </div>
+                                    <div class="col-12">
+                                        <div class="small text-muted mb-1">Tempat Lahir</div>
+                                        <div class="fw-semibold">{{ optional($pendaftar->ibu)->tempat_lahir }}</div>
+                                    </div>
+                                    <div class="col-12">
+                                        <div class="small text-muted mb-1">Tanggal Lahir</div>
+                                        <div class="fw-semibold">{{ optional($pendaftar->ibu)->tanggal_lahir }}</div>
+                                    </div>
+                                    <div class="col-12">
+                                        <div class="small text-muted mb-1">Agama</div>
+                                        <div class="fw-semibold">{{ optional($pendaftar->ibu)->agama }}</div>
+                                    </div>
+                                    <div class="col-12">
+                                        <div class="small text-muted mb-1">Pendidikan</div>
+                                        <div class="fw-semibold">{{ optional($pendaftar->ibu)->pendidikan }}</div>
+                                    </div>
+                                    <div class="col-12">
+                                        <div class="small text-muted mb-1">Pekerjaan</div>
                                         <div class="fw-semibold">{{ optional($pendaftar->ibu)->pekerjaan  }}</div>
                                     </div>
                                     <div class="col-12">
@@ -236,35 +308,128 @@
                                         <div class="small text-muted mb-1">Nomor Akta</div>
                                         <div class="fw-semibold">{{ $pendaftar->nomor_akta }}</div>
                                     </div>
+                                    <div class="col-12">
+                                        <div class="small text-muted mb-1">Kewarganegaraan</div>
+                                        <div class="fw-semibold">{{ $pendaftar->kewarganegaraan }}</div>
+                                    </div>
                                 </div>
                             </div>
-                        </div>
-                        
-                        </div>
-                    </div>                    
+                        </div>                        
+                    </div>  
+
+                    <div class="col-lg-6">
+                        <div class="card border h-100">
+                            <div class="card-body">
+                                <div class="d-flex align-items-center mb-3">
+                                    <div class="rounded-circle bg-secondary bg-opacity-10 p-2 me-2">
+                                        <i class="bi bi-map fs-5 text-secondary"></i>
+                                    </div>
+                                    <h5 class="fw-bold mb-0">Data Alamat</h5>
+                                </div>
+
+                                <div class="row g-3">
+                                    <div class="col-12">
+                                        <div class="small text-muted mb-1">Provinsi</div>
+                                        <div class="fw-semibold">{{ $pendaftar->provinsi }}</div>
+                                    </div>
+                                    <div class="col-12">
+                                        <div class="small text-muted mb-1">Kabupaten/Kota</div>
+                                        <div class="fw-semibold">{{ $pendaftar->kabupaten }}</div>
+                                    </div>
+                                    <div class="col-12">
+                                        <div class="small text-muted mb-1">Kecamatan</div>
+                                        <div class="fw-semibold">{{ $pendaftar->kecamatan }}</div>
+                                    </div>
+                                    <div class="col-12">
+                                        <div class="small text-muted mb-1">Kelurahan/Desa</div>
+                                        <div class="fw-semibold">{{ $pendaftar->desa }}</div>
+                                    </div>
+                                    <div class="col-12">
+                                        <div class="small text-muted mb-1">RT/RW</div>
+                                        <div class="fw-semibold">{{ $pendaftar->rt }}/{{ $pendaftar->rw }}</div>
+                                    </div>
+                                    <div class="col-12">
+                                        <div class="small text-muted mb-1">Alamat Lengkap</div>
+                                        <div class="fw-semibold">{{ $pendaftar->alamat }}</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>                        
+                    </div>  
+                    <div class="col-lg-6">
+                        <div class="card border h-100">
+                            <div class="card-body">
+                                <div class="d-flex align-items-center mb-3">
+                                    <div class="rounded-circle bg-secondary bg-opacity-10 p-2 me-2">
+                                        <i class="bi bi-person-lines-fill fs-5 text-success"></i>
+                                    </div>
+                                    <h5 class="fw-bold mb-0">Data Kontak</h5>
+                                </div>
+
+                                <div class="row g-3">
+                                    <div class="col-12">
+                                        <div class="small text-muted mb-1">Nomor HP/WhatsApp</div>
+                                        <div class="fw-semibold">{{ $pendaftar->nomor_hp }}</div>
+                                    </div>
+                                    <div class="col-12">
+                                        <div class="small text-muted mb-1">Email</div>
+                                        <div class="fw-semibold">{{ $pendaftar->email }}</div>
+                                    </div>                                    
+                                </div>
+                            </div>
+                        </div>                        
+                    </div> 
+                    <div class="col-lg-6">
+                        <div class="card border h-100">
+                            <div class="card-body">
+                                <div class="d-flex align-items-center mb-3">
+                                    <div class="rounded-circle bg-secondary bg-opacity-10 p-2 me-2">
+                                        <i class="bi bi-person-check-fill fs-5 text-success"></i>
+                                    </div>
+                                    <h5 class="fw-bold mb-0">Data Periodik</h5>
+                                </div>
+
+                                <div class="row g-3">
+                                    <div class="col-12">
+                                        <div class="small text-muted mb-1">Anak ke</div>
+                                        <div class="fw-semibold">{{ $pendaftar->anak_ke }}</div>
+                                    </div>
+                                    <div class="col-12">
+                                        <div class="small text-muted mb-1">Jumlah Saudara</div>
+                                        <div class="fw-semibold">{{ $pendaftar->jumlah_saudara }}</div>
+                                    </div> 
+                                    <div class="col-12">
+                                        <div class="small text-muted mb-1">Tinggi Badan</div>
+                                        <div class="fw-semibold">{{ $pendaftar->tinggi_badan }}</div>
+                                    </div>  
+                                    <div class="col-12">
+                                        <div class="small text-muted mb-1">Berat Badan</div>
+                                        <div class="fw-semibold">{{ $pendaftar->berat_badan }}</div>
+                                    </div>                                               
+                                </div>
+                            </div>
+                        </div>                        
+                    </div>                     
                 </div>
             </div>
         </div>
         <div class="sticky-bottom bg-white border border-light-subtle py-3 mt-4">
             <div class="d-flex justify-content-between align-items-center">
-                <a href="{{ route('tu.ppdb.pendaftar.index') }}" class="btn btn-outline-secondary rounded-3 ms-4">
+                <button  
+                    type="button"
+                    class="btn btn-outline-secondary rounded-3"
+                    onclick="history.back()"
+                >
                     <i class="bi bi-chevron-left me-1"></i> Kembali
-                </a>
-                @if($pendaftar->status == 'pending')
-                    <form
-                        action="{{ route('tu.ppdb.pendaftar.simpan-verifikasi', $pendaftar) }}"
-                        method="POST"
-                        class="d-inline"
+                </button>
+                @if(in_array($pendaftar->status, ['pending', 'verifikasi'], true))
+                    <a
+                        href="{{ route('tu.ppdb.pendaftar.form-verifikasi', $pendaftar) }}"
+                        class="btn btn-primary rounded-3 me-4"
                     >
-                        @csrf
-                        <button
-                            type="submit"
-                            class="btn btn-primary rounded-3 me-4"
-                        >
-                            <i class="bi bi-search me-1"></i>
-                            Mulai Verifikasi
-                        </button>
-                    </form>     
+                        <i class="bi bi-search me-1"></i>
+                        Tinjau Berkas
+                    </a>
                 @else
                     <button 
                         type="button" 
@@ -272,7 +437,7 @@
                         disabled
                     >
                             <i class="bi bi-search me-1"></i>
-                            Mulai Verifikasi
+                            Keputusan Sudah Ditetapkan
                     </button>           
                 @endif
             </div>

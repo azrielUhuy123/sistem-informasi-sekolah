@@ -13,7 +13,7 @@
                 <h3 class="text-primary fw-bold text-center mb-1">
                     Buat Pengajuan Surat
                 </h3>
-
+ 
                 <p class="text-muted text-center">
                     Upload draft surat untuk divalidasi kepala sekolah
                 </p>

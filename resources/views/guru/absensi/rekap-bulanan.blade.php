@@ -13,6 +13,30 @@
     z-index:10;
 }
 
+.absen-hadir{
+    background-color:#edf7ef !important;
+    color:#276738;
+    font-weight:600;
+}
+
+.absen-izin{
+    background-color:#fff8e6 !important;
+    color:#795b16;
+    font-weight:600;
+}
+
+.absen-sakit{
+    background-color:#edf5fc !important;
+    color:#245b86;
+    font-weight:600;
+}
+
+.absen-alpha{
+    background-color:#fceeee !important;
+    color:#8b3333;
+    font-weight:600;
+}
+
 </style>
 
 <div class="container-fluid py-3">
@@ -177,7 +201,7 @@
                         &nbsp;
                     </label>
 
-                    <button class="btn btn-primary">
+                    <button class="btn btn-primary rounded-3">
 
                         Filter
 
@@ -273,9 +297,17 @@
                                     $absen =
                                         $row['absensi'][$i]
                                         ?? null;
+
+                                    $absenClass = match($absen?->status){
+                                        'hadir' => 'absen-hadir',
+                                        'izin' => 'absen-izin',
+                                        'sakit' => 'absen-sakit',
+                                        'alpha' => 'absen-alpha',
+                                        default => '',
+                                    };
                                 @endphp
 
-                                <td>
+                                <td class="{{ $absenClass }}">
 
                                     @if($absen)
 

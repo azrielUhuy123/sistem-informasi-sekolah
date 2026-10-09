@@ -25,7 +25,7 @@
                                 >
 
                                 <div>
-                                    <h4 class="mb-1 fw-bold text-uppercase">{{ $siswa->nama }}</h4>
+                                    <h4 class="mb-1 fw-bold">{{ $siswa->nama }}</h4>
                                     <p class="text-muted mb-2">Siswa</p>
 
                                     <div class="d-flex flex-wrap gap-2 justify-content-center">

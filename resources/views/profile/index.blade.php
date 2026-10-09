@@ -33,7 +33,7 @@
                             </span>
                         @endif                
                     </div>    
-
+ 
                     {{-- DETAIL PROFIL --}}
                     <div class="mt-3">
                         <a
@@ -114,7 +114,7 @@
                     <div class="row mt-4">    
 
                         {{-- AGAMA --}}
-                        <div class="col-4">
+                        <div class="col-12 col-sm-4 mb-2">
                             <div class="d-flex align-items-start gap-3 bg-light px-3 py-2 rounded-3">
                                 <i class="bi bi-bookmark-heart-fill text-primary fs-5 mt-1"></i>
                                 <div class="flex-grow-1 min-w-0">
@@ -129,7 +129,7 @@
                         </div>
 
                         {{-- JENIS KELAMIN --}}
-                        <div class="col-4">
+                        <div class="col-12 col-sm-4 mb-2">
                             <div class="d-flex align-items-start gap-3 bg-light px-3 py-2 rounded-3">
                                 <i class="bi bi-gender-ambiguous text-primary fs-5 mt-1"></i>
                                 <div class="flex-grow-1 min-w-0">
@@ -146,7 +146,7 @@
                         </div>
 
                         {{-- STATUS --}}
-                        <div class="col-4">
+                        <div class="col-12 col-sm-4">
                             <div class="d-flex align-items-start gap-3 bg-light px-3 py-2 rounded-3">
                                 <i class="bi bi-shield-check text-primary fs-5 mt-1"></i>
                                 <div class="flex-grow-1 min-w-0">

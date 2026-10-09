@@ -41,10 +41,10 @@
                         <div class="rounded-circle bg-warning bg-opacity-10 p-2">
                             <i class="bi bi-hourglass-split text-warning fs-5"></i>
                         </div>
-                        <span class="badge bg-light text-muted">Pending</span>
+                        <span class="badge bg-light text-muted">Belum Diputuskan</span>
                     </div>
                     <h2 class="fw-bold mb-0">{{ $pending }}</h2>
-                    <p class="text-muted small mb-0 mt-2">Menunggu verifikasi</p>
+                    <p class="text-muted small mb-0 mt-2">Menunggu keputusan admin</p>
                 </div>
             </div>
         </div>
@@ -114,9 +114,9 @@
                                         <div class="rounded-circle bg-warning bg-opacity-10 p-2 me-2">
                                             <i class="bi bi-search text-warning"></i>
                                         </div>
-                                        <h6 class="mb-0 fw-semibold text-dark">Verifikasi</h6>
+                                        <h6 class="mb-0 fw-semibold text-dark">Tinjau Berkas</h6>
                                     </div>
-                                    <p class="small text-muted mb-0">Tinjau dan lakukan verifikasi status pendaftar.</p>
+                                    <p class="small text-muted mb-0">Tinjau berkas dan tetapkan keputusan pendaftar.</p>
                                 </div>
                             </a>
                         </div>
@@ -239,7 +239,7 @@
     const chartPpdbStatus = new Chart(ctx, {
         type: 'bar',
         data: {
-            labels: ['Pending', 'Diterima', 'Ditolak'],
+            labels: ['Belum Diputuskan', 'Diterima', 'Ditolak'],
             datasets: [{
                 label: 'Jumlah',
                 data: [{{ $pending }}, {{ $diterima }}, {{ $ditolak }}],

@@ -15,6 +15,8 @@ use App\Models\WaliKelas;
 use App\Models\Guru;
 use Maatwebsite\Excel\Facades\Excel;
 use App\Exports\KelasExport;
+use Illuminate\Validation\Rule;
+use Illuminate\Validation\ValidationException;
 
 
 class KelasController extends Controller
@@ -36,7 +38,7 @@ class KelasController extends Controller
             ->orderBy('kelas_master_id')
             ->get();
 
-        $tahunAktif = TahunAjaran::current()->first();
+        $tahunAktif = TahunAjaran::current();
 
         return view('tu.kelas.index', compact(
             'grupKelas',
@@ -99,32 +101,102 @@ class KelasController extends Controller
      */
     public function storeRombel(Request $request, $kelasGrupId)
     {
-        $request->validate([
-            'kode' => 'required|string|max:1|alpha'
-        ]);
-
         $kelasGrup = KelasGrup::with('kelasMaster')->findOrFail($kelasGrupId);
-
-        // contoh: tingkat 1 + A = 1A
-        $namaKelas = $kelasGrup->kelasMaster->tingkat . strtoupper($request->kode);
-
-        // cegah duplikat rombel
-        if (
-            Kelas::where('kelas_grup_id', $kelasGrupId)
-                ->where('nama_kelas', $namaKelas)
-                ->exists()
-        ) {
-            return back()->with('error', 'Rombel sudah ada');
-        }
+        $validated = $this->validateNamaRombel($request, $kelasGrup);
 
         Kelas::create([
-            'kelas_grup_id' => $kelasGrupId,
-            'nama_kelas'    => $namaKelas,
+            'kelas_grup_id' => $kelasGrup->id,
+            'nama_kelas' => $validated['nama_kelas'],
         ]);
 
         return redirect()
             ->route('tu.kelas.rombel.index', $kelasGrupId)
             ->with('success', 'Rombel berhasil ditambahkan');
+    }
+
+    public function editRombel($id)
+    {
+        $rombel = Kelas::with('kelasGrup.angkatan', 'kelasGrup.kelasMaster')
+            ->findOrFail($id);
+
+        abort_unless($rombel->kelasGrup?->kelasMaster, 404);
+
+        return view('tu.kelas.rombel.edit', compact('rombel'));
+    }
+
+    public function updateRombel(Request $request, $id)
+    {
+        $rombel = Kelas::with('kelasGrup.kelasMaster')->findOrFail($id);
+        $kelasGrup = $rombel->kelasGrup;
+
+        abort_unless($kelasGrup?->kelasMaster, 404);
+
+        $validated = $this->validateNamaRombel($request, $kelasGrup, $rombel);
+
+        if (
+            $rombel->penempatan()->exists() &&
+            $validated['nama_kelas'] !== $rombel->nama_kelas
+        ) {
+            return back()->withErrors([
+                'nama_kelas' => 'Nama rombel tidak dapat diubah karena sudah digunakan oleh penempatan siswa.',
+            ])->withInput();
+        }
+
+        $rombel->update([
+            'nama_kelas' => $validated['nama_kelas'],
+        ]);
+
+        return redirect()
+            ->route('tu.kelas.rombel.index', $rombel->kelas_grup_id)
+            ->with('success', 'Rombel berhasil diperbarui.');
+    }
+
+    private function validateNamaRombel(
+        Request $request,
+        KelasGrup $kelasGrup,
+        ?Kelas $rombel = null
+    ): array {
+        $tingkat = strtoupper((string) $kelasGrup->kelasMaster?->tingkat);
+
+        if ($tingkat === '') {
+            throw ValidationException::withMessages([
+                'kelas_grup_id' => 'KelasGrup harus memiliki tingkat kelas yang valid.',
+            ]);
+        }
+
+        $submittedName = strtoupper(trim((string) $request->input('nama_kelas')));
+        if (preg_match('/^' . preg_quote($tingkat, '/') . '-?([A-Z])$/', $submittedName, $matches)) {
+            $request->merge([
+                'nama_kelas' => $tingkat . $matches[1],
+            ]);
+        }
+
+        $uniqueName = Rule::unique('kelas', 'nama_kelas')
+            ->where(fn ($query) => $query->where('kelas_grup_id', $kelasGrup->id));
+
+        if ($rombel) {
+            $uniqueName->ignore($rombel->id);
+        }
+
+        $rules = [
+            'nama_kelas' => [
+                'required',
+                'string',
+                'max:50',
+                'regex:/^' . preg_quote($tingkat, '/') . '[A-Z]$/',
+                $uniqueName,
+            ],
+        ];
+
+        if ($rombel) {
+            $rules['kelas_grup_id'] = 'missing';
+        }
+
+        return $request->validate($rules, [
+            'nama_kelas.regex' => "Nama rombel harus menggunakan tingkat {$tingkat}, misalnya {$tingkat}-A.",
+            'nama_kelas.unique' => 'Nama rombel sudah digunakan dalam KelasGrup ini.',
+            'kelas_grup_id.missing' => 'Rombel tidak dapat dipindahkan ke KelasGrup lain.',
+        ]);
     }
 
     /**
@@ -178,8 +250,21 @@ class KelasController extends Controller
      */
     public function destroy($id)
     {
-        Kelas::findOrFail($id)->delete();
-        return back()->with('success', 'Rombel dipindahkan ke trash');
+        $rombel = Kelas::findOrFail($id);
+
+        abort_unless($rombel->kelas_grup_id, 404);
+
+        if ($rombel->penempatan()->exists()) {
+            return redirect()
+                ->route('tu.kelas.rombel.index', $rombel->kelas_grup_id)
+                ->with('error', 'Rombel tidak dapat dihapus karena sudah digunakan oleh penempatan siswa.');
+        }
+
+        $rombel->delete();
+
+        return redirect()
+            ->route('tu.kelas.rombel.index', $rombel->kelas_grup_id)
+            ->with('success', 'Rombel berhasil dihapus.');
     }
 
     public function restore($id)

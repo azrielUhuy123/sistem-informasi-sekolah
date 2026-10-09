@@ -14,407 +14,168 @@
     $ekskulCount = $memberItems->pluck('ekskul_id')->filter()->unique()->count();
 @endphp
 
-<div class="container-fluid py-4">
+<div class="container-fluid">
 
-    {{-- HERO --}}
-    <div class="hero card border-0 shadow-sm rounded-4 overflow-hidden mb-4">
-        <div class="card-body p-4 p-lg-5 text-white">
-            <div class="row align-items-center g-4">
-                <div class="col-lg-8">
-                    <div class="d-flex align-items-center gap-3 mb-3">
-                        <div class="hero-icon d-inline-flex align-items-center justify-content-center rounded-circle">
-                            <i class="bi bi-people-fill"></i>
-                        </div>
-                        <span class="badge rounded-pill bg-white bg-opacity-20 px-3 py-2 fw-semibold">
-                            <i class="bi bi-shield-check me-2"></i> Enterprise Panel
-                        </span>
-                    </div>
-                    <h3 class="hero-title fw-bold mb-3">Daftar Anggota Ekstrakurikuler</h3>
-                    <p class="hero-subtitle mb-0">Kelola seluruh anggota ekstrakurikuler, pantau status keanggotaan siswa, dan lakukan administrasi anggota dalam satu halaman.</p>
-                </div>
-                <div class="col-lg-4">
-                    <div class="hero-box glass-card p-4 rounded-4">
-                        <div class="d-flex justify-content-between align-items-center mb-3">
-                            <span class="fw-semibold opacity-75">Total Anggota</span>
-                            <span class="badge rounded-pill bg-white bg-opacity-20 px-3 py-2">Live</span>
-                        </div>
-                        <div class="hero-stat fw-bold">{{ $totalAnggota }}</div>
-                        <p class="mb-0 opacity-75">Siswa terdaftar dalam ektrakurikuler</p>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    {{-- ALERT SUCCESS --}}
-    @if(session('success'))
-        <div class="alert alert-success border-0 shadow-sm rounded-4 px-4 py-3 mb-4">
-            <i class="bi bi-check-circle-fill me-2"></i>
-            {{ session('success') }}
-        </div>
-    @endif
-
-    {{-- ALERT ERROR --}}
-    @if(session('error'))
-        <div class="alert alert-danger border-0 shadow-sm rounded-4 px-4 py-3 mb-4">
-            <i class="bi bi-exclamation-circle-fill me-2"></i>
-            {{ session('error') }}
-        </div>
-    @endif
-
-    {{-- SUMMARY CARDS --}}
-    <div class="row g-4 mb-4">
-        <div class="col-xl-3 col-md-6">
-            <div class="card border-0 shadow-sm rounded-4 summary-card h-100">
-                <div class="card-body p-4">
-                    <div class="summary-icon rounded-circle d-inline-flex align-items-center justify-content-center mb-3">
-                        <i class="bi bi-people-fill"></i>
-                    </div>
-                    <h6 class="fw-semibold text-muted mb-2">Total Anggota</h6>
-                    <h3 class="fw-bold mb-0">{{ $totalAnggota }}</h3>
-                </div>
-            </div>
-        </div>
-        <div class="col-xl-3 col-md-6">
-            <div class="card border-0 shadow-sm rounded-4 summary-card h-100">
-                <div class="card-body p-4">
-                    <div class="summary-icon rounded-circle d-inline-flex align-items-center justify-content-center mb-3">
-                        <i class="bi bi-check-circle-fill"></i>
-                    </div>
-                    <h6 class="fw-semibold text-muted mb-2">Anggota Aktif</h6>
-                    <h3 class="fw-bold mb-0">{{ $aktifAnggota }}</h3>
-                </div>
-            </div>
-        </div>
-        <div class="col-xl-3 col-md-6">
-            <div class="card border-0 shadow-sm rounded-4 summary-card h-100">
-                <div class="card-body p-4">
-                    <div class="summary-icon rounded-circle d-inline-flex align-items-center justify-content-center mb-3">
-                        <i class="bi bi-person-plus-fill"></i>
-                    </div>
-                    <h6 class="fw-semibold text-muted mb-2">Anggota Baru</h6>
-                    <h3 class="fw-bold mb-0">{{ $anggotaBaru }}</h3>
-                </div>
-            </div>
-        </div>
-        <div class="col-xl-3 col-md-6">
-            <div class="card border-0 shadow-sm rounded-4 summary-card h-100">
-                <div class="card-body p-4">
-                    <div class="summary-icon rounded-circle d-inline-flex align-items-center justify-content-center mb-3">
-                        <i class="bi bi-award-fill"></i>
-                    </div>
-                    <h6 class="fw-semibold text-muted mb-2">Ekstrakurikuler</h6>
-                    <h3 class="fw-bold mb-0">{{ $ekskulCount }}</h3>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    {{-- SEARCH --}}
-    <div class="card border-0 shadow-sm rounded-4 search-card mb-4">
-        <div class="card-body p-4 p-lg-5">
-            <div class="d-flex flex-column flex-lg-row justify-content-between align-items-lg-center gap-3 mb-4">
+    <div class="card border-0 shadow-sm rounded-4 overflow-hidden mb-4">
+        <div
+            class="card-body p-4 p-lg-5 text-white"
+            style="background:linear-gradient(135deg,#0f4c81 0%,#2563eb 100%);"
+        >
+            <div class="d-flex flex-column flex-lg-row justify-content-between align-items-lg-center gap-3">
                 <div>
-                    <h5 class="fw-bold mb-1">Cari Anggota</h5>
-                    <p class="text-muted mb-0">Cari berdasarkan Nama ataupun NIS.</p>
+                    <h3 class="fw-bold mb-2">Daftar Anggota Ekstrakurikuler</h3>
+                    <p class="mb-0 opacity-75">
+                        Kelola seluruh anggota ekstrakurikuler, pantau status keanggotaan siswa, dan lakukan administrasi anggota dalam satu halaman.
+                    </p>
                 </div>
-                <span class="badge rounded-pill bg-primary-subtle text-primary px-3 py-2">
-                    <i class="bi bi-funnel-fill me-2"></i> Pencarian Cepat
-                </span>
-            </div>
 
-            <form method="GET">
-                <div class="row g-3 align-items-end">
-                    <div class="col-lg-10">
-                        <div class="position-relative">
-                            <i class="bi bi-search position-absolute top-50 start-0 translate-middle-y ms-3 text-muted"></i>
-                            <input
-                                type="text"
-                                name="search"
-                                class="form-control form-control-lg ps-5 rounded-pill"
-                                placeholder="Cari Nama atau NIS..."
-                                value="{{ $search }}"
-                            >
-                        </div>
-                    </div>
-                    <div class="col-lg-2">
-                        <button class="btn btn-primary btn-lg w-100 rounded-pill">
-                            <i class="bi bi-search me-2"></i>Cari
-                        </button>
-                    </div>
+                <div class="badge bg-white text-primary px-3 py-2 fs-6">
+                    <i class="bi bi-shield-check me-2"></i>
+                    Sinergi-MJ
                 </div>
-            </form>
+            </div>
         </div>
     </div>
 
-    {{-- TABLE --}}
-    <div class="card border-0 shadow-sm rounded-4 overflow-hidden table-card">
-        <div class="card-body p-0">
-            <div class="table-responsive">
-                <table class="table table-modern align-middle mb-0">
-                    <thead>
+    <x-alert.flash key="success" type="success" />
+    <x-alert.flash key="error" type="danger" />
+
+    <x-table.card
+        title="Daftar Anggota"
+        subtitle="Kelola seluruh anggota ekstrakurikuler dalam satu tampilan."
+    >
+        <x-slot:badge>
+            <span class="badge bg-primary rounded-pill px-2 py-1">
+                {{ $totalAnggota }}
+                <span class="text-badge">Anggota</span>
+            </span>
+        </x-slot:badge>
+
+        <x-slot:actions>
+            <input
+                type="text"
+                id="searchInput"
+                name="search"
+                class="form-control table-search"
+                placeholder="Cari nama atau NIS..."                        
+            >
+        </x-slot:actions>
+
+        <div class="table-responsive">
+            <table class="table table-hover align-middle mb-0">
+                <thead>
+                    <tr>
+                        <th width="70">No</th>
+                        <th>Nama</th>
+                        <th>Tanggal Bergabung</th>
+                        <th>Status</th>
+                        <th width="140">Aksi</th>
+                    </tr>
+                </thead>
+                <tbody id="tableAnggotaEkskul">
+                    @forelse($anggota as $a)
+                        @php
+                            $siswaData = $a->siswa;
+                            $namaSiswa = optional($siswaData)->nama ?? 'Data Siswa Hilang';
+                            $nis = optional($siswaData)->nis ?? '-';
+                            $inisial = strtoupper(substr(trim($namaSiswa), 0, 1));
+                        @endphp
                         <tr>
-                            <th width="70">No</th>
-                            <th>Nama</th>
-                            <th>NIS</th>
-                            <th>Tanggal Bergabung</th>
-                            <th>Status</th>
-                            <th width="140">Aksi</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        @forelse($anggota as $a)
-                            @php
-                                $namaSiswa = optional($a->siswa)->nama ?? '';
-                                $inisial = strtoupper(substr(trim($namaSiswa), 0, 1));
-                            @endphp
-                            <tr>
-                                <td class="fw-semibold text-muted">
+                            <td>
+                                <span class="badge bg-light text-dark rounded-circle">
                                     {{ $anggota->firstItem() + $loop->index }}
-                                </td>
-                                <td>
-                                    <div class="d-flex align-items-center gap-3">
-                                        <div class="member-avatar rounded-circle d-inline-flex align-items-center justify-content-center text-white fw-bold">
-                                            {{ $inisial ?: 'A' }}
-                                        </div>
-                                        <div class="d-flex flex-column">
-                                            <span class="fw-semibold text-dark">{{ $a->siswa->nama }}</span>
-                                            <small class="text-muted">Anggota Ekstrakurikuler</small>
-                                        </div>
-                                    </div>
-                                </td>
-                                <td>
-                                    <span class="badge rounded-pill bg-light text-secondary px-3 py-2">
-                                        {{ $a->siswa->nis }}
-                                    </span>
-                                </td>
-                                <td>
-                                    <div class="d-flex flex-column">
-                                        <span class="fw-semibold text-dark">{{ $a->created_at->translatedFormat('d F Y') }}</span>
-                                        <small class="text-muted">{{ $a->created_at->diffForHumans() }}</small>
-                                    </div>
-                                </td>
-                                <td>
-                                    <span class="badge status-badge rounded-pill bg-success-subtle text-success px-3 py-2">
-                                        <i class="bi bi-check-circle-fill me-2"></i>Aktif
-                                    </span>
-                                </td>
-                                <td>
-                                    <form
-                                        action="{{ route('guru.ekskul.daftar-anggota.destroy', $a->id) }}"
-                                        method="POST"
-                                        onsubmit="return confirm('Keluarkan anggota ini?')"
+                                </span>
+                            </td>
+                            <td>
+                                <div class="d-flex align-items-center">
+                                    <div
+                                        class="rounded-circle bg-primary-subtle text-primary d-flex align-items-center justify-content-center me-3"
+                                        style="width:48px;height:48px;"
                                     >
-                                        @csrf
-                                        @method('DELETE')
-
-                                        <button class="btn action-btn btn-sm rounded-pill">
-                                            <i class="bi bi-person-dash-fill me-2"></i>Keluarkan
-                                        </button>
-                                    </form>
-                                </td>
-                            </tr>
-                        @empty
-                            <tr>
-                                <td colspan="6" class="text-center py-5">
-                                    <div class="empty-state">
-                                        <div class="empty-icon mb-3">
-                                            <i class="bi bi-people"></i>
-                                        </div>
-                                        <h5 class="fw-bold mb-2">Belum Ada Anggota</h5>
-                                        <p class="text-muted mb-0">Belum ada siswa yang menjadi anggota ekstrakurikuler ini.</p>
+                                        <i class="bi bi-person-fill fs-4"></i>
                                     </div>
-                                </td>
-                            </tr>
-                        @endforelse
-                    </tbody>
-                </table>
-            </div>
 
-            {{-- PAGINATION --}}
-            <div class="mt-4 d-flex justify-content-center">
-                {{ $anggota->links() }}
-            </div>
+                                    <div>
+                                        <div class="fw-semibold">{{ $namaSiswa }}</div>
+                                        <small class="text-muted">{{ $nis }}</small>
+                                    </div>
+                                </div>
+                            </td>
+                            <td>
+                                <div class="d-flex flex-column">
+                                    <span class="fw-semibold">{{ $a->created_at->translatedFormat('d F Y') }}</span>
+                                    <small class="text-muted">{{ $a->created_at->diffForHumans() }}</small>
+                                </div>
+                            </td>
+                            <td>
+                                <span class="badge-status aktif">
+                                    <i class="bi bi-check-circle-fill me-2"></i>Aktif
+                                </span>
+                            </td>
+                            <td>
+                                <form
+                                    action="{{ route('guru.ekskul.daftar-anggota.destroy', $a->id) }}"
+                                    method="POST"
+                                    onsubmit="return confirm('Keluarkan anggota ini?')"
+                                >
+                                    @csrf
+                                    @method('DELETE')
 
+                                    <button class="btn btn-danger btn-sm rounded-pill px-3 py-0">
+                                        Keluarkan<i class="bi bi-person-dash-fill ms-1"></i>
+                                    </button>
+                                </form>
+                            </td>
+                        </tr>
+                    @empty
+                        <tr>
+                            <td colspan="5" class="text-center py-5">
+                                <div class="d-flex flex-column align-items-center">
+                                    <i class="bi bi-people display-4 text-secondary"></i>
+                                    <h5 class="fw-bold mt-3 mb-2">Belum Ada Anggota</h5>
+                                    <p class="text-muted mb-0">Belum ada siswa yang menjadi anggota ekstrakurikuler ini.</p>
+                                </div>
+                            </td>
+                        </tr>
+                    @endforelse
+                </tbody>
+            </table>
         </div>
-    </div>
+
+        <div class="mt-3 d-flex justify-content-center">
+            {{ $anggota->links() }}
+        </div>
+    </x-table.card>
 
 </div>
+{{-- SEARCH --}}
+<script>
 
-<style>
-    .hero {
-        background: linear-gradient(135deg, #0f4c81 0%, #2563eb 100%);
-        position: relative;
-        overflow: hidden;
-    }
+    const searchInput =
+        document.getElementById('searchInput');
 
-    .hero::after {
-        content: "";
-        position: absolute;
-        inset: 0;
-        background: radial-gradient(circle at top right, rgba(255,255,255,0.2), transparent 35%);
-        pointer-events: none;
-    }
+    searchInput.addEventListener('keyup', function () {
 
-    .hero-icon {
-        width: 48px;
-        height: 48px;
-        background: rgba(255,255,255,0.2);
-        backdrop-filter: blur(10px);
-        color: #fff;
-        font-size: 1.25rem;
-    }
+        const keyword =
+            this.value.toLowerCase();
 
-    .hero-title {
-        font-size: clamp(1.5rem, 2.2vw, 2rem);
-        letter-spacing: -0.02em;
-    }
+        const rows =
+            document.querySelectorAll(
+                '#tableAnggotaEkskul tr'
+            );
 
-    .hero-subtitle {
-        font-size: 1rem;
-        line-height: 1.7;
-        color: rgba(255,255,255,0.9);
-        max-width: 720px;
-    }
+        rows.forEach(row => {
 
-    .hero-stat {
-        font-size: 2.2rem;
-        line-height: 1;
-    }
+            const text =
+                row.innerText.toLowerCase();
 
-    .hero-box {
-        background: rgba(255,255,255,0.16);
-        backdrop-filter: blur(16px);
-        border: 1px solid rgba(255,255,255,0.24);
-        box-shadow: 0 16px 40px rgba(0, 0, 0, 0.12);
-    }
+            row.style.display =
+                text.includes(keyword)
+                ? ''
+                : 'none';
 
-    .glass-card {
-        backdrop-filter: blur(12px);
-        -webkit-backdrop-filter: blur(12px);
-    }
+        });
+    });
 
-    .summary-card,
-    .search-card,
-    .table-card {
-        transition: transform 0.2s ease, box-shadow 0.2s ease;
-    }
-
-    .summary-card:hover,
-    .search-card:hover,
-    .table-card:hover {
-        transform: translateY(-3px);
-        box-shadow: 0 16px 40px rgba(15, 76, 129, 0.12) !important;
-    }
-
-    .summary-icon {
-        width: 46px;
-        height: 46px;
-        background: linear-gradient(135deg, #0f4c81 0%, #2563eb 100%);
-        color: #fff;
-        font-size: 1.1rem;
-        box-shadow: 0 10px 20px rgba(37, 99, 235, 0.22);
-    }
-
-    .search-card {
-        border: 1px solid rgba(37, 99, 235, 0.08);
-    }
-
-    .member-avatar {
-        width: 44px;
-        height: 44px;
-        min-width: 44px;
-        background: linear-gradient(135deg, #0f4c81 0%, #2563eb 100%);
-        box-shadow: 0 8px 18px rgba(37, 99, 235, 0.18);
-        font-size: 1rem;
-    }
-
-    .table-modern thead th {
-        background: #f8fbff;
-        color: #475569;
-        font-weight: 700;
-        border-bottom: 1px solid #e5eef9;
-        padding-top: 1rem;
-        padding-bottom: 1rem;
-    }
-
-    .table-modern tbody tr {
-        transition: background-color 0.2s ease;
-    }
-
-    .table-modern tbody tr:hover {
-        background: #f3f8ff;
-    }
-
-    .table-modern td {
-        padding-top: 1rem;
-        padding-bottom: 1rem;
-        border-color: #eef4fb;
-    }
-
-    .status-badge {
-        font-weight: 600;
-        letter-spacing: 0.02em;
-    }
-
-    .action-btn {
-        background: #fff5f5;
-        color: #dc2626;
-        border: 1px solid #fed7d7;
-        transition: all 0.2s ease;
-    }
-
-    .action-btn:hover {
-        background: #dc2626;
-        color: #fff;
-        box-shadow: 0 10px 20px rgba(220, 38, 38, 0.16);
-    }
-
-    .empty-state {
-        color: #64748b;
-    }
-
-    .empty-icon {
-        width: 72px;
-        height: 72px;
-        margin: 0 auto;
-        display: inline-flex;
-        align-items: center;
-        justify-content: center;
-        border-radius: 50%;
-        background: linear-gradient(135deg, rgba(15, 76, 129, 0.1), rgba(37, 99, 235, 0.12));
-        color: #2563eb;
-        font-size: 2rem;
-    }
-
-    .pagination .page-item .page-link {
-        border: 0;
-        border-radius: 999px;
-        margin: 0 4px;
-        color: #2563eb;
-        box-shadow: 0 8px 20px rgba(15, 76, 129, 0.08);
-        transition: all 0.2s ease;
-    }
-
-    .pagination .page-item.active .page-link {
-        background: linear-gradient(135deg, #0f4c81 0%, #2563eb 100%);
-        color: #fff;
-    }
-
-    .pagination .page-item .page-link:hover {
-        background: #eff6ff;
-        color: #0f4c81;
-    }
-
-    @media (max-width: 767.98px) {
-        .hero-box {
-            margin-top: 0.5rem;
-        }
-
-        .search-card .btn {
-            width: 100%;
-        }
-    }
-</style>
-
+</script>
 @endsection

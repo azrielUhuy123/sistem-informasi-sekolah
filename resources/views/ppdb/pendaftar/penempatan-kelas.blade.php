@@ -75,18 +75,31 @@
                             </div>                            
                         </td>                        
                         <td>
+                            @php
+                                $kelasSesuaiAngkatan = $kelas->filter(
+                                    fn ($kelasItem) => (int) $kelasItem->kelasGrup->angkatan_id === (int) $item->siswa->angkatan_id
+                                );
+                            @endphp
+
                             <form method="POST" action="{{ route('tu.ppdb.penempatan-kelas.simpan', $item) }}">
                                 @csrf
                                 <div class="d-flex gap-2">
-                                    <select name="kelas_id" class="form-control" required>
-                                        <option value="">Pilih Kelas</option>
-                                        @foreach ($kelas as $k)
-                                            <option value="{{ $k->id }}">
-                                                {{ $k->nama_kelas_label }} ({{ $k->jumlah_siswa }} Siswa)
-                                            </option>
-                                        @endforeach
-                                    </select>
-                                    <button class="btn btn-primary rounded-3 btn-sm">Tempatkan</button>
+                                    @if($kelasSesuaiAngkatan->isNotEmpty())
+                                        <select name="kelas_id" class="form-control" required>
+                                            <option value="">Pilih Kelas I Angkatan {{ $item->siswa->angkatan_id }}</option>
+                                            @foreach ($kelasSesuaiAngkatan as $k)
+                                                <option value="{{ $k->id }}">
+                                                    {{ $k->nama_kelas_label }} ({{ $k->jumlah_siswa }} Siswa)
+                                                </option>
+                                            @endforeach
+                                        </select>
+                                        <button class="btn btn-primary rounded-3 btn-sm">Tempatkan</button>
+                                    @else
+                                        <span class="text-muted small align-self-center">
+                                            Kelas I untuk Angkatan ID {{ $item->siswa->angkatan_id }} belum tersedia.
+                                        </span>
+                                        <button class="btn btn-primary rounded-3 btn-sm" disabled>Tempatkan</button>
+                                    @endif
                                 </div>
                             </form>
                         </td>                        

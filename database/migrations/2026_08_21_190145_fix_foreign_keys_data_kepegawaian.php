@@ -12,7 +12,7 @@ return new class extends Migration
         // GURU → DATA KEPEGAWAIAN
         // =========================================
         Schema::table('guru', function (Blueprint $table) {
-            $table->dropForeign('guru_data_kepegawaian_id_foreign');
+            $table->dropForeign(['data_kepegawaian_id']);
 
             $table->foreign('data_kepegawaian_id')
                 ->references('id')
@@ -24,7 +24,7 @@ return new class extends Migration
         // USERS → DATA KEPEGAWAIAN
         // =========================================
         Schema::table('users', function (Blueprint $table) {
-            $table->dropForeign('users_pegawai_id_foreign');
+            $table->dropForeign(['pegawai_id']);
 
             $table->foreign('pegawai_id')
                 ->references('id')
@@ -39,7 +39,7 @@ return new class extends Migration
         // GURU → DATA KEPEGAWAIAN
         // =========================================
         Schema::table('guru', function (Blueprint $table) {
-            $table->dropForeign('guru_data_kepegawaian_id_foreign');
+            $table->dropForeign(['data_kepegawaian_id']);
 
             $table->foreign('data_kepegawaian_id')
                 ->references('id')
@@ -51,7 +51,7 @@ return new class extends Migration
         // USERS → DATA KEPEGAWAIAN
         // =========================================
         Schema::table('users', function (Blueprint $table) {
-            $table->dropForeign('users_pegawai_id_foreign');
+            $table->dropForeign(['pegawai_id']);
 
             $table->foreign('pegawai_id')
                 ->references('id')

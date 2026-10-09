@@ -21,56 +21,30 @@
     {{-- TOOLBAR --}}
     <div class="card border-0 shadow-sm rounded-4 mb-4">
         <div class="card-body">
-            <div class="d-flex flex-wrap justify-content-between align-items-center gap-3">
-                {{-- LEFT --}}
-                <div class="d-flex flex-wrap gap-2">                    
-                    <a
-                        href="{{ route(
-                            'superadmin.monitoring-jadwal.show',
-                            [
-                                'kelas' => $kelas->id,
-                                'view' => 'grid',
-                            ]
-                        ) }}"
-                        class="btn rounded-3
-                        {{ $view=='grid'
-                            ? 'btn-primary'
-                            : 'btn-outline-primary'
-                        }}"
-                    >
-                        <i class="bi bi-grid-3x3-gap-fill me-1"></i>
-                        <span class="desc-add">Tampilan Grid</span>
-                    </a>
-                    <a
-                        href="{{ route(
-                            'superadmin.monitoring-jadwal.show',
-                            [
-                                'kelas' => $kelas->id,
-                                'view' => 'table',
-                            ]
-                        ) }}"
-                        class="btn rounded-3
-                        {{ $view=='table'
-                            ? 'btn-primary'
-                            : 'btn-outline-primary'
-                        }}"
-                    >
-                        <i class="bi bi-table me-1"></i>
-                        <span class="desc-add">Tampilan Tabel</span>
-                    </a>
-                </div>                
-                
+            <div class="d-flex flex-column flex-md-row justify-content-center justify-content-md-between align-items-center gap-3">                                               
                 {{-- RIGHT --}}
                 <div class="d-flex flex-wrap gap-2">
-                    
+                    <div class="badge-status aktif">
+                        <div class="me-2">
+                            <span class="desc-add">Total Jadwal</span> Aman : 
+                        </div>{{ $totalAman }}
+                    </div> 
+                    <div class="badge-status nonaktif">
+                        <div class="me-2">
+                            <span class="desc-add">Total Jadwal</span> Bentrok : 
+                        </div>{{ $totalConflict }}
+                    </div>                          
+                </div>
+                
+                <div class="d-flex flex-wrap justify-content-center gap-2">                    
                     {{-- REJECT --}}
                     <button
-                        class="btn btn-danger rounded-3"
+                        class="btn btn-danger btn-sm rounded-3"
                         data-bs-toggle="modal"
                         data-bs-target="#rejectModal"
                     >
                         <i class="bi bi-x-circle me-1"></i>
-                        <span class="desc-add">Tolak</span>
+                        Tolak
                     </button>
                     {{-- APPROVE --}}
                     <form
@@ -79,14 +53,14 @@
                     >
                         @csrf
                         <button
-                            class="btn btn-success rounded-3 btn-confirm"
+                            class="btn btn-success btn-sm rounded-3 btn-confirm"
                             data-title="SETUJUI SELURUH JADWAL INI?"
                             data-message="Jadwal yang sudah disetujui tidak akan bisa diubah kembali"
                             data-button="btn-danger">                            
                             <i class="bi bi-check-circle me-1"></i>
-                            <span class="desc-add">Setujui</span>
+                            Setujui
                         </button>
-                    </form>
+                    </form>                
                     @if ($jadwals->isNotEmpty() && $jadwals->every(fn ($jadwal) => $jadwal->status === 'approved'))
                         {{-- PUBLISH --}}
                         <form
@@ -96,15 +70,15 @@
                             @csrf
                             @method('PATCH')
                             <button
-                                class="btn btn-primary rounded-3">
+                                class="btn btn-primary btn-sm rounded-3 px-3">
                                 <i class="bi bi-send-check-fill me-1"></i>
-                                <span class="desc-add">Publish</span>
+                                Publish
                             </button>
                         </form>
                     @else
                         <button 
                             type="button" 
-                            class="btn btn-secondary rounded-3" 
+                            class="btn btn-secondary btn-sm rounded-3 px-3" 
                             disabled
                         >
                                 <i class="bi bi-send-check-fill me-1"></i>
@@ -114,6 +88,46 @@
                 </div>
             </div>
         </div>
+    </div>
+    <div class="d-flex justify-content-center align-items-center w-100">  
+        <div class="card border-0 rounded-top-5 rounded-bottom-0 col-md-4 col-5 pt-2 mb-0 mx-auto">
+            <div class="d-flex flex-wrap justify-content-center gap-2">                    
+                <a
+                    href="{{ route(
+                        'superadmin.monitoring-jadwal.show',
+                        [
+                            'kelas' => $kelas->id,
+                            'view' => 'grid',
+                        ]
+                    ) }}"
+                    class="btn btn-sm rounded-3
+                    {{ $view=='grid'
+                        ? 'btn-primary'
+                        : 'btn-outline-primary'
+                    }}"
+                >
+                    <i class="bi bi-grid-fill"></i>
+                    <span class="ms-1 desc-add">Tampilan Grid</span>
+                </a>
+                <a
+                    href="{{ route(
+                        'superadmin.monitoring-jadwal.show',
+                        [
+                            'kelas' => $kelas->id,
+                            'view' => 'table',
+                        ]
+                    ) }}"
+                    class="btn btn-sm rounded-3
+                    {{ $view=='table'
+                        ? 'btn-primary'
+                        : 'btn-outline-primary'
+                    }}"
+                >
+                    <i class="bi bi-table"></i>
+                    <span class="me-1 desc-add">Tampilan Tabel</span>
+                </a>
+            </div> 
+        </div> 
     </div>
     {{-- GRID VIEW --}}
     @if ($view == 'grid')

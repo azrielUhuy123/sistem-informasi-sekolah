@@ -9,8 +9,10 @@ use App\Models\TahunAjaran;
 use Illuminate\Support\Facades\DB;
 use App\Models\PenempatanSiswa;
 use App\Models\KelasMaster;
+use App\Helpers\TingkatKelasHelper;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Validation\ValidationException;
 
 class KenaikanKelasController extends Controller
 {
@@ -104,15 +106,8 @@ class KenaikanKelasController extends Controller
             ->values();
 
         $totalSiswa = $keputusan->count();
-
-        $jumlahNaik = $keputusan
-            ->where('status', 'naik')
-            ->count();
-
-        $jumlahTinggal = $keputusan
-            ->where('status', 'tinggal')
-            ->count();
-
+        $jumlahNaik = $keputusan->where('status', 'naik')->count();
+        $jumlahTinggal = $keputusan->where('status', 'tinggal')->count();
         $approvalStatus = $keputusan->first()?->approval_status ?? 'draft';
 
         return view(
@@ -148,31 +143,40 @@ class KenaikanKelasController extends Controller
 
         abort_if($keputusan->isEmpty(), 404, 'Data pengajuan tidak ditemukan.');
 
-        if ($keputusan->first()->approval_status !== 'pending') {
-            return back()->with(
-                'error',
-                'Pengajuan ini sudah diproses.'
-            );
+        $approvalStatuses = $keputusan->pluck('approval_status')->unique()->values();
+
+        if ($approvalStatuses->count() !== 1 || $approvalStatuses->first() !== 'pending') {
+            return back()->with('error', 'Pengajuan harus berstatus pending dan seragam sebelum ditolak.');
         }
 
-        foreach ($keputusan as $item) {
-            $item->update([
-                'approval_status' => 'rejected',
-                'catatan_kepsek' => $request->catatan_kepsek,
-                'approved_by' => Auth::id(),
-                'approved_at' => now(),
-            ]);
-        }
+        DB::transaction(function () use ($kelas, $tahunAktif, $request) {
+            $keputusan = KeputusanKenaikan::where('kelas_id', $kelas->id)
+                ->where('tahun_ajaran_id', $tahunAktif->id)
+                ->lockForUpdate()
+                ->get();
+
+            if (
+                $keputusan->isEmpty() ||
+                $keputusan->contains(fn ($item) => $item->approval_status !== 'pending')
+            ) {
+                throw ValidationException::withMessages([
+                    'keputusan' => 'Status pengajuan berubah atau tidak lagi pending.',
+                ]);
+            }
+
+            foreach ($keputusan as $item) {
+                $item->update([
+                    'approval_status' => 'rejected',
+                    'catatan_kepsek' => $request->catatan_kepsek,
+                    'approved_by' => Auth::id(),
+                    'approved_at' => now(),
+                ]);
+            }
+        });
 
         return redirect()
-            ->route(
-                'superadmin.monitoring-kenaikan.show',
-                $kelas
-            )
-            ->with(
-                'success',
-                'Pengajuan kenaikan kelas berhasil ditolak.'
-            );
+            ->route('superadmin.monitoring-kenaikan.show', $kelas)
+            ->with('success', 'Pengajuan kenaikan kelas berhasil ditolak.');
     }
     public function approve(Request $request, Kelas $kelas)
     {
@@ -191,68 +195,153 @@ class KenaikanKelasController extends Controller
 
         abort_if($keputusan->isEmpty(), 404, 'Data pengajuan tidak ditemukan.');
 
-        if ($keputusan->first()->approval_status !== 'pending') {
-            return back()->with(
-                'error',
-                'Pengajuan ini sudah diproses.'
-            );
+        $approvalStatuses = $keputusan->pluck('approval_status')->unique()->values();
+
+        if ($approvalStatuses->count() === 1 && $approvalStatuses->first() === 'approved') {
+            return back()->with('success', 'Pengajuan ini sudah disetujui; tidak ada perubahan penempatan tambahan.');
         }
 
-        DB::transaction(function () use ($kelas, $keputusan, $tahunAktif) {
+        if ($approvalStatuses->count() !== 1 || $approvalStatuses->first() !== 'pending') {
+            return back()->with('error', 'Pengajuan harus berstatus pending dan seragam sebelum disetujui.');
+        }
 
-            // ============================
-            // APPROVAL
-            // ============================
+        DB::transaction(function () use ($kelas, $tahunAktif) {
+
+            $keputusan = KeputusanKenaikan::with('siswa')
+                ->where('kelas_id', $kelas->id)
+                ->where('tahun_ajaran_id', $tahunAktif->id)
+                ->lockForUpdate()
+                ->get();
+
+            if (
+                $keputusan->isEmpty() ||
+                $keputusan->contains(fn ($item) => $item->approval_status !== 'pending')
+            ) {
+                throw ValidationException::withMessages([
+                    'keputusan' => 'Status pengajuan berubah atau tidak lagi pending.',
+                ]);
+            }
+
+            if ($keputusan->pluck('siswa_id')->duplicates()->isNotEmpty()) {
+                throw ValidationException::withMessages([
+                    'keputusan' => 'Terdapat keputusan ganda untuk siswa pada kelas dan Tahun Ajaran ini.',
+                ]);
+            }
+
+            $kelas->loadMissing('kelasGrup.kelasMaster');
+
+            $angkatanId = $kelas->kelasGrup?->angkatan_id;
+            $tingkatSekarang = $kelas->kelasGrup?->kelasMaster?->tingkat;
+
+            if (!$angkatanId || !$tingkatSekarang) {
+                throw ValidationException::withMessages([
+                    'kelas' => 'Angkatan atau tingkat kelas asal belum lengkap.',
+                ]);
+            }
+
+            if ($tingkatSekarang === 'VI' && $tahunAktif->semester !== 'Genap') {
+                throw ValidationException::withMessages([
+                    'tahun_ajaran' => 'Keputusan akhir kelas VI hanya dapat disetujui pada semester Genap.',
+                ]);
+            }
+
+            $tingkatBaru = TingkatKelasHelper::berikutnya($tingkatSekarang);
+
+            $rombel = str_starts_with($kelas->nama_kelas, $tingkatSekarang)
+                ? substr($kelas->nama_kelas, strlen($tingkatSekarang))
+                : '';
+
+            if (!preg_match('/^[A-Za-z]+$/', $rombel)) {
+                throw ValidationException::withMessages([
+                    'kelas' => 'Kode rombel kelas asal tidak valid.',
+                ]);
+            }
+
+            $kelasTujuan = null;
+            $adaSiswaNaik = $keputusan->contains(
+                fn ($item) => $item->status === 'naik'
+            );
+
+            if (!$tingkatBaru) {
+                throw ValidationException::withMessages([
+                    'kelas' => 'Tingkat tujuan tidak dapat ditentukan.',
+                ]);
+            }
+
+            if ($tingkatBaru !== 'LULUS' && $adaSiswaNaik) {
+                $kelasTujuan = Kelas::whereHas('kelasGrup', function ($q) use ($angkatanId, $tingkatBaru) {
+                    $q->where('angkatan_id', $angkatanId)
+                        ->whereHas('kelasMaster', function ($q) use ($tingkatBaru) {
+                            $q->where('tingkat', $tingkatBaru);
+                        });
+                })
+                ->where('nama_kelas', $tingkatBaru . $rombel)
+                ->first();
+            }
+
+            if ($tingkatBaru !== 'LULUS' && $adaSiswaNaik && !$kelasTujuan) {
+                throw ValidationException::withMessages([
+                    'kelas' => "Kelas tujuan {$tingkatBaru}{$rombel} untuk Angkatan ini tidak ditemukan.",
+                ]);
+            }
+
+            $penempatanPerSiswa = [];
 
             foreach ($keputusan as $item) {
 
+                if (!$item->siswa || (int) $item->siswa->angkatan_id !== (int) $angkatanId) {
+                    throw ValidationException::withMessages([
+                        'siswa' => 'Angkatan siswa tidak sesuai dengan Angkatan kelas asal.',
+                    ]);
+                }
+
+                $penempatanAktif = PenempatanSiswa::where('siswa_id', $item->siswa_id)
+                    ->where('tahun_ajaran_id', $tahunAktif->id)
+                    ->whereNull('tanggal_keluar')
+                    ->lockForUpdate()
+                    ->get();
+
+                if ($penempatanAktif->count() !== 1) {
+                    throw ValidationException::withMessages([
+                        'siswa' => 'Siswa harus memiliki tepat satu penempatan aktif pada Tahun Ajaran ini.',
+                    ]);
+                }
+
+                $penempatan = $penempatanAktif->first();
+
+                if ((int) $penempatan->kelas_id !== (int) $item->kelas_id) {
+                    throw ValidationException::withMessages([
+                        'siswa' => 'Penempatan aktif siswa tidak sesuai dengan kelas keputusan.',
+                    ]);
+                }
+
+                $penempatanPerSiswa[$item->siswa_id] = $penempatan;
+            }
+
+            foreach ($keputusan as $item) {
                 $item->update([
                     'approval_status' => 'approved',
                     'approved_by' => Auth::id(),
                     'approved_at' => now(),
                 ]);
-
-            }
-
-            // ============================
-            // KENAIKAN KELAS
-            // ============================
-
-            $tingkatSekarang = $kelas->kelasGrup->kelasMaster->tingkat;
-            $tingkatBaru = $tingkatSekarang + 1;
-
-            preg_match('/[A-Za-z]+$/', $kelas->nama_kelas, $match);
-
-            $rombel = $match[0] ?? '';
-
-            $kelasTujuan = Kelas::whereHas('kelasGrup.kelasMaster', function ($q) use ($tingkatBaru) {
-                $q->where('tingkat', $tingkatBaru);
-            })
-            ->where('nama_kelas', $tingkatBaru . $rombel)
-            ->first();
-
-            if (!$kelasTujuan) {
-                throw new \Exception('Kelas tujuan tidak ditemukan.');
             }
 
             foreach ($keputusan as $item) {
-
                 if ($item->status !== 'naik') {
                     continue;
                 }
 
-                $penempatan = PenempatanSiswa::where('siswa_id', $item->siswa_id)
-                    ->where('tahun_ajaran_id', $tahunAktif->id)
-                    ->whereNull('tanggal_keluar')
-                    ->first();
-
-                if (!$penempatan) {
+                if ($tingkatSekarang === 'VI') {
                     continue;
                 }
 
-                $penempatan->update([
+                $penempatanPerSiswa[$item->siswa_id]->update([
                     'tanggal_keluar' => now(),
                 ]);
+
+                if ($tingkatBaru === 'LULUS') {
+                    continue;
+                }
 
                 PenempatanSiswa::create([
                     'siswa_id' => $item->siswa_id,

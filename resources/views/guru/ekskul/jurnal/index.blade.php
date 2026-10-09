@@ -133,9 +133,9 @@
 
                 <div class="mt-4 text-end">
 
-                    <button class="btn btn-dark">
+                    <button class="btn btn-primary rounded-3">
 
-                        Simpan Jurnal
+                        Simpan <i class="bi bi-save ms-2"></i>
 
                     </button>
 

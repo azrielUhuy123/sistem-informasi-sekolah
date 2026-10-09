@@ -165,3 +165,48 @@
     background: linear-gradient(135deg, #334155, #0f172a);
     color: #fff;
 }
+.bg-status {
+    font-weight: 750;
+}
+
+/* AKTIF */
+.bg-status.aktif {
+    background: #d1e7dd;
+    color: #0f5132;    
+}
+
+
+/* DRAFT */
+.bg-status.draft {
+    background: #e2e3e5;
+    color: #41464b;
+}
+
+
+/* SELESAI */
+.bg-status.selesai {
+    background: #f1f3f5;
+    color: #495057;
+    border: 1px solid #dee2e6;
+}
+
+
+/* NONAKTIF */
+.bg-status.nonaktif {
+    background: #f8d7da;
+    color: #842029;
+}
+
+/* =========================
+   PENDING
+========================= */
+
+.bg-status.pending {
+    background: #fff3cd;
+    color: #856404;
+}
+
+.bg-status.verifikasi {
+    background: #cfe2ff;
+    color: #084298;
+}

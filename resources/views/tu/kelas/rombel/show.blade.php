@@ -177,7 +177,7 @@
                 </table>
             {{ $siswa->links() }}
             @else
-                <div class="text-muted text-center py-4">
+                <div class="text-muted text-center">
                     Belum ada siswa di rombel ini
                 </div>
             @endif             

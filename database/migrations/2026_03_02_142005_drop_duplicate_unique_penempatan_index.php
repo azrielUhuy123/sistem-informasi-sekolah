@@ -9,6 +9,10 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('penempatan_siswa', function (Blueprint $table) {
+            $table->index('siswa_id', 'penempatan_siswa_siswa_id_index');
+        });
+
+        Schema::table('penempatan_siswa', function (Blueprint $table) {
             $table->dropUnique('unique_penempatan_aktif');
         });
     }
@@ -20,6 +24,10 @@ return new class extends Migration
                 ['siswa_id', 'tahun_ajaran_id', 'tanggal_keluar'],
                 'unique_penempatan_aktif'
             );
+        });
+
+        Schema::table('penempatan_siswa', function (Blueprint $table) {
+            $table->dropIndex('penempatan_siswa_siswa_id_index');
         });
     }
 };

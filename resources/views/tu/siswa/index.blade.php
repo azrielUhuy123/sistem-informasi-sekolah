@@ -64,7 +64,7 @@
                         name="search"
                         class="form-control siswa-filter-search"
                         placeholder="Cari Nama / NIS..."
-                        value="{{ request('search') }}"                        "
+                        value="{{ request('search') }}"                        
                     >
                     <button
                         type="submit"
@@ -127,7 +127,7 @@
                             <th width="70">No</th>
                             <th>Nama</th>
                             <th width="150">NISN</th>
-                            <th width="150">Rombel</th>
+                            <th>Rombel</th>
                             <th width="150">Angkatan</th>
                             <th width="150">Status</th>
                             <th width="90">Aksi</th>
@@ -164,9 +164,9 @@
                                 </td>
                                 <td>{{ $row->nisn ?? '-' }}</td>
                                 <td>
-                                    <span class="fw-semibold">
+                                    <div class="fw-bold">
                                         {{ $row->penempatanAktif?->kelas?->nama_kelas_label ?? '-' }}
-                                    </span>
+                                    </div>
                                 </td>
                                 <td>
                                     {{ $row->penempatanAktif?->kelas?->kelasGrup?->angkatan?->tahun ?? '-' }}
@@ -207,13 +207,7 @@
                             </tr>
                         @empty
                             <tr>
-                                <td colspan="9" class="text-center py-5 text-muted">
-                                    <div class="mb-3">
-                                        <i class="bi bi-inbox fs-1"></i>
-                                    </div>
-                                    <div class="fw-semibold">Tidak ada data siswa</div>
-                                    <div class="small">Coba ubah filter atau hapus kata kunci pencarian.</div>
-                                </td>
+                                <td colspan="8" class="text-center text-muted">Belum ada data siswa</td>
                             </tr>
                         @endforelse
                     </tbody>

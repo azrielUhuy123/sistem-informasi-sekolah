@@ -45,7 +45,7 @@
             > 
             <x-button.add
                 :href="route('tu.datakepegawaian.create')"
-                label="Tambah Dokumen Sekolah"
+                label="Tambah Pegawai"
             />            
 
         </x-slot:actions>

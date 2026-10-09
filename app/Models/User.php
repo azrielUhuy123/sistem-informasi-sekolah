@@ -12,6 +12,8 @@ class User extends Authenticatable
     use HasFactory, Notifiable;
 
     protected $fillable = [
+        'name',
+        'email',
         'pegawai_id',
         'siswa_id',
         'username',
@@ -108,24 +110,40 @@ class User extends Authenticatable
 
     public function getNameAttribute()
     {
+        if (array_key_exists('name', $this->attributes)) {
+            return $this->attributes['name'];
+        }
+
         return $this->pegawai?->nama
             ?? $this->siswa?->nama;
     }
 
     public function getEmailAttribute()
     {
+        if (array_key_exists('email', $this->attributes)) {
+            return $this->attributes['email'];
+        }
+
         return $this->pegawai?->email
             ?? $this->siswa?->email;
     }
 
     public function getTeleponAttribute()
     {
+        if (array_key_exists('telepon', $this->attributes)) {
+            return $this->attributes['telepon'];
+        }
+
         return $this->pegawai?->telepon
             ?? $this->siswa?->telepon;
     }
 
     public function getAlamatAttribute()
     {
+        if (array_key_exists('alamat', $this->attributes)) {
+            return $this->attributes['alamat'];
+        }
+
         return $this->pegawai?->alamat
             ?? $this->siswa?->alamat;
     }

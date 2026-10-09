@@ -4,93 +4,82 @@
 
 @section('content')
 
-<div class="container-fluid py-3">
+<div class="container-fluid">
 
     {{-- HEADER --}}
     <div class="card border-0 shadow-sm rounded-4 overflow-hidden mb-4">
-        <div class="card-body p-4 p-lg-5 text-white" style="background: linear-gradient(135deg, #0f4c81 0%, #2563eb 100%);">
+
+        <div
+            class="card-body p-4 p-lg-5 text-white"
+            style="background:linear-gradient(135deg,#0f4c81 0%,#2563eb 100%);"
+        >
+
             <div class="d-flex flex-column flex-lg-row justify-content-between align-items-lg-center gap-3">
+
                 <div>
-                    <h3 class="fw-bold mb-2">Manajemen Catatan Pembinaan</h3>
-                    <p class="mb-0 opacity-75">Kelola catatan pembinaan ekstrakurikuler</p>
+
+                    <h3 class="fw-bold mb-2">
+                        Manajemen Catatan Pembinaan
+                    </h3>
+
+                    <p class="mb-0 opacity-75">
+                        Kelola catatan pembinaan ekstrakurikuler
+                    </p>
+
                 </div>
+
                 <div class="badge bg-white text-primary px-3 py-2 fs-6">
-                    <i class="bi bi-shield-check me-2"></i> Sinergi-MJ
+                    <i class="bi bi-shield-check me-2"></i>
+                    Sinergi-MJ
                 </div>
+
             </div>
+
         </div>
+
     </div>
 
+    {{-- ALERT --}}
+    <x-alert.flash key="success" type="success"/>
+    <x-alert.flash key="error" type="danger"/>
 
-    {{-- ALERT SUCCESS --}}
-    @if(session('success'))
+    {{-- TABLE --}}
+    <x-table.card
+        title="Daftar Anggota"
+        subtitle="Klik tombol Isi / Edit untuk memperbarui pengembangan anggota."
+    >        
 
-        <div class="alert alert-success border-0 shadow-sm">
+        <div class="table-responsive">
 
-            <i class="bi bi-check-circle-fill me-2"></i>
-            {{ session('success') }}
+            <table class="table table-hover align-middle mb-0">
 
-        </div>
+                <thead>
 
-    @endif
+                    <tr>
 
-    {{-- ALERT ERROR --}}
-    @if(session('error'))
+                        <th width="70">
+                            No
+                        </th>
 
-        <div class="alert alert-danger border-0 shadow-sm">
+                        <th>
+                            Nama Siswa
+                        </th>
 
-            <i class="bi bi-exclamation-circle-fill me-2"></i>
-            {{ session('error') }}
+                        <th width="200">
+                            Status
+                        </th>
 
-        </div>
+                        <th width="170">
+                            Aksi
+                        </th>
 
-    @endif
+                    </tr>
 
-</div>
+                </thead>
 
-    <div class="card border-0 shadow-sm">
+                <tbody>
 
-        <div class="card-body">
-
-            <div class="table-responsive">
-
-                <table class="table align-middle">
-
-                    <thead class="table-light">
-
-                        <tr>
-
-                            <th width="80">
-
-                                No
-
-                            </th>
-
-                            <th>
-
-                                Nama Siswa
-
-                            </th>
-
-                            <th width="180">
-
-                                Status
-
-                            </th>
-
-                            <th width="150">
-
-                                Aksi
-
-                            </th>
-
-                        </tr>
-
-                    </thead>
-
-                    <tbody>
-
-                        @forelse($anggota as $item)
+                    @forelse($anggota as $item)
 
                             @php
 
@@ -122,121 +111,135 @@
 
                             @endphp
 
-                            <tr>
+                            @php
+                                $siswa = $item->siswa;
+                                $namaSiswa = optional($siswa)->nama ?? 'Data Siswa Hilang';
+                            @endphp
 
-                                <td>
+                        <tr>
 
+                            {{-- NO --}}
+                            <td>
+
+                                <span class="badge bg-light text-dark rounded-circle">
                                     {{ $anggota->firstItem() + $loop->index }}
+                                </span>
 
-                                </td>
+                            </td>
 
-                                <td>
+                            {{-- SISWA --}}
+                            <td>
 
-                                    {{ $item->siswa->nama }}
+                                <div class="d-flex align-items-center">
 
-                                </td>
-
-                                <td>
-
-                                    @if(!$catatan)
-
-                                        <span class="badge bg-secondary">
-
-                                            Belum Ada
-
-                                        </span>
-
-                                    @elseif($lengkap)
-
-                                        <span class="badge bg-success">
-
-                                            Lengkap
-
-                                        </span>
-
-                                    @else
-
-                                        <span class="badge bg-warning text-dark">
-
-                                            Belum Lengkap
-
-                                        </span>
-
-                                    @endif
-
-                                </td>
-
-                                <td>
-
-                                    <button
-                                        class="btn btn-primary btn-sm"
-                                        data-bs-toggle="modal"
-                                        data-bs-target="#modal{{ $item->id }}"
+                                    <div
+                                        class="rounded-circle bg-primary-subtle text-primary d-flex align-items-center justify-content-center me-3"
+                                        style="width:48px;height:48px;"
                                     >
 
-                                        Isi / Edit
+                                        <i class="bi bi-person-fill fs-4"></i>
 
-                                    </button>
+                                    </div>
 
-                                </td>
+                                    <div>
 
-                            </tr>
+                                        <div class="fw-semibold">
+                                            {{ $namaSiswa }}
+                                        </div>
 
-                            {{-- MODAL --}}
+                                    </div>
 
-                            <div
-                                class="modal fade"
-                                id="modal{{ $item->id }}"
-                                tabindex="-1"
-                            >
+                                </div>
 
-                                <div class="modal-dialog modal-lg">
+                            </td>
 
-                                    <div class="modal-content">
+                            {{-- STATUS --}}
+                            <td>
 
-                                        <form
-                                            action="{{ route('guru.ekskul.pembinaan.store') }}"
-                                            method="POST"
+                                @if(!$catatan)
+                                    <span class="badge-status draft">
+                                        <i class="bi bi-dash-circle-fill me-2"></i>
+                                        Belum Ada
+                                    </span>                                
+                                @elseif($lengkap)
+                                    <span class="badge-status aktif">
+                                        <i class="bi bi-check-circle-fill me-2"></i>
+                                        Lengkap
+                                    </span>
+                                @else                                
+                                    <span class="badge-status pending">
+                                        <i class="bi bi-pencil-square me-2"></i>
+                                        Belum Lengkap
+                                    </span>                                
+                                @endif
+                            </td>
+
+                            {{-- AKSI --}}
+                            <td>
+
+                                <button
+                                    type="button"
+                                    class="btn btn-primary btn-sm rounded-pill px-3 py-0"
+                                    data-bs-toggle="modal"
+                                    data-bs-target="#modal{{ $item->id }}"
+                                >                                    
+                                    Isi / Edit <i class="bi bi-pencil-square ms-1"></i>
+
+                                </button>
+
+                            </td>
+
+                        </tr>
+
+                        {{-- MODAL --}}
+                        <div
+                            class="modal fade"
+                            id="modal{{ $item->id }}"
+                            tabindex="-1"
+                        >
+
+                            <div class="modal-dialog modal-xl modal-dialog-scrollable">
+
+                                <div class="modal-content border-0 rounded-4">
+
+                                    <form
+                                        action="{{ route('guru.ekskul.pembinaan.store') }}"
+                                        method="POST"
+                                    >
+
+                                        @csrf
+
+                                        <input
+                                            type="hidden"
+                                            name="ekskul_id"
+                                            value="{{ $ekskul->id }}"
                                         >
+                                        <input
+                                            type="hidden"
+                                            name="siswa_id"
+                                            value="{{ $item->siswa_id }}"
+                                        >
+                                        <div class="modal-header bg-light border-0">  
+                                            <h5 class="text-label fw-bold">
+                                                {{ optional($item->siswa)->nama ?? 'Data Siswa Hilang' }}
+                                            </h5>                       
+                                                                    
+                                            <button
+                                                type="button"
+                                                class="btn-close text-label"
+                                                data-bs-dismiss="modal"
+                                            ></button>
 
-                                            @csrf
+                                        </div>
 
-                                            <input
-                                                type="hidden"
-                                                name="ekskul_id"
-                                                value="{{ $ekskul->id }}"
-                                            >
+                                        <div class="modal-body">
 
-                                            <input
-                                                type="hidden"
-                                                name="siswa_id"
-                                                value="{{ $item->siswa_id }}"
-                                            >
+                                            <div class="row g-4">
 
-                                            <div class="modal-header">
-
-                                                <h5 class="modal-title">
-
-                                                    {{ $item->siswa->nama }}
-
-                                                </h5>
-
-                                                <button
-                                                    type="button"
-                                                    class="btn-close"
-                                                    data-bs-dismiss="modal"
-                                                ></button>
-
-                                            </div>
-
-                                            <div class="modal-body">
-
-                                                <div class="mb-3">
+                                                <div class="col-md-6">
 
                                                     <label class="form-label">
-
                                                         Kehadiran
-
                                                     </label>
 
                                                     <textarea
@@ -247,12 +250,10 @@
 
                                                 </div>
 
-                                                <div class="mb-3">
+                                                <div class="col-md-6">
 
                                                     <label class="form-label">
-
                                                         Partisipasi
-
                                                     </label>
 
                                                     <textarea
@@ -263,12 +264,10 @@
 
                                                 </div>
 
-                                                <div class="mb-3">
+                                                <div class="col-md-6">
 
                                                     <label class="form-label">
-
                                                         Perkembangan Kemampuan
-
                                                     </label>
 
                                                     <textarea
@@ -279,12 +278,10 @@
 
                                                 </div>
 
-                                                <div class="mb-3">
+                                                <div class="col-md-6">
 
                                                     <label class="form-label">
-
                                                         Catatan Pembina
-
                                                     </label>
 
                                                     <textarea
@@ -297,70 +294,78 @@
 
                                             </div>
 
-                                            <div class="modal-footer">
+                                        </div>
 
-                                                <button
-                                                    type="button"
-                                                    class="btn btn-secondary"
-                                                    data-bs-dismiss="modal"
-                                                >
+                                        <div class="modal-footer border-0">
 
-                                                    Tutup
+                                            <button
+                                                type="button"
+                                                class="btn btn-light rounded-3"
+                                                data-bs-dismiss="modal"
+                                            >
+                                                Tutup
+                                            </button>
 
-                                                </button>
+                                            <button
+                                                type="submit"
+                                                class="btn btn-success rounded-3"
+                                            >                                                
+                                                Simpan <i class="bi bi-save ms-1"></i>
 
-                                                <button
-                                                    type="submit"
-                                                    class="btn btn-success"
-                                                >
+                                            </button>                                        
 
-                                                    Simpan
+                                        </div>
 
-                                                </button>
-
-                                            </div>
-
-                                        </form>
-
-                                    </div>
+                                    </form>
 
                                 </div>
 
                             </div>
 
-                        @empty
+                        </div>
 
-                            <tr>
+                    @empty
 
-                                <td
-                                    colspan="4"
-                                    class="text-center text-muted py-4"
-                                >
+                        <tr>
 
-                                    Belum ada anggota ekskul
+                            <td colspan="4" class="text-center py-5">
 
-                                </td>
+                                <div class="d-flex flex-column align-items-center">
 
-                            </tr>
+                                    <i class="bi bi-people display-4 text-secondary"></i>
 
-                        @endforelse
+                                    <h5 class="fw-bold mt-3">
+                                        Belum ada anggota ekskul
+                                    </h5>
 
-                    </tbody>
+                                    <p class="text-muted mb-0">
+                                        Tidak ada data anggota yang dapat ditampilkan.
+                                    </p>
 
-                </table>
+                                </div>
 
-            </div>
+                            </td>
 
-            <div class="mt-3">
+                        </tr>
 
-                {{ $anggota->links() }}
+                    @endforelse
 
-            </div>
+                </tbody>
+
+            </table>
 
         </div>
 
-    </div>
+    </x-table.card>
 
 </div>
+
+<style>
+
+.modal-content {
+    overflow: hidden;
+}
+
+</style>
 
 @endsection

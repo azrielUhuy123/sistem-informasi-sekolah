@@ -93,7 +93,7 @@
                             name="ekskul_id"
                             class="form-control"
                             required
-                        >
+                        > 
                             <option value="">
                                 -- Pilih Ekskul --
                             </option>
@@ -200,7 +200,8 @@
                             {{-- EKSTRAKURIKULER --}}
                             <td>
 
-                                <span class="text-muted">                                
+                                <div class="d-flex align-items-center text-muted">
+                                    <i class="bi bi-star-fill text-primary me-2"></i>                              
                                     {{ $p->ekskul->nama ?? '-' }}
                                 </span>
 

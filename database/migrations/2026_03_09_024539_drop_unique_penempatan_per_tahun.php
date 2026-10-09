@@ -8,22 +8,8 @@ return new class extends Migration
 {
     public function up(): void
     {
-        Schema::table('penempatan_siswa', function (Blueprint $table) {
-
-            $table->index('siswa_id');
-            $table->index('tahun_ajaran_id');
-
-            $table->dropUnique('unique_penempatan_per_tahun');
-
-        });
     }
     public function down(): void
     {
-        Schema::table('penempatan_siswa', function (Blueprint $table) {
-            $table->unique(
-                ['siswa_id','tahun_ajaran_id','tanggal_keluar'],
-                'unique_penempatan_per_tahun'
-            );
-        });
     }
 };

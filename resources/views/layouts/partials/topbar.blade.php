@@ -30,6 +30,8 @@
 
     <div class="topbar-right">
 
+        @include('layouts.partials.notifications')
+
         <div class="dropdown">
             <a
                 class="btn border rounded-3 p-2 dropdown-toggle text-primary d-flex align-items-center gap-2"

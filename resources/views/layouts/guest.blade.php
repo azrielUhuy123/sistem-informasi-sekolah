@@ -13,6 +13,8 @@
         name="apple-mobile-web-app-status-bar-style"
         content="default"
     >
+    <link rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
     <link
         rel="icon"
         type="image/png"
@@ -36,7 +38,7 @@
             margin: 0;
             font-family: 'Figtree', sans-serif;
             min-height: 100vh;
-            
+             
             /* BACKGROUND IMAGE */
             background-image: url('{{ asset('assets/images/Bg-animated.svg') }}');
             background-size: cover;

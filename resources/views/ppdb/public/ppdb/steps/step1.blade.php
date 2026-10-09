@@ -1,9 +1,9 @@
 <div id="step1" class="wizard-step">
-    <h4 class="mb-4">Data Pribadi</h4>
+    <h4 class="mb-4">Data Pribadi Anak</h4>
 
     <div class="row g-3">
         <div class="col-md-6">
-            <label for="nama" class="form-label">Nama Lengkap <span class="text-danger">*</span></label>
+            <label for="nama" class="form-label">Nama Lengkap Anak<span class="text-danger">*</span></label>
             <input type="text"
                 id="nama"
                 name="nama"
@@ -16,7 +16,7 @@
         </div>
 
         <div class="col-md-6">
-            <label for="jenis_kelamin" class="form-label">Jenis Kelamin <span class="text-danger">*</span></label>
+            <label for="jenis_kelamin" class="form-label">Jenis Kelamin Anak<span class="text-danger">*</span></label>
             <select id="jenis_kelamin" name="jenis_kelamin" class="form-select" required>
                 <option value="">Pilih Jenis Kelamin</option>
                 <option value="L">Laki-laki</option>
@@ -26,7 +26,7 @@
         </div>
 
         <div class="col-md-6">
-            <label for="nik" class="form-label">Nomor Induk Kependudukan (NIK) <span class="text-danger">*</span></label>
+            <label for="nik" class="form-label">Nomor Induk Kependudukan Anak (NIK) <span class="text-danger">*</span></label>
             <input type="text"
                 id="nik"
                 name="nik"
@@ -41,7 +41,7 @@
         </div>
 
         <div class="col-md-6">
-            <label for="nomor_kk" class="form-label">Nomor Kartu Keluarga <span class="text-danger">*</span></label>
+            <label for="nomor_kk" class="form-label">Nomor Kartu Keluarga Anak<span class="text-danger">*</span></label>
             <input type="text"
                 id="nomor_kk"
                 name="nomor_kk"
@@ -56,7 +56,7 @@
         </div>
 
         <div class="col-md-6">
-            <label for="tempat_lahir" class="form-label">Tempat Lahir <span class="text-danger">*</span></label>
+            <label for="tempat_lahir" class="form-label">Tempat Lahir Anak<span class="text-danger">*</span></label>
             <input type="text"
                 id="tempat_lahir"
                 name="tempat_lahir"
@@ -68,7 +68,7 @@
         </div>
 
         <div class="col-md-6">
-            <label for="tanggal_lahir" class="form-label">Tanggal Lahir <span class="text-danger">*</span></label>
+            <label for="tanggal_lahir" class="form-label">Tanggal Lahir Anak<span class="text-danger">*</span></label>
             <input type="date"
                 id="tanggal_lahir"
                 name="tanggal_lahir"
@@ -80,20 +80,20 @@
         </div>
 
         <div class="col-md-6">
-            <label for="nomor_akta" class="form-label">Nomor Akta Kelahiran <span class="text-danger">*</span></label>
+            <label for="nomor_akta" class="form-label">Nomor Akta Kelahiran Anak</label>
             <input type="text"
                 id="nomor_akta"
                 name="nomor_akta"
                 class="form-control"
                 placeholder="Masukkan nomor akta kelahiran" 
                 maxlength="30"
-                required>
+                >
             <small class="text-muted">Nomor sesuai Akta Kelahiran.</small>
             <div class="invalid-feedback"></div>
         </div>
 
         <div class="col-md-6">
-            <label for="agama" class="form-label">Agama <span class="text-danger">*</span></label>
+            <label for="agama" class="form-label">Agama Anak<span class="text-danger">*</span></label>
             <select id="agama" name="agama" class="form-select" required>
                 <option value="">Pilih Agama</option>
                 <option value="Islam">Islam</option>
@@ -107,7 +107,7 @@
         </div>
 
         <div class="col-md-6">
-            <label for="kewarganegaraan" class="form-label">Kewarganegaraan <span class="text-danger">*</span></label>
+            <label for="kewarganegaraan" class="form-label">Kewarganegaraan Anak<span class="text-danger">*</span></label>
             <select id="kewarganegaraan" name="kewarganegaraan" class="form-select" required>
                 <option value="">Pilih Kewarganegaraan</option>
                 <option value="Indonesia">Indonesia</option>
@@ -120,11 +120,16 @@
     <hr class="my-4">
 
     <div class="d-flex justify-content-between align-items-center mt-4">
-        <a href="{{ route('ppdb.informasi') }}" class="btn btn-outline-secondary rounded-3 btn-sm">
-            <i class="bi bi-chevron-left me-1"></i> Kembali
+        <a href="{{ route('ppdb.informasi') }}" 
+        class="btn btn-outline-secondary rounded-3 btn-sm btn-confirm"
+        data-title="Ingin Keluar Dari Formulir Pendaftaran?"
+        data-message="Formulir akan tertutup, apakah anda yakin?"
+        data-button="btn-danger"
+        >
+            <i class="bi bi-chevron-left me-1"></i> Keluar
         </a>
 
-        <button type="button" id="step1NextButton" class="btn btn-primary btn-sm">
+        <button type="button" id="step1NextButton" class="btn btn-primary btn-sm" onclick="showStep(2)">
             Selanjutnya <i class="bi bi-arrow-right ms-1"></i>
         </button>
     </div>
@@ -138,8 +143,7 @@
             nik: document.getElementById('nik'),
             nomor_kk: document.getElementById('nomor_kk'),
             tempat_lahir: document.getElementById('tempat_lahir'),
-            tanggal_lahir: document.getElementById('tanggal_lahir'),
-            nomor_akta: document.getElementById('nomor_akta'),
+            tanggal_lahir: document.getElementById('tanggal_lahir'),            
             agama: document.getElementById('agama'),
             kewarganegaraan: document.getElementById('kewarganegaraan')
         };
@@ -232,13 +236,7 @@
                         setInvalid(input, 'Tanggal lahir tidak boleh di masa depan.');
                         return false;
                     }
-                    return true;
-                case 'nomor_akta':
-                    if (!value) {
-                        setInvalid(input, 'Nomor Akta Kelahiran wajib diisi.');
-                        return false;
-                    }
-                    return true;
+                    return true;                
                 case 'agama':
                     if (!value) {
                         setInvalid(input, 'Silakan pilih agama.');
@@ -266,7 +264,7 @@
             input.value = input.value.trim().replace(/\s+/g, ' ');
         };
 
-        ['nama', 'tempat_lahir', 'nik', 'nomor_kk', 'tanggal_lahir', 'jenis_kelamin', 'agama', 'kewarganegaraan', 'nomor_akta'].forEach((fieldName) => {
+        ['nama', 'tempat_lahir', 'nik', 'nomor_kk', 'tanggal_lahir', 'jenis_kelamin', 'agama', 'kewarganegaraan'].forEach((fieldName) => {
             const input = document.getElementsByName(fieldName)[0];
             if (!input) {
                 return;
@@ -294,38 +292,6 @@
             });
         });
 
-        document.getElementById('step1NextButton').addEventListener('click', () => {
-            const fieldOrder = [
-                step1Fields.nama,
-                step1Fields.jenis_kelamin,
-                step1Fields.nik,
-                step1Fields.nomor_kk,
-                step1Fields.tempat_lahir,
-                step1Fields.tanggal_lahir,
-                step1Fields.agama,
-                step1Fields.kewarganegaraan,
-                step1Fields.nomor_akta
-            ];
 
-            let firstInvalid = null;
-            let isValid = true;
-
-            fieldOrder.forEach((field) => {
-                if (field && !validateField(field)) {
-                    isValid = false;
-                    if (!firstInvalid) {
-                        firstInvalid = field;
-                    }
-                }
-            });
-
-            if (firstInvalid) {
-                firstInvalid.focus();
-            }
-
-            if (isValid) {
-                showStep(2);
-            }
-        });
     });
 </script>

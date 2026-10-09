@@ -206,6 +206,11 @@ Route::prefix('guru')
         )->name('raport.show');
 
         Route::get(
+            '/raport/{siswa}/pdf',
+            [RaportController::class, 'pdf']
+        )->name('raport.pdf');
+
+        Route::get(
             '/absensi',
             [AbsensiController::class, 'index']
         )->name('absensi.index');
@@ -373,6 +378,16 @@ Route::prefix('guru')
             ]
         )->name(
             'ekskul.jadwal.update'
+        );
+
+        Route::delete(
+            '/ekskul/jadwal/{jadwal}',
+            [
+                JadwalEkskulController::class,
+                'destroy'
+            ]
+        )->name(
+            'ekskul.jadwal.destroy'
         );
 
         Route::get('/profile/detail', [ProfileController::class, 'detail'])

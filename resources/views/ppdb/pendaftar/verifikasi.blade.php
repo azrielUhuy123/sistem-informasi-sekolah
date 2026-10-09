@@ -100,12 +100,12 @@
                         <td>
                             @if($item->status == 'pending')
                                 <span class="badge-status pending">
-                                    <i class="bi bi-hourglass-split me-2"></i> Pending
+                                    <i class="bi bi-hourglass-split me-2"></i> Belum Diputuskan
                                 </span>
                             @elseif($item->status == 'verifikasi')
                                 <span class="badge-status verifikasi">
                                     <i class="bi bi-search me-2"></i>
-                                    Verifikasi
+                                    Tahap Verifikasi (Data Lama)
                                 </span>
                             @elseif($item->status === 'diterima')
                                 <span class="badge-status aktif">
@@ -117,7 +117,7 @@
                         <td>
                             <a href="{{ route('tu.ppdb.pendaftar.show', $item) }}"
                             class="btn btn-primary btn-sm rounded-pill px-3 py-0">                                
-                                Verifikasi <i class="bi bi-chevron-right ms-2"></i>
+                                Tinjau Berkas <i class="bi bi-chevron-right ms-2"></i>
                             </a>
                         </td>
                     </tr>

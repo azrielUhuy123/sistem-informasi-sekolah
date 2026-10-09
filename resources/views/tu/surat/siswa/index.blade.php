@@ -148,19 +148,7 @@
                         </tr>
                     @empty
                         <tr>
-                            <td colspan="5"
-                                class="text-center py-5">
-                                <div class="d-flex flex-column align-items-center">
-                                    <i class="bi bi-folder-x text-muted"
-                                        style="font-size: 50px;"></i>
-                                    <h6 class="mt-3 text-muted">
-                                        Belum ada dokumen
-                                    </h6>
-                                    <p class="text-muted small mb-0">
-                                        Dokumen sekolah yang diupload akan muncul di sini
-                                    </p>
-                                </div>
-                            </td>
+                            <td colspan="5" class="text-center text-muted">Belum ada data dokumen</td>
                         </tr>
                     @endforelse
                 </tbody>

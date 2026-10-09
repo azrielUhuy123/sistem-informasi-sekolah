@@ -27,8 +27,18 @@ class PpdbPendaftaranMail extends Mailable
     public function envelope(): Envelope
     {
         return new Envelope(
-            subject: 'Perbaikan Berkas Pendaftaran PPDB - SDN Mekar Jaya',
+            subject: $this->emailSubject(),
         );
+    }
+
+    private function emailSubject(): string
+    {
+        return match ($this->pendaftar->status) {
+            'verifikasi' => 'PPDB SDN Mekar Jaya - Sedang Diverifikasi',
+            'diterima' => 'PPDB SDN Mekar Jaya - Pendaftaran Diterima',
+            'ditolak' => 'PPDB SDN Mekar Jaya - Pendaftaran Ditolak',
+            default => 'PPDB SDN Mekar Jaya - Pendaftaran Telah Berhasil',
+        };
     }
 
     public function content(): Content
@@ -38,6 +48,7 @@ class PpdbPendaftaranMail extends Mailable
             with: [
                 'pendaftar' => $this->pendaftar,
                 'statusUrl' => $this->statusUrl,
+                'subject' => $this->emailSubject(),
             ],
         );
     }

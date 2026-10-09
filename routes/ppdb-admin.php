@@ -92,14 +92,9 @@ Route::middleware([
         )->name('pendaftar.form-verifikasi');
 
         Route::post(
-            '/pendaftar/{pendaftar}/verifikasi',
-            [PendaftarController::class, 'simpanVerifikasi'
-        ])->name('pendaftar.simpan-verifikasi');
-
-        Route::post(
-            '/pendaftar/{pendaftar}/tolak-berkas',
-            [PendaftarController::class, 'tolakBerkas']
-        )->name('pendaftar.tolak-berkas');
+            '/pendaftar/{pendaftar}/tolak',
+            [PendaftarController::class, 'tolak']
+        )->name('pendaftar.tolak');
         /*
         |--------------------------------------------------------------------------
         | FILTER STATUS
@@ -107,9 +102,24 @@ Route::middleware([
         */
 
         Route::get(
+            '/diterima/export',
+            [PendaftarController::class, 'exportDiterima']
+        )->name('diterima.export');
+
+        Route::get(
             '/diterima',
             [PendaftarController::class, 'diterima']
         )->name('diterima.index');
+
+        Route::post(
+            '/diterima/{pendaftar}/resend-email',
+            [PendaftarController::class, 'resendEmailDiterima']
+        )->name('diterima.resend-email');
+
+        Route::get(
+            '/ditolak',
+            [PendaftarController::class, 'ditolak']
+        )->name('ditolak.index');
 
         Route::get(
             '/verifikasi',

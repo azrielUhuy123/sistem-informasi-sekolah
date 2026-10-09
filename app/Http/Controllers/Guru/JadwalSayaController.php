@@ -10,9 +10,12 @@ use App\Models\KelasMaster;
 use App\Models\MataPelajaran;
 use App\Models\PengajuanJadwal;
 use App\Models\PengampuMapel;
+use App\Models\TahunAjaran;
 use App\Models\WaliKelas;
+use App\Services\BusinessNotificationService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 
 class JadwalSayaController extends Controller
 {
@@ -260,8 +263,10 @@ class JadwalSayaController extends Controller
             return back()->with('error', 'Anda tidak memiliki akses ke kelas ini.');
         }
 
+        $tahunAjaranId = current_tahun_id();
+
         $published = PengajuanJadwal::where('kelas_id', $kelas->id)
-            ->where('tahun_ajaran_id', current_tahun_id())
+            ->where('tahun_ajaran_id', $tahunAjaranId)
             ->where('status', 'published')
             ->exists();
 
@@ -269,23 +274,35 @@ class JadwalSayaController extends Controller
             return back()->with('error', 'Jadwal sudah dipublish');
         }
 
-        $drafts = PengajuanJadwal::where('guru_id', $guru->id)
-            ->where('kelas_id', $kelas->id)
-            ->where('tahun_ajaran_id', current_tahun_id())
-            ->whereIn('status', [
-                'draft',
-                'rejected'
-            ])
-            ->get();
+        $submittedCount = DB::transaction(function () use ($guru, $kelas, $tahunAjaranId) {
+            $drafts = PengajuanJadwal::where('guru_id', $guru->id)
+                ->where('kelas_id', $kelas->id)
+                ->where('tahun_ajaran_id', $tahunAjaranId)
+                ->whereIn('status', ['draft', 'rejected'])
+                ->lockForUpdate()
+                ->get();
 
-        if ($drafts->count() === 0) {
+            if ($drafts->isEmpty()) {
+                return 0;
+            }
+
+            foreach ($drafts as $item) {
+                $item->update(['status' => 'submitted']);
+            }
+
+            $academicYear = TahunAjaran::findOrFail($tahunAjaranId)->tahun;
+
+            app(BusinessNotificationService::class)->notifyScheduleSubmitted(
+                $kelas,
+                $academicYear,
+                $drafts->count(),
+            );
+
+            return $drafts->count();
+        });
+
+        if ($submittedCount === 0) {
             return back()->with('error', 'Tidak ada jadwal untuk disubmit');
-        }
-
-        foreach ($drafts as $item) {
-            $item->update([
-                'status' => 'submitted'
-            ]);
         }
 
         return back()->with('success', 'Jadwal berhasil disubmit');

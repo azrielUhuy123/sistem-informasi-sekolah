@@ -114,7 +114,7 @@
 </form>
 @endif
 
-@if(isset($actions['activate']) && !$row->aktif)
+@if(isset($actions['activate']) && $row->status === 'draft')
 <form method="POST" action="{{ route($actions['activate'], $row->id) }}" class="d-inline">
     @csrf
     @method('PATCH')

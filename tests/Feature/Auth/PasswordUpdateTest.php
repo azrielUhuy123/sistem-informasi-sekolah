@@ -48,4 +48,25 @@ class PasswordUpdateTest extends TestCase
             ->assertSessionHasErrorsIn('updatePassword', 'current_password')
             ->assertRedirect('/profile');
     }
+
+    public function test_student_can_update_own_password(): void
+    {
+        $user = User::factory()->create([
+            'role' => 'siswa',
+            'approval_status' => 'approved',
+            'is_active' => true,
+        ]);
+
+        $this->from('/profile')
+            ->actingAs($user)
+            ->put('/password', [
+                'current_password' => 'password',
+                'password' => 'new-student-password',
+                'password_confirmation' => 'new-student-password',
+            ])
+            ->assertSessionHasNoErrors()
+            ->assertRedirect('/profile');
+
+        $this->assertTrue(Hash::check('new-student-password', $user->refresh()->password));
+    }
 }

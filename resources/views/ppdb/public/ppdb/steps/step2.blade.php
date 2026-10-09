@@ -67,7 +67,7 @@
             Sebelumnya
         </button>
 
-        <button type="button" id="step2NextButton" class="btn btn-primary btn-sm">
+        <button type="button" id="step2NextButton" class="btn btn-primary btn-sm" onclick="showStep(3)">
             Selanjutnya <i class="bi bi-arrow-right ms-1"></i>
         </button>
     </div>
@@ -283,28 +283,6 @@
         step2Fields.provinsi.addEventListener('change', handleProvinsiChange);
         step2Fields.kabupaten.addEventListener('change', handleKabupatenChange);
         step2Fields.kecamatan.addEventListener('change', handleKecamatanChange);
-
-        step2NextButton.addEventListener('click', () => {
-            let firstInvalid = null;
-            let isValid = true;
-
-            fieldOrder.forEach((field) => {
-                if (field && !validateField(field)) {
-                    isValid = false;
-                    if (!firstInvalid) {
-                        firstInvalid = field;
-                    }
-                }
-            });
-
-            if (firstInvalid) {
-                firstInvalid.focus();
-            }
-
-            if (isValid) {
-                showStep(3);
-            }
-        });
 
         loadWilayah();
     });

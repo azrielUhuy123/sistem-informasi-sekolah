@@ -119,7 +119,7 @@
 
             <span class="badge bg-primary rounded-pill px-2 py-1">
 
-                {{ $totalSiswa }}
+                {{ $totalSiswa }} 
 
                 <span class="text-badge">
                     Siswa
@@ -265,7 +265,7 @@
 
                                         @csrf
 
-                                        <div class="modal-header bg-light text-white border-0">
+                                        <div class="modal-header bg-light border-0">
 
                                             <div>
 

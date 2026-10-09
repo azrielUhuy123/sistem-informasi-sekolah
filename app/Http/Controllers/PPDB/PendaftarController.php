@@ -10,14 +10,18 @@ use App\Models\Angkatan;
 use App\Models\Kelas;
 use App\Models\TahunAjaran;
 use App\Models\PenempatanSiswa;
+use App\Models\PpdbSetting;
+use App\Exports\PpdbDiterimaExport;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Mail;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\URL;
 use App\Exports\RekapPpdbExport;
 use App\Services\PpdbReportService;
 use App\Mail\PpdbPendaftaranMail;
+use App\Mail\PpdbDaftarUlangCredentialsMail;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Maatwebsite\Excel\Facades\Excel;
 
@@ -52,7 +56,7 @@ class PendaftarController extends Controller
             'ayah',
             'ibu'
         ])
-        ->where('status','pending')
+        ->whereIn('status', ['pending', 'verifikasi'])
         ->latest()
         ->paginate(20);
 
@@ -62,38 +66,152 @@ class PendaftarController extends Controller
         );
     }
 
-    public function diterima()
+    public function diterima(Request $request)
     {
-        $data = PpdbPendaftar::with([
-            'siswa'
-        ])
-        ->where('status','diterima')
-        ->latest()
-        ->paginate(20);
+        $validated = $request->validate([
+            'tahun_ajaran_id' => ['nullable', 'integer', 'exists:tahun_ajaran,id'],
+        ]);
+
+        $tahunAjaranId = $validated['tahun_ajaran_id'] ?? null;
+        $tahunAjaran = TahunAjaran::orderByDesc('id')->get();
+
+        $data = PpdbPendaftar::query()
+            ->with('siswa')
+            ->where('status', 'diterima')
+            ->when($tahunAjaranId, function ($query) use ($tahunAjaranId) {
+                $query->where('tahun_ajaran_id', $tahunAjaranId);
+            })
+            ->latest()
+            ->paginate(20)
+            ->withQueryString();
 
         return view(
             'ppdb.pendaftar.diterima',
+            compact('data', 'tahunAjaran', 'tahunAjaranId')
+        );
+    }
+
+    public function exportDiterima(Request $request)
+    {
+        $validated = $request->validate([
+            'tahun_ajaran_id' => ['required', 'integer', 'exists:tahun_ajaran,id'],
+        ]);
+
+        $tahunAjaran = TahunAjaran::findOrFail($validated['tahun_ajaran_id']);
+        $tahunFile = str_replace('/', '-', $tahunAjaran->tahun);
+
+        return Excel::download(
+            new PpdbDiterimaExport($tahunAjaran->id),
+            "data-diterima-{$tahunFile}.xlsx"
+        );
+    }
+
+    public function resendEmailDiterima(Request $request, PpdbPendaftar $pendaftar)
+    {
+        if ($pendaftar->status !== 'diterima') {
+            return response()->json([
+                'success' => false,
+                'message' => 'Email hanya dapat dikirim ulang untuk pendaftar berstatus diterima.',
+            ], 409);
+        }
+
+        $validated = $request->validate([
+            'email' => ['required', 'email', 'max:255'],
+        ]);
+
+        $pendaftar->update([
+            'email' => $validated['email'],
+        ]);
+
+        if (!$this->sendPpdbEmail($pendaftar)) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Alamat email berhasil diperbarui, tetapi email pemberitahuan gagal dikirim.',
+            ], 502);
+        }
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Email pemberitahuan berhasil dikirim.',
+        ]);
+    }
+
+    public function ditolak()
+    {
+        $data = PpdbPendaftar::latest()
+            ->where('status', 'ditolak')
+            ->paginate(20);
+
+        return view(
+            'ppdb.pendaftar.ditolak',
             compact('data')
         );
     }
 
     public function terima(PpdbPendaftar $pendaftar)
     {
-        if ($pendaftar->status != 'verifikasi') {
-            return back()->with(
-                'error',
-                'Pendaftar harus diverifikasi terlebih dahulu'
-            );
+        $result = DB::transaction(function () use ($pendaftar) {
+            $pendaftar = PpdbPendaftar::whereKey($pendaftar->getKey())
+                ->lockForUpdate()
+                ->firstOrFail();
+
+            if (!in_array($pendaftar->status, ['pending', 'verifikasi'], true)) {
+                return ['error' => 'Pendaftar ini sudah memiliki keputusan.'];
+            }
+
+            if (
+                !$pendaftar->kartu_keluarga ||
+                !$pendaftar->ktp ||
+                !$pendaftar->foto
+            ) {
+                return ['error' => 'Kartu keluarga, KTP orang tua, dan foto wajib tersedia sebelum pendaftar diterima.'];
+            }
+
+            $setting = PpdbSetting::where('tahun_ajaran_id', $pendaftar->tahun_ajaran_id)
+                ->orderBy('id')
+                ->lockForUpdate()
+                ->first();
+
+            if (!$setting) {
+                return ['error' => 'Konfigurasi PPDB untuk Tahun Ajaran pendaftar tidak ditemukan.'];
+            }
+
+            $jumlahDiterima = PpdbPendaftar::where('tahun_ajaran_id', $pendaftar->tahun_ajaran_id)
+                ->where('status', 'diterima')
+                ->count();
+
+            if ($jumlahDiterima >= (int) $setting->kuota) {
+                return ['error' => 'Kuota PPDB untuk tahun ajaran ini telah penuh.'];
+            }
+
+            $pendaftar->update([
+                'status' => 'diterima',
+            ]);
+
+            return ['pendaftar' => $pendaftar];
+        });
+
+        if (isset($result['error'])) {
+            return back()->with('error', $result['error']);
         }
 
-        $pendaftar->update([
-            'status' => 'diterima',
-        ]);
+        $pendaftar = $result['pendaftar'];
 
-        return back()->with(
+        $emailSent = $this->sendPpdbEmail($pendaftar);
+
+        $response = back()->with(
             'success',
             'Pendaftar berhasil diterima.'
         );
+
+        if (!$emailSent) {
+            $response->with(
+                'warning',
+                'Status berhasil diperbarui, tetapi email pemberitahuan tidak dapat dikirim.'
+            );
+        }
+
+        return $response;
     }
 
     public function formVerifikasi(
@@ -105,90 +223,89 @@ class PendaftarController extends Controller
             compact('pendaftar')
         );
     }
-    public function simpanVerifikasi(
-        Request $request,
-        PpdbPendaftar $pendaftar
-    )
+    public function tolak(PpdbPendaftar $pendaftar)
     {
-        if (
-            !$pendaftar->kartu_keluarga ||
-            !$pendaftar->akta_lahir ||
-            !$pendaftar->foto
-        )
-        {
+        $result = DB::transaction(function () use ($pendaftar) {
+            $pendaftar = PpdbPendaftar::whereKey($pendaftar->getKey())
+                ->lockForUpdate()
+                ->firstOrFail();
+
+            if (!in_array($pendaftar->status, ['pending', 'verifikasi'], true)) {
+                return ['error' => 'Pendaftar ini sudah memiliki keputusan.'];
+            }
+
+            $pendaftar->update([
+                'status' => 'ditolak',
+            ]);
+
+            return ['pendaftar' => $pendaftar];
+        });
+
+        if (isset($result['error'])) {
             return back()->with(
                 'error',
-                'Dokumen belum lengkap'
+                $result['error']
             );
         }
-        $request->validate([
-            'catatan_verifikasi'
-                => 'nullable|string'
-        ]);
 
-        $pendaftar->update([
+        $pendaftar = $result['pendaftar'];
 
-            'status'
-                => 'verifikasi',
+        $emailSent = $this->sendPpdbEmail($pendaftar);
 
-            'catatan_verifikasi'
-                => null
-        ]);
-
-        return redirect()
+        $response = redirect()
             ->route(
                 'tu.ppdb.pendaftar.show',
                 $pendaftar
             )
             ->with(
                 'success',
-                'Berkas beralih ke fase verifikasi'
+                'Pendaftar berhasil ditolak.'
             );
+
+        if (!$emailSent) {
+            $response->with(
+                'warning',
+                'Status berhasil diperbarui, tetapi email pemberitahuan tidak dapat dikirim.'
+            );
+        }
+
+        return $response;
     }
 
-    public function tolakBerkas(
-        Request $request,
-        PpdbPendaftar $pendaftar
-    )
+    private function sendPpdbEmail(
+        PpdbPendaftar $pendaftar,
+        ?string $actionUrl = null
+    ): bool
     {
-        $request->validate([
-            'catatan_verifikasi' => 'required|string'
-        ]);
+        if (empty($pendaftar->email)) {
+            return false;
+        }
 
-        $pendaftar->update([
-            'status' => 'pending',
-            'catatan_verifikasi' => $request->catatan_verifikasi
-        ]);
+        $statusUrl = $actionUrl ?? URL::temporarySignedRoute(
+            'ppdb.status.link',
+            now()->addDays(7),
+            ['pendaftar' => $pendaftar->id]
+        );
 
-        if (!empty($pendaftar->email)) {
-            $repairUrl = URL::temporarySignedRoute(
-                'ppdb.perbaikan.form',
-                now()->addHours(48),
-                ['pendaftar' => $pendaftar->id]
-            );
-
+        try {
             Mail::to($pendaftar->email)
-                ->send(new PpdbPendaftaranMail($pendaftar, $repairUrl));
-        }
+                ->send(new PpdbPendaftaranMail($pendaftar, $statusUrl));
 
-        return redirect()
-            ->route(
-                'tu.ppdb.pendaftar.show',
-                $pendaftar
-            )
-            ->with(
-                'success',
-                'Berkas ditandai untuk diperbaiki. Pendaftar dapat mengajukan ulang berkas.'
-            );
+            return true;
+        } catch (\Throwable $exception) {
+            Log::error('Email status PPDB gagal dikirim.', [
+                'pendaftar_id' => $pendaftar->id,
+                'email' => $pendaftar->email,
+                'status' => $pendaftar->status,
+                'error' => $exception->getMessage(),
+            ]);
+
+            return false;
+        }
     }
-    private function generateNis()
+    private function generateNis(PpdbPendaftar $pendaftar)
     {
-        // Ambil tahun ajaran aktif
-        $tahunAjaran = TahunAjaran::aktif();
-
-        if (!$tahunAjaran) {
-            throw new \Exception('Tahun ajaran aktif belum tersedia.');
-        }
+        $tahunAjaran = TahunAjaran::findOrFail($pendaftar->tahun_ajaran_id);
 
         /*
         |-------------------------------------------------------------
@@ -247,41 +364,36 @@ class PendaftarController extends Controller
 
     public function konfirmasiDaftarUlang(PpdbPendaftar $pendaftar)
     {
-        if ($pendaftar->status != 'diterima') {
-            return back()->with(
-                'error',
-                'Pendaftar belum diterima.'
-            );
-        }
-    
-        if ($pendaftar->status_daftar_ulang == 'sudah') {
-            return back()->with(
-                'error',
-                'Daftar ulang sudah dikonfirmasi.'
-            );
-        }
+        $result = DB::transaction(function () use ($pendaftar) {
+            $pendaftar = PpdbPendaftar::whereKey($pendaftar->getKey())
+                ->lockForUpdate()
+                ->firstOrFail();
 
-        if ($pendaftar->siswa_id) {
-            return back()->with(
-                'error',
-                'Data siswa sudah dibuat.'
-            );
-        }
+            if ($pendaftar->status !== 'diterima') {
+                return ['error' => 'Pendaftar belum diterima.'];
+            }
 
-        DB::transaction(function () use ($pendaftar) {
+            if ($pendaftar->status_daftar_ulang !== 'sudah') {
+                return ['error' => 'Daftar ulang belum dilakukan oleh orang tua atau wali.'];
+            }
 
-            $tahunAjaran = TahunAjaran::aktif();
+            if ($pendaftar->siswa_id) {
+                return ['already_completed' => true];
+            }
+
+            $tahunAjaran = TahunAjaran::findOrFail($pendaftar->tahun_ajaran_id);
+            $tahunAwalAngkatan = (int) explode('/', $tahunAjaran->tahun, 2)[0];
 
             $angkatan = Angkatan::firstOrCreate(
                 [
-                    'tahun' => $tahunAjaran->tahun
+                    'tahun' => $tahunAwalAngkatan
                 ],
                 [
                     'keterangan' => 'Angkatan ' . $tahunAjaran->tahun
                 ]
             );
 
-            $nis = $this->generateNis();
+            $nis = $this->generateNis($pendaftar);
 
             $password = \Carbon\Carbon::parse(
                 $pendaftar->tanggal_lahir
@@ -296,6 +408,8 @@ class PendaftarController extends Controller
             $user = User::create([
 
                 'name' => $pendaftar->nama,
+
+                'email' => $pendaftar->email,
 
                 'username' => $nis,
 
@@ -336,7 +450,7 @@ class PendaftarController extends Controller
 
                 'nama_wali' => optional($pendaftar->ayah)->nama,
 
-                'telepon_wali' => $pendaftar->hp_ayah,
+                'telepon_wali' => $pendaftar->nomor_hp ?: $pendaftar->hp_ayah,
             ]);
 
             /*
@@ -360,12 +474,63 @@ class PendaftarController extends Controller
                 'status_daftar_ulang' => 'sudah',
                 'siswa_id' => $siswa->id,
             ]);
+
+            return [
+                'siswa_id' => $siswa->id,
+                'credentials' => [
+                    'recipient' => $pendaftar->email,
+                    'student_name' => $pendaftar->nama,
+                    'nis' => $nis,
+                    'initial_password' => $password,
+                ],
+            ];
         });
 
-        return back()->with(
+        if (isset($result['error'])) {
+            return back()->with('error', $result['error']);
+        }
+
+        if (isset($result['already_completed'])) {
+            return back()->with(
+                'success',
+                'Akun siswa untuk daftar ulang ini sudah pernah dibuat.'
+            );
+        }
+
+        $mailFailed = false;
+
+        try {
+            Mail::to($result['credentials']['recipient'])->send(
+                new PpdbDaftarUlangCredentialsMail(
+                    $result['credentials']['student_name'],
+                    $result['credentials']['nis'],
+                    $result['credentials']['initial_password'],
+                )
+            );
+        } catch (\Throwable $exception) {
+            $mailFailed = true;
+
+            Log::error('Email kredensial daftar ulang gagal dikirim.', [
+                'pendaftar_id' => $pendaftar->getKey(),
+                'exception' => get_class($exception),
+            ]);
+        } finally {
+            unset($result['credentials']['initial_password']);
+        }
+
+        $response = back()->with(
             'success',
             'Daftar ulang berhasil dikonfirmasi.'
         );
+
+        if ($mailFailed) {
+            $response->with(
+                'warning',
+                'Akun siswa berhasil dibuat, tetapi email informasi akun gagal dikirim.'
+            );
+        }
+
+        return $response;
     }
 
     public function penempatanKelas()
@@ -373,7 +538,8 @@ class PendaftarController extends Controller
         $tahunAktif = TahunAjaran::aktif();
 
         $data = PpdbPendaftar::with([
-                'siswa.penempatanAktif.kelas'
+                'siswa',
+                'siswa.penempatanAktif.kelas',
             ])
             ->whereNotNull('siswa_id')
             ->whereHas('siswa')
@@ -383,15 +549,22 @@ class PendaftarController extends Controller
             })
             ->paginate(20);
 
-        $kelas = Kelas::withCount([
-            'penempatan as jumlah_siswa' => function ($q) use ($tahunAktif) {
-                $q->where('tahun_ajaran_id', $tahunAktif->id)
-                ->whereNull('tanggal_keluar');
-            }
-        ])
-        ->tingkat('I')
-        ->orderBy('nama_kelas')
-        ->get();
+        $kelas = Kelas::with([
+                'kelasGrup.angkatan',
+                'kelasGrup.kelasMaster',
+            ])
+            ->withCount([
+                'penempatan as jumlah_siswa' => function ($q) use ($tahunAktif) {
+                    $q->where('tahun_ajaran_id', $tahunAktif->id)
+                        ->whereNull('tanggal_keluar');
+                }
+            ])
+            ->whereHas('kelasGrup', function ($q) {
+                $q->whereNotNull('angkatan_id');
+            })
+            ->tingkat('I')
+            ->orderBy('nama_kelas')
+            ->get();
 
         return view(
             'ppdb.pendaftar.penempatan-kelas',
@@ -408,19 +581,39 @@ class PendaftarController extends Controller
             'kelas_id' => 'required|exists:kelas,id'
         ]);
 
-        if (!$pendaftar->siswa) {
+        $siswa = $pendaftar->siswa;
+
+        if (!$siswa) {
             return back()->with('error', 'Data siswa tidak ditemukan');
+        }
+
+        $kelas = Kelas::with(['kelasGrup.kelasMaster'])
+            ->findOrFail($request->kelas_id);
+
+        if (
+            !$kelas->kelasGrup ||
+            !$kelas->kelasGrup->kelasMaster ||
+            $kelas->kelasGrup->kelasMaster->tingkat !== 'I'
+        ) {
+            return back()->with('error', 'Siswa PPDB hanya dapat ditempatkan pada kelas tingkat I.');
+        }
+
+        if (
+            !$kelas->kelasGrup->angkatan_id ||
+            (int) $kelas->kelasGrup->angkatan_id !== (int) $siswa->angkatan_id
+        ) {
+            return back()->with('error', 'Angkatan kelas tidak sesuai dengan angkatan siswa.');
         }
 
         $tahunAktif = TahunAjaran::aktif();
 
         PenempatanSiswa::updateOrCreate(
             [
-                'siswa_id' => $pendaftar->siswa->id,
+                'siswa_id' => $siswa->id,
                 'tahun_ajaran_id' => $tahunAktif->id,
             ],
             [
-                'kelas_id' => $request->kelas_id,
+                'kelas_id' => $kelas->id,
                 'tanggal_masuk' => now(),
                 'tanggal_keluar' => null,
             ]

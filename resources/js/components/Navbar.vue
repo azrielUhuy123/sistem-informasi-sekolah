@@ -14,7 +14,7 @@
             <div class="brand-text">
 
                 <h1>SDN Mekar Jaya</h1>
-
+                
             </div>
 
         </div>

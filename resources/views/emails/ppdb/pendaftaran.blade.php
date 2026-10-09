@@ -5,7 +5,7 @@
 
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-    <title>Perbaikan Berkas Pendaftaran PPDB</title>
+    <title>{{ $subject }}</title>
 </head>
 
 <body style="
@@ -49,16 +49,24 @@
                 margin-top: 0;
                 color: #212529;
             ">
-                Perbaikan Berkas Pendaftaran PPDB
+                {{ $subject }}
             </h3>
 
             <p>
                 Yth. <strong>{{ $pendaftar->nama }}</strong>,
             </p>
 
+            @php
+                $statusLabel = match ($pendaftar->status) {
+                    'verifikasi' => 'Sedang Diverifikasi',
+                    'diterima' => 'Diterima',
+                    'ditolak' => 'Ditolak',
+                    default => 'Menunggu Keputusan Admin',
+                };
+            @endphp
+
             <p>
-                Setelah pemeriksaan berkas pendaftaran, ditemukan bahwa
-                beberapa dokumen perlu diperbaiki dan dikirim ulang.
+                Berikut informasi terbaru mengenai pendaftaran PPDB Anda.
             </p>
 
             <div style="
@@ -81,19 +89,37 @@
                     {{ $pendaftar->no_pendaftaran }}
                 </div>
 
+                <p style="margin: 18px 0 0;">
+                    <strong>Status Pendaftaran</strong>
+                </p>
+                <div style="
+                    margin-top: 6px;
+                    font-size: 18px;
+                    font-weight: bold;
+                    color: #17416e;
+                ">
+                    {{ $statusLabel }}
+                </div>
+
             </div>
 
-            <p style="font-weight: bold; color: #dc3545; margin-bottom: 8px;">
-                Catatan Petugas:
-            </p>
-            <p style="margin-top: 0; color: #495057;">
-                {{ $pendaftar->catatan_verifikasi }}
-            </p>
-
-            <p>
-                Mohon perbaiki seluruh berkas sesuai dengan catatan di atas dan
-                ajukan ulang melalui halaman perbaikan berkas.
-            </p>
+            @if($pendaftar->status === 'pending')
+                <p>
+                    Pendaftaran Anda masih menunggu keputusan admin.
+                </p>
+            @elseif($pendaftar->status === 'verifikasi')
+                <p>
+                    Tindakan yang perlu dilakukan: tunggu hasil verifikasi dari petugas PPDB. Tidak ada tindakan tambahan saat ini.
+                </p>
+            @elseif($pendaftar->status === 'diterima')
+                <p>
+                    Tindakan yang perlu dilakukan: lakukan daftar ulang sesuai informasi dan jadwal yang ditetapkan sekolah.
+                </p>
+            @elseif($pendaftar->status === 'ditolak')
+                <p>
+                    Tindakan yang perlu dilakukan: hubungi pihak sekolah untuk mendapatkan informasi lebih lanjut mengenai pendaftaran Anda.
+                </p>
+            @endif
 
             @if(!empty($statusUrl))
                 <div style="text-align: center; margin: 30px 0;">
@@ -109,14 +135,13 @@
                             font-weight: bold;
                         "
                     >
-                        Perbaiki Berkas
+                        Lihat Status Pendaftaran
                     </a>
                 </div>
             @endif
 
             <p>
-                Silakan kunjungi halaman di atas untuk memulai proses perbaikan
-                berkas. Jika membutuhkan bantuan, hubungi tim PPDB SDN Mekar Jaya.
+                Pastikan alamat email yang Anda gunakan aktif dan dapat diakses untuk menerima pemberitahuan terkait pendaftaran.
             </p>
 
 

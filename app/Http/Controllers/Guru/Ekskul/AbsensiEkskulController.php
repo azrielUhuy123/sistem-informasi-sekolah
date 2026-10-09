@@ -6,14 +6,22 @@ use App\Http\Controllers\Controller;
 use App\Models\Ekskul;
 use App\Models\EkskulSiswa;
 use App\Models\AbsensiEkskul;
+use App\Models\HariSekolah;
 use App\Models\PembinaEkskul;
+use App\Models\PengajuanJadwalEkskul;
+use Carbon\Carbon;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 
 class AbsensiEkskulController extends Controller
 {
     public function index(Request $request)
     {
-        $guru = auth()->user()->guru;
+        $guru = Auth::user()?->guru;
+
+        if (! $guru) {
+            abort(403, 'Akun guru tidak ditemukan.');
+        }
 
         $ekskul = Ekskul::whereHas(
             'pembina',
@@ -26,6 +34,30 @@ class AbsensiEkskulController extends Controller
             ??
             now()->format('Y-m-d');
 
+        $hariMap = [
+            'Sunday' => 'Minggu',
+            'Monday' => 'Senin',
+            'Tuesday' => 'Selasa',
+            'Wednesday' => 'Rabu',
+            'Thursday' => 'Kamis',
+            'Friday' => 'Jumat',
+            'Saturday' => 'Sabtu',
+        ];
+
+        $namaHari = $hariMap[Carbon::parse($tanggal)->format('l')] ?? Carbon::parse($tanggal)->format('l');
+
+        $hari = HariSekolah::where('nama', $namaHari)->first();
+
+        $jadwal = PengajuanJadwalEkskul::with('hari')
+            ->where('ekskul_id', $ekskul->id)
+            ->where('hari_id', $hari?->id)
+            ->where('tahun_ajaran_id', current_tahun_id())
+            ->whereIn('status', ['approved', 'published'])
+            ->orderBy('jam_mulai')
+            ->get();
+
+        $jadwalAda = $jadwal->isNotEmpty();
+
         $anggota = EkskulSiswa::with('siswa')
             ->where(
                 'ekskul_id',
@@ -35,6 +67,10 @@ class AbsensiEkskulController extends Controller
                 'status',
                 'aktif'
             )
+            ->whereHas(
+                'siswa',
+                fn ($query) => $query->whereNull('deleted_at')
+            )
             ->get();
 
         return view(
@@ -42,19 +78,61 @@ class AbsensiEkskulController extends Controller
             compact(
                 'ekskul',
                 'anggota',
-                'tanggal'
+                'tanggal',
+                'jadwal',
+                'jadwalAda'
             )
         );
     }
     public function store(Request $request)
     {
-        $guru = auth()->user()->guru;
+        $request->validate([
+            'tanggal' => 'required|date',
+            'absensi' => 'required|array',
+        ]);
+
+        $guru = Auth::user()?->guru;
+
+        if (! $guru) {
+            abort(403, 'Akun guru tidak ditemukan.');
+        }
 
         $ekskul = Ekskul::whereHas(
             'pembina',
             fn ($q) =>
                 $q->where('guru_id', $guru->id)
         )->firstOrFail();
+
+        $hariMap = [
+            'Sunday' => 'Minggu',
+            'Monday' => 'Senin',
+            'Tuesday' => 'Selasa',
+            'Wednesday' => 'Rabu',
+            'Thursday' => 'Kamis',
+            'Friday' => 'Jumat',
+            'Saturday' => 'Sabtu',
+        ];
+
+        $namaHari = $hariMap[Carbon::parse($request->tanggal)->format('l')] ?? Carbon::parse($request->tanggal)->format('l');
+
+        $hari = HariSekolah::where('nama', $namaHari)->first();
+
+        $jadwal = PengajuanJadwalEkskul::with('hari')
+            ->where('ekskul_id', $ekskul->id)
+            ->where('hari_id', $hari?->id)
+            ->where('tahun_ajaran_id', current_tahun_id())
+            ->whereIn('status', ['approved', 'published'])
+            ->orderBy('jam_mulai')
+            ->get();
+
+        $jadwalAda = $jadwal->isNotEmpty();
+
+        if (! $jadwalAda) {
+            return back()->with(
+                'error',
+                'Tidak Ada Jadwal Ekskul'
+            );
+        }
 
         foreach (
             $request->absensi
@@ -78,7 +156,7 @@ class AbsensiEkskulController extends Controller
 
                     'status' => $a['status'],
 
-                    'created_by' => auth()->id(),
+                    'created_by' => Auth::id(),
 
                 ]
 
@@ -98,7 +176,11 @@ class AbsensiEkskulController extends Controller
         |--------------------------------------------------------------------------
         */
 
-        $guru = auth()->user()->guru;
+        $guru = Auth::user()?->guru;
+
+        if (! $guru) {
+            abort(403, 'Akun guru tidak ditemukan.');
+        }
 
         /*
         |--------------------------------------------------------------------------

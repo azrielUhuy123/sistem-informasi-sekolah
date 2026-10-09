@@ -51,7 +51,7 @@
                     <tr>
                         <th width="70">No</th>
                         <th>Nama Guru</th>
-                        <th width="150">Kelas</th>
+                        <th>Kelas</th>
                         <th width="220">Tahun Ajaran</th>
                         <th width="130">Aksi</th>
                     </tr>
@@ -97,10 +97,10 @@
                             </td>
 
                             {{-- KELAS --}}
-                            <td>
-                                <span class="badge bg-purple rounded-3">
+                            <td> 
+                                <div class="fw-bold border text-label text-center bg-light rounded-3 px-2 py-2">
                                     {{ $item->kelas->nama_kelas_label ?? '-' }}
-                                </span>
+                                </div>
                             </td>
 
                             {{-- TAHUN AJARAN --}}

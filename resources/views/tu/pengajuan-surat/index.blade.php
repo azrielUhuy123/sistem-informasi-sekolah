@@ -129,8 +129,8 @@
                     @empty
                         <tr>
                             <td colspan="5"
-                                class="text-center text-muted py-4">
-                                Belum ada pengajuan surat
+                                class="text-center text-muted">
+                                Belum ada data pengajuan surat
                             </td>
                         </tr>
                     @endforelse

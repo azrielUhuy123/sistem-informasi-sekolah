@@ -92,7 +92,7 @@
                                 <div class="d-flex align-items-center">
                                     <div class="rounded-circle bg-primary-subtle text-primary d-flex align-items-center justify-content-center me-3" style="width: 48px; height: 48px;">
                                         <i class="bi bi-person-fill fs-4"></i>
-                                    </div>    
+                                    </div>     
                                     <div>
                                         <div class="fw-semibold">
                                             {{ $e->guru->pegawai->nama ?? '-' }}
@@ -161,13 +161,7 @@
                         </tr>
                     @empty
                         <tr>
-                            <td colspan="7">
-                                <div class="text-center py-5">
-                                    <i class="bi bi-trophy display-3 text-secondary"></i>
-                                    <h5 class="fw-bold mt-3">Belum Ada Ekskul</h5>
-                                    <p class="text-muted mb-0">Saat ini belum ada ekskul yang terdata pada sistem ini.</p>
-                                </div>
-                            </td>
+                            <td colspan="7" class="text-center text-muted">Belum ada data ekskul</td>
                         </tr>
                     @endforelse
                 </tbody>

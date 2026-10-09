@@ -7,7 +7,10 @@ use App\Models\Kelas;
 use App\Models\PengajuanJadwal;
 use App\Models\HariSekolah;
 use App\Models\JamPelajaran;
+use App\Models\TahunAjaran;
+use App\Services\BusinessNotificationService;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 
 class MonitoringJadwalController extends Controller
 {
@@ -80,6 +83,14 @@ class MonitoringJadwalController extends Controller
             $conflicts[$jadwal->id] = $this->hasConflict($jadwal);
         }
 
+        $totalConflict = collect($conflicts)->filter(function ($isConflict) {
+            return $isConflict === true;
+        })->count();
+
+        $totalAman = collect($conflicts)->filter(function ($isConflict) {
+            return $isConflict === false;
+        })->count();
+
         return view(
             'superadmin.monitoring-jadwal.show',
             compact(
@@ -89,32 +100,61 @@ class MonitoringJadwalController extends Controller
                 'formattedJadwal',
                 'jadwals',
                 'conflicts',
-                'view'
+                'view',
+                'totalConflict', // <-- Kirim ke Blade
+                'totalAman'
             )
         );
     }
 
     public function approve(Kelas $kelas)
     {
-        $query = PengajuanJadwal::where('kelas_id', $kelas->id)
-            ->where('tahun_ajaran_id', current_tahun_id())
-            ->where('status', 'submitted');
+        $result = DB::transaction(function () use ($kelas) {
+            $tahunAjaranId = current_tahun_id();
+            $jadwals = PengajuanJadwal::with(['guru.user'])
+                ->where('kelas_id', $kelas->id)
+                ->where('tahun_ajaran_id', $tahunAjaranId)
+                ->where('status', 'submitted')
+                ->lockForUpdate()
+                ->get();
 
-        $jadwals = $query->get();
+            if ($jadwals->isEmpty()) {
+                return 'empty';
+            }
 
-        if ($jadwals->isEmpty()) {
+            foreach ($jadwals as $jadwal) {
+                if ($this->hasConflict($jadwal)) {
+                    return 'conflict';
+                }
+            }
+
+            foreach ($jadwals as $jadwal) {
+                $jadwal->update(['status' => 'approved']);
+            }
+
+            $teacherUsers = $jadwals
+                ->map(fn ($jadwal) => $jadwal->guru?->user)
+                ->filter()
+                ->unique('id')
+                ->values();
+            $academicYear = TahunAjaran::findOrFail($tahunAjaranId)->tahun;
+
+            app(BusinessNotificationService::class)->notifyScheduleApproved(
+                $kelas,
+                $academicYear,
+                $teacherUsers,
+            );
+
+            return 'approved';
+        });
+
+        if ($result === 'empty') {
             return back()->with('error', 'Tidak ada jadwal submitted untuk di-approve.');
         }
 
-        foreach ($jadwals as $jadwal) {
-            if ($this->hasConflict($jadwal)) {
-                return back()->with('error', 'Jadwal bentrok tidak dapat di-approve.');
-            }
+        if ($result === 'conflict') {
+            return back()->with('error', 'Jadwal bentrok tidak dapat di-approve.');
         }
-
-        $query->update([
-            'status' => 'approved'
-        ]);
 
         return redirect()->back()->with('success', 'Jadwal berhasil di-approve.');
     }
@@ -128,39 +168,61 @@ class MonitoringJadwalController extends Controller
             'catatan_tambahan' => 'nullable|string',
         ]);
 
-        $jadwals = PengajuanJadwal::where('kelas_id', $kelas->id)
-            ->where('tahun_ajaran_id', current_tahun_id())
-            ->where('hari_id', $request->integer('hari'))
-            ->where('jam_pelajaran_id', $request->integer('jam'))
-            ->where('status', 'submitted')
-            ->get();
+        $result = DB::transaction(function () use ($request, $kelas) {
+            $jadwals = PengajuanJadwal::with(['guru.user'])
+                ->where('kelas_id', $kelas->id)
+                ->where('tahun_ajaran_id', current_tahun_id())
+                ->where('hari_id', $request->integer('hari'))
+                ->where('jam_pelajaran_id', $request->integer('jam'))
+                ->where('status', 'submitted')
+                ->lockForUpdate()
+                ->get();
 
-        if ($jadwals->isEmpty()) {
+            if ($jadwals->isEmpty()) {
+                return 'empty';
+            }
+
+            if ($jadwals->count() > 1) {
+                return 'ambiguous';
+            }
+
+            $jadwal = $jadwals->first();
+            $hari = HariSekolah::findOrFail($request->integer('hari'));
+            $jam = JamPelajaran::findOrFail($request->integer('jam'));
+            $rejectionDetails = "Alasan: {$request->string('alasan')}\n"
+                .'Hari: '.($hari->nama ?? $hari->nama_hari)."\n"
+                .'Jam: Jam '.$jam->jam_ke.' ('.substr($jam->mulai, 0, 5)
+                .' - '.substr($jam->selesai, 0, 5).')'
+                .($request->filled('catatan_tambahan')
+                    ? "\nCatatan: {$request->string('catatan_tambahan')}"
+                    : '');
+
+            $jadwal->update([
+                'status' => 'rejected',
+                'catatan' => $rejectionDetails,
+            ]);
+
+            $teacherUser = $jadwal->guru?->user;
+
+            if ($teacherUser) {
+                app(BusinessNotificationService::class)->notifyScheduleRejected(
+                    $kelas,
+                    $teacherUser,
+                    $jadwal->getKey(),
+                    $rejectionDetails,
+                );
+            }
+
+            return 'rejected';
+        });
+
+        if ($result === 'empty') {
             return back()->with('error', 'Jadwal submitted pada slot tersebut tidak ditemukan.');
         }
 
-        if ($jadwals->count() > 1) {
+        if ($result === 'ambiguous') {
             return back()->with('error', 'Slot reject memiliki lebih dari satu jadwal. Data tidak diubah.');
         }
-
-        $hari = HariSekolah::findOrFail($request->integer('hari'));
-        $jam = JamPelajaran::findOrFail($request->integer('jam'));
-
-        $jadwals->first()->update([
-            'status' => 'rejected',
-            'catatan' =>
-
-                "Alasan: " . $request->string('alasan') . "\n" .
-
-                "Hari: " . ($hari->nama ?? $hari->nama_hari) . "\n" .
-
-                "Jam: Jam " . $jam->jam_ke . " (" . substr($jam->mulai, 0, 5) .
-                    " - " . substr($jam->selesai, 0, 5) . ")" .
-
-                ($request->filled('catatan_tambahan')
-                    ? "\nCatatan: " . $request->string('catatan_tambahan')
-                    : ''),
-        ]);
 
         return redirect()
             ->back()

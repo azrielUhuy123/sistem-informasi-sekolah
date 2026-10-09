@@ -24,14 +24,17 @@
 
                 <div class="row g-4 mb-5">
                     <div>
-                        <label class="form-label">Kode Kelas</label>
+                        <label class="form-label">Nama Rombel</label>
                         <input type="text"
-                            name="kode"
+                            name="nama_kelas"
                             class="form-control"
-                            placeholder="A / B / C"
-                            maxlength="1"
+                            value="{{ old('nama_kelas') }}"
+                            placeholder="{{ $kelasGrup->kelasMaster->tingkat }}-A"
                             required
-                            oninput="this.value = this.value.toUpperCase().replace(/[^A-Z]/g, '').slice(0, 1)">
+                        >
+                        @error('nama_kelas')
+                            <div class="text-danger small mt-1">{{ $message }}</div>
+                        @enderror
                     </div>
                 </div>
 

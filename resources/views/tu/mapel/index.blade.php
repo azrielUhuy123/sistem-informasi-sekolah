@@ -55,10 +55,15 @@
                                 </span>
                             </td>
                             <td>
-                                <span class="badge bg-primary rounded-pill px-2 py-1">{{ $row->kode_mapel ?? '-' }}</span>
+                                <span class="badge bg-primary rounded-pill px-2 py-1">
+                                    {{ $row->kode_mapel ?? '-' }}
+                                </span>
                             </td>
                             <td>
-                                <span class="fw-semibold">{{ $row->nama_mapel }}</span>
+                                <div class="d-flex align-items-center text-muted">
+                                    <i class="bi bi-book-half text-primary me-2"></i>
+                                    {{ $row->nama_mapel }}
+                                </div>
                             </td>
                             <td>
                                 <x-table.actions>                                
@@ -86,7 +91,7 @@
                         </tr>
                     @empty
                         <tr>
-                            <td colspan="4" class="text-center text-muted">Tidak ada data mata pelajaran</td>
+                            <td colspan="4" class="text-center text-muted">Belum ada data mata pelajaran</td>
                         </tr>
                     @endforelse
                 </tbody>

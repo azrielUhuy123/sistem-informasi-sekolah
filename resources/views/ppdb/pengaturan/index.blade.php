@@ -131,18 +131,17 @@
                     <select
                         name="status"
                         class="form-control"
-                            @selected(
-                                optional($setting)->status == 'dibuka'
-                            )
+                    >
+                        <option
+                            value="dibuka"
+                            @selected(old('status', optional($setting)->status) == 'dibuka')
                         >
                             Dibuka
                         </option>
 
                         <option
                             value="ditutup"
-                            @selected(
-                                optional($setting)->status == 'ditutup'
-                            )
+                            @selected(old('status', optional($setting)->status) == 'ditutup')
                         >
                             Ditutup
                         </option>

@@ -58,7 +58,8 @@
                 <thead>
                     <tr>
                         <th width="70">No</th>
-                        <th width="90">Kelas</th>
+                        <th width="120">Rombel</th>
+                        <th width="90">Tingkat</th>
                         <th>Wali Kelas</th>
                         <th width="150">Jumlah Siswa</th>
                         <th width="150">Angkatan</th>
@@ -74,14 +75,15 @@
                                 </span>
                             </td>
                             <td>
-                                <span class="fw-semibold">
+                                <div class="fw-bold">
                                     {{ $rombel->nama_kelas_label }}
-                                </span>
+                                </div>
                             </td>
+                            <td>{{ $kelasGrup->kelasMaster->tingkat }}</td>
                             <td>
                                 <div class="d-flex align-items-center">
                                     <div>
-                                        <div class="fw-bold">
+                                        <div class="fw-semibold">
                                             {{ optional(optional($rombel->waliKelas)->guru)->nama ?? '-' }}
                                         </div>
 
@@ -105,18 +107,30 @@
                                 </div>
                             </td>
                             <td>
-                                <a href="{{ route('tu.kelas.rombel.show', $rombel->id) }}"
-                                class="btn btn-primary btn-sm rounded-pill px-3 py-0">                                    
-                                    Masuk <i class="bi bi-chevron-right ms-1"></i>
-                                </a>
+                                <div class="d-flex justify-content-center gap-2">                                    
+                                    <a href="{{ route('tu.kelas.rombel.show', $rombel->id) }}"
+                                    class="btn btn-primary btn-sm rounded-pill px-3 py-0">
+                                        Detail
+                                        <i class="bi bi-chevron-right ms-1"></i>
+                                    </a>                      
+                                    <form action="{{ route('tu.kelas.rombel.destroy', $rombel->id) }}"
+                                        method="POST">
+                                        @csrf
+                                        @method('DELETE')
+                                        <button type="submit" class="btn btn-outline-danger rounded-pill px-3 py-0 btn-sm btn-confirm"
+                                        data-title="Hapus Rombel"
+                                        data-message="Rombel akan dihapus dari sistem ini."
+                                        data-button="btn-danger">
+                                            <i class="bi bi-trash"></i>                                            
+                                        </button>
+                                    </form>
+                                </div>
                             </td>
                         </tr>
                         
                     @empty
                         <tr>
-                            <td colspan="5" class="text-center text-muted py-4">
-                                Belum ada rombel
-                            </td>
+                            <td colspan="7" class="text-center text-muted">Belum ada data rombel</td>
                         </tr>
                     @endforelse
                 </tbody>

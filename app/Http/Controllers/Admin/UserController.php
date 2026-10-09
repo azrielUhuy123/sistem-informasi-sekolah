@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\User;
+use App\Services\BusinessNotificationService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 
@@ -87,12 +88,17 @@ class UserController extends Controller
             'role' => 'required|in:admin,tu,guru',
         ]);
 
-        User::create([
+        $user = User::create([
             'name' => $request->name,
             'email' => $request->email,
             'password' => Hash::make($request->password),
             'role' => $request->role,
+            'approval_status' => 'pending',
         ]);
+
+        if ($user->approval_status === 'pending') {
+            app(BusinessNotificationService::class)->notifyPendingAccount($user);
+        }
 
         return redirect()->route('admin.users.index')
             ->with('success','User berhasil ditambahkan');

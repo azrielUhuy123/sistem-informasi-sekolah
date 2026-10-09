@@ -1,8 +1,27 @@
-@extends('layouts.public')
+@extends('layouts.ppdb-form')
 
 @section('title','Bukti Pendaftaran')
 
 @section('content')
+
+@php
+    $nameParts = preg_split('/\s+/u', trim((string) $data->nama), -1, PREG_SPLIT_NO_EMPTY) ?: [];
+    $maskedName = implode(' ', array_map(function ($namePart) {
+        $length = mb_strlen($namePart);
+
+        if ($length <= 1) {
+            return $length === 1 ? mb_substr($namePart, 0, 1) . '*' : '*';
+        }
+
+        if ($length === 2) {
+            return mb_substr($namePart, 0, 1) . '*';
+        }
+
+        return mb_substr($namePart, 0, 1)
+            . str_repeat('*', $length - 2)
+            . mb_substr($namePart, -1);
+    }, $nameParts));
+@endphp
 
 <style>
     .card-body {
@@ -74,18 +93,10 @@
                             </tr>
                             <tr>
                                 <th>
-                                    Nama Lengkap
+                                    Nama
                                 </th>
                                 <td>
-                                    {{ $data->nama }}
-                                </td>
-                            </tr>
-                            <tr>
-                                <th>
-                                    NIK
-                                </th>
-                                <td>
-                                    {{ $data->nik }}
+                                    {{ $maskedName }}
                                 </td>
                             </tr>
                             <tr>
@@ -101,9 +112,15 @@
                                     Status
                                 </th>
                                 <td>
-                                    <span class="badge bg-warning fs-6">
-                                        MENUNGGU VERIFIKASI
-                                    </span>
+                                    @if($data->status === 'pending')
+                                        <span class="badge bg-warning fs-6">Menunggu Keputusan Admin</span>
+                                    @elseif($data->status === 'verifikasi')
+                                        <span class="badge bg-info fs-6">Sedang Diverifikasi</span>
+                                    @elseif($data->status === 'diterima')
+                                        <span class="badge bg-success fs-6">Diterima</span>
+                                    @elseif($data->status === 'ditolak')
+                                        <span class="badge bg-danger fs-6">Ditolak</span>
+                                    @endif
                                 </td>
                             </tr>
                         </table>
@@ -132,6 +149,9 @@
                     </div>
 
                     <div class="text-center mt-4">
+                        <a href="{{ route('ppdb.informasi') }}" class="btn btn-outline-light btn-lg btn-hero">
+                            Kembali
+                        </a>
                         <button
                             onclick="window.print()"
                             class="btn btn-primary btn-lg"

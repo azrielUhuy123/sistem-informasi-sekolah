@@ -86,7 +86,7 @@
                     @forelse($jadwals as $item)                        
                         <tr>
                             {{-- KELAS --}}
-                            <td>                                
+                            <td>                                 
                                 <div class="fw-bold border text-label text-center bg-light rounded-3 px-2 py-2">
                                     {{ $item->kelas->nama_kelas_label ?? '-' }}
                                 </div>                                                                            

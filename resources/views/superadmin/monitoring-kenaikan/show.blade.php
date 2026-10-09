@@ -25,9 +25,51 @@
 
     <x-alert.flash key="error" type="danger"/>
 
+    {{-- TOOLBAR --}}
+    <div class="card border-0 shadow-sm rounded-4 mb-4">
+        <div class="card-body">
+            <div class="d-flex flex-column flex-md-row justify-content-center justify-content-md-between align-items-center gap-3">                                               
+                {{-- RIGHT --}}
+                <div class="d-flex flex-wrap gap-2">
+                    <div class="badge-status aktif">
+                        <div class="me-2">
+                            <span class="desc-add">Total Siswa</span> Naik Kelas: 
+                        </div>{{ $jumlahNaik }}
+                    </div> 
+                    <div class="badge-status nonaktif">
+                        <div class="me-2">
+                            <span class="desc-add">Total Siswa</span> Tinggal Kelas : 
+                        </div>{{ $jumlahTinggal }}
+                    </div>                          
+                </div>
+                
+                <div class="d-flex flex-wrap justify-content-center gap-2"> 
+                    @if($approvalStatus == 'pending')                  
+                        {{-- REJECT --}}
+                        <button
+                            class="btn btn-danger btn-sm rounded-3"
+                            data-bs-toggle="modal"
+                            data-bs-target="#rejectModal">                        
+                            <i class="bi bi-x-circle me-1"></i>
+                            Tolak
+                        </button>
+                        {{-- APPROVE --}}                        
+                        <button
+                            class="btn btn-success btn-sm rounded-3"
+                            data-bs-toggle="modal"
+                            data-bs-target="#finalApproveModal">                         
+                            <i class="bi bi-check-circle me-1"></i>
+                            Persetujuan Akhir
+                        </button>                        
+                    @endif       
+                </div>
+            </div>
+        </div>
+    </div>
+
     <x-table.card
         title="Kelas {{ $kelas->nama_kelas_label }}"
-        subtitle="Wali Kelas : {{ optional(optional($kelas->waliKelas)->guru->pegawai)->nama ?? '-' }}"
+        subtitle="Wali Kelas : {{ $kelas->waliKelas?->guru?->pegawai?->nama ?? '-' }}"
     >
         <x-slot:badge>
             <span class="badge bg-primary rounded-pill px-2 py-1">
@@ -40,23 +82,7 @@
                 {{ $jumlahTinggal }} <span class="text-badge">Tinggal Kelas</span>
             </span>                
             </span>            
-        </x-slot:badge>
-        <x-slot:actions>
-             @if($approvalStatus == 'pending')
-                <button class="btn btn-danger rounded-3"
-                    data-bs-toggle="modal"
-                    data-bs-target="#rejectModal">
-                    <i class="bi bi-x-circle me-2"></i>
-                    Tolak
-                </button>
-                <button class="btn btn-success rounded3"
-                    data-bs-toggle="modal"
-                    data-bs-target="#finalApproveModal">
-                    <i class="bi bi-check-circle me-2"></i>
-                    Persetujuan Akhir
-                </button>
-            @endif
-        </x-slot:actions>
+        </x-slot:badge>         
 
         <div class="table-responsive">            
                 <table class="table table-hover align-middle mb-0">
@@ -118,7 +144,12 @@
                                 </td>
                                 <td>
                                     <span class="badge {{ $statusBadge }} rounded-pill px-2 py-1">
-                                        {{ ucfirst($item->approval_status ?? 'draft') }}
+                                        {{ match ($item->approval_status ?? 'draft') {
+                                            'pending' => 'Menunggu Persetujuan',
+                                            'approved' => 'Disetujui',
+                                            'rejected' => 'Ditolak',
+                                            default => 'Draft',
+                                        } }}
                                     </span>
                                 </td>
                                 <td>
@@ -151,7 +182,7 @@
     <div class="modal-dialog">
         <div class="modal-content border-0 shadow">
             <div class="modal-header">
-                <h5 class="modal-title fw-bold">Reject Pengajuan</h5>
+                <h5 class="modal-title fw-bold">Tolak Pengajuan Kenaikan Kelas</h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <form action="{{ route('superadmin.monitoring-kenaikan.reject', $kelas) }}" method="POST">
@@ -159,13 +190,13 @@
                 @method('PATCH')
                 <div class="modal-body">
                     <div class="mb-3">
-                        <label for="catatanKepsek" class="form-label">Alasan Reject</label>
+                        <label for="catatanKepsek" class="form-label">Alasan Penolakan</label>
                         <textarea class="form-control" id="catatanKepsek" name="catatan_kepsek" rows="4" required></textarea>
                     </div>
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Batal</button>
-                    <button type="submit" class="btn btn-danger">Reject</button>
+                    <button type="submit" class="btn btn-danger">Tolak</button>
                 </div>
             </form>
         </div>
@@ -176,7 +207,7 @@
     <div class="modal-dialog">
         <div class="modal-content border-0 shadow">
             <div class="modal-header">
-                <h5 class="modal-title fw-bold">Final Approve</h5>
+                <h5 class="modal-title fw-bold">Persetujuan Akhir</h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <form action="{{ route('superadmin.monitoring-kenaikan.approve', $kelas) }}" method="POST">
@@ -185,7 +216,7 @@
                 <div class="modal-body">
                     <div class="alert alert-warning">
                         <i class="bi bi-exclamation-triangle-fill me-2"></i>
-                        Persetujuan ini bersifat FINAL. Seluruh siswa akan diproses naik kelas sesuai keputusan wali kelas dan tindakan ini tidak dapat dibatalkan.
+                        Persetujuan ini bersifat final. Siswa kelas I-V diproses sesuai keputusan. Keputusan siswa kelas VI dicatat untuk Penutupan Tahun Ajaran dan Kenaikan Kelas; penempatan siswa sebelumnya tetap berlaku sampai proses tersebut.
                     </div>
                     <div class="mb-3">
                         <label for="confirmation" class="form-label">Konfirmasi</label>
@@ -195,7 +226,7 @@
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Batal</button>
-                    <button type="submit" class="btn btn-success">Final Approve</button>
+                    <button type="submit" class="btn btn-success">Setujui</button>
                 </div>
             </form>
         </div>

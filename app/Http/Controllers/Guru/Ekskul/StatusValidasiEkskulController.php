@@ -5,12 +5,13 @@ namespace App\Http\Controllers\Guru\Ekskul;
 use App\Http\Controllers\Controller;
 use App\Models\PembinaEkskul;
 use App\Models\PengajuanJadwalEkskul;
+use Illuminate\Support\Facades\Auth;
 
 class StatusValidasiEkskulController extends Controller
 {
 public function index()
 {
-    $guru = auth()->user()->guru;
+    $guru = Auth::user()->guru;
 
     $ekskul = PembinaEkskul::where(
             'guru_id',

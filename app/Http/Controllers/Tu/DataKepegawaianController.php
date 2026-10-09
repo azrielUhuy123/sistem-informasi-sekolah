@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Tu;
 use App\Http\Controllers\Controller;
 use App\Models\DataKepegawaian;
 use App\Models\User;
+use App\Services\BusinessNotificationService;
 use App\Models\Guru;
 use Illuminate\Support\Facades\Hash;
 use Carbon\Carbon;
@@ -297,7 +298,7 @@ class DataKepegawaianController extends Controller
             $pegawai->tanggal_lahir
         )->format('Ymd');
 
-        User::create([
+        $user = User::create([
 
             'pegawai_id' => $pegawai->id,
 
@@ -316,6 +317,10 @@ class DataKepegawaianController extends Controller
             'is_active' => false,
 
         ]);
+
+        if ($user->approval_status === 'pending') {
+            app(BusinessNotificationService::class)->notifyPendingAccount($user);
+        }
 
         return back()->with(
             'success',

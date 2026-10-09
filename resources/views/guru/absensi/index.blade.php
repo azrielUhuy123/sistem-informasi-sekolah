@@ -4,14 +4,14 @@
 
 @section('content')
 
-    $totalSiswa = $penempatan->count();    
-    $hadir = $penempatan->filter(function ($p) use ($jadwal) {    
-        return optional(    
-            \App\Models\AbsensiSiswa::where('jadwal_id', $jadwal?->id)    
-                ->where('siswa_id', $p->siswa->id)    
-                ->where('tanggal', date('Y-m-d'))    
-                ->first()    
-        )->status == 'hadir';    
+@php
+
+    $totalSiswa = $penempatan->count();
+
+    $hadir = $penempatan->filter(function($p) use ($jadwal){
+
+        return optional(
+            \App\Models\AbsensiSiswa::where('jadwal_id',$jadwal?->id)
                 ->where('siswa_id',$p->siswa->id)
                 ->where('tanggal',date('Y-m-d'))
                 ->first()
@@ -21,7 +21,7 @@
 
 @endphp
 
-<div class="container-fluid py-4">
+<div class="container-fluid">
 
     {{-- HERO --}}
     <div class="card border-0 shadow-sm rounded-4 overflow-hidden mb-4">
@@ -59,29 +59,8 @@
 
     {{-- ALERT --}}
 
-    @if(session('success'))
-
-        <div class="alert alert-success border-0 shadow-sm rounded-4">
-
-            <i class="bi bi-check-circle-fill me-2"></i>
-
-            {{ session('success') }}
-
-        </div>
-
-    @endif
-
-    @if(session('error'))
-
-        <div class="alert alert-danger border-0 shadow-sm rounded-4">
-
-            <i class="bi bi-exclamation-triangle-fill me-2"></i>
-
-            {{ session('error') }}
-
-        </div>
-
-    @endif
+    <x-alert.flash key="success" type="success"/>
+    <x-alert.flash key="error" type="danger"/>
 
     {{-- FILTER --}}
     <div class="card border-0 shadow-sm rounded-4 mb-4">
@@ -97,94 +76,58 @@
         </div>
 
         <div class="card-body">
-
             <form method="GET">
-
                 <div class="row g-3 align-items-end">
-
                     <div class="col-lg-7">
-
                         <label class="form-label fw-semibold">
-
                             Jadwal
-
                         </label>
 
                         <select
                             name="jadwal_id"
                             class="form-control"
                             onchange="this.form.submit()">
-
                             @forelse($jadwals as $j)
-
                                 <option
                                     value="{{ $j->id }}"
                                     {{ $jadwalId==$j->id?'selected':'' }}>
-
                                     {{ $j->kelas->nama_kelas_label }}
                                     •
                                     {{ $j->mapel->nama_mapel }}
                                     •
-                                    Jam {{ $j->jamPelajaran->jam_ke }}
-
+                                    Jam ke-{{ $j->jamPelajaran->jam_ke }}
                                 </option>
-
                             @empty
-
                                 <option>
-
                                     Tidak ada jadwal hari ini
-
                                 </option>
-
                             @endforelse
-
                         </select>
-
                     </div>
 
                     <div class="col-lg-3">
-
                         <label class="form-label fw-semibold">
-
                             Tanggal
-
                         </label>
-
                         <input
                             type="date"
                             class="form-control"
                             value="{{ request('tanggal') ?? date('Y-m-d') }}"
                             disabled>
-
                     </div>
-
                     <div class="col-lg-2">
-
-                        <div class="summary-card">
-
+                        <div class="text-center text-label">
                             <h3 class="mb-1">
-
                                 {{ $jadwals->count() }}
-
                             </h3>
-
                             <small>
-
                                 Jadwal
-
                             </small>
-
                         </div>
-
                     </div>
-
                 </div>
-
             </form>
-
         </div>
-
     </div>
 
     @if($jadwal)
@@ -192,61 +135,36 @@
         <div class="row g-3 mb-4">
 
             <div class="col-md-3">
-
-                <div class="info-card">
-
+                <div class="card bg-white shadow-sm border-0 rounded-4 p-3 h-100">
                     <small>Kelas</small>
-
                     <h6>{{ $jadwal->kelas->nama_kelas_label }}</h6>
-
                 </div>
-
             </div>
 
             <div class="col-md-3">
-
-                <div class="info-card">
-
+                <div class="card bg-white shadow-sm border-0 rounded-4 p-3 h-100">
                     <small>Mata Pelajaran</small>
-
                     <h6>{{ $jadwal->mapel->nama_mapel }}</h6>
-
                 </div>
-
             </div>
 
             <div class="col-md-3">
-
-                <div class="info-card">
-
+                <div class="card bg-white shadow-sm border-0 rounded-4 p-3 h-100">
                     <small>Hari</small>
-
                     <h6>{{ $jadwal->hari->nama }}</h6>
-
                 </div>
-
             </div>
 
             <div class="col-md-3">
-
-                <div class="info-card">
-
+                <div class="card bg-white shadow-sm border-0 rounded-4 p-3 h-100">
                     <small>Jam</small>
-
                     <h6>
-
                         {{ substr($jadwal->jamPelajaran->mulai,0,5) }}
-
                         -
-
                         {{ substr($jadwal->jamPelajaran->selesai,0,5) }}
-
                     </h6>
-
                 </div>
-
             </div>
-
         </div>
 
         <form
@@ -261,66 +179,38 @@
 
             <input type="hidden" name="tanggal" value="{{ date('Y-m-d') }}">
 
-            <div class="card border-0 shadow-sm rounded-4">
+            <x-table.card
+                title="Daftar Kehadiran Siswa"
+                subtitle="{{ $penempatan->count() }} Siswa"
+            >
 
-                <div class="card-header bg-white border-0 py-4">
+                <x-slot:badge>
+                    <span class="badge bg-primary rounded-pill px-2 py-1">
+                        {{ $totalSiswa }}
+                        <span class="text-badge">Siswa</span>
+                    </span>
+                </x-slot:badge>
 
-                    <div class="d-flex justify-content-between align-items-center flex-wrap gap-3">
+                <x-slot:actions>
+                    <div class="d-flex gap-2 align-items-end">
+                        <select
+                            class="form-control"
+                            id="bulkAction"
+                            style="width:220px">
+                            <option value="">Aksi Massal</option>
+                            <option value="hadir">Hadir</option>
+                            <option value="izin">Izin</option>
+                            <option value="sakit">Sakit</option>
+                            <option value="alpha">Alpha</option>
+                        </select>
 
-                        <div>
-
-                            <h5 class="fw-bold mb-1">
-
-                                Daftar Kehadiran Siswa
-
-                            </h5>
-
-                            <small class="text-muted">
-
-                                {{ $penempatan->count() }} Siswa
-
-                            </small>
-
-                        </div>
-
-                        <div class="d-flex gap-2">
-
-                            <select
-                                class="form-control"
-                                id="bulkAction"
-                                style="width:180px">
-
-                                <option value="">
-
-                                    Aksi Massal
-
-                                </option>
-
-                                <option value="hadir">Hadir</option>
-
-                                <option value="izin">Izin</option>
-
-                                <option value="sakit">Sakit</option>
-
-                                <option value="alpha">Alpha</option>
-
-                            </select>
-
-                            <button class="btn btn-success rounded-3">
-
-                                Simpan <i class="bi bi-save ms-1"></i>
-
-                            </button>
-
-                        </div>
-
+                        <button class="btn btn-success rounded-3 px-3" type="submit">
+                            <span class="desc-add">Simpan</span><i class="bi bi-save px-1"></i>
+                        </button>
                     </div>
+                </x-slot:actions>
 
-                </div>
-
-                <div class="card-body p-0">
-
-                    <div class="table-responsive">
+                <div class="table-responsive">
 
                         <table class="table table-hover align-middle mb-0">
 
@@ -351,7 +241,7 @@
 
                                     <th width="120">
 
-                                        Hadir
+                                        Waktu
 
                                     </th>
 
@@ -502,11 +392,11 @@
 
         <tr>
 
-            <td colspan="6">
+            <td colspan="6" class="text-center py-5">
 
-                <div class="text-center py-5">
+                <div class="d-flex flex-column align-items-center">
 
-                    <i class="bi bi-person-x display-3 text-secondary"></i>
+                    <i class="bi bi-person-x display-4 text-secondary"></i>
 
                     <h5 class="fw-bold mt-3">
 
@@ -534,9 +424,7 @@
 
 </div>
 
-</div>
-
-</div>
+</x-table.card>
 
 </form>
 

@@ -12,6 +12,7 @@ const state = {
     titleElement: null,
     messageElement: null,
     targetForm: null,
+    targetLink: null,
     isProcessing: false,
 };
 
@@ -52,6 +53,7 @@ const resetModal = () => {
     }
 
     state.targetForm = null;
+    state.targetLink = null;
     state.isProcessing = false;
 };
 
@@ -60,13 +62,15 @@ const openConfirmModal = (triggerButton) => {
         return;
     }
 
-    const form = triggerButton.closest('form');
+    const link = triggerButton instanceof HTMLAnchorElement ? triggerButton : null;
+    const form = link ? null : triggerButton.closest('form');
 
-    if (!form) {
+    if (!form && !link) {
         return;
     }
 
     state.targetForm = form;
+    state.targetLink = link;
     state.isProcessing = false;
 
     state.titleElement.textContent = triggerButton.dataset.title || defaultTitle;
@@ -79,7 +83,13 @@ const openConfirmModal = (triggerButton) => {
 };
 
 const confirmSubmit = () => {
-    if (!state.targetForm || state.isProcessing) {
+    if ((!state.targetForm && !state.targetLink) || state.isProcessing) {
+        return;
+    }
+
+    if (state.targetLink) {
+        state.isProcessing = true;
+        window.location.assign(state.targetLink.href);
         return;
     }
 

@@ -50,6 +50,68 @@
             ->implode(', ');
     @endphp
 
+    <div class="card border-0 shadow-sm rounded-4 mb-4">
+        <div class="card-body">
+            <div class="d-flex flex-column flex-md-row justify-content-center justify-content-md-between align-items-center gap-3">                                               
+                {{-- RIGHT --}}
+                <div class="d-flex flex-wrap gap-2">
+                    <div class="badge-status aktif">
+                        <div class="me-2">
+                            <span class="desc-add">Total Jadwal</span> Aman : 
+                        </div>{{ $totalAman }}
+                    </div> 
+                    <div class="badge-status nonaktif">
+                        <div class="me-2">
+                            <span class="desc-add">Total Jadwal</span> Bentrok : 
+                        </div>{{ $totalBentrok }}
+                    </div>                          
+                </div>
+                
+                <div class="d-flex flex-wrap justify-content-center gap-2"> 
+                    @if($bisaApprove)                   
+                        {{-- REJECT --}}
+                        <button
+                            type="button"
+                            class="btn btn-danger btn-sm rounded-3"
+                            data-bs-toggle="modal"
+                            data-bs-target="#modalReject"
+                        >
+                            <i class="bi bi-x-circle me-1"></i>
+                            Tolak
+                        </button>
+                        {{-- APPROVE --}}
+                        <form
+                            method="POST"
+                            action="{{ route('superadmin.monitoring-ekskul.approve', $ekskul->id) }}"
+                        >
+                            @csrf
+                            <button
+                                class="btn btn-success btn-sm rounded-3 btn-confirm"
+                                data-title="SETUJUI SELURUH JADWAL INI?"
+                                data-message="Jadwal yang sudah disetujui tidak akan bisa diubah kembali"
+                                data-button="btn-danger">                            
+                                <i class="bi bi-check-circle me-1"></i>
+                                Setujui
+                            </button>
+                        </form>                
+                        <form
+                            method="POST"
+                            action="{{ route('superadmin.monitoring-ekskul.publish', $ekskul->id) }}"
+                        >
+                            @csrf
+                            
+                            <button
+                                type="submit"
+                                class="btn btn-primary btn-sm rounded-3 px-3">
+                                <i class="bi bi-send-check-fill me-1"></i>
+                                Publish
+                            </button>
+                        </form>
+                    @endif
+                </div>
+            </div>
+        </div>
+    </div>
     {{-- TABLE --}}
     <x-table.card
         title="Jadwal {{ $ekskul->nama }}"
@@ -72,58 +134,8 @@
                 {{ $totalBentrok }}
                 <span class="text-badge">Bentrok</span>
             </span>
-
         </x-slot:badge>
-
-        <x-slot:actions>
-
-            @if($bisaApprove)
-
-                {{-- REJECT --}}
-                <button
-                    type="button"
-                    class="btn btn-danger rounded-3"
-                    data-bs-toggle="modal"
-                    data-bs-target="#modalReject"
-                >
-                    <i class="bi bi-x-circle me-2"></i>
-                    Tolak
-                </button>
-
-                {{-- APPROVE --}}
-                <form
-                    method="POST"
-                    action="{{ route('superadmin.monitoring-ekskul.approve', $ekskul->id) }}"
-                >
-                    @csrf
-
-                    <button
-                        type="submit"
-                        class="btn btn-success rounded-3"
-                    >
-                        <i class="bi bi-check-circle me-2"></i>
-                        Approve
-                    </button>
-                </form>
-
-                {{-- PUBLISH --}}
-                <form
-                    method="POST"
-                    action="{{ route('superadmin.monitoring-ekskul.publish', $ekskul->id) }}"
-                >
-                    @csrf
-
-                    <button
-                        type="submit"
-                        class="btn btn-primary rounded-3"
-                    >
-                        <i class="bi bi-send-check me-2"></i>
-                        Publish
-                    </button>
-                </form>
-
-            @endif
-        </x-slot:actions>
+        
         {{-- WARNING BENTROK --}}
         @if($totalBentrok > 0)
             <div class="alert alert-danger mb-4">

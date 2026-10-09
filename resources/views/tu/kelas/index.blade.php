@@ -110,9 +110,7 @@
                         </tr>
                     @empty
                         <tr>
-                            <td colspan="4" class="text-center text-muted py-4">
-                                Belum ada data kelas
-                            </td>
+                            <td colspan="5" class="text-center text-muted">Belum ada data kelas</td>
                         </tr>
                     @endforelse
                 </tbody>

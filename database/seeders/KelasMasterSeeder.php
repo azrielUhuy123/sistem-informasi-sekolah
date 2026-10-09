@@ -9,7 +9,7 @@ class KelasMasterSeeder extends Seeder
 {
     public function run(): void
     {
-        foreach (range(1, 6) as $tingkat) {
+        foreach (['I', 'II', 'III', 'IV', 'V', 'VI'] as $tingkat) {
             KelasMaster::firstOrCreate([
                 'tingkat' => $tingkat,
             ]);

@@ -40,6 +40,25 @@
         background-color .15s ease;
 }
 
+.form-control-sm.form-control-sm{
+    height: 33px;
+
+    border: 1px solid #dbe4ee;
+    border-radius: 10px;
+
+    background-color: #fff;
+    color: #1e293b;
+
+    font-size: .74rem;
+
+    box-shadow: none;
+
+    transition:
+        border-color .15s ease,
+        box-shadow .15s ease,
+        background-color .15s ease;
+}
+
 
 /* =========================================================
    INPUT HOVER
@@ -136,3 +155,79 @@ textarea.form-control {
 
     cursor: not-allowed;
 }
+
+
+/*==================================================
+UPLOAD
+==================================================*/
+
+.upload-box{
+
+    border:2px dashed #cbd5e1;
+
+    border-radius:18px;
+
+    padding:24px;
+
+    background:#f8fafc;
+
+    transition:.3s;
+
+}
+
+.upload-box:hover{
+
+    border-color:#2563eb;
+
+    background:#eff6ff;
+
+}
+
+.upload-info{
+
+    margin-top:15px;
+
+    display:flex;
+
+    align-items:center;
+
+    gap:10px;
+
+    color:#64748b;
+
+    font-size:14px;
+
+}
+
+.upload-info i{
+
+    font-size:20px;
+
+    color:#2563eb;
+
+}
+
+
+
+/*==================================================
+INPUT
+==================================================*/
+
+.modern-input.modern-input{
+
+    border-radius:16px;
+
+    border:1px solid #dbe4f0;
+
+    min-height:56px;
+
+    padding:15px 18px;
+
+    font-size:15px;
+
+    transition:.3s;
+
+    background:#fff;
+
+}
+

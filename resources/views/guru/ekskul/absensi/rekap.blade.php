@@ -309,7 +309,7 @@
 
                                 <td>
 
-                                    {{ $r['siswa']->nama }}
+                                    {{ optional($r['siswa'])->nama ?? 'Data Siswa Hilang' }}
 
                                 </td>
 

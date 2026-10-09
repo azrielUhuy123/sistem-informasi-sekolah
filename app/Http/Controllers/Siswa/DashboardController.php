@@ -7,6 +7,7 @@ use App\Models\AbsensiSiswa;
 use App\Models\NilaiSiswa;
 use App\Models\PengajuanJadwal;
 use Carbon\Carbon;
+use Illuminate\Support\Facades\Auth;
 
 class DashboardController extends Controller
 {
@@ -18,7 +19,7 @@ class DashboardController extends Controller
         |--------------------------------------------------------------------------
         */
 
-        $siswa = auth()->user()->siswa;
+        $siswa = Auth::user()->siswa;
 
         /*
         |--------------------------------------------------------------------------
@@ -69,6 +70,8 @@ class DashboardController extends Controller
 
         $hariId = $hariMap[$hariIni] ?? null;
 
+        $kelasAktifId = $siswa->penempatanAktif?->kelas_id;
+
         /*
         |--------------------------------------------------------------------------
         | JADWAL HARI INI
@@ -77,7 +80,7 @@ class DashboardController extends Controller
 
         $jadwalHariIni = collect();
 
-        if ($siswa->kelas_id && $hariId) {
+        if ($kelasAktifId && $hariId) {
 
             $jadwalHariIni = PengajuanJadwal::with([
 
@@ -88,7 +91,7 @@ class DashboardController extends Controller
                 ])
                 ->where(
                     'kelas_id',
-                    $siswa->kelas_id
+                    $kelasAktifId
                 )
                 ->where(
                     'hari_id',

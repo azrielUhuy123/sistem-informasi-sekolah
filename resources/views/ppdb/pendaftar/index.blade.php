@@ -100,17 +100,22 @@
                         <td>
                             @if($item->status == 'pending')
                                 <span class="badge-status pending">
-                                    <i class="bi bi-hourglass-split me-2"></i> Pending
+                                    <i class="bi bi-hourglass-split me-2"></i> Belum Diputuskan
                                 </span>
                             @elseif($item->status == 'verifikasi')
                                 <span class="badge-status verifikasi">
                                     <i class="bi bi-search me-2"></i>
-                                    Verifikasi
+                                    Tahap Verifikasi (Data Lama)
                                 </span>
                             @elseif($item->status === 'diterima')
                                 <span class="badge-status aktif">
                                     <i class="bi bi-check-circle-fill me-2"></i>
                                     Diterima
+                                </span>
+                            @elseif($item->status === 'ditolak')
+                                <span class="badge-status nonaktif">
+                                    <i class="bi bi-x-circle-fill me-2"></i>
+                                    Ditolak
                                 </span>
                             @endif
                         </td>

@@ -75,28 +75,29 @@
     }
 
     .password-wrapper {
-    position: relative;
-    width: 100%;
-}
+        position: relative;
+        width: 100%;
+    }
 
-.password-wrapper .login-input {
-    padding-right: 46px; /* ruang icon mata */
-}
+    .password-wrapper .login-input {
+        padding-right: 46px;
+    }
 
-.toggle-password {
-    position: absolute;
-    right: 14px;
-    top: 50%;
-    transform: translateY(-70%);
-    cursor: pointer;
-    font-size: 16px;
-    color: #666;
-    line-height: 1;
-}
+    .toggle-password {
+        position: absolute;
+        right: 14px;
+        top: 50%;
+        transform: translateY(-70%);
+        cursor: pointer;
+        font-size: 16px;
+        color: #666;
+        line-height: 1;
+        z-index: 5;
+    }
 
-.toggle-password:hover {
-    color: #17416e;
-}
+    .toggle-password:hover {
+        color: #17416e;
+    }
 
 
     .btn-login {
@@ -218,10 +219,7 @@
         .password-wrapper .login-input {
             padding-right: 46px;
         }
-
-        .toggle-password {
-            display: none;
-        }
+       
     }
 
     @media (max-width: 480px) {
@@ -298,7 +296,7 @@
                 </div>
             @endif
             <!-- Username -->
-            
+            <label class="form-label">Username</label>
             <input
                 type="text"
                 name="username"
@@ -310,6 +308,7 @@
             >
            
             <!-- Password -->
+            <label class="form-label">Password</label>
             <div class="password-wrapper">
                 <input
                     type="password"
@@ -319,6 +318,12 @@
                     placeholder="Kata Sandi"
                     required
                 >
+                <i
+                    class="bi bi-eye-fill toggle-password"
+                    id="togglePassword"
+                    onclick="togglePassword()"
+                    title="Tampilkan kata sandi"
+                ></i>
                 
             </div>
 
@@ -378,12 +383,24 @@
 <script>
 function togglePassword() {
     const input = document.getElementById('passwordInput');
-    if (!input) return;
+    const icon = document.getElementById('togglePassword');
+
+    if (!input || !icon) return;
 
     if (input.type === 'password') {
         input.type = 'text';
+
+        icon.classList.remove('bi-eye-fill');
+        icon.classList.add('bi-eye-slash-fill');
+
+        icon.title = 'Sembunyikan kata sandi';
     } else {
         input.type = 'password';
+
+        icon.classList.remove('bi-eye-slash-fill');
+        icon.classList.add('bi-eye-fill');
+
+        icon.title = 'Tampilkan kata sandi';
     }
 }
 </script>

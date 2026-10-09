@@ -54,6 +54,18 @@
         </div>
 
     </a>
+    
+    <a
+        class="menu-item
+        {{ request()->is('guru/e-learning*') ?  : '' }}"
+        href="{{ route('guru.e-learning.index') }}">
+
+        <div class="menu-left">
+            <i class="bi bi-mortarboard"></i>
+            <span>E-Learning</span>
+        </div>
+
+    </a>
 
     <button class="menu-item border-0 bg-transparent text-start"
             onclick="toggleMenu('menuJadwal','arrowJadwal')">
@@ -105,8 +117,13 @@
                 </div>
             </a>
         @endif
-
-        
+        <a class="menu-item {{ request()->is('guru/absensi*') ?  : '' }}"
+           href="{{ route('guru.absensi.index') }}">
+            <div class="menu-left">
+                <i class="bi bi-send-check"></i>
+                <span>Absensi Kelas</span>
+            </div>
+        </a>
 
         <a class="menu-item {{ request()->is('guru/nilai*') ?  : '' }}"
            href="{{ route('guru.nilai.index') }}">
@@ -140,20 +157,12 @@
             onclick="toggleMenu('menuAbsen','arrowAbsen')">
         <div class="menu-left">
             <i class="bi bi-journal-text"></i>
-            <span>Absensi</span>
+            <span>Rekapitulasi Absen</span>
         </div>
 
         <i class="bi bi-chevron-right dropdown-arrow" id="arrowAbsen"></i>
     </button>
     <div class="submenu" id="menuAbsen">
-        <a class="menu-item {{ request()->is('guru/absensi*') ?  : '' }}"
-           href="{{ route('guru.absensi.index') }}">
-            <div class="menu-left">
-                <i class="bi bi-send-check"></i>
-                <span>Absensi Kelas</span>
-            </div>
-        </a>
-
         <a
             class="menu-item
             {{ request()->is('guru/rekap-bulanan*') ?  : '' }}"
@@ -164,7 +173,6 @@
                 <span>Rekap Bulanan</span>
             </div>
         </a>
-
         <a
             class="menu-item
             {{ request()->is('guru/rekap-semester*') ? 'active' : '' }}"
@@ -175,27 +183,7 @@
                 <span>Rekap Semester</span>
             </div>
         </a>
-
-        <a class="menu-item {{ request()->is('guru/rekap-absensi*') ?  : '' }}"
-           href="{{ route('guru.absensi.rekap') }}">
-            <div class="menu-left">
-                <i class="bi bi-bar-chart"></i>
-                <span>Statistik Absensi</span>
-            </div>
-        </a>
     </div>
-
-    <a
-        class="menu-item
-        {{ request()->is('guru/e-learning*') ?  : '' }}"
-        href="{{ route('guru.e-learning.index') }}">
-
-        <div class="menu-left">
-            <i class="bi bi-mortarboard"></i>
-            <span>E-Learning</span>
-        </div>
-
-    </a>
 
     {{-- DOKUMEN --}}
     <button

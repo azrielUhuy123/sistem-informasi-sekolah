@@ -12,7 +12,7 @@ class TahunAjaranController extends Controller
     public function index()
     {
         $rows = TahunAjaran::query()
-            ->orderByDesc('aktif')
+            ->orderByRaw("CASE WHEN status = 'aktif' THEN 1 ELSE 0 END DESC")
             ->orderByDesc('tahun')
             ->orderByDesc('semester')
             ->paginate(request('per_page', 10));
@@ -25,12 +25,12 @@ class TahunAjaranController extends Controller
                 ['key' => 'tahun', 'label' => 'Tahun Ajaran'],
                 ['key' => 'semester', 'label' => 'Semester'],
                 [
-                    'key' => 'aktif',
+                    'key' => 'status',
                     'label' => 'Status',
                     'format' => fn ($row) =>
-                        $row->aktif
+                        $row->status === 'aktif'
                             ? '<span class="badge bg-success">Aktif</span>'
-                            : '<span class="badge bg-secondary">Arsip</span>',
+                            : '<span class="badge bg-secondary">' . e(ucfirst($row->status ?? 'draft')) . '</span>',
                 ],
             ],
             'actions' => [
@@ -59,7 +59,7 @@ class TahunAjaranController extends Controller
         \App\Models\TahunAjaran::create([
             'tahun'    => $validated['tahun'],
             'semester' => $validated['semester'] ?? null,
-            'aktif'    => false, // PENTING: default nonaktif
+            'status'   => 'draft',
         ]);
 
         return redirect()
@@ -69,12 +69,35 @@ class TahunAjaranController extends Controller
 
     public function activate($id)
     {
-        DB::transaction(function () use ($id) {
-            // nonaktifkan semua
-            \App\Models\TahunAjaran::where('aktif', true)->update(['aktif' => false]);
+        $tahun = TahunAjaran::findOrFail($id);
 
-            // aktifkan yang dipilih
-            \App\Models\TahunAjaran::where('id', $id)->update(['aktif' => true]);
+        if ($tahun->status !== 'draft') {
+            return redirect()
+                ->route('admin.tahun-ajaran.index')
+                ->with('error', 'Hanya Tahun Ajaran berstatus draft yang dapat diaktifkan.');
+        }
+
+        if (TahunAjaran::where('status', 'aktif')->exists()) {
+            return redirect()
+                ->route('admin.tahun-ajaran.index')
+                ->with('error', 'Masih ada Tahun Ajaran berstatus aktif.');
+        }
+
+        if (
+            $tahun->semester === 'Ganjil' &&
+            preg_match('/^(\d{4})\/(\d{4})$/', $tahun->tahun, $parts)
+        ) {
+            $tahunSumber = ((int) $parts[1] - 1) . '/' . ((int) $parts[2] - 1);
+
+            if (TahunAjaran::where('tahun', $tahunSumber)->where('semester', 'Genap')->exists()) {
+                return redirect()
+                    ->route('admin.tahun-ajaran.index')
+                    ->with('error', 'Aktivasi Semester Ganjil tahunan harus melalui proses Penutupan Tahun Ajaran dan Kenaikan Kelas agar penempatan siswa mengikuti kenaikan tahun ajaran.');
+            }
+        }
+
+        DB::transaction(function () use ($tahun) {
+            $tahun->update(['status' => 'aktif']);
         });
 
         return redirect()

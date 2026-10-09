@@ -10,29 +10,28 @@ class DashboardController extends Controller
 {
     public function index()
     {
-        $total = PpdbPendaftar::count();
+        $tahunAjaranId = current_tahun_id();
+        $setting = PpdbSetting::where('tahun_ajaran_id', $tahunAjaranId)
+            ->orderBy('id')
+            ->first();
 
-        $pending = PpdbPendaftar::where(
-            'status',
-            'pending'
-        )->count();
+        $pendaftarTahunAjaran = PpdbPendaftar::where('tahun_ajaran_id', $tahunAjaranId);
 
-        $diterima = PpdbPendaftar::where(
-            'status',
-            'diterima'
-        )->count();
+        $total = (clone $pendaftarTahunAjaran)->count();
 
-        $ditolak = PpdbPendaftar::where(
-            'status',
-            'ditolak'
-        )->count();
+        $pending = (clone $pendaftarTahunAjaran)
+            ->whereIn('status', ['pending', 'verifikasi'])
+            ->count();
 
+        $diterima = (clone $pendaftarTahunAjaran)
+            ->where('status', 'diterima')
+            ->count();
 
+        $ditolak = (clone $pendaftarTahunAjaran)
+            ->where('status', 'ditolak')
+            ->count();
 
-        $setting = PpdbSetting::first();
-
-        $kuota = PpdbSetting::latest()->first()?->kuota ?? 0;
-        
+        $kuota = $setting?->kuota ?? 0;
         $sisaKuota = max(
             0,
             $kuota - $diterima

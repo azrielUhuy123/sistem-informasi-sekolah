@@ -77,6 +77,10 @@
                         </th>
 
                         <th width="80">
+                            Validasi
+                        </th>
+
+                        <th width="80">
                             Aksi
                         </th>
 
@@ -153,70 +157,46 @@
                                 @endif
 
                             </td>
+                            <td>
+                            {{-- VALIDASI --}}
+                                @if($row->approval_status != 'approved')                                
+                                    <form
+                                        action="{{ route('superadmin.datakepegawaian.approve', $row->id) }}"
+                                        method="POST"
+                                    >
+                                        @csrf
+                                        @method('PATCH')
+                                        <button
+                                            type="submit"
+                                            class="btn btn-success btm-sm rounded-3 px-3 py-0 btn-confirm"
+                                            data-title="VALIDASI DATA KEPEGAWAIAN INI?"
+                                            data-message="Data kepegawaian ini akan divalidasi dan dinyatakan valid."
+                                            data-button="btn-success"
+                                        >                                            
+                                            <small>Setujui</small>
+                                        </button>
+                                    </form>                                     
+                                @endif                            
+                                @if($row->approval_status != 'rejected')                            
+                                    <button
+                                        type="button"
+                                        class="btn btn-danger btm-sm rounded-3 px-3 py-0"
+                                        data-bs-toggle="modal"
+                                        data-bs-target="#rejectModal{{ $row->id }}"
+                                    >
+                                        <small>Tolak</small>                                                                             
+                                    </button>                                    
+                                @endif
+                            </td>
 
                             {{-- AKSI --}}
-                            <td>
-                                <x-table.actions>
-
-                                    {{-- DETAIL --}}
-                                    <li>
-                                        <a
-                                            class="dropdown-item"
-                                            href="{{ route('superadmin.datakepegawaian.show', $row->id) }}"
-                                        >
-                                            <i class="bi bi-eye me-2"></i>
-                                            Detail
-                                        </a>
-                                    </li>
-
-                                    {{-- VALIDASI --}}
-                                    @if($row->approval_status != 'approved')
-
-                                        <li>
-                                            <form
-                                                action="{{ route('superadmin.datakepegawaian.approve', $row->id) }}"
-                                                method="POST"
-                                            >
-                                                @csrf
-                                                @method('PATCH')
-
-                                                <button
-                                                    type="submit"
-                                                    class="dropdown-item btn-confirm"
-                                                    data-title="VALIDASI DATA KEPEGAWAIAN INI?"
-                                                    data-message="Data kepegawaian ini akan divalidasi dan dinyatakan valid."
-                                                    data-button="btn-success"
-                                                >
-                                                    <i class="bi bi-check-circle me-2"></i>
-                                                    Validasi
-                                                </button>
-                                            </form>
-                                        </li>
-
-                                    @endif
-
-                                    <li>
-                                        <hr class="dropdown-divider">
-                                    </li>
-
-                                    {{-- TOLAK --}}
-                                    @if($row->approval_status != 'rejected')
-
-                                        <li>
-                                            <button
-                                                type="button"
-                                                class="dropdown-item text-danger"
-                                                data-bs-toggle="modal"
-                                                data-bs-target="#rejectModal{{ $row->id }}"
-                                            >
-                                                <i class="bi bi-x-circle me-2"></i>
-                                                Tolak
-                                            </button>
-                                        </li>
-
-                                    @endif
-
-                                </x-table.actions>
+                            <td>                                
+                                <a
+                                    class="btn btn-primary btn-sm rounded-pill px-3 py-0"
+                                    href="{{ route('superadmin.datakepegawaian.show', $row->id) }}"
+                                >                                        
+                                    Detail <i class="bi bi-chevron-right ms-1"></i>
+                                </a>                                    
                             </td>
 
                         </tr>

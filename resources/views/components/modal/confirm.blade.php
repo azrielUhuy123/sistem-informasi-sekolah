@@ -26,7 +26,7 @@
                     Konfirmasi
                 </h4>
 
-                <p id="confirmMessage" class="text-muted mb-4">
+                <p id="confirmMessage" class="text-muted mb-4" style="white-space: pre-line;">
                     Apakah Anda yakin?
                 </p>
 

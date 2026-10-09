@@ -121,6 +121,9 @@
                         Mata pelajaran tidak ditemukan.
                     </div>
                     <div class="text-end">
+                        <a href="{{ route('superadmin.pengampu-mapel.index') }}" class="btn btn-outline-secondary rounded-3 me-2">
+                            <i class="bi bi-chevron-left me-1"></i> <span class="desc-add">Kembali</span>
+                        </a>  
                         <button type="submit" class="btn btn-primary rounded-3">                        
                             {{ $pengampuGuru->isEmpty() ? 'Simpan Penugasan' : 'Simpan Perubahan' }} <i class="bi bi-save ms-1"></i>
                         </button>
@@ -172,7 +175,8 @@
                                 </div>
                             </td>
                             <td>                            
-                                <div class="d-flex flex-wrap gap-1">
+                                <div class="d-flex align-items-center text-muted">
+                                    <i class="bi bi-book-half text-primary me-2"></i>
                                     @foreach ($uniqueMapel as $mapelItem)
                                         <span class="text-muted">{{ $mapelItem->nama_mapel }}</span>
                                     @endforeach
@@ -222,14 +226,7 @@
             </table>
         </div>
         
-    </x-table.card>
-    <div class="sticky-bottom bg-white border border-light-subtle py-3 mt-4">
-        <div class="d-flex justify-content-between align-items-center">                 
-            <a href="{{ route('superadmin.pengampu-mapel.index') }}" class="btn btn-outline-secondary rounded-3 ml-4">
-                <i class="bi bi-chevron-left me-1"></i> Kembali
-            </a>                            
-        </div>
-    </div>
+    </x-table.card>    
 </div>
 
 @if ($guruTerpilih)

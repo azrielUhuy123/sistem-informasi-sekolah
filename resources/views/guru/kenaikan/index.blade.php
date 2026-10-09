@@ -86,17 +86,17 @@
             'pending' => [
                 'class' => 'warning',
                 'icon' => 'bi-hourglass-split',
-                'text' => 'Menunggu Persetujuan Kepala Sekolah',
+                'text' => 'Menunggu Persetujuan',
             ],
             'rejected' => [
                 'class' => 'danger',
                 'icon' => 'bi-x-circle',
-                'text' => 'Ditolak Kepala Sekolah',
+                'text' => 'Ditolak',
             ],
             'approved' => [
                 'class' => 'success',
                 'icon' => 'bi-check-circle',
-                'text' => 'Final Approved',
+                'text' => 'Disetujui',
             ],
         ];
     @endphp
@@ -215,7 +215,7 @@
                 @elseif($approvalStatus == 'approved')
                     <span class="badge bg-success fs-6 px-4 py-3">
                         <i class="bi bi-check-circle-fill me-2"></i>
-                        Final Approved
+                        Disetujui
                     </span>
                 @endif
             </div>

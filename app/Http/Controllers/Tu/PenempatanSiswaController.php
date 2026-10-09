@@ -7,8 +7,10 @@ use App\Models\PenempatanSiswa;
 use App\Models\Siswa;
 use App\Models\Kelas;
 use App\Models\TahunAjaran;
+use App\Helpers\TingkatKelasHelper;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Validation\ValidationException;
 
 class PenempatanSiswaController extends Controller
 {
@@ -59,6 +61,16 @@ class PenempatanSiswaController extends Controller
         if ($tahunAktif->status !== 'aktif') {
             abort(403, 'Assign hanya boleh saat tahun aktif.');
         }
+
+        $siswa = Siswa::findOrFail($request->siswa_id);
+        $kelas = Kelas::with('kelasGrup')->findOrFail($request->kelas_id);
+
+        if (!$this->kelasSesuaiAngkatan($siswa, $kelas)) {
+            return back()->withErrors([
+                'kelas_id' => 'Angkatan kelas tidak sesuai dengan angkatan siswa.'
+            ]);
+        }
+
         $exists = PenempatanSiswa::where('siswa_id', $request->siswa_id)
             ->where('tahun_ajaran_id', $tahunAktif->id)
             ->whereNull('tanggal_keluar')
@@ -105,39 +117,83 @@ class PenempatanSiswaController extends Controller
 
             foreach ($request->siswa as $penempatanId => $value) {
 
-                $item = PenempatanSiswa::with('kelas.kelasGrup.kelasMaster')
+                $item = PenempatanSiswa::with([
+                    'siswa',
+                    'kelas.kelasGrup.kelasMaster',
+                ])
                     ->where('id', $penempatanId)
                     ->where('tahun_ajaran_id', $tahunSebelumnya->id)
                     ->whereNull('tanggal_keluar')
                     ->first();
 
-                if (!$item) continue;
+                if (!$item) {
+                    throw ValidationException::withMessages([
+                        'siswa' => 'Penempatan sumber tidak ditemukan atau sudah ditutup.',
+                    ]);
+                }
 
-                // 🔒 tutup penempatan lama
-                $item->update([
-                    'tanggal_keluar' => now()
-                ]);
+                if (
+                    !$item->siswa ||
+                    !$item->kelas ||
+                    !$this->kelasSesuaiAngkatan($item->siswa, $item->kelas)
+                ) {
+                    throw ValidationException::withMessages([
+                        'siswa' => 'Angkatan siswa tidak sesuai dengan kelas asal.',
+                    ]);
+                }
 
-                // 🎯 AUTO MAPPING
                 $tingkatSekarang = $item->kelas->kelasGrup->kelasMaster->tingkat;
-                $tingkatTujuan = $tingkatSekarang + 1;
+                $tingkatTujuan = TingkatKelasHelper::berikutnya($tingkatSekarang);
 
-                $kelasTujuan = Kelas::whereHas('kelasGrup.kelasMaster', function ($q) use ($tingkatTujuan) {
-                    $q->where('tingkat', $tingkatTujuan);
-                })
-                ->where('nama_kelas', str_replace($tingkatSekarang, $tingkatTujuan, $item->kelas->nama_kelas))
-                ->first();
+                if (!$tingkatTujuan) {
+                    throw ValidationException::withMessages([
+                        'siswa' => 'Tingkat tujuan siswa tidak dapat ditentukan.',
+                    ]);
+                }
 
-                // ❗ kalau tidak ada (misal lulus)
-                if (!$kelasTujuan) continue;
+                $kelasTujuan = null;
 
-                // 🆕 buat penempatan baru
-                PenempatanSiswa::create([
-                    'siswa_id'        => $item->siswa_id,
-                    'kelas_id'        => $kelasTujuan->id,
-                    'tahun_ajaran_id' => $tahunAktif->id,
-                    'tanggal_masuk'   => now(),
-                ]);
+                if ($tingkatTujuan !== 'LULUS') {
+                    preg_match('/[A-Za-z]+$/', $item->kelas->nama_kelas, $match);
+                    $rombel = $match[0] ?? '';
+
+                    $kelasTujuan = Kelas::whereHas('kelasGrup', function ($q) use ($item, $tingkatTujuan) {
+                        $q->where('angkatan_id', $item->siswa->angkatan_id)
+                            ->whereHas('kelasMaster', function ($q) use ($tingkatTujuan) {
+                                $q->where('tingkat', $tingkatTujuan);
+                            });
+                    })
+                    ->where('nama_kelas', $tingkatTujuan . $rombel)
+                    ->first();
+
+                    if (!$kelasTujuan || !$this->kelasSesuaiAngkatan($item->siswa, $kelasTujuan)) {
+                        throw ValidationException::withMessages([
+                            'siswa' => "Kelas tujuan {$tingkatTujuan}{$rombel} untuk Angkatan siswa tidak tersedia.",
+                        ]);
+                    }
+                }
+
+                $sudahDitempatkan = PenempatanSiswa::where('siswa_id', $item->siswa_id)
+                    ->where('tahun_ajaran_id', $tahunAktif->id)
+                    ->whereNull('tanggal_keluar')
+                    ->exists();
+
+                if ($sudahDitempatkan) {
+                    throw ValidationException::withMessages([
+                        'siswa' => 'Siswa sudah memiliki penempatan aktif pada Tahun Ajaran tujuan.',
+                    ]);
+                }
+
+                $item->update(['tanggal_keluar' => now()]);
+
+                if ($kelasTujuan) {
+                    PenempatanSiswa::create([
+                        'siswa_id'        => $item->siswa_id,
+                        'kelas_id'        => $kelasTujuan->id,
+                        'tahun_ajaran_id' => $tahunAktif->id,
+                        'tanggal_masuk'   => now(),
+                    ]);
+                }
             }
         });
 
@@ -206,7 +262,7 @@ class PenempatanSiswaController extends Controller
         }
 
         $request->validate([
-            'tingkat' => 'required|integer'
+            'tingkat' => 'required|in:I,II,III,IV,V,VI'
         ]);
 
         $tahunAktif = TahunAjaran::current();
@@ -217,7 +273,7 @@ class PenempatanSiswaController extends Controller
         }
 
         $tingkatAsal = $request->tingkat;
-        $tingkatTujuan = $tingkatAsal + 1;
+        $tingkatTujuan = TingkatKelasHelper::berikutnya($tingkatAsal);
 
         $rombelsAsal = Kelas::whereHas('kelasGrup.kelasMaster', function ($q) use ($tingkatAsal) {
                 $q->where('tingkat', $tingkatAsal);
@@ -233,11 +289,13 @@ class PenempatanSiswaController extends Controller
                 ->get();
         }
 
-        $rombelsTujuan = Kelas::whereHas('kelasGrup.kelasMaster', function ($q) use ($tingkatTujuan) {
-            $q->where('tingkat', $tingkatTujuan);
-        })
-        ->orderBy('nama_kelas')
-        ->get();
+        $rombelsTujuan = $tingkatTujuan === 'LULUS'
+            ? collect()
+            : Kelas::whereHas('kelasGrup.kelasMaster', function ($q) use ($tingkatTujuan) {
+                $q->where('tingkat', $tingkatTujuan);
+            })
+            ->orderBy('nama_kelas')
+            ->get();
 
         return view('tu.penempatan-siswa.naik-kelas-mapping', compact(
             'rombelsAsal',
@@ -253,6 +311,13 @@ class PenempatanSiswaController extends Controller
 
         if (!$tahunAktif || $tahunAktif->status !== 'aktif') {
             return back()->with('error', 'Mutasi hanya dapat dilakukan pada tahun ajaran aktif.');
+        }
+
+        if (
+            (int) $penempatan->tahun_ajaran_id !== (int) $tahunAktif->id ||
+            $penempatan->tanggal_keluar !== null
+        ) {
+            return back()->with('error', 'Hanya penempatan aktif pada Tahun Ajaran aktif yang dapat dimutasi.');
         }
 
         $penempatan->load([
@@ -280,8 +345,35 @@ class PenempatanSiswaController extends Controller
             return back()->with('error', 'Mutasi hanya dapat dilakukan pada tahun ajaran aktif.');
         }
 
+        if (
+            (int) $penempatan->tahun_ajaran_id !== (int) $tahunAktif->id ||
+            $penempatan->tanggal_keluar !== null
+        ) {
+            return back()->with('error', 'Hanya penempatan aktif pada Tahun Ajaran aktif yang dapat dimutasi.');
+        }
+
+        $penempatan->load('siswa');
+        $siswa = $penempatan->siswa;
+        $kelasTujuan = Kelas::with('kelasGrup')->findOrFail($request->kelas_id);
+
+        if (!$siswa || !$this->kelasSesuaiAngkatan($siswa, $kelasTujuan)) {
+            return back()->withErrors([
+                'kelas_id' => 'Angkatan kelas tidak sesuai dengan angkatan siswa.'
+            ]);
+        }
+
         if ($penempatan->kelas_id == $request->kelas_id) {
             return back()->with('error', 'Siswa sudah berada di kelas tersebut.');
+        }
+
+        $placementAktifLain = PenempatanSiswa::where('siswa_id', $penempatan->siswa_id)
+            ->where('tahun_ajaran_id', $tahunAktif->id)
+            ->whereNull('tanggal_keluar')
+            ->where('id', '!=', $penempatan->id)
+            ->exists();
+
+        if ($placementAktifLain) {
+            return back()->with('error', 'Siswa sudah memiliki penempatan aktif lain pada Tahun Ajaran ini.');
         }
 
         DB::transaction(function () use ($request, $penempatan) {
@@ -310,7 +402,7 @@ class PenempatanSiswaController extends Controller
     {
         $tahunAktif = TahunAjaran::current();
 
-        if ($tahunAktif->status !== 'aktif') {
+        if (!$tahunAktif || $tahunAktif->status !== 'aktif') {
             abort(403, 'Tidak bisa mengeluarkan siswa di fase ini.');
         }
 
@@ -327,6 +419,15 @@ class PenempatanSiswaController extends Controller
         ]);
 
         return back()->with('success', 'Siswa berhasil dikeluarkan dari rombel.');
+    }
+
+    private function kelasSesuaiAngkatan(Siswa $siswa, Kelas $kelas): bool
+    {
+        $angkatanKelas = $kelas->kelasGrup?->angkatan_id;
+
+        return $siswa->angkatan_id !== null &&
+            $angkatanKelas !== null &&
+            (int) $siswa->angkatan_id === (int) $angkatanKelas;
     }
 
 

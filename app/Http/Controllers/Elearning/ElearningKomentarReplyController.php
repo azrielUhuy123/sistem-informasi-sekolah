@@ -7,6 +7,7 @@ use App\Models\ElearningKomentarReply;
 use App\Models\ElearningKomentar;
 use App\Models\ElearningKomentarLampiran;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 
 class ElearningKomentarReplyController extends Controller
 {
@@ -15,6 +16,15 @@ class ElearningKomentarReplyController extends Controller
         ElearningKomentar $komentar
     )
     {
+        $user = Auth::user();
+        $siswa = $user->siswa;
+        $kelasAktif = $siswa?->penempatanAktif?->kelas;
+        $forum = $komentar->elearning;
+
+        if (!$kelasAktif || !$forum || $forum->kelas_id != $kelasAktif->id) {
+            abort(403);
+        }
+
         $request->validate([
             'isi' => 'nullable|string',
             'lampiran.*' => 'nullable|file|max:20480'
@@ -36,7 +46,7 @@ class ElearningKomentarReplyController extends Controller
             'reply_to_reply_id' =>
                 $request->reply_to_reply_id,
 
-            'user_id' => auth()->id(),
+            'user_id' => $user->id,
 
             'isi' => $request->isi,
 

@@ -28,11 +28,11 @@ class SiswaSheetImport implements ToCollection, WithHeadingRow
     {
         /*
         |--------------------------------------------------------------------------
-        | AMBIL TAHUN AJARAN TERBARU
+        | AMBIL TAHUN AJARAN AKTIF
         |--------------------------------------------------------------------------
         */
 
-        $this->tahunAjaran = TahunAjaran::latest()->first();
+        $this->tahunAjaran = TahunAjaran::current();
 
         if (!$this->tahunAjaran) {
             throw new \Exception("Data tahun ajaran belum tersedia.");
@@ -202,9 +202,25 @@ class SiswaSheetImport implements ToCollection, WithHeadingRow
                         'nama'          => $nama,
                         'jenis_kelamin' => $jk,
                         'tanggal_lahir' => $tanggalLahir,
+                        'angkatan_id'   => $angkatan->id,
                         'status'        => 'aktif'
                     ]
                 );
+
+                if ((int) $siswa->angkatan_id !== (int) $angkatan->id) {
+                    throw new \Exception(
+                        "Angkatan siswa NIS {$nis} tidak sesuai dengan Angkatan dari tingkat {$tingkat}."
+                    );
+                }
+
+                if (
+                    !$kelas->kelasGrup ||
+                    (int) $kelas->kelasGrup->angkatan_id !== (int) $siswa->angkatan_id
+                ) {
+                    throw new \Exception(
+                        "Angkatan kelas {$namaKelas} tidak sesuai dengan Angkatan siswa NIS {$nis}."
+                    );
+                }
 
                 /*
                 |--------------------------------------------------------------------------
@@ -215,7 +231,15 @@ class SiswaSheetImport implements ToCollection, WithHeadingRow
                 $penempatanAktif = PenempatanSiswa::where('siswa_id', $siswa->id)
                     ->where('tahun_ajaran_id', $this->tahunAjaran->id)
                     ->whereNull('tanggal_keluar')
-                    ->first();
+                    ->get();
+
+                if ($penempatanAktif->count() > 1) {
+                    throw new \Exception(
+                        "Siswa NIS {$nis} memiliki lebih dari satu penempatan siswa aktif pada Tahun Ajaran ini."
+                    );
+                }
+
+                $penempatanAktif = $penempatanAktif->first();
 
                 /*
                 |--------------------------------------------------------------------------
@@ -272,7 +296,20 @@ class SiswaSheetImport implements ToCollection, WithHeadingRow
     {
         $tahunAwal = (int) explode('/', $this->tahunAjaran->tahun)[0];
 
-        $tahunAngkatan = $tahunAwal - ((int)$tingkat - 1);
+        $tingkatUrutan = [
+            'I' => 1,
+            'II' => 2,
+            'III' => 3,
+            'IV' => 4,
+            'V' => 5,
+            'VI' => 6,
+        ][strtoupper(trim((string) $tingkat))] ?? null;
+
+        if (!$tingkatUrutan) {
+            throw new \Exception("Tingkat {$tingkat} tidak valid.");
+        }
+
+        $tahunAngkatan = $tahunAwal - ($tingkatUrutan - 1);
 
         $angkatan = Angkatan::where('tahun', $tahunAngkatan)->first();
 

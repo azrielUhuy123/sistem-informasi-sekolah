@@ -143,12 +143,7 @@
                         </tr>
                     @empty
                         <tr>
-                            <td colspan="6" class="text-center py-5">
-                                <i class="bi bi-person-x display-5 text-secondary"></i>
-                                <p class="mt-3 mb-0 text-muted">
-                                    Belum ada data guru.
-                                </p>
-                            </td>
+                            <td colspan="6" class="text-center text-muted">Belum ada data guru</td>
                         </tr>
                     @endforelse
                 </tbody>

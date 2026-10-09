@@ -7,9 +7,13 @@ import { createApp } from 'vue'
 import App from './App.vue'
 import router from './router'
 
-createApp(App)
-    .use(router)
-    .mount('#app')
+const appElement = document.getElementById('app');
+
+if (appElement) {
+    createApp(App)
+        .use(router)
+        .mount(appElement);
+}
 
 import Alpine from 'alpinejs';
 

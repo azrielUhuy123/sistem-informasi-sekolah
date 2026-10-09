@@ -76,12 +76,21 @@
                 </div>
 
                 @if($tahunAktif->status === 'aktif' && $tahunAktif->semester === 'Ganjil')
-                    <div class="mt-3">
+                    <div class="mt-3 d-flex flex-column flex-md-row justify-content-end align-items-md-center gap-3">
                         <form method="POST"
-                              action="{{ route('tu.tahun.lanjutSemester') }}"
-                              onsubmit="return confirm('Lanjut ke semester genap?')">
+                              action="{{ route('tu.tahun.lanjutSemester') }}">                              
                             @csrf
-                            <button class="btn btn-dark">
+                            <button class="btn btn-secondary btn-sm btn-confirm"
+                                data-title="Lanjut ke Semester Genap"
+                                data-message="Semester Ganjil akan ditutup dan Semester Genap pada tahun ajaran yang sama akan diaktifkan.
+
+Penempatan siswa yang valid pada Semester Ganjil akan diteruskan ke Semester Genap dengan kelas dan rombel yang sama. Riwayat penempatan Semester Ganjil tetap tersimpan.
+
+Jika terdapat penempatan siswa atau data kelas yang tidak valid, seluruh proses akan dibatalkan dan status semester tidak berubah.
+
+Apakah Anda yakin ingin melanjutkan?"
+                                data-confirm-text="Lanjutkan"
+                                data-button="btn-danger">
                                 <i class="bi bi-arrow-right-circle me-1"></i>
                                 Lanjut ke Semester Genap
                             </button>
@@ -98,11 +107,18 @@
                               action="{{ route('tu.tahun.tutup') }}">
                             @csrf
                             <button class="btn btn-secondary btn-sm btn-confirm"
-                                    data-title="Tutup Tahun Ajaran"
-                                    data-message="Apakah Anda yakin ingin menutup tahun ajaran ini? Setelah ditutup, tahun ajaran tidak dapat diubah."
+                                    data-title="Penutupan Tahun Ajaran dan Kenaikan Kelas"
+                                    data-message="Semester Genap akan ditutup dan Semester Ganjil tahun ajaran berikutnya akan diaktifkan.
+
+Siswa yang memenuhi ketentuan akan diproses ke tingkat berikutnya dengan Angkatan dan rombel yang sesuai. Siswa kelas VI yang telah dinyatakan lulus akan ditutup sebagai LULUS dan tidak dibuatkan penempatan pada tahun ajaran berikutnya.
+
+Jika terdapat penempatan siswa atau kelas tujuan yang tidak valid, seluruh proses akan dibatalkan dan status tahun ajaran tidak berubah.
+
+Apakah Anda yakin ingin melanjutkan?"
+                                    data-confirm-text="Ya, Tutup Tahun & Naikkan Kelas"
                                     data-button="btn-danger">
                                 <i class="bi bi-door-closed me-1"></i>
-                                Tutup Tahun Ajaran
+                                Penutupan Tahun Ajaran dan Kenaikan Kelas
                             </button>
                         </form>
                     </div>

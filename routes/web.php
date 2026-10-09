@@ -3,6 +3,16 @@
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\GatewayController;
+use App\Http\Controllers\NotificationController;
+
+Route::middleware('auth')->group(function () {
+    Route::get('/notifications', [NotificationController::class, 'index'])
+        ->name('notifications.index');
+    Route::post('/notifications/read-all', [NotificationController::class, 'readAll'])
+        ->name('notifications.readAll');
+    Route::post('/notifications/{notification}/read', [NotificationController::class, 'read'])
+        ->name('notifications.read');
+});
 
 /*
 |--------------------------------------------------------------------------
@@ -12,7 +22,7 @@ use App\Http\Controllers\GatewayController;
 Route::get('/{any?}', [GatewayController::class, 'index'])
     ->where(
         'any',
-        '^(?!login|dashboard|guru|tu|siswa|superadmin|ppdb).*$'
+        '^(?!login|forgot-password|reset-password|dashboard|guru|tu|siswa|superadmin|ppdb).*$'
     )
     ->name('gateway');
 

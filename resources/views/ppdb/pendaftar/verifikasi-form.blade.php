@@ -35,15 +35,19 @@
                                                 <div>
                                                     @if($pendaftar->status == 'pending')
                                                         <span class="badge-status pending">
-                                                           Pending
+                                                           Belum Diputuskan
                                                         </span>
                                                     @elseif($pendaftar->status == 'verifikasi')
                                                         <span class="badge-status verifikasi">                                                            
-                                                            Verifikasi
+                                                            Tahap Verifikasi (Data Lama)
                                                         </span>
                                                     @elseif($pendaftar->status === 'diterima')
                                                         <span class="badge-status aktif">                                                            
                                                             Diterima
+                                                        </span>
+                                                    @elseif($pendaftar->status === 'ditolak')
+                                                        <span class="badge-status nonaktif">
+                                                            Ditolak
                                                         </span>
                                                     @endif
                                                 </div>
@@ -67,7 +71,7 @@
                                 <div class="d-flex justify-content-between align-items-center border-bottom py-2">
 
                                     <span class="fw-semibold">
-                                        Kartu Keluarga
+                                        Kartu Keluarga <span class="text-danger">(Wajib)</span>
                                     </span>
 
                                     @if($pendaftar->kartu_keluarga)
@@ -83,8 +87,64 @@
 
                                     @else
 
-                                        <span class="badge bg-danger">
-                                            Belum Upload
+                                        <span class="badge bg-secondary">
+                                            <i class="bi bi-dash-lg"></i>
+                                        </span>
+
+                                    @endif
+
+                                </div>
+
+                                {{-- KTP --}}
+                                <div class="d-flex justify-content-between align-items-center border-bottom py-2">
+
+                                    <span class="fw-semibold">
+                                        KTP Orangtua <span class="text-danger">(Wajib)</span>
+                                    </span>
+
+                                    @if($pendaftar->ktp)
+
+                                        <a
+                                            href="{{ asset('storage/'.$pendaftar->ktp) }}"
+                                            target="_blank"
+                                            class="btn btn-primary btn-sm rounded-3"
+                                        >
+                                            <i class="bi bi-file-earmark-text-fill me-2"></i>
+                                            Lihat <span class="desc-add">Berkas</span>
+                                        </a>
+
+                                    @else
+
+                                        <span class="badge bg-secondary">
+                                            <i class="bi bi-dash-lg"></i>
+                                        </span>
+
+                                    @endif
+
+                                </div>
+
+                                {{-- Ijazah --}}
+                                <div class="d-flex justify-content-between align-items-center border-bottom py-2">
+
+                                    <span class="fw-semibold">
+                                        Ijazah <span class="text-muted">(Opsional)</span>
+                                    </span>
+
+                                    @if($pendaftar->ijazah)
+
+                                        <a
+                                            href="{{ asset('storage/'.$pendaftar->ijazah) }}"
+                                            target="_blank"
+                                            class="btn btn-primary btn-sm rounded-3"
+                                        >
+                                            <i class="bi bi-file-earmark-text-fill me-2"></i>
+                                            Lihat <span class="desc-add">Berkas</span>
+                                        </a>
+
+                                    @else
+
+                                        <span class="badge bg-secondary">
+                                            <i class="bi bi-dash-lg"></i>
                                         </span>
 
                                     @endif
@@ -95,7 +155,7 @@
                                 <div class="d-flex justify-content-between align-items-center border-bottom py-2">
 
                                     <span class="fw-semibold">
-                                        Akta Kelahiran
+                                        Akta Kelahiran <span class="text-muted">(Opsional)</span>
                                     </span>
 
                                     @if($pendaftar->akta_lahir)
@@ -111,8 +171,36 @@
 
                                     @else
 
-                                        <span class="badge bg-danger">
-                                            Belum Upload
+                                        <span class="badge bg-secondary">
+                                            <i class="bi bi-dash-lg"></i>
+                                        </span>
+
+                                    @endif
+
+                                </div>
+
+                                {{-- KIP --}}
+                                <div class="d-flex justify-content-between align-items-center border-bottom py-2">
+
+                                    <span class="fw-semibold">
+                                        Kartu Indonesia Pintar <span class="text-muted">(Opsional)</span>
+                                    </span>
+
+                                    @if($pendaftar->kartu_kip)
+
+                                        <a
+                                            href="{{ asset('storage/'.$pendaftar->kartu_kip) }}"
+                                            target="_blank"
+                                            class="btn btn-primary btn-sm rounded-3"
+                                        >
+                                            <i class="bi bi-file-earmark-text-fill me-2"></i>
+                                            Lihat <span class="desc-add">Berkas</span>
+                                        </a>
+
+                                    @else
+
+                                        <span class="badge bg-secondary">
+                                            <i class="bi bi-dash-lg"></i>
                                         </span>
 
                                     @endif
@@ -123,7 +211,7 @@
                                 <div class="d-flex justify-content-between align-items-center py-2">
 
                                     <span class="fw-semibold">
-                                        Pas Foto
+                                        Pas Foto <span class="text-danger">(Wajib)</span>
                                     </span>
 
                                     @if($pendaftar->foto)
@@ -139,37 +227,37 @@
 
                                     @else
 
-                                        <span class="badge bg-danger">
-                                            Belum Upload
+                                        <span class="badge bg-secondary">
+                                            <i class="bi bi-dash-lg"></i>
                                         </span>
 
                                     @endif
 
                                 </div>
 
-                                @if($pendaftar->status == 'verifikasi')
+                                @if(in_array($pendaftar->status, ['pending', 'verifikasi'], true))
 
                                     <hr class="my-4">
 
                                     <div class="d-flex justify-content-end gap-2">
 
-                                        {{-- FORM TOLAK BERKAS --}}
+                                        {{-- FORM KEPUTUSAN DITOLAK --}}
                                         <form
                                             method="POST"
-                                            action="{{ route('tu.ppdb.pendaftar.tolak-berkas', $pendaftar) }}"
-                                            id="tolak-berkas-form"
+                                            action="{{ route('tu.ppdb.pendaftar.tolak', $pendaftar) }}"
                                             class="m-0"
                                         >
                                             @csrf
 
                                             <button
-                                                type="button"
-                                                class="btn btn-outline-danger rounded-3"
-                                                data-bs-toggle="modal"
-                                                data-bs-target="#tolakBerkasModal"
+                                                type="submit"
+                                                class="btn btn-outline-danger rounded-3 btn-confirm"
+                                                data-title="TOLAK PENDAFTAR INI?"
+                                                data-message="Penolakan adalah keputusan akhir dan tidak dapat diajukan ulang."
+                                                data-button="btn-danger"
                                             >
                                                 <i class="bi bi-x-circle me-1"></i>
-                                                Tolak <span class="desc-add">Berkas</span>
+                                                Tolak
                                             </button>
                                         </form>
 
@@ -205,7 +293,7 @@
                     <hr class="my-4">
                     <div class="col-12">
                         <div class="d-flex justify-content-between align-items-center">
-                            <button 
+                            <button  
                                 type="button"
                                 class="btn btn-outline-secondary rounded-3"
                                 onclick="history.back()"
@@ -219,137 +307,4 @@
             </div>
         </div>
     </div>
-<div
-    class="modal fade"
-    id="tolakBerkasModal"
-    tabindex="-1"
-    aria-labelledby="tolakBerkasModalLabel"
-    aria-hidden="true"
->
-    <div class="modal-dialog modal-dialog-centered">
-        <div class="modal-content border-0 shadow rounded-4">
-
-            <form
-                method="POST"
-                action="{{ route('tu.ppdb.pendaftar.tolak-berkas', $pendaftar) }}"
-                id="tolak-berkas-modal-form"
-                novalidate
-            >
-                @csrf
-
-                <div class="modal-header border-0 px-4 pt-4">                    
-                    <div class="mb-0 w-100">
-                        <h5
-                            class="modal-title fw-bold text-danger text-center"
-                            id="tolakBerkasModalLabel"
-                        >
-                            Kembalikan Berkas
-                        </h5>
-                        <p class="text-muted text-center mb-0">
-                            Berikan catatan perbaikan yang harus dilakukan
-                            oleh pendaftar.
-                        </p>
-                    </div>                    
-                </div>
-
-                <div class="modal-body px-4 py-0">
-
-                    <label
-                        for="catatan_verifikasi"
-                        class="form-label fw-semibold"
-                    >
-                        Catatan Verifikasi
-                        <span class="text-danger">*</span>
-                    </label>
-
-                    <textarea
-                        name="catatan_verifikasi"
-                        id="catatan_verifikasi"
-                        class="form-control"
-                        rows="4"
-                        placeholder="Contoh: Kartu Keluarga kurang jelas, silakan upload ulang..."
-                        required
-                    ></textarea>
-
-                    <div
-                        id="catatan-verifikasi-error"
-                        class="invalid-feedback"
-                    >
-                        Catatan verifikasi wajib diisi.
-                    </div>
-
-                </div>
-
-                <div class="modal-footer border-0 px-4 pb-4">
-
-                    <button
-                        type="button"
-                        class="btn btn-light rounded-3 px-3"
-                        data-bs-dismiss="modal"
-                    >
-                        Batal
-                    </button>
-
-                    <button
-                        type="submit"
-                        class="btn btn-danger rounded-3 px-3 btn-confirm"
-                        data-title="KEMBALIKAN BERKAS UNTUK PERBAIKAN?"
-                        data-message="Berkas akan dikembalikan kepada pendaftar untuk diperbaiki."
-                        data-button="btn-danger"
-                    >
-                        <i class="bi bi-send me-1"></i>
-                        Kirim Perbaikan
-                    </button>
-
-                </div>
-
-            </form>
-        </div>
-    </div>
-</div>
-<script>
-document.addEventListener('DOMContentLoaded', function () {
-
-    const form = document.getElementById('tolak-berkas-modal-form');
-    const textarea = document.getElementById('catatan_verifikasi');
-    const confirmButton = form?.querySelector('.btn-confirm');
-
-    if (!form || !textarea || !confirmButton) {
-        return;
-    }
-
-    /*
-     * Validasi dilakukan SEBELUM .btn-confirm global diproses.
-     */
-    confirmButton.addEventListener('click', function (event) {
-
-        if (!textarea.value.trim()) {
-
-            event.preventDefault();
-            event.stopImmediatePropagation();
-
-            textarea.classList.add('is-invalid');
-            textarea.focus();
-
-            return;
-        }
-
-        textarea.classList.remove('is-invalid');
-
-    }, true);
-
-
-    /*
-     * Hilangkan error ketika user mulai mengetik.
-     */
-    textarea.addEventListener('input', function () {
-
-        if (this.value.trim()) {
-            this.classList.remove('is-invalid');
-        }
-
-    });
-
-});
-</script>          
 @endsection

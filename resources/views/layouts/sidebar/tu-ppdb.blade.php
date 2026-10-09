@@ -96,26 +96,6 @@
 
         <a
             class="menu-item
-            {{ request()->is('tu.ppdb/verifikasi*') ? 'active' : '' }}"
-            href="{{ route('tu.ppdb.verifikasi.index') }}"
-        >
-
-            <div class="menu-left">
-
-                <i class="bi bi-patch-check"></i>
-
-                <span>
-
-                    Verifikasi Berkas
-
-                </span>
-
-            </div>
-
-        </a>
-
-        <a
-            class="menu-item
             {{ request()->is('tu.ppdb/diterima*') ? 'active' : '' }}"
             href="{{ route('tu.ppdb.diterima.index') }}"
         >

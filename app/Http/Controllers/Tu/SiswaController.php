@@ -118,7 +118,24 @@ class SiswaController extends Controller
             'nama_wali'      => 'nullable|string|max:255',
             'telepon_wali'   => 'nullable|string|max:20',
         ]);
-        DB::transaction(function () use ($validated, $request) {
+
+        $kelas = Kelas::with('kelasGrup')->findOrFail($validated['kelas_id']);
+        $angkatanId = $kelas->kelasGrup?->angkatan_id;
+        $tahunAktif = TahunAjaran::aktif();
+
+        if (!$angkatanId) {
+            return back()->withErrors([
+                'kelas_id' => 'Kelas harus memiliki Angkatan sebelum siswa ditempatkan.'
+            ])->withInput();
+        }
+
+        if (!$tahunAktif) {
+            return back()->withErrors([
+                'kelas_id' => 'Tidak ada Tahun Ajaran aktif untuk membuat penempatan.'
+            ])->withInput();
+        }
+
+        DB::transaction(function () use ($validated, $request, $angkatanId, $tahunAktif) {
             $siswa = Siswa::create([
                 'nama'           => $validated['nama'],
                 'nis'            => $validated['nis'],
@@ -128,8 +145,9 @@ class SiswaController extends Controller
                 'alamat'         => $validated['alamat'] ?? null,
                 'nama_wali'      => $validated['nama_wali'] ?? null,
                 'telepon_wali'   => $validated['telepon_wali'] ?? null,
+                'angkatan_id'    => $angkatanId,
             ]);
-            $tahunAktif = TahunAjaran::aktif();
+
             // buat penempatan aktif
             PenempatanSiswa::create([
                 'siswa_id'        => $siswa->id,
@@ -258,7 +276,7 @@ public function ajaxTable(Request $request)
 
         $request->validate([
             'nama'           => 'required|string|max:255',
-            'nis'            => 'required|string|max:50|unique:siswa,nis,' . $siswa->id,
+            'nis'            => 'missing',
             'nisn'           => 'nullable|string|max:50|unique:siswa,nisn,' . $siswa->id,
             'jenis_kelamin'  => 'required|in:L,P',
             'tanggal_lahir'  => 'nullable|date',
@@ -272,7 +290,6 @@ public function ajaxTable(Request $request)
 
             $siswa->update([
                 'nama'          => $request->nama,
-                'nis'           => $request->nis,
                 'nisn'          => $request->nisn,
                 'jenis_kelamin' => $request->jenis_kelamin,
                 'tanggal_lahir' => $request->tanggal_lahir,

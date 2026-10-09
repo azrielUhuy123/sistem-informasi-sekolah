@@ -83,7 +83,7 @@
                                         <th>Kelas</th>
                                         <th>Wali Kelas</th>
                                         <th width="140">Total Ditolak</th>
-                                        <th width="140">Total Diterima</th>
+                                        <th width="140">Total Disetujui</th>
                                         <th width="140">Jumlah Siswa</th>
                                         <th width="140">Status</th>
                                         <th width="120">Aksi</th>
@@ -156,11 +156,11 @@
                                             <td>{{ $kelas->penempatan->count() }}</td>
                                             <td>
                                                 @if ($status == 'pending')
-                                                    <span class="badge-status pending">Pending</span>
+                                                    <span class="badge-status pending">Menunggu Persetujuan</span>
                                                 @elseif ($status == 'rejected')
                                                     <span class="badge-status nonaktif">Ditolak</span>
                                                 @elseif ($status == 'approved')
-                                                    <span class="badge-status aktif">Diterima</span>
+                                                    <span class="badge-status aktif">Disetujui</span>
                                                 @else
                                                     -
                                                 @endif

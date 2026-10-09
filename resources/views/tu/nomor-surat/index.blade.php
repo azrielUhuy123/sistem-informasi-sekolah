@@ -89,13 +89,7 @@
  
                     @empty
                     <tr>
-                        <td colspan="5">
-                            <div class="text-center py-5">
-                                <i class="bi bi-file-earmark-x display-3 text-secondary"></i>
-                                <h5 class="fw-bold mt-3">Belum Ada Nomor Surat</h5>
-                                <p class="text-muted mb-0">Silakan generate nomor surat baru untuk mulai melakukan administrasi surat.</p>
-                            </div>
-                        </td>
+                        <td colspan="5" class="text-center text-muted">Belum ada data nomor surat</td>
                     </tr>
                     @endforelse
                 </tbody>

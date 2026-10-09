@@ -7,6 +7,7 @@ use App\Models\Ekskul;
 use App\Models\PengajuanJadwal;
 use App\Models\PengajuanJadwalEkskul;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 
 class MonitoringEkskulController extends Controller
 {
@@ -71,40 +72,35 @@ class MonitoringEkskulController extends Controller
 
     public function approve(Ekskul $ekskul)
     {
-        $jadwal = PengajuanJadwalEkskul::where(
-                'ekskul_id',
-                $ekskul->id
-            )
-            ->where(
-                'tahun_ajaran_id',
-                current_tahun_id()
-            )
-            ->get();
+        $approved = DB::transaction(function () use ($ekskul) {
+            $jadwal = PengajuanJadwalEkskul::where('ekskul_id', $ekskul->id)
+                ->where('tahun_ajaran_id', current_tahun_id())
+                ->lockForUpdate()
+                ->get();
 
-        foreach ($jadwal as $item) {
-
-            if (
-                $this->cekBentrok($item)
-                !== 'aman'
-            ) {
-
-                return back()->with(
-                    'error',
-                    'Masih terdapat jadwal yang bentrok.'
-                );
+            foreach ($jadwal as $item) {
+                if ($this->cekBentrok($item) !== 'aman') {
+                    return false;
+                }
             }
+
+            PengajuanJadwalEkskul::where('ekskul_id', $ekskul->id)
+                ->where('tahun_ajaran_id', current_tahun_id())
+                ->where('status', 'submitted')
+                ->update([
+                    'status' => 'approved',
+                    'catatan' => null,
+                ]);
+
+            return true;
+        });
+
+        if (! $approved) {
+            return back()->with(
+                'error',
+                'Masih terdapat jadwal yang bentrok.'
+            );
         }
-
-        PengajuanJadwalEkskul::where(
-            'ekskul_id',
-            $ekskul->id
-        )->update([
-
-            'status' => 'approved',
-
-            'catatan' => null
-
-        ]);
 
         return back()->with(
             'success',
@@ -117,16 +113,21 @@ class MonitoringEkskulController extends Controller
         Ekskul $ekskul
     )
     {
-        PengajuanJadwalEkskul::where(
-            'ekskul_id',
-            $ekskul->id
-        )->update([
+        DB::transaction(function () use ($request, $ekskul) {
+            PengajuanJadwalEkskul::where('ekskul_id', $ekskul->id)
+                ->where('tahun_ajaran_id', current_tahun_id())
+                ->where('status', 'submitted')
+                ->lockForUpdate()
+                ->get();
 
-            'status' => 'rejected',
-
-            'catatan' => $request->catatan
-
-        ]);
+            PengajuanJadwalEkskul::where('ekskul_id', $ekskul->id)
+                ->where('tahun_ajaran_id', current_tahun_id())
+                ->where('status', 'submitted')
+                ->update([
+                    'status' => 'rejected',
+                    'catatan' => $request->catatan,
+                ]);
+        });
 
         return back()->with(
             'success',
@@ -136,43 +137,34 @@ class MonitoringEkskulController extends Controller
 
     public function publish(Ekskul $ekskul)
     {
-        $jadwal = PengajuanJadwalEkskul::where(
-                'ekskul_id',
-                $ekskul->id
-            )
-            ->where(
-                'tahun_ajaran_id',
-                current_tahun_id()
-            )
-            ->get();
+        $published = DB::transaction(function () use ($ekskul) {
+            $jadwal = PengajuanJadwalEkskul::where('ekskul_id', $ekskul->id)
+                ->where('tahun_ajaran_id', current_tahun_id())
+                ->lockForUpdate()
+                ->get();
 
-        foreach ($jadwal as $item) {
-
-            if (
-                $this->cekBentrok($item)
-                !== 'aman'
-            ) {
-
-                return back()->with(
-                    'error',
-                    'Masih terdapat jadwal yang bentrok.'
-                );
+            foreach ($jadwal as $item) {
+                if ($this->cekBentrok($item) !== 'aman') {
+                    return false;
+                }
             }
+
+            PengajuanJadwalEkskul::where('ekskul_id', $ekskul->id)
+                ->where('tahun_ajaran_id', current_tahun_id())
+                ->where('status', 'approved')
+                ->update([
+                    'status' => 'published',
+                ]);
+
+            return true;
+        });
+
+        if (! $published) {
+            return back()->with(
+                'error',
+                'Masih terdapat jadwal yang bentrok.'
+            );
         }
-
-        PengajuanJadwalEkskul::where(
-            'ekskul_id',
-            $ekskul->id
-        )
-        ->where(
-            'status',
-            'approved'
-        )
-        ->update([
-
-            'status' => 'published'
-
-        ]);
 
         return back()->with(
             'success',

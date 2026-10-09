@@ -4,9 +4,11 @@ namespace App\Http\Controllers\SuperAdmin;
 
 use App\Http\Controllers\Controller;
 use App\Models\User;
+use App\Services\BusinessNotificationService;
 use App\Models\Guru;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 
 class UserApprovalController extends Controller
 {
@@ -64,25 +66,38 @@ class UserApprovalController extends Controller
 
     public function approve(User $user)
     {
-        $user->update([
-            'approval_status' => 'approved',
-            'approved_at'      => now(),
-            'approved_by'      => Auth::id(),
-            'is_active'        => true,
-        ]);
+            DB::transaction(function () use ($user) {
+                $user = User::whereKey($user->getKey())
+                    ->lockForUpdate()
+                    ->firstOrFail();
+                $wasPendingOrRejected = in_array($user->approval_status, ['pending', 'rejected'], true);
 
-        if (
-            $user->role === 'guru' &&
-            $user->pegawai &&
-            !$user->guru
-        ) {
+                $user->update([
+                    'approval_status' => 'approved',
+                    'approved_at'      => now(),
+                    'approved_by'      => Auth::id(),
+                    'is_active'        => true,
+                ]);
 
-            Guru::create([
-                'user_id' => $user->id,
-                'data_kepegawaian_id' => $user->pegawai->id,
-            ]);
+                if (
+                    $user->role === 'guru' &&
+                    $user->pegawai &&
+                    !$user->guru
+                ) {
+                    Guru::create([
+                        'user_id' => $user->id,
+                        'data_kepegawaian_id' => $user->pegawai->id,
+                    ]);
+                }
 
-        }
+                if (
+                    $wasPendingOrRejected &&
+                    $user->approval_status === 'approved' &&
+                    $user->is_active
+                ) {
+                    app(BusinessNotificationService::class)->notifyAccountApproved($user);
+                }
+            });
 
         return redirect()
             ->route('superadmin.users.pending')

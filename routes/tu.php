@@ -115,19 +115,15 @@ Route::middleware([
                     Route::post('/{kelas_grup}',
                         [KelasController::class, 'storeRombel']
                     )->name('store');
+
+                    Route::get('/{id}/edit', [KelasController::class, 'editRombel'])
+                        ->name('edit');
+                    Route::put('/{id}', [KelasController::class, 'updateRombel'])
+                        ->name('update');
+                    Route::delete('/{id}', [KelasController::class, 'destroy'])
+                        ->name('destroy');
                 });
 
-                // ===== CRUD KELAS =====
-                Route::get('/create', [KelasController::class, 'create'])->name('create');
-                Route::post('/', [KelasController::class, 'store'])->name('store');
-                Route::get('/{id}/edit', [KelasController::class, 'edit'])->name('edit');
-                Route::put('/{id}', [KelasController::class, 'update'])->name('update');
-                Route::delete('/{id}', [KelasController::class, 'destroy'])->name('destroy');
-                Route::get('/{id}/detail', [KelasController::class, 'detail'])->name('detail');
-                Route::post('/{id}/restore', [KelasController::class, 'restore'])->name('restore');
-                Route::delete('/{id}/force-delete', [KelasController::class, 'forceDelete'])->name('forceDelete');
-                Route::post('/bulk', [KelasController::class, 'bulkAction'])->name('bulk');
-                Route::get('/search/ajax', [KelasController::class, 'ajaxSearch'])->name('search');
                 Route::get('/{id}/wali', [KelasController::class, 'wali'])
                     ->name('wali');
             Route::post('/{id}/wali', [KelasController::class, 'storeWali'])

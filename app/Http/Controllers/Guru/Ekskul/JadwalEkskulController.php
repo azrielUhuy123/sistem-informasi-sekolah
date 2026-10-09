@@ -8,7 +8,9 @@ use Illuminate\Http\Request;
 use App\Models\PembinaEkskul;
 use App\Models\HariSekolah;
 use App\Models\PengajuanJadwalEkskul;
+use App\Services\BusinessNotificationService;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 
 class JadwalEkskulController extends Controller
 {
@@ -150,31 +152,43 @@ class JadwalEkskulController extends Controller
         |--------------------------------------------------------------------------
         */
 
-        if (
-            $jadwal->guru_id != $guru->id
-        ) {
-            abort(403);
+        $submission = DB::transaction(function () use ($jadwal, $guru, $request) {
+            $jadwal = PengajuanJadwalEkskul::whereKey($jadwal->getKey())
+                ->lockForUpdate()
+                ->firstOrFail();
+
+            if ($jadwal->guru_id != $guru->id) {
+                abort(403);
+            }
+
+            if (! in_array($jadwal->status, ['draft', 'rejected', 'submitted'], true)) {
+                return false;
+            }
+
+            $isNewSubmission = in_array($jadwal->status, ['draft', 'rejected'], true);
+
+            $jadwal->update([
+                'hari_id' => $request->hari_id,
+                'jam_mulai' => $request->jam_mulai,
+                'jam_selesai' => $request->jam_selesai,
+                'status' => 'submitted',
+                'catatan' => null,
+            ]);
+
+            return $isNewSubmission ? $jadwal : null;
+        });
+
+        if ($submission === false) {
+            return back()->with(
+                'error',
+                'Jadwal tidak dapat diperbarui pada status saat ini.'
+            );
         }
 
-        $jadwal->update([
-
-            'hari_id'     => $request->hari_id,
-
-            'jam_mulai'   => $request->jam_mulai,
-
-            'jam_selesai' => $request->jam_selesai,
-
-            /*
-            |--------------------------------------------------------------------------
-            | KIRIM ULANG KE KEPSEK
-            |--------------------------------------------------------------------------
-            */
-
-            'status'      => 'submitted',
-
-            'catatan'     => null,
-
-        ]);
+        if ($submission instanceof PengajuanJadwalEkskul) {
+            app(BusinessNotificationService::class)
+                ->notifyExtracurricularScheduleSubmitted($submission->ekskul);
+        }
 
         return redirect()
             ->route(
@@ -184,5 +198,25 @@ class JadwalEkskulController extends Controller
                 'success',
                 'Jadwal berhasil diperbarui dan dikirim ulang untuk validasi.'
             );
+    }
+
+    public function destroy(
+        PengajuanJadwalEkskul $jadwal
+    )
+    {
+        $guru = Auth::user()->guru;
+
+        if (
+            $jadwal->guru_id != $guru->id
+        ) {
+            abort(403);
+        }
+
+        $jadwal->delete();
+
+        return back()->with(
+            'success',
+            'Jadwal berhasil dihapus'
+        );
     }
 }

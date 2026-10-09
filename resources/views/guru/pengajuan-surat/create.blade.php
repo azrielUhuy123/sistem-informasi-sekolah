@@ -4,53 +4,23 @@
 
 @section('content')
 
-<div class="container-fluid">
+<div class="container-fluid py-4">
 
-    <div class="d-flex justify-content-between align-items-center mb-4">
+    <div class="card shadow-sm border-0">
+        <div class="card-body">
 
-        <div>
+            <div class="mb-4">
+                <h3 class="text-primary fw-bold text-center mb-1">
+                    Buat Pengajuan Surat
+                </h3>
 
-            <h4 class="fw-bold mb-1">
-                Buat Pengajuan Surat
-            </h4>
+                <p class="text-muted text-center">
+                    Upload draft surat untuk divalidasi kepala sekolah
+                </p>
+            </div>
 
-            <p class="text-muted mb-0">
-                Upload draft surat untuk divalidasi kepala sekolah
-            </p>
-
-        </div>
-
-        <a href="{{ route('guru.pengajuan-surat.index') }}"
-           class="btn btn-secondary rounded-3">
-
-            Kembali
-
-        </a>
-
-    </div>
-
-    {{-- ERROR --}}
-    @if ($errors->any())
-
-        <div class="alert alert-danger">
-
-            <ul class="mb-0">
-
-                @foreach ($errors->all() as $error)
-
-                    <li>{{ $error }}</li>
-
-                @endforeach
-
-            </ul>
-
-        </div>
-
-    @endif
-
-    <div class="card border-0 shadow-sm rounded-4">
-
-        <div class="card-body p-4">
+            {{-- ALERT --}}
+            <x-alert.flash key="error" type="danger"/>
 
             <form action="{{ route('guru.pengajuan-surat.store') }}"
                   method="POST"
@@ -58,7 +28,7 @@
 
                 @csrf
 
-                {{-- KATEGORI --}}
+                {{-- Kategori Surat --}}
                 <div class="mb-3">
 
                     <label class="form-label fw-semibold">
@@ -68,11 +38,13 @@
                     <input type="text"
                            name="kategori_surat"
                            class="form-control"
+                           placeholder="Contoh: Surat Tugas, Surat Edaran, Surat Keputusan"
+                           oninput="this.value = this.value.replace(/\s+/g, ' ').replace(/(^|\s)\S/g, c => c.toUpperCase())"
                            required>
 
                 </div>
 
-                {{-- NAMA SURAT --}}
+                {{-- Nama Surat --}}
                 <div class="mb-3">
 
                     <label class="form-label fw-semibold">
@@ -82,29 +54,30 @@
                     <input type="text"
                            name="nama_surat"
                            class="form-control"
+                           placeholder="Masukkan nama surat"
+                           oninput="this.value = this.value.replace(/\s+/g, ' ').replace(/(^|\s)\S/g, c => c.toUpperCase())"
                            required>
 
                 </div>
 
-                {{-- PERIHAL --}}
-                <div class="mb-4">
+                {{-- Perihal --}}
+                <div class="mb-3">
 
                     <label class="form-label fw-semibold">
                         Perihal
                     </label>
 
-                    <input
-                        type="text"
-                        name="perihal"
-                        class="form-control"
-                        placeholder="Masukkan perihal surat"
-                        required
-                    >
+                    <input type="text"
+                           name="perihal"
+                           class="form-control"
+                           placeholder="Masukkan perihal surat"
+                           oninput="this.value = this.value.replace(/\s+/g, ' ').replace(/(^|\s)\S/g, c => c.toUpperCase())"
+                           required>
 
                 </div>
 
-                {{-- TUJUAN --}}
-                <div class="mb-3">
+                {{-- Tujuan Surat --}}
+                <div class="mb-4">
 
                     <label class="form-label fw-semibold">
                         Tujuan Surat
@@ -113,40 +86,52 @@
                     <input type="text"
                            name="tujuan_surat"
                            class="form-control"
+                           placeholder="Masukkan tujuan surat"
+                           oninput="this.value = this.value.replace(/\s+/g, ' ').replace(/(^|\s)\S/g, c => c.toUpperCase())"
                            required>
 
                 </div>
 
-                {{-- FILE --}}
-                <div class="mb-4">
-
+                {{-- Upload Draft Surat --}}
+                <div class="upload-box">
                     <label class="form-label fw-semibold">
                         Upload Draft Surat
                     </label>
-
                     <input type="file"
                            name="file_surat"
-                           class="form-control"
+                           class="form-control modern-input"
+                           accept=".pdf,.doc,.docx"
                            required>
 
-                    <small class="text-muted">
-                        Format file: PDF, DOC, DOCX
-                    </small>
+                    <div class="upload-info">
+                        <i class="bi bi-file-earmark-arrow-up"></i>
+                        <span>
+                            PDF, DOCX, DOC
+                        </span>
+                    </div>
 
                 </div>
 
-                <button type="submit"
-                        class="btn btn-primary rounded-3 px-4">
+                {{-- BUTTON --}}
+                <div class="d-flex justify-content-between align-items-center mt-4">
 
-                    <i class="bi bi-send-check"></i>
-                    Ajukan Surat
+                    <a href="{{ route('guru.pengajuan-surat.index') }}"
+                       class="btn btn-outline-secondary rounded-3">
+                        <i class="bi bi-chevron-left me-1"></i>
+                        Kembali
+                    </a>
 
-                </button>
+                    <button type="submit"
+                            class="btn btn-primary rounded-3">
+                        Simpan
+                        <i class="bi bi-save ms-1"></i>
+                    </button>
+
+                </div>
 
             </form>
 
         </div>
-
     </div>
 
 </div>
