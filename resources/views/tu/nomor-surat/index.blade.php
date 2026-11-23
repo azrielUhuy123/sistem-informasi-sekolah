@@ -4,23 +4,14 @@
 
 @section('content')
 
-<div class="container-fluid">
+<div class="container-fluid dt-siswa-page">
 
-    {{-- HEADER --}}
-
-    <div class="card border-0 shadow-sm rounded-4 overflow-hidden mb-4">
-        <div class="card-body p-4 p-lg-5 text-white" style="background: linear-gradient(135deg, #0f4c81 0%, #2563eb 100%);">
-            <div class="d-flex flex-column flex-lg-row justify-content-between align-items-lg-center gap-3">
-                <div>
-                    <h3 class="fw-bold mb-2">Data Nomor Surat</h3>
-                    <p class="mb-0 opacity-75">Kelola data nomor surat sekolah</p>
-                </div>
-                <div class="badge bg-white text-primary px-3 py-2 fs-6">
-                    <i class="bi bi-shield-check me-2"></i> Sinergi-MJ
-                </div>
-            </div>
-        </div>
-    </div>
+    <x-table.page-header
+        icon="bi-envelope"
+        eyebrow="Administrasi / Nomor Surat"
+        title="Data Nomor Surat"
+        description="Kelola data nomor surat sekolah."
+    />
 
     {{-- ALERT --}}
     <x-alert.flash key="success" type="success"/>
@@ -31,13 +22,12 @@
     {{-- ================= TABLE ================= --}}
     <x-table.card
         title="Riwayat Nomor Surat"
-        subtitle="Seluruh nomor surat yang pernah dibuat.">
+        subtitle="Seluruh nomor surat yang pernah dibuat."
+        :count="$nomorSurat->total()"
+        count-label="data"
+    >
 
-        <x-slot:badge>
-            <span class="badge bg-primary rounded-pill px-2 py-1">{{ $nomorSurat->count() }}<span class="text-badge"> Nomor</span></span>
-        </x-slot:badge>
-
-        <x-slot:actions>
+        <x-slot:pageActions>
            <form action="{{ route('tu.nomor-surat.generate') }}" method="POST">
                 @csrf
                 <button class="btn btn-primary rounded-3">
@@ -45,16 +35,16 @@
                     Generate Nomor
                 </button>
             </form>
-        </x-slot:actions>
+        </x-slot:pageActions>
 
-        <div class="table-responsive">
-            <table class="table table-hover align-middle mb-0">
+        <div class="table-responsive dt-siswa-table-wrap">
+            <table class="table table-hover align-middle dt-table">
                 <thead>
                     <tr>
-                        <th width="70" class="text-center">No</th>
-                        <th>Nomor Surat</th>
-                        <th width="220">Tanggal Dibuat</th>
-                        <th width="170">Status</th>
+                        <x-table.heading width="70px" class="text-center">No</x-table.heading>
+                        <x-table.heading>Nomor Surat</x-table.heading>
+                        <x-table.heading width="220px">Tanggal Dibuat</x-table.heading>
+                        <x-table.heading width="170px">Status</x-table.heading>
                     </tr>
                 </thead>
 
@@ -88,9 +78,11 @@
                     </tr>
  
                     @empty
-                    <tr>
-                        <td colspan="5" class="text-center text-muted">Belum ada data nomor surat</td>
-                    </tr>
+                        <x-table.empty
+                            :colspan="4"
+                            title="Belum ada data nomor surat"
+                            description="Nomor surat yang pernah dibuat akan ditampilkan di sini."
+                        />
                     @endforelse
                 </tbody>
             </table>

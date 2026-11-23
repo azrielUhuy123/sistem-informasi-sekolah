@@ -22,7 +22,7 @@ Route::middleware('auth')->group(function () {
 Route::get('/{any?}', [GatewayController::class, 'index'])
     ->where(
         'any',
-        '^(?!login|forgot-password|reset-password|dashboard|guru|tu|siswa|superadmin|ppdb).*$'
+        '^(?!((login|forgot-password|reset-password|verify-email|email|confirm-password|profile|dashboard|notifications|guru|tu|siswa|superadmin|ppdb|admin|spmb)(?:/.*)?)).*$'
     )
     ->name('gateway');
 

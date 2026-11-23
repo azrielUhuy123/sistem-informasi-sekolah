@@ -4,31 +4,14 @@
 
 @section('content')
 
-<div class="container-fluid">
+<div class="container-fluid dt-siswa-page">
 
-    {{-- HEADER --}}
-    <div class="card border-0 shadow-sm rounded-4 overflow-hidden mb-4">
-        <div class="card-body p-4 p-lg-5 text-white" style="background: linear-gradient(135deg, #0f4c81 0%, #2563eb 100%);">
-            <div class="d-flex flex-column flex-lg-row justify-content-between align-items-lg-center gap-3">
-
-                <div>
-                    <h3 class="fw-bold mb-2">
-                        Validasi Pengajuan Surat
-                    </h3>
-
-                    <p class="mb-0 opacity-75">
-                        Kelola pengajuan surat dari Tata Usaha maupun Guru
-                        untuk proses validasi Kepala Sekolah.
-                    </p>
-                </div>
-
-                <div class="badge bg-white text-primary px-3 py-2 fs-6">
-                    <i class="bi bi-shield-check me-2"></i> Sinergi-MJ
-                </div>
-
-            </div>
-        </div>
-    </div>
+    <x-table.page-header
+        icon="bi-envelope-check"
+        eyebrow="Administrasi / Surat"
+        title="Validasi Pengajuan Surat"
+        description="Kelola pengajuan surat dari Tata Usaha dan Guru untuk proses validasi Kepala Sekolah."
+    />
 
     {{-- ALERT --}}
     <x-alert.flash key="success" type="success"/>
@@ -38,56 +21,48 @@
     <x-table.card
         title="Daftar Pengajuan Surat"
         subtitle="Seluruh pengajuan surat yang memerlukan proses validasi Kepala Sekolah"
+        :count="$pengajuan->count()"
     >
 
-        <x-slot:badge>
-            <span class="badge bg-primary rounded-pill px-2 py-1">
-                {{ $pengajuan->count() }}
-                <span class="text-badge">Pengajuan Surat</span>
-            </span>
-        </x-slot:badge>
+        <x-slot:toolbar>
+            <x-table.local-toolbar
+                search-id="searchInput"
+                search-label="Cari dokumen"
+                search-placeholder="Cari dokumen..."
+            />
+        </x-slot:toolbar>
 
-        <x-slot:actions>
+        <div class="table-responsive dt-siswa-table-wrap">
 
-            <input
-                type="text"
-                id="searchInput"
-                class="form-control table-search"
-                placeholder="Cari dokumen..."
-            >
-
-        </x-slot:actions>
-
-        <div class="table-responsive">
-
-            <table class="table table-hover align-middle mb-0">
+            <table class="table table-hover align-middle mb-0 dt-table">
+                <caption class="visually-hidden">Daftar pengajuan surat, pengirim, status validasi, dan tindakan</caption>
 
                 <thead>
                     <tr>
 
-                        <th width="70">
+                        <x-table.heading width="70">
                             No
-                        </th>
+                        </x-table.heading>
 
-                        <th>
+                        <x-table.heading>
                             Nama Dokumen
-                        </th>
+                        </x-table.heading>
 
-                        <th width="150">
+                        <x-table.heading width="150">
                             Kategori
-                        </th>
+                        </x-table.heading>
 
-                        <th width="150">
+                        <x-table.heading width="150">
                             Pengirim
-                        </th>
+                        </x-table.heading>
 
-                        <th width="150">
+                        <x-table.heading width="150">
                             Status
-                        </th>
+                        </x-table.heading>
 
-                        <th width="90">
+                        <x-table.heading width="90">
                             Aksi
-                        </th>
+                        </x-table.heading>
 
                     </tr>
                 </thead>
@@ -190,16 +165,11 @@
 
                     @empty
 
-                        <tr>
-
-                            <td
-                                colspan="6"
-                                class="text-center py-4"
-                            >
-                                Belum ada pengajuan surat
-                            </td>
-
-                        </tr>
+                        <x-table.empty
+                            :colspan="6"
+                            title="Belum ada pengajuan surat"
+                            description="Pengajuan surat yang masuk akan tampil di sini."
+                        />
 
                     @endforelse
 

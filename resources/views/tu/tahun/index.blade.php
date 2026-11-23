@@ -4,22 +4,14 @@
 
 @section('content')
 
-<div class="container-fluid">
+<div class="container-fluid dt-siswa-page">
 
-    {{-- HEADER --}}
-    <div class="card border-0 shadow-sm rounded-4 overflow-hidden mb-4">
-        <div class="card-body p-4 p-lg-5 text-white" style="background: linear-gradient(135deg, #0f4c81 0%, #2563eb 100%);">
-            <div class="d-flex flex-column flex-lg-row justify-content-between align-items-lg-center gap-3">
-                <div>
-                    <h3 class="fw-bold mb-2">Manajemen Tahun Ajaran</h3>
-                    <p class="mb-0 opacity-75">Kelola siklus akademik sistem</p>
-                </div>
-                <div class="badge bg-white text-primary px-3 py-2 fs-6">
-                    <i class="bi bi-shield-check me-2"></i> Sinergi-MJ
-                </div>
-            </div>
-        </div>
-    </div>
+    <x-table.page-header
+        icon="bi-calendar3"
+        eyebrow="Data Akademik / Tahun Ajaran"
+        title="Manajemen Tahun Ajaran"
+        description="Kelola siklus akademik sekolah."
+    />
 
     <x-alert.flash key="success" type="success" />
     <x-alert.flash key="error" type="danger" />
@@ -188,29 +180,25 @@ Apakah Anda yakin ingin melanjutkan?"
     <x-table.card
         title="Daftar Tahun Ajaran"
         subtitle="Seluruh Tahun Ajaran yang terdata pada sistem ini"
+        :count="$tahun->total()"
+        count-label="data"
     >
-        <x-slot:badge>
-            <span class="badge bg-primary rounded-pill px-2 py-1">
-                {{ $tahun->count() }} <span class="text-badge">Tahun Ajaran</span>
-            </span>
-        </x-slot:badge>
  
-        <x-slot:actions>
-            <input
-                type="text"
-                id="searchInput"
-                class="form-control table-search"
-                placeholder="Cari Tahun..."
-            >
-        </x-slot:actions>
-        <div class="table-responsive">
-            <table class="table table-hover align-middle mb-0">
+        <x-slot:toolbar>
+            <x-table.local-toolbar
+                search-id="searchInput"
+                search-label="Cari tahun ajaran"
+                search-placeholder="Cari tahun..."
+            />
+        </x-slot:toolbar>
+        <div class="table-responsive dt-siswa-table-wrap">
+            <table class="table table-hover align-middle dt-table">
                 <thead>
                     <tr>
-                        <th width="100">Perubahan</th>
-                        <th>Tahun</th>
-                        <th width="150">Semester</th>
-                        <th width="150">Status</th>
+                        <x-table.heading width="100px">Perubahan</x-table.heading>
+                        <x-table.heading>Tahun</x-table.heading>
+                        <x-table.heading width="150px">Semester</x-table.heading>
+                        <x-table.heading width="150px">Status</x-table.heading>
                         
                     </tr>
                 </thead>
@@ -248,11 +236,11 @@ Apakah Anda yakin ingin melanjutkan?"
                             
                         </tr>
                     @empty
-                        <tr>
-                            <td colspan="4" class="text-center py-4 text-muted">
-                                Belum ada data tahun ajaran
-                            </td>
-                        </tr>
+                        <x-table.empty
+                            :colspan="4"
+                            title="Belum ada data tahun ajaran"
+                            description="Data tahun ajaran belum tersedia."
+                        />
                     @endforelse
                 </tbody>
             </table>  

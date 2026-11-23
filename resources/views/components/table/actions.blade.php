@@ -1,17 +1,36 @@
-<div class="dropdown table-actions">
+@props([
+    'label' => 'Aksi lainnya',
+    'menuId' => null,
+])
+
+@php
+    $menuId = $menuId ?: 'table-actions-menu-' . \Illuminate\Support\Str::uuid();
+    $triggerId = $menuId . '-trigger';
+@endphp
+
+<div {{ $attributes->class(['dropdown table-actions dt-actions']) }}>
 
     <button
+        id="{{ $triggerId }}"
         type="button"
-        class="btn btn-sm btn-outline-primary"
+        class="btn btn-sm btn-outline-primary dt-actions__trigger"
         data-bs-toggle="dropdown"
         data-bs-display="dynamic"
+        aria-label="{{ $label }}"
+        aria-haspopup="true"
+        aria-controls="{{ $menuId }}"
         aria-expanded="false"
+        title="{{ $label }}"
     >
-        <i class="bi bi-gear-fill me-1"></i>
-        <i class="bi bi-caret-down-fill"></i>
+        <i class="bi bi-gear-fill me-1" aria-hidden="true"></i>
+        <i class="bi bi-caret-down-fill" aria-hidden="true"></i>
     </button>
 
-    <ul class="dropdown-menu dropdown-menu-end shadow-sm border-0">
+    <ul
+        id="{{ $menuId }}"
+        class="dropdown-menu dropdown-menu-end shadow-sm border-0 dt-actions__menu"
+        aria-labelledby="{{ $triggerId }}"
+    >
 
         {{ $slot }}
 

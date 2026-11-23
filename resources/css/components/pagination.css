@@ -112,6 +112,45 @@
     font-size: .75rem;
 }
 
+.table-pagination-wrapper.dt-pagination {
+    gap: .75rem;
+    margin-top: .75rem;
+    padding-top: .75rem;
+    border-top: 1px solid #eef2f7;
+}
+
+.dt-pagination .table-pagination-btn {
+    min-width: 2.25rem;
+    width: auto;
+    height: 2.25rem;
+    padding: 0 .5rem;
+    border-radius: .4375rem;
+    font-size: .8125rem;
+}
+
+.dt-pagination .table-pagination-info {
+    font-size: .8125rem;
+}
+
+.dt-pagination .table-pagination-btn:focus-visible {
+    outline: 2px solid #2563eb;
+    outline-offset: 2px;
+}
+
+.dt-pagination-size {
+    display: flex;
+    align-items: center;
+    gap: .5rem;
+    color: #64748b;
+    font-size: .8125rem;
+}
+
+.dt-pagination-size select {
+    width: 4.5rem;
+    min-height: 2.25rem;
+    border-color: #dbe4ee;
+    border-radius: .4375rem;
+}
 
 
 /* =====================================================
@@ -119,6 +158,12 @@
 ===================================================== */
 
 @media (max-width: 576px) {
+
+    .table-pagination-wrapper.dt-pagination {
+        margin-top: .75rem;
+        padding-top: .75rem;
+        gap: .625rem;
+    }
 
     .table-pagination-wrapper {
         flex-direction: column;
@@ -149,5 +194,11 @@
         border-radius: 7px;
 
         font-size: .75rem;
+    }
+
+    .dt-pagination .table-pagination-btn {
+        min-width: 2.25rem;
+        width: auto;
+        height: 2.25rem;
     }
 }

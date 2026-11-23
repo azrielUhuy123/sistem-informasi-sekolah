@@ -4,22 +4,14 @@
 
 @section('content')
 
-<div class="container-fluid">
+<div class="container-fluid dt-siswa-page">
 
-    {{-- HEADER --}}
-    <div class="card border-0 shadow-sm rounded-4 overflow-hidden mb-4">
-        <div class="card-body p-4 p-lg-5 text-white" style="background: linear-gradient(135deg, #0f4c81 0%, #2563eb 100%);">
-            <div class="d-flex flex-column flex-lg-row justify-content-between align-items-lg-center gap-3">
-                <div>
-                    <h3 class="fw-bold mb-2">Data Kepegawaian</h3>
-                    <p class="mb-0 opacity-75">Kelola data pegawai sekolah</p>
-                </div>
-                <div class="badge bg-white text-primary px-3 py-2 fs-6">
-                    <i class="bi bi-shield-check me-2"></i> Sinergi-MJ
-                </div>
-            </div>
-        </div>
-    </div>    
+    <x-table.page-header
+        icon="bi-person-vcard"
+        eyebrow="Data Kepegawaian"
+        title="Data Kepegawaian"
+        description="Kelola data pegawai sekolah."
+    />
 
     {{-- ALERT --}}
     <x-alert.flash key="success" type="success"/>
@@ -29,37 +21,33 @@
     <x-table.card
         title="Daftar Pegawai"
         subtitle="Seluruh pegawai pada SDN Mekar Jaya."
+        :count="$data->count()"
+        count-label="data"
     >
-        <x-slot:badge>
-            <span class="badge bg-primary rounded-pill px-2 py-1">
-                {{ $data->count() }} <span class="text-badge">Pegawai</span>
-            </span>
-        </x-slot:badge>
 
-        <x-slot:actions>            
-            <input
-                type="text"
-                id="searchInput"
-                class="form-control table-search"
-                placeholder="Cari pegawai..."                
-            > 
-            <x-button.add
-                :href="route('tu.datakepegawaian.create')"
-                label="Tambah Pegawai"
-            />            
+        <x-slot:toolbar>
+            <x-table.local-toolbar
+                search-id="searchInput"
+                search-label="Cari pegawai"
+                search-placeholder="Cari pegawai..."
+            >
+                <x-button.add
+                    :href="route('tu.datakepegawaian.create')"
+                    label="Tambah Pegawai"
+                />
+            </x-table.local-toolbar>
+        </x-slot:toolbar>
 
-        </x-slot:actions>
-
-        <div class="table-responsive">
-            <table class="table table-hover align-middle mb-0">
+        <div class="table-responsive dt-siswa-table-wrap">
+            <table class="table table-hover align-middle dt-table">
                 <thead>
                     <tr> 
-                        <th width="70">No</th>
-                        <th>Nama Pegawai & NIP</th>
-                        <th width="150">Status</th>
-                        <th width="150">Akun</th>
-                        <th width="150">Pesan</th>
-                        <th width="90">Aksi</th>
+                        <x-table.heading width="70px">No</x-table.heading>
+                        <x-table.heading>Nama Pegawai &amp; NIP</x-table.heading>
+                        <x-table.heading width="150px">Status</x-table.heading>
+                        <x-table.heading width="150px">Akun</x-table.heading>
+                        <x-table.heading width="150px">Pesan</x-table.heading>
+                        <x-table.heading width="90px">Aksi</x-table.heading>
                     </tr>
                 </thead>
                 <tbody id="tablePegawai">
@@ -175,15 +163,11 @@
                             </td>
                         </tr>
                     @empty
-                        <tr>
-                            <td colspan="5">
-                                <div class="text-center py-5">
-                                    <i class="bi bi-folder2-open display-3 text-secondary"></i>
-                                    <h5 class="fw-bold mt-3">Belum Ada Pegawai Yang Terdaftar</h5>
-                                    <p class="text-muted mb-0">Saat ini belum ada pegawai yang terdaftar pada sekolah ini</p>
-                                </div>
-                            </td>
-                        </tr>
+                        <x-table.empty
+                            :colspan="6"
+                            title="Belum ada pegawai yang terdaftar"
+                            description="Saat ini belum ada pegawai yang terdaftar pada sekolah ini."
+                        />
                     @endforelse
                 </tbody>
             </table>    

@@ -4,22 +4,14 @@
 
 @section('content')
 
-<div class="container-fluid">
+<div class="container-fluid dt-siswa-page">
 
-    {{-- HEADER --}}
-    <div class="card border-0 shadow-sm rounded-4 overflow-hidden mb-4">
-        <div class="card-body p-4 p-lg-5 text-white" style="background: linear-gradient(135deg, #0f4c81 0%, #2563eb 100%);">
-            <div class="d-flex flex-column flex-lg-row justify-content-between align-items-lg-center gap-3">
-                <div>
-                    <h3 class="fw-bold mb-2">Manajemen Akun</h3>
-                    <p class="mb-0 opacity-75">Kelola akun pengguna sistem</p>
-                </div>
-                <div class="badge bg-white text-primary px-3 py-2 fs-6">
-                    <i class="bi bi-shield-check me-2"></i> Sinergi-MJ
-                </div>
-            </div>
-        </div>
-    </div>
+    <x-table.page-header
+        icon="bi-person-gear"
+        eyebrow="Administrasi / Akun"
+        title="Manajemen Akun"
+        description="Kelola akun pengguna sistem."
+    />
     
     {{-- ALERT --}}
     <x-alert.flash key="success" type="success"/>
@@ -30,65 +22,58 @@
     <x-table.card
         title="Daftar Pengguna Sistem"
         subtitle="Seluruh pengguna sistem yang terdaftar."
+        :count="$data->total()"
+        count-label="data"
     >
-        <x-slot:badge>
-            <span class="badge bg-primary rounded-pill px-2 py-1">
-                {{ $data->total() }} <span class="text-badge">Pengguna</span>
-            </span>
-        </x-slot:badge>
-
-        <x-slot:actions>
-            <div class="d-flex flex-column align-items-center gap-2">
+        <x-slot:toolbar>
+            <x-table.local-toolbar
+                search-id="searchInput"
+                search-label="Cari pengguna"
+                search-placeholder="Cari pengguna..."
+            >
                 <form action="{{ route('tu.akun.index') }}" method="GET" class="akun-filter-form">
-                    <select
-                        name="role"
-                        class="form-control akun-filter-status"                        
-                    >
+                    <select name="role" class="form-control akun-filter-status" aria-label="Filter role pengguna">
                         <option value="">Semua Role</option>
-                        <option value="guru" @selected(request('role') == 'guru')>
-                            Guru
-                        </option>
-                        <option value="siswa" @selected(request('role') == 'siswa')>
-                            Siswa
-                        </option>
+                        <option value="guru" @selected(request('role') == 'guru')>Guru</option>
+                        <option value="siswa" @selected(request('role') == 'siswa')>Siswa</option>
                     </select>
-                    <select
-                        name="status"
-                        class="form-control akun-filter-status"                        
-                    >
+                    <select name="status" class="form-control akun-filter-status" aria-label="Filter status akun">
                         <option value="">Semua Status</option>
-                        <option value="1" @selected(request('status') === '1')>
-                            Aktif
-                        </option>
-                        <option value="0" @selected(request('status') === '0')>
-                            Nonaktif
-                        </option>
+                        <option value="1" @selected(request('status') === '1')>Aktif</option>
+                        <option value="0" @selected(request('status') === '0')>Nonaktif</option>
                     </select>
-                    <button class="btn btn-primary rounded-3" type="submit">
-                        Filter
-                    </button>
+                    <button class="btn btn-primary dt-toolbar__button" type="submit">Filter</button>
                 </form>
-                <input
-                    type="text"
-                    id="searchInput"
-                    class="form-control akun-filter-search"
-                    placeholder="Cari pengguna..."                   
-                >
-            </div>
+            </x-table.local-toolbar>
+        </x-slot:toolbar>
 
-        </x-slot:actions>
+        <x-table.chips
+            :criteria="[
+                [
+                    'name' => 'role',
+                    'label' => 'Role',
+                    'value' => request('role'),
+                ],
+                [
+                    'name' => 'status',
+                    'label' => 'Status',
+                    'value' => request('status'),
+                    'display' => request('status') === '1'
+                        ? 'Aktif'
+                        : (request('status') === '0' ? 'Nonaktif' : request('status')),
+                ],
+            ]"
+        />
 
-        <div class="table-responsive">
-            <table class="table table-hover align-middle mb-0">
+        <div class="table-responsive dt-siswa-table-wrap">
+            <table class="table table-hover align-middle dt-table">
                 <thead>
                     <tr>
-                        <th width="70">No</th>
-                        <th>Nama & Username</th>
-                        <th width="150">Role</th>
-                        <th width="150">Status</th>
-                        <th width="90">
-                            Aksi
-                        </th>
+                        <x-table.heading width="70px">No</x-table.heading>
+                        <x-table.heading>Nama &amp; Username</x-table.heading>
+                        <x-table.heading width="150px">Role</x-table.heading>
+                        <x-table.heading width="150px">Status</x-table.heading>
+                        <x-table.heading width="90px">Aksi</x-table.heading>
                     </tr>
                 </thead>
                 <tbody id="tablePengguna">
@@ -178,20 +163,25 @@
                             </td>
                         </tr>
                     @empty
-                        <tr>
-                            <td colspan="5">
-                                <div class="text-center py-5">
-                                    <i class="bi bi-folder2-open display-3 text-secondary"></i>
-                                    <h5 class="fw-bold mt-3">Belum Ada Pengguna</h5>
-                                    <p class="text-muted mb-0">Saat ini belum ada pengguna dari sistem ini.</p>
-                                </div>
-                            </td>
-                        </tr>
+                        @if (request()->filled('role') || request()->filled('status'))
+                            <x-table.empty
+                                :colspan="5"
+                                state="no-results"
+                                title="Tidak ada pengguna yang cocok"
+                                description="Ubah role atau status, lalu coba lagi."
+                            />
+                        @else
+                            <x-table.empty
+                                :colspan="5"
+                                title="Belum ada pengguna"
+                                description="Saat ini belum ada pengguna dari sistem ini."
+                            />
+                        @endif
                     @endforelse
                 </tbody>
             </table>
         </div>
-        {{ $data->links() }}
+        <x-table.pagination :paginator="$data->appends(request()->query())" :show-summary="true" />
     </x-table.card>
 </div>
 {{-- SEARCH --}}

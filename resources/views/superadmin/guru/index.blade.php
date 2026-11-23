@@ -4,59 +4,42 @@
 
 @section('content')
 
-<div class="container-fluid">
+<div class="container-fluid dt-siswa-page">
 
-    {{-- HEADER --}}
-    <div class="card border-0 shadow-sm rounded-4 overflow-hidden mb-4">
-        <div class="card-body p-4 p-lg-5 text-white" style="background: linear-gradient(135deg, #0f4c81 0%, #2563eb 100%);">
-            <div class="d-flex flex-column flex-lg-row justify-content-between align-items-lg-center gap-3">
-                <div>
-                    <h3 class="fw-bold mb-2">Guru & Wali Kelas</h3>
-                    <p class="mb-0 opacity-75">
-                        Kelola data guru dan wali kelas sekolah.
-                    </p>
-                </div>
-
-                <div class="badge bg-white text-primary px-3 py-2 fs-6">
-                    <i class="bi bi-shield-check me-2"></i> Sinergi-MJ
-                </div>
-            </div>
-        </div>
-    </div>
+    <x-table.page-header
+        icon="bi-person-workspace"
+        eyebrow="Data Akademik / Guru"
+        title="Guru & Wali Kelas"
+        description="Kelola data guru dan wali kelas sekolah."
+    />
 
     {{-- TABLE --}}
     <x-table.card
         title="Daftar Guru"
         subtitle="Daftar seluruh guru pada SDN Mekar Jaya"
+        :count="$gurus->count()"
     >
 
-        <x-slot:badge>
-            <span class="badge bg-primary rounded-pill px-2 py-1">
-                {{ $gurus->count() }}
-                <span class="text-badge">Guru</span>
-            </span>
-        </x-slot:badge>
+        <x-slot:toolbar>
+            <x-table.local-toolbar
+                search-id="searchInput"
+                search-label="Cari guru"
+                search-placeholder="Cari guru..."
+            />
+        </x-slot:toolbar>
 
-        <x-slot:actions>
-            <input
-                type="text"
-                id="searchInput"
-                class="form-control table-search"
-                placeholder="Cari guru..."                
-            >
-        </x-slot:actions>
-
-        <div class="table-responsive">
-            <table class="table table-hover align-middle mb-0">
+        <div class="table-responsive dt-siswa-table-wrap">
+            <table class="table table-hover align-middle dt-table">
+                <caption class="visually-hidden">Daftar seluruh guru</caption>
 
                 <thead>
                     <tr>
-                        <th width="70">No</th>
-                        <th>Nama Guru</th>
-                        <th width="200">Status Akademik</th>
-                        <th width="500">Mata Pelajaran</th>
-                        <th width="100">Total Kelas</th>
-                        <th width="130">Aksi</th>
+                        <x-table.heading width="70px">No</x-table.heading>
+                        <x-table.heading>Nama Guru</x-table.heading>
+                        <x-table.heading width="200px">Status Akademik</x-table.heading>
+                        <x-table.heading width="500px">Mata Pelajaran</x-table.heading>
+                        <x-table.heading width="100px">Total Kelas</x-table.heading>
+                        <x-table.heading width="130px">Aksi</x-table.heading>
                     </tr>
                 </thead>
 
@@ -187,15 +170,11 @@
 
                     @empty
 
-                        <tr>
-                            <td colspan="6" class="text-center py-5">
-                                <i class="bi bi-person-x display-5 text-secondary"></i>
-
-                                <p class="mt-3 mb-0 text-muted">
-                                    Belum ada data guru.
-                                </p>
-                            </td>
-                        </tr>
+                        <x-table.empty
+                            :colspan="6"
+                            title="Belum ada data guru."
+                            description=""
+                        />
 
                     @endforelse
 

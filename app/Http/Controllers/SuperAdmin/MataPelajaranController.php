@@ -9,19 +9,24 @@ use Illuminate\Http\Request;
 class MataPelajaranController extends Controller
 {
     /**
-     * INDEX — Sorting + Search + Pagination + Deleted Filter
+     * Index with search and the legacy status query parameter.
      */
     public function index(Request $request)
     {
-        $deleted = $request->deleted ?? 'active';
+        $deleted = $request->query('deleted', 'active');
 
-        if ($deleted === 'only') {
-            $query = MataPelajaran::onlyTrashed();
-        } elseif ($deleted === 'all') {
-            $query = MataPelajaran::withTrashed();
-        } else {
-            $query = MataPelajaran::query();
+        if ($deleted === '') {
+            $deleted = 'all';
         }
+
+        if (! in_array($deleted, ['active', 'all'], true)) {
+            $query = $request->query();
+            $query['deleted'] = 'active';
+
+            return redirect()->route('superadmin.mapel.index', $query);
+        }
+
+        $query = MataPelajaran::query();
 
         // SEARCH
         if ($request->filled('q')) {
@@ -51,7 +56,7 @@ class MataPelajaranController extends Controller
             ];
         })->values();
 
-        return view('superadmin.mapel.index', compact('mata_pelajaran'));
+        return view('superadmin.mapel.index', compact('mata_pelajaran', 'deleted'));
     }
     /**
      * CREATE PAGE
@@ -121,7 +126,7 @@ class MataPelajaranController extends Controller
     }
 
     /**
-     * SOFT DELETE
+     * Delete a subject permanently.
      */
     public function destroy($id)
     {
@@ -129,31 +134,29 @@ class MataPelajaranController extends Controller
 
         return redirect()
             ->route('superadmin.mapel.index')
-            ->with('success', 'Mata pelajaran dipindahkan ke trash.');
+            ->with('success', 'Mata pelajaran berhasil dihapus permanen.');
     }
 
     /**
-     * RESTORE
+     * Subjects are physically deleted and cannot be restored.
      */
     public function restore($id)
     {
-        MataPelajaran::withTrashed()->findOrFail($id)->restore();
-
-        return back()->with('success', 'Mata pelajaran berhasil direstore.');
+        return back()->with('error', 'Mata pelajaran yang telah dihapus permanen tidak dapat dipulihkan.');
     }
 
     /**
-     * FORCE DELETE
+     * Delete a subject permanently.
      */
     public function forceDelete($id)
     {
-        MataPelajaran::withTrashed()->findOrFail($id)->forceDelete();
+        MataPelajaran::findOrFail($id)->delete();
 
         return back()->with('success', 'Mata pelajaran berhasil dihapus permanen.');
     }
 
     /**
-     * BULK ACTION — delete | restore | forceDelete
+     * Bulk permanently delete subjects.
      */
     public function bulkAction(Request $request)
     {
@@ -165,20 +168,15 @@ class MataPelajaranController extends Controller
 
         $ids = $request->ids;
 
-        if ($request->action === 'delete') {
-            MataPelajaran::whereIn('id', $ids)->delete();
-            return response()->json(['message' => 'Mapel berhasil dihapus (soft delete).']);
-        }
-
         if ($request->action === 'restore') {
-            MataPelajaran::onlyTrashed()->whereIn('id', $ids)->restore();
-            return response()->json(['message' => 'Mapel berhasil direstore.']);
+            return response()->json([
+                'message' => 'Mata pelajaran yang telah dihapus permanen tidak dapat dipulihkan.',
+            ], 422);
         }
 
-        if ($request->action === 'forceDelete') {
-            MataPelajaran::onlyTrashed()->whereIn('id', $ids)->forceDelete();
-            return response()->json(['message' => 'Mapel berhasil dihapus permanen.']);
-        }
+        MataPelajaran::whereIn('id', $ids)->delete();
+
+        return response()->json(['message' => 'Mata pelajaran berhasil dihapus permanen.']);
     }
 
     /**

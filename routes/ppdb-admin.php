@@ -9,7 +9,8 @@ use App\Http\Controllers\PPDB\LaporanController;
 
 Route::middleware([
         'auth',
-        'role:tu'
+        'role:guru',
+        'feature:tu.ppdb'
     ])
     ->prefix('tu/ppdb')
     ->name('tu.ppdb.')

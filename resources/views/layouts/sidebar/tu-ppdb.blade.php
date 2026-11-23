@@ -1,5 +1,6 @@
 @php
     $tahun = current_tahun();
+    $canPpdb = auth()->user()->hasFeature('tu.ppdb');
 @endphp
 
 <div class="sidebar">
@@ -15,6 +16,7 @@
     </div>
 
     {{-- DASHBOARD PPDB --}}
+    @if($canPpdb)
     <a
         class="menu-item
         {{ request()->is('tu.ppdb/dashboard*') ? 'active' : '' }}"
@@ -34,8 +36,10 @@
         </div>
 
     </a>
+    @endif
 
     {{-- PPDB --}}
+    @if($canPpdb)
     <button
         class="menu-item border-0 bg-transparent text-start"
         onclick="toggleMenu('menuPpdb','arrowPpdb')"
@@ -158,8 +162,10 @@
 
 
     </div>
+    @endif
 
     {{-- PENGATURAN --}}
+    @if($canPpdb)
     <button
         class="menu-item border-0 bg-transparent text-start"
         onclick="toggleMenu('menuPengaturanPpdb','arrowPengaturanPpdb')"
@@ -176,6 +182,7 @@
             </span>
 
         </div>
+        @endif
 
         <i
             class="bi bi-chevron-right dropdown-arrow"

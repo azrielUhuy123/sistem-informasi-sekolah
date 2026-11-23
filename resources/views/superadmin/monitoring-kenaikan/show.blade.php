@@ -4,21 +4,14 @@
 
 @section('content')
 
-<div class="container-fluid">
+<div class="container-fluid dt-siswa-page">
 
-    <div class="card border-0 shadow-sm rounded-4 overflow-hidden mb-4">
-        <div class="card-body p-4 p-lg-5 text-white" style="background: linear-gradient(135deg, #0f4c81 0%, #2563eb 100%);">
-            <div class="d-flex flex-column flex-lg-row justify-content-between align-items-lg-center gap-3">
-                <div>
-                    <h3 class="fw-bold mb-2">Monitoring Kenaikan Kelas</h3>
-                    <p class="mb-0 opacity-75">Monitoring hasil pengajuan kenaikan kelas yang diajukan oleh wali kelas.</p>
-                </div>
-                <div class="badge bg-white text-primary px-3 py-2 fs-6">
-                    <i class="bi bi-shield-check me-2"></i> Sinergi-MJ
-                </div>
-            </div>
-        </div>
-    </div>
+    <x-table.page-header
+        icon="bi-mortarboard"
+        eyebrow="Monitoring / Kenaikan Kelas"
+        title="Monitoring Kenaikan Kelas"
+        description="Monitoring hasil pengajuan kenaikan kelas yang diajukan oleh wali kelas."
+    />
 
     {{-- ALERT --}}
     <x-alert.flash key="success" type="success"/>
@@ -70,11 +63,10 @@
     <x-table.card
         title="Kelas {{ $kelas->nama_kelas_label }}"
         subtitle="Wali Kelas : {{ $kelas->waliKelas?->guru?->pegawai?->nama ?? '-' }}"
+        :count="$totalSiswa"
+        count-label="siswa"
     >
         <x-slot:badge>
-            <span class="badge bg-primary rounded-pill px-2 py-1">
-                {{ $totalSiswa }} <span class="text-badge">Siswa</span>
-            </span>  
             <span class="badge bg-success rounded-pill px-2 py-1">
                 {{ $jumlahNaik }} <span class="text-badge">Naik Kelas</span>
             </span>           
@@ -84,16 +76,52 @@
             </span>            
         </x-slot:badge>         
 
-        <div class="table-responsive">            
-                <table class="table table-hover align-middle mb-0">
+        <x-slot:toolbar>
+            <x-table.toolbar
+                table-id="monitoring-kenaikan-table"
+                :column-toggle="true"
+                :refreshable="true"
+                :refresh-url="request()->fullUrl()"
+            >
+                <x-slot:columnMenu>
+                    <label class="dt-column-menu__option">
+                        <input type="checkbox" data-dt-column="absen">
+                        <span>Absen</span>
+                    </label>
+                    <label class="dt-column-menu__option">
+                        <input type="checkbox" data-dt-column="siswa">
+                        <span>Nama Siswa</span>
+                    </label>
+                    <label class="dt-column-menu__option">
+                        <input type="checkbox" data-dt-column="keputusan">
+                        <span>Keputusan</span>
+                    </label>
+                    <label class="dt-column-menu__option">
+                        <input type="checkbox" data-dt-column="catatan_wali">
+                        <span>Catatan Wali Kelas</span>
+                    </label>
+                    <label class="dt-column-menu__option">
+                        <input type="checkbox" data-dt-column="status_approval">
+                        <span>Status Approval</span>
+                    </label>
+                    <label class="dt-column-menu__option">
+                        <input type="checkbox" data-dt-column="catatan_kepsek">
+                        <span>Catatan Kepala Sekolah</span>
+                    </label>
+                </x-slot:columnMenu>
+            </x-table.toolbar>
+        </x-slot:toolbar>
+
+        <div class="table-responsive dt-siswa-table-wrap">
+                <table id="monitoring-kenaikan-table" class="table table-hover align-middle mb-0 dt-table" data-dt-table>
                     <thead>
                         <tr>
-                            <th width="70">Absen</th>
-                            <th>Nama Siswa</th>
-                            <th>Keputusan</th>
-                            <th>Catatan Wali Kelas</th>
-                            <th width="150">Status Approval</th>
-                            <th>Catatan Kepala Sekolah</th>                            
+                            <x-table.heading column="absen" width="70">Absen</x-table.heading>
+                            <x-table.heading column="siswa">Nama Siswa</x-table.heading>
+                            <x-table.heading column="keputusan">Keputusan</x-table.heading>
+                            <x-table.heading column="catatan_wali">Catatan Wali Kelas</x-table.heading>
+                            <x-table.heading column="status_approval" width="150">Status Approval</x-table.heading>
+                            <x-table.heading column="catatan_kepsek">Catatan Kepala Sekolah</x-table.heading>
                         </tr>
                     </thead>
                     <tbody>
@@ -109,12 +137,12 @@
                                 $keputusanBadge = $item->status_keputusan === 'naik' ? 'bg-success' : 'bg-danger';
                             @endphp
                             <tr>
-                                <td>
+                                <td data-dt-column="absen">
                                     <span class="badge bg-light text-dark rounded-circle">
                                         {{ $loop->iteration }}
                                     </span>
                                 </td>
-                                <td>
+                                <td data-dt-column="siswa">
                                     <div class="d-flex align-items-center">
                                         <div class="rounded-circle bg-primary-subtle text-primary d-flex align-items-center justify-content-center me-3" style="width: 48px; height: 48px;">
                                             <i class="bi bi-person-fill fs-4"></i>
@@ -130,7 +158,7 @@
                                         </div>
                                     </div>
                                 </td>
-                                <td>
+                                <td data-dt-column="keputusan">
                                     @if(($item->status ?? '') === 'naik')
                                         <span class="badge-status aktif">Naik Kelas</span>
                                     @elseif(($item->status ?? '') === 'tinggal')
@@ -139,10 +167,10 @@
                                         <span class="badge bg-secondary px-3 py-2">-</span>
                                     @endif
                                 </td>
-                                <td>
+                                <td data-dt-column="catatan_wali">
                                     {{ $item->catatan ?? '-' }}
                                 </td>
-                                <td>
+                                <td data-dt-column="status_approval">
                                     <span class="badge {{ $statusBadge }} rounded-pill px-2 py-1">
                                         {{ match ($item->approval_status ?? 'draft') {
                                             'pending' => 'Menunggu Persetujuan',
@@ -152,7 +180,7 @@
                                         } }}
                                     </span>
                                 </td>
-                                <td>
+                                <td data-dt-column="catatan_kepsek">
                                     {{ $item->catatan_kepsek ?? '-' }}
                                 </td>                                
                             </tr>

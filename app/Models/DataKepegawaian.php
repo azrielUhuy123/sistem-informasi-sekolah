@@ -91,4 +91,9 @@ class DataKepegawaian extends Model
             'pegawai_id'
         );
     }
+
+    public function penugasans()
+    {
+        return $this->hasMany(Penugasan::class, 'data_kepegawaian_id');
+    }
 }

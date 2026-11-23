@@ -41,16 +41,14 @@
             </li>
 
             <li>
-
-                <a
-                    class="dropdown-item"
-                    href="{{ route('tu.switch-mode', 'ppdb') }}"
-                >
-
-                    PPDB
-
-                </a>
-
+                @if(auth()->user()->hasFeature('tu.ppdb'))
+                    <a
+                        class="dropdown-item"
+                        href="{{ route('tu.switch-mode', 'ppdb') }}"
+                    >
+                        PPDB
+                    </a>
+                @endif
             </li>
 
         </ul>

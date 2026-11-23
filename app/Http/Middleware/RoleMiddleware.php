@@ -21,6 +21,9 @@ class RoleMiddleware
         }
 
         $allowedRoles = array_map('trim', explode(',', $roles));
+        if (in_array('guru', $allowedRoles, true) && $request->user()->role === 'tu') {
+            $allowedRoles[] = 'tu';
+        }
 
         if (! in_array($request->user()->role, $allowedRoles)) {
             return redirect($request->user()->getDashboardUrl());

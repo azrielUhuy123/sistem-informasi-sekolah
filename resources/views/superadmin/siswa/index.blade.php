@@ -3,183 +3,194 @@
 @section('title', 'Manajemen Data Siswa')
 
 @section('content')
-<div class="container-fluid">
-    {{-- HEADER --}}
-    <div class="card border-0 shadow-sm rounded-4 overflow-hidden mb-4">
-        <div class="card-body p-4 p-lg-5 text-white" style="background: linear-gradient(135deg, #0f4c81 0%, #2563eb 100%);">
-            <div class="d-flex flex-column flex-lg-row justify-content-between align-items-lg-center gap-3">
-                <div>
-                    <h3 class="fw-bold mb-2">Data Siswa</h3>
-                    <p class="mb-0 opacity-75">Daftar seluruh data siswa sekolah</p>
-                </div>
-                <div class="badge bg-white text-primary px-3 py-2 fs-6">
-                    <i class="bi bi-shield-check me-2"></i> Sinergi-MJ
-                </div>
-            </div>
+<div class="container-fluid dt-siswa-page">
+    <header class="dt-siswa-page-header">
+        <div>
+            <p class="dt-siswa-eyebrow">
+                <i class="bi bi-people-fill" aria-hidden="true"></i>
+                Direktori siswa
+            </p>
+            <h1 class="dt-siswa-page-title">Data Siswa</h1>
+            <p class="dt-siswa-page-description">Telusuri data siswa, rombongan belajar, dan status keaktifan.</p>
         </div>
-    </div>
+    </header>
 
-    <x-alert.flash key="success" type="success"/>
-    <x-alert.flash key="error" type="danger"/>
+    <x-alert.flash key="success" type="success" />
+    <x-alert.flash key="error" type="danger" />
 
     <x-table.card
-        title="Daftar Seluruh Siswa"
-        subtitle="Seluruh data siswa pada SDN Mekar Jaya">
-        <x-slot:badge>
-            <span class="badge bg-primary rounded-pill px-2 py-1">
-                {{ $siswa->total() }} <span class="text-badge">siswa</span>
-            </span>
-        </x-slot:badge>
+        title="Daftar Siswa"
+        subtitle="Informasi siswa dan penempatan aktif"
+        :count="$siswa->total()"
+        count-label="data"
+    >
+        <x-slot:toolbar>
+            <x-table.toolbar
+                table-id="dt-siswa-table"
+                action="{{ route('superadmin.siswa.index') }}"
+                :searchable="true"
+                search-name="search"
+                search-value="{{ request('search') }}"
+                search-label="Cari nama atau NIS siswa"
+                search-placeholder="Nama atau NIS"
+                filter-name="status"
+                filter-value="{{ request('status') }}"
+                filter-label="Status"
+                filter-menu-title="Filter status"
+                :filter-options="[
+                    ['value' => 'aktif', 'label' => 'Aktif'],
+                    ['value' => 'nonaktif', 'label' => 'Nonaktif'],
+                ]"
+                :column-toggle="true"
+                :refreshable="true"
+                refresh-url="{{ request()->fullUrl() }}"
+            >
+                <x-slot:columnMenu>
+                    @foreach ([
+                        'no' => 'No',
+                        'name' => 'Siswa',
+                        'nisn' => 'NISN',
+                        'class' => 'Rombel',
+                        'year' => 'Angkatan',
+                        'status' => 'Status',
+                        'action' => 'Aksi',
+                    ] as $column => $label)
+                        <label class="dt-column-menu__option">
+                            <input type="checkbox" data-dt-column="{{ $column }}" checked>
+                            <span>{{ $label }}</span>
+                        </label>
+                    @endforeach
+                </x-slot:columnMenu>
+            </x-table.toolbar>
+        </x-slot:toolbar>
 
-        <x-slot:actions>
-            <div class="d-flex flex-column align-items-end gap-2">
-                {{-- FILTER --}}
-                <form
-                    action="{{ route('superadmin.siswa.index') }}"
-                    method="GET"
-                    class="siswa-filter-form"
-                >
-                    <select
-                        name="status" 
-                        class="form-control siswa-filter-status"                        
-                    >
-                        <option value="">Semua Status</option>
-                        <option
-                            value="aktif"
-                            @selected(request('status')=='aktif')
-                        >
-                            Aktif
-                        </option>
-                        <option
-                            value="nonaktif"
-                            @selected(request('status')=='nonaktif')
-                        >
-                            Nonaktif
-                        </option>
-                    </select>
-                    {{-- SEARCH --}}
-                    <input
-                        type="text"
-                        id="search"
-                        name="search"
-                        class="form-control siswa-filter-search"
-                        placeholder="Cari Nama / NIS..."
-                        value="{{ request('search') }}"
-                    >
-                    <button
-                        type="submit"
-                        class="btn btn-primary rounded-3"
-                    >
-                        <i class="bi bi-funnel me-1"></i>
-                        Filter
-                    </button>
-                    @if(request()->filled('status') || request()->filled('search'))
-                        <a
-                            href="{{ route('superadmin.siswa.index') }}"
-                            class="btn btn-outline-secondary rounded-3"
-                        >
-                            Reset
-                        </a>
-                    @endif
-                </form>
-                
-            </div>
-        </x-slot:actions>
-                    
-        <div class="table-responsive">
-            <table class="table table-hover align-middle mb-0">
+        <x-table.chips
+            :criteria="[
+                ['name' => 'search', 'label' => 'Search', 'value' => request('search')],
+                [
+                    'name' => 'status',
+                    'label' => 'Status',
+                    'value' => in_array(request('status'), ['aktif', 'nonaktif'], true) ? request('status') : null,
+                    'display' => request('status') === 'aktif' ? 'Aktif' : 'Nonaktif',
+                ],
+            ]"
+        />
+
+        <p class="dt-siswa-scroll-hint" aria-hidden="true">
+            <i class="bi bi-arrow-left-right me-1"></i>
+            Geser tabel ke samping untuk melihat kolom lainnya.
+        </p>
+
+        <div
+            class="table-responsive dt-siswa-table-wrap"
+            role="region"
+            aria-label="Daftar data siswa"
+            tabindex="0"
+        >
+            <table id="dt-siswa-table" class="table table-hover align-middle dt-table dt-siswa-table">
+                <caption class="visually-hidden">Data siswa, nomor induk, penempatan, status, dan tautan detail</caption>
+                <colgroup>
+                    <col class="dt-siswa-col-number" data-dt-column="no">
+                    <col class="dt-siswa-col-name" data-dt-column="name">
+                    <col class="dt-siswa-col-nisn" data-dt-column="nisn">
+                    <col class="dt-siswa-col-class" data-dt-column="class">
+                    <col class="dt-siswa-col-year" data-dt-column="year">
+                    <col class="dt-siswa-col-status" data-dt-column="status">
+                    <col class="dt-siswa-col-action" data-dt-column="action">
+                </colgroup>
                 <thead>
-                    <tr>                            
-                        <th width="70">No</th>
-                        <th>Nama</th>
-                        <th width="150">NISN</th>
-                        <th width="150">Rombel</th>
-                        <th width="150">Angkatan</th>
-                        <th width="150">Status</th>
-                        <th width="90">Aksi</th>
+                    <tr>
+                        <x-table.heading class="text-center" width="4rem" column="no">No</x-table.heading>
+                        <x-table.heading width="21rem" column="name">Siswa</x-table.heading>
+                        <x-table.heading width="8.5rem" column="nisn">NISN</x-table.heading>
+                        <x-table.heading width="8rem" column="class">Rombel</x-table.heading>
+                        <x-table.heading width="7.5rem" column="year">Angkatan</x-table.heading>
+                        <x-table.heading width="8rem" column="status">Status</x-table.heading>
+                        <x-table.heading class="text-center" width="7.5rem" column="action">Aksi</x-table.heading>
                     </tr>
                 </thead>
                 <tbody id="tableSiswa">
                     @forelse ($siswa as $row)
-                        <tr>                                
-                            <td>
-                                <span class="badge bg-light text-dark rounded-circle">
-                                    {{ $loop->iteration + ($siswa->currentPage()-1) * $siswa->perPage() }}
-                                </span>
+                        <tr>
+                            <td class="dt-siswa-row-number" data-dt-column="no">
+                                {{ $loop->iteration + ($siswa->currentPage() - 1) * $siswa->perPage() }}
                             </td>
-                            <td>
-                                <div class="d-flex align-items-center">
-                                    <div class="rounded-circle bg-primary-subtle text-primary d-flex align-items-center justify-content-center me-3" style="width: 48px; height: 48px;">
-                                        <i class="bi bi-person-fill fs-4"></i>
-                                    </div>
-                                    <div>
-                                        <div class="fw-semibold">
-                                            {{ $row->nama }}
-                                        </div>
-                                        <small class="text-muted">
-                                            NIS : {{ $row->nis }}
-                                        </small>
-                                    </div>
+                            <th scope="row" class="dt-siswa-identity-cell" data-dt-column="name">
+                                <div class="dt-siswa-identity">
+                                    <span class="dt-siswa-avatar" aria-hidden="true">
+                                        <i class="bi bi-person-fill"></i>
+                                    </span>
+                                    <span class="dt-siswa-identity-copy">
+                                        <span class="dt-siswa-name">{{ $row->nama }}</span>
+                                        <span class="dt-siswa-meta">NIS {{ $row->nis }}</span>
+                                    </span>
                                 </div>
+                            </th>
+                            <td class="dt-siswa-identifier" data-dt-column="nisn">{{ $row->nisn ?? '-' }}</td>
+                            <td class="dt-siswa-class" data-dt-column="class">
+                                {{ $row->penempatanAktif?->kelas?->nama_kelas_label ?? '-' }}
                             </td>
-                            <td>{{ $row->nisn ?? '-' }}</td>
-                            <td>
-                                <div class="fw-bold border text-label text-center bg-light rounded-3 px-2 py-2">
-                                    {{ $row->penempatanAktif?->kelas?->nama_kelas_label ?? '-' }}
-                                </div>
-                            </td>
-                            <td>
+                            <td class="dt-siswa-year" data-dt-column="year">
                                 {{ $row->penempatanAktif?->kelas?->kelasGrup?->angkatan?->tahun ?? '-' }}
                             </td>
-                            <td>
-                                @if($row->trashed())
-                                    <span class="badge-status nonaktif">
-                                        <i class="bi bi-circle-fill me-2"></i> Nonaktif
-                                    </span> 
+                            <td data-dt-column="status">
+                                @if ($row->trashed())
+                                    <span class="badge-status nonaktif dt-siswa-status">
+                                        <i class="bi bi-circle-fill" aria-hidden="true"></i>
+                                        Nonaktif
+                                    </span>
                                 @else
-                                    <span class="badge-status aktif">
-                                        <i class="bi bi-circle-fill me-2"></i> Aktif
+                                    <span class="badge-status aktif dt-siswa-status">
+                                        <i class="bi bi-circle-fill" aria-hidden="true"></i>
+                                        Aktif
                                     </span>
                                 @endif
                             </td>
-                            <td>
-                                @if($row->trashed())
+                            <td class="text-center" data-dt-column="action">
+                                @if ($row->trashed())
                                     <button
                                         type="button"
-                                        class="btn btn-primary btn-sm rounded-pill px-3 py-0"
+                                        class="btn btn-outline-secondary dt-siswa-detail"
                                         disabled
+                                        title="Detail tidak tersedia untuk siswa nonaktif"
                                     >
                                         Detail
-                                        <i class="bi bi-chevron-right ms-1"></i>
-                                    </button>   
+                                    </button>
                                 @else
                                     <a
                                         href="{{ route('superadmin.siswa.show', $row) }}"
-                                        class="btn btn-primary btn-sm rounded-pill px-3 py-0"
+                                        class="btn btn-outline-primary dt-siswa-detail"
                                     >
                                         Detail
-                                        <i class="bi bi-chevron-right ms-1"></i>
-                                    </a> 
-                                @endif                                                                                                   
+                                        <i class="bi bi-arrow-up-right" aria-hidden="true"></i>
+                                    </a>
+                                @endif
                             </td>
                         </tr>
                     @empty
-                        <tr>
-                            <td colspan="9" class="text-center py-5 text-muted">
-                                <div class="mb-3">
-                                    <i class="bi bi-inbox fs-1"></i>
-                                </div>
-                                <div class="fw-semibold">Tidak ada data siswa</div>
-                                <div class="small">Coba ubah filter atau hapus kata kunci pencarian.</div>
-                            </td>
-                        </tr>
+                        @if (request()->filled('search') || request()->filled('status'))
+                            <x-table.empty
+                                :colspan="7"
+                                state="no-results"
+                                title="Tidak ada siswa yang cocok"
+                                description="Ubah status atau kata kunci pencarian, lalu coba lagi."
+                            />
+                        @else
+                            <x-table.empty
+                                :colspan="7"
+                                state="empty"
+                                title="Belum ada data siswa"
+                                description="Data siswa belum tersedia."
+                            />
+                        @endif
                     @endforelse
                 </tbody>
             </table>
         </div>
-        <div class="mt-3">
-            {{ $siswa->links() }}
-        </div>        
+
+        <div class="dt-siswa-pagination">
+            <x-table.pagination :paginator="$siswa" :show-summary="true" />
+        </div>
     </x-table.card>
 </div>
 @endsection

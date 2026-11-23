@@ -1,5 +1,7 @@
 @php
     $tahun = current_tahun();
+    $canAcademic = auth()->user()->hasFeature('tu.academic');
+    $canDocuments = auth()->user()->hasFeature('tu.documents');
 @endphp
 <div class="sidebar">
 
@@ -24,7 +26,7 @@
     </a>
 
     {{-- PROSES AKADEMIK --}}
-
+    @if($canAcademic)
     <a
         class="menu-item"
         href="{{ route('tu.tahun.index') }}"
@@ -36,9 +38,11 @@
         </div>
 
     </a>
+    @endif
     
 
     {{-- MANAJEMEN SEKOLAH --}}
+    @if($canAcademic)
     <button
         class="menu-item border-0 bg-transparent text-start"
         onclick="toggleMenu('menuSekolah','arrowSekolah')"
@@ -48,6 +52,7 @@
             <i class="bi bi-building"></i>
             <span>Kelola Akademik</span>
         </div>
+        @endif
 
         <i
             class="bi bi-chevron-right dropdown-arrow"
@@ -148,6 +153,7 @@
     </div>
 
     {{-- ARSIP & DOKUMEN --}}
+    @if($canDocuments)
     <button
         class="menu-item border-0 bg-transparent text-start"
         onclick="toggleMenu('menuArsip','arrowArsip')"
@@ -157,6 +163,7 @@
             <i class="bi bi-folder2-open"></i>
             <span>Arsip & Dokumen</span>
         </div>
+        @endif
 
         <i
             class="bi bi-chevron-right dropdown-arrow"
@@ -225,6 +232,7 @@
     </div>
 
     {{-- DATA KEPEGAWAIAN --}}
+    @if($canAcademic)
     <a
         class="menu-item"
         href="{{ route('tu.datakepegawaian.index') }}">
@@ -234,6 +242,7 @@
             <span>Data Kepegawaian</span>
         </div>
     </a>
+    @endif
 
     {{-- AKUN --}}
     <a

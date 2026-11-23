@@ -26,17 +26,17 @@ Route::prefix('siswa')
         Route::get(
             '/jadwal',
             [JadwalController::class, 'index']
-        )->name('jadwal.index');
+        )->middleware('feature:siswa.academic')->name('jadwal.index');
 
         Route::get(
             '/nilai',
             [NilaiController::class, 'index']
-        )->name('nilai.index');
+        )->middleware('feature:siswa.academic')->name('nilai.index');
 
         Route::get(
             '/absensi',
             [AbsensiController::class, 'index']
-        )->name('absensi.index');
+        )->middleware('feature:siswa.academic')->name('absensi.index');
 
         Route::get(
             '/profile',
@@ -46,17 +46,17 @@ Route::prefix('siswa')
         Route::get(
             '/ekskul',
             [EkskulController::class, 'index']
-        )->name('ekskul.index');
+        )->middleware('feature:siswa.extracurricular')->name('ekskul.index');
 
         Route::get(
             '/ekskul/{ekskul}',
             [EkskulController::class, 'show']
-        )->name('ekskul.show');
+        )->middleware('feature:siswa.extracurricular')->name('ekskul.show');
 
         Route::get(
             '/ekskul/{ekskul}/absensi',
             [EkskulController::class, 'absensi']
-        )->name('ekskul.absensi');
+        )->middleware('feature:siswa.extracurricular')->name('ekskul.absensi');
 
         Route::get(
             '/download-dokumen',
@@ -68,7 +68,7 @@ Route::prefix('siswa')
         Route::get(
         '/download-dokumen',
         [DownloadDokumenController::class, 'index']
-    )->name('download-dokumen.index');
+    )->middleware('feature:siswa.documents')->name('download-dokumen.index');
 
         Route::get(
             '/nomor-surat',
@@ -80,15 +80,16 @@ Route::prefix('siswa')
         Route::get(
             '/nomor-surat',
             [NomorSuratSiswaController::class, 'index']
-        )->name('nomor-surat.index');
+        )->middleware('feature:siswa.letter')->name('nomor-surat.index');
 
         Route::post(
             '/nomor-surat/generate',
             [NomorSuratSiswaController::class, 'generate']
-        )->name('nomor-surat.generate');
+        )->middleware('feature:siswa.letter')->name('nomor-surat.generate');
 
         Route::prefix('e-learning')
             ->name('e-learning.')
+            ->middleware('feature:siswa.elearning')
             ->group(function () {
 
                 Route::get(
@@ -111,12 +112,12 @@ Route::prefix('siswa')
             Route::post(
                 '/e-learning/{elearning}/komentar',
                 [\App\Http\Controllers\Elearning\ElearningKomentarController::class, 'store']
-            )->name('e-learning.komentar.store');
+            )->middleware('feature:siswa.elearning')->name('e-learning.komentar.store');
 
             Route::post(
                 '/e-learning-komentar/{komentar}/reply',
                 [\App\Http\Controllers\Elearning\ElearningKomentarReplyController::class, 'store']
-            )->name('e-learning.reply.store');
+            )->middleware('feature:siswa.elearning')->name('e-learning.reply.store');
 
            Route::get('/profile', [ProfileController::class, 'index'])
                 ->name('profile');

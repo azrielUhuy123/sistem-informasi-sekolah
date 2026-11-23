@@ -3,88 +3,54 @@
 @section('title', 'Manajemen Data Siswa')
 
 @section('content')
-<div class="container-fluid">
-    {{-- HEADER --}}
-    <div class="card border-0 shadow-sm rounded-4 overflow-hidden mb-4">
-        <div class="card-body p-4 p-lg-5 text-white" style="background: linear-gradient(135deg, #0f4c81 0%, #2563eb 100%);">
-            <div class="d-flex flex-column flex-lg-row justify-content-between align-items-lg-center gap-3">
-                <div>
-                    <h3 class="fw-bold mb-2">Data Siswa</h3>
-                    <p class="mb-0 opacity-75">Kelola data siswa sekolah</p>
-                </div>
-                <div class="badge bg-white text-primary px-3 py-2 fs-6">
-                    <i class="bi bi-shield-check me-2"></i> Sinergi-MJ
-                </div>
-            </div>
-        </div>
-    </div>
+<div class="container-fluid dt-siswa-page">
+    <x-table.page-header
+        icon="bi-people-fill"
+        eyebrow="Direktori Siswa"
+        title="Data Siswa"
+        description="Kelola data siswa sekolah."
+    />
 
     <x-alert.flash key="success" type="success"/>
     <x-alert.flash key="error" type="danger"/>
 
     <x-table.card
         title="Daftar Seluruh Siswa"
-        subtitle="Seluruh data siswa pada SDN Mekar Jaya">
-        <x-slot:badge>
-            <span class="badge bg-primary rounded-pill px-2 py-1">
-                {{ $siswa->total() }} <span class="text-badge">siswa</span>
-            </span>
-        </x-slot:badge>
+        subtitle="Seluruh data siswa pada SDN Mekar Jaya"
+        :count="$siswa->total()"
+        count-label="data"
+    >
+        <x-slot:toolbar>
+            <x-table.toolbar
+                table-id="tu-siswa-table"
+                :action="route('tu.siswa.index')"
+                :searchable="true"
+                search-name="search"
+                :search-value="request('search')"
+                search-label="Cari nama atau NIS siswa"
+                search-placeholder="Nama atau NIS"
+                filter-name="status"
+                :filter-value="request('status')"
+                filter-label="Status"
+                filter-menu-title="Filter status"
+                :filter-options="[
+                    ['value' => 'aktif', 'label' => 'Aktif'],
+                    ['value' => 'nonaktif', 'label' => 'Nonaktif'],
+                ]"
+            />
+        </x-slot:toolbar>
 
-        <x-slot:actions>
-            <div class="d-flex flex-column align-items-end gap-2">
-                {{-- FILTER --}}
-                <form
-                    action="{{ route('tu.siswa.index') }}"
-                    method="GET"
-                    class="siswa-filter-form"
-                >
-                    <select
-                        name="status" 
-                        class="form-control siswa-filter-status"                        
-                    >
-                        <option value="">Semua Status</option>
-                        <option
-                            value="aktif"
-                            @selected(request('status')=='aktif')
-                        >
-                            Aktif
-                        </option>
-                        <option
-                            value="nonaktif"
-                            @selected(request('status')=='nonaktif')
-                        >
-                            Nonaktif
-                        </option>
-                    </select>
-                    {{-- SEARCH --}}
-                    <input
-                        type="text"
-                        id="search"
-                        name="search"
-                        class="form-control siswa-filter-search"
-                        placeholder="Cari Nama / NIS..."
-                        value="{{ request('search') }}"                        
-                    >
-                    <button
-                        type="submit"
-                        class="btn btn-primary rounded-3"
-                    >
-                        <i class="bi bi-funnel me-1"></i>
-                        Filter
-                    </button>
-                    @if(request()->filled('status') || request()->filled('search'))
-                        <a
-                            href="{{ route('tu.siswa.index') }}"
-                            class="btn btn-outline-secondary rounded-3"
-                        >
-                            Reset
-                        </a>
-                    @endif
-                </form>
-                
-            </div>
-        </x-slot:actions>
+        <x-table.chips
+            :criteria="[
+                ['name' => 'search', 'label' => 'Search', 'value' => request('search')],
+                [
+                    'name' => 'status',
+                    'label' => 'Status',
+                    'value' => in_array(request('status'), ['aktif', 'nonaktif'], true) ? request('status') : null,
+                    'display' => request('status') === 'aktif' ? 'Aktif' : 'Nonaktif',
+                ],
+            ]"
+        />
 
         <form method="POST" action="{{ route('tu.siswa.bulk') }}" id="bulkForm">
             @csrf
@@ -114,23 +80,23 @@
 
             </div>
 
-            <div class="table-responsive">
-                <table class="table table-hover align-middle mb-0">
+            <div class="table-responsive dt-siswa-table-wrap">
+                <table id="tu-siswa-table" class="table table-hover align-middle dt-table">
                     <thead>
                         <tr>
-                            <th width="70">
+                            <x-table.heading width="70px" class="text-center">
                                 <input
                                     id="selectAll"
                                     class="form-check-input"
                                     type="checkbox">
-                            </th>
-                            <th width="70">No</th>
-                            <th>Nama</th>
-                            <th width="150">NISN</th>
-                            <th>Rombel</th>
-                            <th width="150">Angkatan</th>
-                            <th width="150">Status</th>
-                            <th width="90">Aksi</th>
+                            </x-table.heading>
+                            <x-table.heading width="70px">No</x-table.heading>
+                            <x-table.heading>Nama</x-table.heading>
+                            <x-table.heading width="150px">NISN</x-table.heading>
+                            <x-table.heading>Rombel</x-table.heading>
+                            <x-table.heading width="150px">Angkatan</x-table.heading>
+                            <x-table.heading width="150px">Status</x-table.heading>
+                            <x-table.heading width="90px">Aksi</x-table.heading>
                         </tr>
                     </thead>
 
@@ -206,16 +172,27 @@
                                 </td>
                             </tr>
                         @empty
-                            <tr>
-                                <td colspan="8" class="text-center text-muted">Belum ada data siswa</td>
-                            </tr>
+                            @if (request()->filled('status') || request()->filled('search'))
+                                <x-table.empty
+                                    :colspan="8"
+                                    state="no-results"
+                                    title="Tidak ada siswa yang cocok"
+                                    description="Ubah status atau kata kunci pencarian, lalu coba lagi."
+                                />
+                            @else
+                                <x-table.empty
+                                    :colspan="8"
+                                    title="Belum ada data siswa"
+                                    description="Data siswa belum tersedia."
+                                />
+                            @endif
                         @endforelse
                     </tbody>
                 </table>
             </div>
 
             <div class="mt-3">
-                {{ $siswa->links() }}
+                <x-table.pagination :paginator="$siswa" :show-summary="true" />
             </div>
         </form>
     </x-table.card>

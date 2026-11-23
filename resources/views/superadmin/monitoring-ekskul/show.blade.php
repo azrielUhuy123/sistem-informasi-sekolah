@@ -4,32 +4,14 @@
 
 @section('content')
 
-<div class="container-fluid">
+<div class="container-fluid dt-siswa-page">
 
-    {{-- HEADER --}}
-    <div class="card border-0 shadow-sm rounded-4 overflow-hidden mb-4">
-        <div class="card-body p-4 p-lg-5 text-white" style="background: linear-gradient(135deg, #0f4c81 0%, #2563eb 100%);">
-            <div class="d-flex flex-column flex-lg-row justify-content-between align-items-lg-center gap-3">
-
-                <div>
-                    <h3 class="fw-bold mb-2">
-                        Monitoring Jadwal Ekskul
-                    </h3>
-
-                    <p class="mb-0 opacity-75">
-                        Monitoring jadwal kegiatan ekstrakurikuler
-                        <strong>{{ $ekskul->nama }}</strong>,
-                        termasuk proses validasi, approval, dan publikasi jadwal.
-                    </p>
-                </div>
-
-                <div class="badge bg-white text-primary px-3 py-2 fs-6">
-                    <i class="bi bi-shield-check me-2"></i> Sinergi-MJ
-                </div>
-
-            </div>
-        </div>
-    </div>
+    <x-table.page-header
+        icon="bi-calendar2-week"
+        eyebrow="Monitoring / Ekstrakurikuler"
+        title="Monitoring Jadwal Ekskul"
+        :description="'Monitoring jadwal kegiatan ekstrakurikuler ' . $ekskul->nama . ', termasuk validasi, persetujuan, dan publikasi.'"
+    />
 
     {{-- ALERT --}}
     <x-alert.flash key="success" type="success"/>
@@ -116,15 +98,11 @@
     <x-table.card
         title="Jadwal {{ $ekskul->nama }}"
         subtitle="Monitoring jadwal kegiatan ekstrakurikuler"
+        :count="$totalJadwal"
+        count-label="jadwal"
     >
 
         <x-slot:badge>
-
-            <span class="badge bg-primary rounded-pill px-2 py-1">
-                {{ $totalJadwal }}
-                <span class="text-badge">Jadwal</span>
-            </span>
-
             <span class="badge bg-success rounded-pill px-2 py-1">
                 {{ $totalAman }}
                 <span class="text-badge">Aman</span>
@@ -135,6 +113,46 @@
                 <span class="text-badge">Bentrok</span>
             </span>
         </x-slot:badge>
+
+        <x-slot:toolbar>
+            <x-table.toolbar
+                table-id="monitoring-ekskul-schedule-table"
+                :column-toggle="true"
+                :refreshable="true"
+                :refresh-url="request()->fullUrl()"
+            >
+                <x-slot:columnMenu>
+                    <label class="dt-column-menu__option">
+                        <input type="checkbox" data-dt-column="nomor">
+                        <span>No</span>
+                    </label>
+                    <label class="dt-column-menu__option">
+                        <input type="checkbox" data-dt-column="hari">
+                        <span>Hari</span>
+                    </label>
+                    <label class="dt-column-menu__option">
+                        <input type="checkbox" data-dt-column="jam_mulai">
+                        <span>Jam Mulai</span>
+                    </label>
+                    <label class="dt-column-menu__option">
+                        <input type="checkbox" data-dt-column="jam_selesai">
+                        <span>Jam Selesai</span>
+                    </label>
+                    <label class="dt-column-menu__option">
+                        <input type="checkbox" data-dt-column="status">
+                        <span>Status</span>
+                    </label>
+                    <label class="dt-column-menu__option">
+                        <input type="checkbox" data-dt-column="bentrok">
+                        <span>Bentrok</span>
+                    </label>
+                    <label class="dt-column-menu__option">
+                        <input type="checkbox" data-dt-column="catatan">
+                        <span>Catatan</span>
+                    </label>
+                </x-slot:columnMenu>
+            </x-table.toolbar>
+        </x-slot:toolbar>
         
         {{-- WARNING BENTROK --}}
         @if($totalBentrok > 0)
@@ -151,19 +169,19 @@
         @endif        
 
         {{-- TABLE --}}
-        <div class="table-responsive">
+        <div class="table-responsive dt-siswa-table-wrap">
 
-            <table class="table table-hover align-middle mb-0">
+            <table id="monitoring-ekskul-schedule-table" class="table table-hover align-middle mb-0 dt-table" data-dt-table>
 
                 <thead>
                     <tr>
-                        <th width="70">No</th>
-                        <th>Hari</th>
-                        <th>Jam Mulai</th>
-                        <th>Jam Selesai</th>
-                        <th width="130">Status</th>
-                        <th width="170">Bentrok</th>
-                        <th>Catatan</th>
+                        <x-table.heading column="nomor" width="70">No</x-table.heading>
+                        <x-table.heading column="hari">Hari</x-table.heading>
+                        <x-table.heading column="jam_mulai">Jam Mulai</x-table.heading>
+                        <x-table.heading column="jam_selesai">Jam Selesai</x-table.heading>
+                        <x-table.heading column="status" width="130">Status</x-table.heading>
+                        <x-table.heading column="bentrok" width="170">Bentrok</x-table.heading>
+                        <x-table.heading column="catatan">Catatan</x-table.heading>
                     </tr>
                 </thead>
 
@@ -174,35 +192,35 @@
                         <tr>
 
                             {{-- NO --}}
-                            <td>
+                            <td data-dt-column="nomor">
                                 <span class="badge bg-light text-dark rounded-circle">
                                     {{ $loop->iteration }}
                                 </span>
                             </td>
 
                             {{-- HARI --}}
-                            <td>
+                            <td data-dt-column="hari">
                                 <span class="badge bg-light text-dark border">
                                     {{ $item->hari->nama ?? '-' }}
                                 </span>
                             </td>
 
                             {{-- JAM MULAI --}}
-                            <td>
+                            <td data-dt-column="jam_mulai">
                                 <span class="text-muted">
                                     {{ substr($item->jam_mulai, 0, 5) }}
                                 </span>
                             </td>
 
                             {{-- JAM SELESAI --}}
-                            <td>
+                            <td data-dt-column="jam_selesai">
                                 <span class="text-muted">
                                     {{ substr($item->jam_selesai, 0, 5) }}
                                 </span>
                             </td>
 
                             {{-- STATUS --}}
-                            <td>
+                            <td data-dt-column="status">
 
                                 @if($item->status == 'draft')
 
@@ -245,7 +263,7 @@
                             </td>
 
                             {{-- BENTROK --}}
-                            <td>
+                            <td data-dt-column="bentrok">
 
                                 @if($item->bentrok == 'aman')
 
@@ -279,7 +297,7 @@
                             </td>
 
                             {{-- CATATAN --}}
-                            <td>
+                            <td data-dt-column="catatan">
                                 {{ $item->catatan ?? '-' }}
                             </td>
 

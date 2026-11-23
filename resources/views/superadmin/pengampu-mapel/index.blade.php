@@ -3,20 +3,13 @@
 @section('title', 'Pengampu Mapel')
 
 @section('content')
-<div class="container-fluid">
-    <div class="card border-0 shadow-sm rounded-4 overflow-hidden mb-4">
-        <div class="card-body p-4 p-lg-5 text-white" style="background: linear-gradient(135deg, #0f4c81 0%, #2563eb 100%);">
-            <div class="d-flex flex-column flex-lg-row justify-content-between align-items-lg-center gap-3">
-                <div>
-                    <h3 class="fw-bold mb-2">Pengampu Mapel</h3>
-                    <p class="mb-0 opacity-75">Kelola guru pengampu mata pelajaran.</p>
-                </div>
-                <div class="badge bg-white text-primary px-3 py-2 fs-6">
-                    <i class="bi bi-shield-check me-2"></i> Sinergi-MJ
-                </div>
-            </div>
-        </div>
-    </div>
+<div class="container-fluid dt-siswa-page">
+    <x-table.page-header
+        icon="bi-book"
+        eyebrow="Data Akademik / Penugasan"
+        title="Pengampu Mapel"
+        description="Kelola penugasan guru untuk mata pelajaran dan kelas."
+    />
 
     <x-alert.flash key="success" type="success" />
     <x-alert.flash key="error" type="danger" />
@@ -136,22 +129,19 @@
     <x-table.card
         title="Data Pengampu Mata Pelajaran"
         subtitle="Ringkasan guru beserta jumlah mata pelajaran dan kelas yang diampu"
+        :count="$pengampu->count()"
     >
-        <x-slot:badge>
-            <span class="badge bg-primary rounded-pill px-2 py-1">
-                {{ $pengampu->count() }} <span class="text-badge">Guru</span>
-            </span>
-        </x-slot:badge>
 
-        <div class="table-responsive">
-            <table class="table table-hover align-middle mb-0">
+        <div class="table-responsive dt-siswa-table-wrap">
+            <table class="table table-hover align-middle dt-table">
+                <caption class="visually-hidden">Ringkasan guru pengampu mata pelajaran dan kelas</caption>
                 <thead>
                     <tr>
-                        <th width="70">No</th>
-                        <th>Guru</th>
-                        <th>Mata Pelajaran</th>
-                        <th>Total Kelas</th>
-                        <th width="100">Aksi</th>
+                        <x-table.heading width="70px">No</x-table.heading>
+                        <x-table.heading>Guru</x-table.heading>
+                        <x-table.heading>Mata Pelajaran</x-table.heading>
+                        <x-table.heading>Total Kelas</x-table.heading>
+                        <x-table.heading width="100px">Aksi</x-table.heading>
                     </tr>
                 </thead>
                 <tbody>
@@ -189,7 +179,7 @@
                                     </span>
                                 @elseif($totalKelas  >= 15)
                                     <span class="badge-status nonaktif">
-                                        {{ $jumlahKelas }} Kelas
+                                        {{ $totalKelas }} Kelas
                                     </span>
                                 @elseif($totalKelas  >= 8)
                                     <span class="badge-status pending">
@@ -215,12 +205,11 @@
                             </td>
                         </tr>
                     @empty
-                        <tr>
-                            <td colspan="5" class="text-center py-5">
-                                <i class="bi bi-journal-x display-5 text-secondary"></i>
-                                <p class="mt-3 mb-0 text-muted">Belum ada data pengampu mata pelajaran.</p>
-                            </td>
-                        </tr>
+                        <x-table.empty
+                            :colspan="5"
+                            title="Belum ada data pengampu mata pelajaran."
+                            description=""
+                        />
                     @endforelse
                 </tbody>
             </table>

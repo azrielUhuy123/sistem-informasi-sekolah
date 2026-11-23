@@ -5,6 +5,7 @@
 @php
 
     $guru = auth()->user()->guru;
+    $canAcademic = auth()->user()->hasFeature('guru.academic');
 
     $isWaliKelas = \App\Models\WaliKelas::where(
         'guru_id',
@@ -28,6 +29,7 @@
         MAIN GURU
     </div>
 
+    @if($canAcademic)
     <a
         class="menu-item
         {{ request()->is('guru/dashboard*') ? 'active' : '' }}"
@@ -42,7 +44,9 @@
         </div>
 
     </a>
+    @endif
 
+    @if($canAcademic)
     <a
         class="menu-item
         {{ request()->is('guru/profile*') ?  : '' }}"
@@ -66,7 +70,9 @@
         </div>
 
     </a>
+    @endif
 
+    @if($canAcademic)
     <button class="menu-item border-0 bg-transparent text-start"
             onclick="toggleMenu('menuJadwal','arrowJadwal')">
         <div class="menu-left">
@@ -96,7 +102,9 @@
         </a>
 
     </div>
+    @endif
 
+    @if($canAcademic)
     <button class="menu-item border-0 bg-transparent text-start"
             onclick="toggleMenu('menuKelas','arrowKelas')">
         <div class="menu-left">
@@ -152,7 +160,9 @@
         @endif
 
     </div>
+    @endif
 
+    @if($canAcademic)
     <button class="menu-item border-0 bg-transparent text-start"
             onclick="toggleMenu('menuAbsen','arrowAbsen')">
         <div class="menu-left">
@@ -184,8 +194,10 @@
             </div>
         </a>
     </div>
+    @endif
 
     {{-- DOKUMEN --}}
+    @if($canAcademic)
     <button
         class="menu-item border-0 bg-transparent text-start"
         onclick="toggleMenu('menuDokumen','arrowDokumen')"
@@ -195,6 +207,7 @@
             <i class="bi bi-folder2-open"></i>
             <span>Dokumen</span>
         </div>
+        @endif
 
         <i class="bi bi-chevron-right dropdown-arrow"
         id="arrowDokumen"></i>

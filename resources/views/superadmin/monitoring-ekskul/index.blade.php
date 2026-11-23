@@ -4,54 +4,59 @@
 
 @section('content')
 
-<div class="container-fluid">
+<div class="container-fluid dt-siswa-page">
 
-    {{-- HEADER --}}
-    <div class="card border-0 shadow-sm rounded-4 overflow-hidden mb-4">
-        <div class="card-body p-4 p-lg-5 text-white" style="background: linear-gradient(135deg, #0f4c81 0%, #2563eb 100%);">
-            <div class="d-flex flex-column flex-lg-row justify-content-between align-items-lg-center gap-3">
-
-                <div>
-                    <h3 class="fw-bold mb-2">
-                        Monitoring Ekskul
-                    </h3>
-
-                    <p class="mb-0 opacity-75">
-                        Pantau seluruh kegiatan ekstrakurikuler, pembina, dan proses monitoring secara terpusat.
-                    </p>
-                </div>
-
-                <div class="badge bg-white text-primary px-3 py-2 fs-6">
-                    <i class="bi bi-shield-check me-2"></i> Sinergi-MJ
-                </div>
-
-            </div>
-        </div>
-    </div>
+    <x-table.page-header
+        icon="bi-activity"
+        eyebrow="Monitoring / Ekstrakurikuler"
+        title="Monitoring Ekskul"
+        description="Pantau kegiatan ekstrakurikuler, pembina, dan proses monitoring secara terpusat."
+    />
 
     {{-- TABLE --}}
     <x-table.card
         title="Daftar Ekstrakurikuler"
         subtitle="Pilih ekstrakurikuler untuk melihat hasil monitoring"
+        :count="$ekskul->count()"
     >
+        <x-slot:toolbar>
+            <x-table.toolbar
+                table-id="monitoring-ekskul-table"
+                :column-toggle="true"
+                :refreshable="true"
+                :refresh-url="request()->fullUrl()"
+            >
+                <x-slot:columnMenu>
+                    <label class="dt-column-menu__option">
+                        <input type="checkbox" data-dt-column="nomor">
+                        <span>No</span>
+                    </label>
+                    <label class="dt-column-menu__option">
+                        <input type="checkbox" data-dt-column="ekskul">
+                        <span>Ekstrakurikuler</span>
+                    </label>
+                    <label class="dt-column-menu__option">
+                        <input type="checkbox" data-dt-column="pembina">
+                        <span>Pembina</span>
+                    </label>
+                    <label class="dt-column-menu__option">
+                        <input type="checkbox" data-dt-column="aksi">
+                        <span>Aksi</span>
+                    </label>
+                </x-slot:columnMenu>
+            </x-table.toolbar>
+        </x-slot:toolbar>
 
-        <x-slot:badge>
-            <span class="badge bg-primary rounded-pill px-2 py-1">
-                {{ $ekskul->count() }}
-                <span class="text-badge">Ekskul</span>
-            </span>
-        </x-slot:badge>
+        <div class="table-responsive dt-siswa-table-wrap">
 
-        <div class="table-responsive">
-
-            <table class="table table-hover align-middle mb-0">
+            <table id="monitoring-ekskul-table" class="table table-hover align-middle mb-0 dt-table" data-dt-table>
 
                 <thead>
                     <tr>
-                        <th width="70">No</th>
-                        <th>Ekstrakurikuler</th>
-                        <th>Pembina</th>
-                        <th width="140">Aksi</th>
+                        <x-table.heading column="nomor" width="70">No</x-table.heading>
+                        <x-table.heading column="ekskul">Ekstrakurikuler</x-table.heading>
+                        <x-table.heading column="pembina">Pembina</x-table.heading>
+                        <x-table.heading column="aksi" width="140">Aksi</x-table.heading>
                     </tr>
                 </thead>
 
@@ -62,20 +67,20 @@
                         <tr>
 
                             {{-- NO --}}
-                            <td>
+                            <td data-dt-column="nomor">
                                 <span class="badge bg-light text-dark rounded-circle">
                                     {{ $loop->iteration }}
                                 </span>
                             </td>
 
                             {{-- EKSTRAKURIKULER --}}
-                            <td>
+                            <td data-dt-column="ekskul">
                                 <span class="fw-semibold">
                                     {{ $e->nama }}
                                 </span>                                                                        
                             </td>
                             {{-- PEMBINA --}}
-                            <td>
+                            <td data-dt-column="pembina">
                                 @if($e->pembina)
                                     <div class="d-flex align-items-center">
                                         <div
@@ -100,7 +105,7 @@
                                 @endif
                             </td>
                             {{-- AKSI --}}
-                            <td>
+                            <td data-dt-column="aksi">
                                 <a
                                     href="{{ route('superadmin.monitoring-ekskul.show', $e->id) }}"
                                     class="btn btn-primary btn-sm rounded-pill px-3 py-0"

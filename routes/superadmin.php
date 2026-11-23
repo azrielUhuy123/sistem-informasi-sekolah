@@ -23,6 +23,8 @@ use App\Http\Controllers\SuperAdmin\MonitoringEkskulController;
 use App\Http\Controllers\SuperAdmin\JadwalFinalEkskulController;
 use App\Http\Controllers\SuperAdmin\SiswaController;
 use App\Http\Controllers\SuperAdmin\KenaikanKelasController;
+use App\Http\Controllers\SuperAdmin\FeatureAccessController;
+use App\Http\Controllers\SuperAdmin\ManajemenPenugasanController;
 
 Route::middleware(['auth', 'role:superadmin'])
     ->prefix('superadmin')
@@ -142,6 +144,29 @@ Route::middleware(['auth', 'role:superadmin'])
             '/pembina-ekskul',
             [PembinaEkskulController::class, 'store']
         )->name('pembina-ekskul.store');
+
+        Route::prefix('feature-access')
+            ->name('feature-access.')
+            ->middleware('feature:superadmin.assignment')
+            ->controller(FeatureAccessController::class)
+            ->group(function () {
+                Route::get('/', 'index')->name('index');
+                Route::get('/{user}/edit', 'edit')->name('edit');
+                Route::put('/{user}', 'update')->name('update');
+            });
+
+        Route::get('/manajemen-penugasan', [ManajemenPenugasanController::class, 'index'])
+            ->name('manajemen-penugasan.index');
+        Route::post('/manajemen-penugasan', [ManajemenPenugasanController::class, 'store'])
+            ->name('manajemen-penugasan.store');
+        Route::put('/manajemen-penugasan/{penugasan}', [ManajemenPenugasanController::class, 'update'])
+            ->name('manajemen-penugasan.update');
+        Route::delete('/manajemen-penugasan/{penugasan}', [ManajemenPenugasanController::class, 'destroy'])
+            ->name('manajemen-penugasan.destroy');
+        Route::post('/manajemen-penugasan/publish', [ManajemenPenugasanController::class, 'publish'])
+            ->name('manajemen-penugasan.publish');
+        Route::patch('/manajemen-penugasan/{penugasan}/revoke', [ManajemenPenugasanController::class, 'revoke'])
+            ->name('manajemen-penugasan.revoke');
 
         Route::delete(
             '/pembina-ekskul/{id}',

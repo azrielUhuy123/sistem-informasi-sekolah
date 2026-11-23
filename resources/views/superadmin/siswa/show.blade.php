@@ -4,7 +4,14 @@
 
 @section('content')
 
-    <div class="container-fluid">
+    <div class="container-fluid dt-siswa-page">
+
+        <x-table.page-header
+            icon="bi-person"
+            eyebrow="Data Siswa / Detail"
+            title="Detail Siswa"
+            :description="'Informasi profil dan riwayat penempatan ' . $siswa->nama . '.'"
+        />
 
         <div class="card shadow-sm border-0 overflow-hidden">
             <div class="card-body p-4 p-lg-5">
@@ -216,100 +223,91 @@
                         </div>
                     </div>
                     <div class="col-12">
-                        <div class="card border h-100">
-                            <div class="card-body">
+                        <x-table.card
+                            title="Riwayat Kelas"
+                            :count="$siswa->penempatan->count()"
+                            count-label="riwayat"
+                        >
 
-                                <div class="d-flex align-items-center mb-3">
-                                    <div class="rounded-circle bg-success bg-opacity-10 p-2 me-2">
-                                        <i class="bi bi-clock-history fs-5 text-success"></i>
-                                    </div>
+                            <div class="table-responsive dt-siswa-table-wrap">
 
-                                    <h5 class="fw-bold mb-0">
-                                        Riwayat Kelas
-                                    </h5>
-                                </div>
+                                <table class="table table-hover align-middle mb-0 dt-table">
 
-                                <div class="table-responsive">
+                                    <thead>
+                                        <tr>
+                                            <x-table.heading column="tahun">Tahun Ajaran</x-table.heading>
+                                            <x-table.heading column="kelas">Kelas</x-table.heading>
+                                            <x-table.heading column="tanggal_masuk">Tanggal Masuk</x-table.heading>
+                                            <x-table.heading column="tanggal_keluar">Tanggal Keluar</x-table.heading>
+                                            <x-table.heading column="status">Status</x-table.heading>
+                                        </tr>
+                                    </thead>
 
-                                    <table class="table table-hover align-middle mb-0">
+                                    <tbody>
 
-                                        <thead class="table-light">
+                                        @forelse($siswa->penempatan as $item)
+
                                             <tr>
-                                                <th>Tahun Ajaran</th>
-                                                <th>Kelas</th>
-                                                <th>Tanggal Masuk</th>
-                                                <th>Tanggal Keluar</th>
-                                                <th>Status</th>
-                                            </tr>
-                                        </thead>
 
-                                        <tbody>
+                                                <td data-dt-column="tahun">
+                                                    {{ $item->tahunAjaran?->tahun ?? '-' }}
+                                                    {{ $item->tahunAjaran?->semester ? '- '.$item->tahunAjaran->semester : '' }}
+                                                </td>
 
-                                            @forelse($siswa->penempatan as $item)
+                                                <td data-dt-column="kelas">
+                                                    <span class="badge bg-purple rounded-3">
+                                                        {{ $item->kelas?->nama_kelas_label ?? '-' }}
+                                                    </span>
+                                                </td>
 
-                                                <tr>
+                                                <td data-dt-column="tanggal_masuk">
+                                                    {{ \Carbon\Carbon::parse($item->tanggal_masuk)->format('d M Y') }}
+                                                </td>
 
-                                                    <td>
-                                                        {{ $item->tahunAjaran?->tahun ?? '-' }}
-                                                        {{ $item->tahunAjaran?->semester ? '- '.$item->tahunAjaran->semester : '' }}
-                                                    </td>
+                                                <td data-dt-column="tanggal_keluar">
+                                                    {{ $item->tanggal_keluar
+                                                        ? \Carbon\Carbon::parse($item->tanggal_keluar)->format('d M Y')
+                                                        : '-' }}
+                                                </td>
 
-                                                    <td>
-                                                        <span class="badge bg-purple rounded-3">
-                                                            {{ $item->kelas?->nama_kelas_label ?? '-' }}
+                                                <td data-dt-column="status">
+
+                                                    @if($item->tanggal_keluar === null)
+
+                                                        <span class="badge-status aktif">
+                                                            <i class="bi bi-circle-fill me-2"></i>
+                                                            Aktif
                                                         </span>
-                                                    </td>
 
-                                                    <td>
-                                                        {{ \Carbon\Carbon::parse($item->tanggal_masuk)->format('d M Y') }}
-                                                    </td>
+                                                    @else
 
-                                                    <td>
-                                                        {{ $item->tanggal_keluar
-                                                            ? \Carbon\Carbon::parse($item->tanggal_keluar)->format('d M Y')
-                                                            : '-' }}
-                                                    </td>
+                                                        <span class="badge-status selesai">
+                                                            <i class="bi bi-check-circle me-2"></i>
+                                                            Selesai
+                                                        </span>
 
-                                                    <td>
+                                                    @endif
 
-                                                        @if($item->tanggal_keluar === null)
+                                                </td>
 
-                                                            <span class="badge-status aktif">
-                                                                <i class="bi bi-circle-fill me-2"></i>
-                                                                Aktif
-                                                            </span>
+                                            </tr>
 
-                                                        @else
+                                        @empty
+                                            <x-table.empty
+                                                :colspan="5"
+                                                title="Belum ada riwayat kelas"
+                                                description="Riwayat penempatan siswa belum tersedia."
+                                            />
 
-                                                            <span class="badge-status selesai">
-                                                                <i class="bi bi-check-circle me-2"></i>
-                                                                Selesai
-                                                            </span>
+                                        @endforelse
 
-                                                        @endif
+                                    </tbody>
 
-                                                    </td>
-
-                                                </tr>
-
-                                            @empty
-
-                                                <tr>
-                                                    <td colspan="5" class="text-center text-muted py-4">
-                                                        Belum ada riwayat kelas.
-                                                    </td>
-                                                </tr>
-
-                                            @endforelse
-
-                                        </tbody>
-
-                                    </table>
-
-                                </div>
+                                </table>
 
                             </div>
-                        </div>
+
+                        </x-table.card>
                     </div>
 
                 </div>

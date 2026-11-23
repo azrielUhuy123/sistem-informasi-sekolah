@@ -21,6 +21,7 @@ return Application::configure(basePath: dirname(__DIR__))
             'tahun.aktif' => \App\Http\Middleware\EnsureTahunAjaranAktif::class,
             'guru.mode' => \App\Http\Middleware\GuruModeMiddleware::class,
             'tu.mode' => \App\Http\Middleware\TuModeMiddleware::class,
+            'feature' => \App\Http\Middleware\FeatureAccessMiddleware::class,
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions): void {

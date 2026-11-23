@@ -38,7 +38,7 @@ Route::prefix('guru')
         Route::get(
             '/dashboard-gurubidang',
             [DashboardGuruBidangController::class, 'index']
-        )->name('dashboard-gurubidang');
+        )->middleware('feature:guru.academic')->name('dashboard-gurubidang');
         
         Route::get(
             '/switch-mode/{mode}',
@@ -85,12 +85,12 @@ Route::prefix('guru')
         Route::get(
             '/ekskul/dashboard',
             [EkskulController::class, 'dashboard']
-        )->name('ekskul.dashboard');
+        )->middleware('feature:guru.extracurricular')->name('ekskul.dashboard');
 
         Route::get(
             '/ekskul',
             [EkskulController::class, 'index']
-        )->name('ekskul.index');
+        )->middleware('feature:guru.extracurricular')->name('ekskul.index');
 
         /*
         |--------------------------------------------------------------------------
@@ -101,17 +101,17 @@ Route::prefix('guru')
         Route::get(
             '/ekskul/anggota',
             [EkskulAnggotaController::class, 'index']
-        )->name('ekskul.anggota.index');
+        )->middleware('feature:guru.extracurricular')->name('ekskul.anggota.index');
 
         Route::post(
             '/ekskul/anggota/store',
             [EkskulAnggotaController::class, 'store']
-        )->name('ekskul.anggota.store');
+        )->middleware('feature:guru.extracurricular')->name('ekskul.anggota.store');
 
         Route::delete(
             '/ekskul/anggota/{id}',
             [EkskulAnggotaController::class, 'destroy']
-        )->name('ekskul.anggota.destroy');
+        )->middleware('feature:guru.extracurricular')->name('ekskul.anggota.destroy');
         
         /*
         |--------------------------------------------------------------------------
@@ -122,15 +122,16 @@ Route::prefix('guru')
         Route::get(
             '/ekskul/daftar-anggota',
             [EkskulAnggotaController::class, 'daftar']
-        )->name('ekskul.daftar-anggota');
+        )->middleware('feature:guru.extracurricular')->name('ekskul.daftar-anggota');
 
         Route::delete(
             '/ekskul/daftar-anggota/{id}',
             [EkskulAnggotaController::class, 'destroy']
-        )->name('ekskul.daftar-anggota.destroy');
+        )->middleware('feature:guru.extracurricular')->name('ekskul.daftar-anggota.destroy');
 
         Route::prefix('ekskul')
             ->name('ekskul.')
+            ->middleware('feature:guru.extracurricular')
             ->group(function () {
 
                 Route::get(
@@ -153,178 +154,182 @@ Route::prefix('guru')
         Route::get(
             '/ekskul/jurnal',
             [JurnalEkskulController::class, 'index']
-        )->name('ekskul.jurnal.index');
+        )->middleware('feature:guru.extracurricular')->name('ekskul.jurnal.index');
 
         Route::post(
             '/ekskul/jurnal',
             [JurnalEkskulController::class, 'store']
-        )->name('ekskul.jurnal.store');
+        )->middleware('feature:guru.extracurricular')->name('ekskul.jurnal.store');
 
         Route::delete(
             '/ekskul/jurnal/{id}',
             [JurnalEkskulController::class, 'destroy']
-        )->name('ekskul.jurnal.destroy');
+        )->middleware('feature:guru.extracurricular')->name('ekskul.jurnal.destroy');
 
         Route::get(
             '/dashboard-walikelas',
             [DashboardWaliKelasController::class, 'index']
-        )->name('dashboard-walikelas');
+        )->middleware('feature:guru.academic')->name('dashboard-walikelas');
 
         Route::get(
             '/jadwal-saya',
             [JadwalSayaController::class, 'index']
-        )->name('jadwal-saya.index');
+        )->middleware('feature:guru.academic')->name('jadwal-saya.index');
 
         Route::post(
             '/jadwal-saya/pilih-slot',
             [JadwalSayaController::class, 'pilihSlot']
-        )->name('jadwal-saya.pilih-slot');
+        )->middleware('feature:guru.academic')->name('jadwal-saya.pilih-slot');
 
         Route::delete(
             '/jadwal-saya/{id}/hapus',
             [JadwalSayaController::class, 'hapusSlot']
-        )->name('jadwal-saya.hapus-slot');
+        )->middleware('feature:guru.academic')->name('jadwal-saya.hapus-slot');
         
         Route::post(
             '/jadwal-saya/submit',
             [JadwalSayaController::class, 'submitJadwal']
-        )->name('jadwal-saya.submit');
+        )->middleware('feature:guru.academic')->name('jadwal-saya.submit');
 
         Route::resource(
             'pengajuan-jadwal',
             PengajuanJadwalController::class
-        );
+        )->middleware('feature:guru.academic');
 
         Route::get(
             '/kelas-saya',
             [WaliKelasController::class, 'kelasSaya']
-        )->name('kelas-saya');
+        )->middleware('feature:guru.academic')->name('kelas-saya');
 
         Route::get(
             '/raport/{siswa}',
             [RaportController::class, 'show']
-        )->name('raport.show');
+        )->middleware('feature:guru.academic')->name('raport.show');
 
         Route::get(
             '/raport/{siswa}/pdf',
             [RaportController::class, 'pdf']
-        )->name('raport.pdf');
+        )->middleware('feature:guru.academic')->name('raport.pdf');
 
         Route::get(
             '/absensi',
             [AbsensiController::class, 'index']
-        )->name('absensi.index');
+        )->middleware('feature:guru.academic')->name('absensi.index');
 
         Route::post(
             '/absensi',
             [AbsensiController::class, 'store']
-        )->name('absensi.store');
+        )->middleware('feature:guru.academic')->name('absensi.store');
 
         Route::get(
             '/absensi/{absensi}/edit',
             [AbsensiController::class, 'edit']
-        )->name('absensi.edit');
+        )->middleware('feature:guru.academic')->name('absensi.edit');
 
         Route::put(
             '/absensi/{absensi}',
             [AbsensiController::class, 'update']
-        )->name('absensi.update');
+        )->middleware('feature:guru.academic')->name('absensi.update');
 
         Route::get(
             '/rekap-absensi',
             [AbsensiController::class, 'rekap']
-        )->name('absensi.rekap');
+        )->middleware('feature:guru.academic')->name('absensi.rekap');
         Route::get(
             '/rekap-absensi/export',
             [AbsensiController::class, 'exportPdf']
-        )->name('absensi.export');
+        )->middleware('feature:guru.academic')->name('absensi.export');
 
         Route::get(
             '/rekap-bulanan',
             [AbsensiController::class, 'rekapBulanan']
-        )->name('absensi.rekap-bulanan');
+        )->middleware('feature:guru.academic')->name('absensi.rekap-bulanan');
 
         Route::get(
             '/rekap-semester',
             [AbsensiController::class, 'rekapSemester']
-        )->name('absensi.rekap-semester');
+        )->middleware('feature:guru.academic')->name('absensi.rekap-semester');
 
         Route::resource(
         'e-learning',
         ElearningController::class
-        );
+        )->middleware('feature:guru.academic');
 
             Route::post(
             '/e-learning/upload-image',
             [ElearningController::class, 'uploadImage']
-        )->name('e-learning.upload-image');
+        )->middleware('feature:guru.academic')->name('e-learning.upload-image');
 
         Route::post(
             '/e-learning/{elearning}/komentar',
             [\App\Http\Controllers\Elearning\ElearningKomentarController::class, 'store']
-        )->name('e-learning.komentar.store');
+        )->middleware('feature:guru.academic')->name('e-learning.komentar.store');
 
         Route::post(
             '/e-learning-komentar/{komentar}/reply',
             [\App\Http\Controllers\Elearning\ElearningKomentarReplyController::class, 'store']
-        )->name(
+        )->middleware('feature:guru.academic')->name(
             'e-learning.reply.store'
         );
 
         Route::get(
             '/nilai',
             [NilaiController::class, 'index']
-        )->name('nilai.index');
+        )->middleware('feature:guru.academic')->name('nilai.index');
 
         Route::post(
             '/nilai',
             [NilaiController::class, 'store']
-        )->name('nilai.store');
+        )->middleware('feature:guru.academic')->name('nilai.store');
 
         Route::get(
             '/perkembangan-siswa',
             [PerkembanganSiswaController::class, 'index']
-        )->name('perkembangan.index');
+        )->middleware('feature:guru.academic')->name('perkembangan.index');
 
         Route::post(
             '/perkembangan-siswa',
             [PerkembanganSiswaController::class, 'store']
-        )->name('perkembangan.store');
+        )->middleware('feature:guru.academic')->name('perkembangan.store');
 
         Route::get(
             '/siswa/{siswa}',
             [WaliKelasController::class, 'show']
-        )->name('kelas-saya.show');
+        )->middleware('feature:guru.academic')->name('kelas-saya.show');
 
         Route::get(
             '/kenaikan-kelas',
             [KenaikanKelasGuruController::class, 'index']
-        )->name('kenaikan.index');
+        )->middleware('feature:guru.academic')->name('kenaikan.index');
 
         Route::post(
             '/kenaikan-kelas',
             [KenaikanKelasGuruController::class, 'store']
-        )->name('kenaikan.store');
+        )->middleware('feature:guru.academic')->name('kenaikan.store');
 
         Route::patch(
             '/kenaikan-kelas/submit',
             [KenaikanKelasGuruController::class, 'submit']
-        )->name('kenaikan.submit');
+        )->middleware('feature:guru.academic')->name('kenaikan.submit');
 
         Route::get(
             '/status-validasi',
             [StatusValidasiController::class, 'index']
-        )->name('status-validasi.index');
+        )->middleware('feature:guru.academic')->name('status-validasi.index');
 
         Route::get('/dokumen/surat', [DokumenGuruController::class, 'index'])
+            ->middleware('feature:guru.academic')
             ->name('dokumen.surat');
 
-        Route::resource('pengajuan-surat',App\Http\Controllers\Guru\PengajuanSuratController::class);
+        Route::resource('pengajuan-surat',App\Http\Controllers\Guru\PengajuanSuratController::class)
+            ->middleware('feature:guru.academic');
 
         Route::get('/nomor-surat',[NomorSuratGuruController::class, 'index'])
+            ->middleware('feature:guru.academic')
             ->name('nomor-surat.index');
 
         Route::post('/nomor-surat/generate',[NomorSuratGuruController::class, 'generate'])
+            ->middleware('feature:guru.academic')
             ->name('nomor-surat.generate');
 
         Route::get('/profile', [ProfileController::class, 'index'])
@@ -333,32 +338,32 @@ Route::prefix('guru')
         Route::get(
             '/ekskul/catatan-pembinaan',
             [CatatanPembinaanController::class, 'index']
-        )->name('ekskul.pembinaan.index');
+        )->middleware('feature:guru.extracurricular')->name('ekskul.pembinaan.index');
 
         Route::post(
             '/ekskul/catatan-pembinaan/store',
             [CatatanPembinaanController::class, 'store']
-        )->name('ekskul.pembinaan.store');
+        )->middleware('feature:guru.extracurricular')->name('ekskul.pembinaan.store');
 
         Route::get(
             '/ekskul/jadwal',
             [JadwalEkskulController::class, 'index']
-        )->name('ekskul.jadwal.index');
+        )->middleware('feature:guru.extracurricular')->name('ekskul.jadwal.index');
 
         Route::post(
             '/ekskul/jadwal/store',
             [JadwalEkskulController::class, 'store']
-        )->name('ekskul.jadwal.store');
+        )->middleware('feature:guru.extracurricular')->name('ekskul.jadwal.store');
 
         Route::post(
             '/ekskul/jadwal/submit',
             [JadwalEkskulController::class, 'submit']
-        )->name('ekskul.jadwal.submit');
+        )->middleware('feature:guru.extracurricular')->name('ekskul.jadwal.submit');
 
         Route::get(
             '/ekskul/status-validasi',
             [StatusValidasiEkskulController::class, 'index']
-        )->name('ekskul.validasi.index');
+        )->middleware('feature:guru.extracurricular')->name('ekskul.validasi.index');
 
         Route::get(
             '/ekskul/jadwal/{jadwal}/edit',
@@ -366,7 +371,7 @@ Route::prefix('guru')
                 JadwalEkskulController::class,
                 'edit'
             ]
-        )->name(
+        )->middleware('feature:guru.extracurricular')->name(
             'ekskul.jadwal.edit'
         );
 
@@ -376,7 +381,7 @@ Route::prefix('guru')
                 JadwalEkskulController::class,
                 'update'
             ]
-        )->name(
+        )->middleware('feature:guru.extracurricular')->name(
             'ekskul.jadwal.update'
         );
 
@@ -386,7 +391,7 @@ Route::prefix('guru')
                 JadwalEkskulController::class,
                 'destroy'
             ]
-        )->name(
+        )->middleware('feature:guru.extracurricular')->name(
             'ekskul.jadwal.destroy'
         );
 
@@ -399,11 +404,11 @@ Route::prefix('guru')
         Route::patch(
             'kenaikan-kelas/submit',
             [KenaikanKelasGuruController::class, 'submit']
-        )->name('kenaikan.submit');
+        )->middleware('feature:guru.academic')->name('kenaikan.submit');
 
         Route::patch(
             'kenaikan-kelas/cancel',
             [KenaikanKelasGuruController::class, 'cancelSubmission']
-        )->name('kenaikan.cancel');
+        )->middleware('feature:guru.academic')->name('kenaikan.cancel');
 
 });

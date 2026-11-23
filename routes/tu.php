@@ -37,7 +37,7 @@ use App\Http\Controllers\Tu\JadwalFinalController;
 */
 Route::middleware([
         'auth',
-        'role:tu',
+        'role:guru',
         'tu.mode'
     ])
     ->prefix('tu')
@@ -87,7 +87,7 @@ Route::middleware([
         | KELAS & ROMBEL
         |--------------------------------------------------------------------------
         */
-        Route::middleware(['approved', 'tahun.aktif'])
+        Route::middleware(['approved', 'tahun.aktif', 'feature:tu.academic'])
             ->prefix('kelas')
             ->name('kelas.')
             ->group(function () {
@@ -141,7 +141,8 @@ Route::middleware([
         Route::post('/siswa/import', [SiswaController::class, 'importExcel'])->name('siswa.import');
         Route::post('/siswa/{id}/restore', [SiswaController::class, 'restore'])->name('siswa.restore');
         Route::delete('/siswa/{id}/force-delete', [SiswaController::class, 'forceDelete'])->name('siswa.forceDelete');
-        Route::resource('siswa', SiswaController::class);
+        Route::resource('siswa', SiswaController::class)
+            ->middleware('feature:tu.academic');
         /*
         |--------------------------------------------------------------------------
         | AJAX (ANGKATAN → GRUP → ROMBEL)
@@ -162,7 +163,8 @@ Route::middleware([
         Route::get('/guru/search/ajax', [GuruController::class, 'ajaxSearch'])->name('guru.search');
         Route::post('/guru/bulk', [GuruController::class, 'bulkAction'])->name('guru.bulk');
         Route::get('/guru/{id}/detail', [GuruController::class, 'detail'])->name('guru.detail');
-        Route::resource('guru', GuruController::class);
+        Route::resource('guru', GuruController::class)
+            ->middleware('feature:tu.academic');
 
         /*
         |--------------------------------------------------------------------------
@@ -181,11 +183,11 @@ Route::middleware([
         Route::get(
             '/jadwal-final',
             [JadwalFinalController::class, 'index']
-        )->name('jadwal-final.index');
+        )->middleware('feature:tu.academic')->name('jadwal-final.index');
         Route::post(
             '/jadwal-final/export',
             [JadwalFinalController::class, 'export']
-        )->name('jadwal-final.export');
+        )->middleware('feature:tu.academic')->name('jadwal-final.export');
         /*
         |--------------------------------------------------------------------------
         | MATA PELAJARAN
@@ -196,7 +198,8 @@ Route::middleware([
         Route::post('/mapel/{id}/restore', [MataPelajaranController::class, 'restore'])->name('mapel.restore');
         Route::delete('/mapel/{id}/force-delete', [MataPelajaranController::class, 'forceDelete'])->name('mapel.forceDelete');
         Route::get('/mapel/{id}/detail', [MataPelajaranController::class, 'show'])->name('mapel.detail');
-        Route::resource('mapel', MataPelajaranController::class);
+        Route::resource('mapel', MataPelajaranController::class)
+            ->middleware('feature:tu.academic');
 
         /*
         |--------------------------------------------------------------------------
@@ -208,7 +211,8 @@ Route::middleware([
         Route::post('/tahun/{id}/restore', [TahunAjaranController::class, 'restore'])->name('tahun.restore');
         Route::delete('/tahun/{id}/force-delete', [TahunAjaranController::class, 'forceDelete'])->name('tahun.forceDelete');
         Route::get('/tahun/{id}/detail', [TahunAjaranController::class, 'detail'])->name('tahun.detail');
-        Route::resource('tahun', TahunAjaranController::class);
+        Route::resource('tahun', TahunAjaranController::class)
+            ->middleware('feature:tu.academic');
         Route::post('/tahun/transisi',
             [TahunAjaranController::class, 'masukTransisi']
         )->name('tahun.transisi');
@@ -229,9 +233,11 @@ Route::middleware([
         | RUANGAN & WALI KELAS
         |--------------------------------------------------------------------------
         */
-        Route::resource('ruangan', RuanganController::class);
+        Route::resource('ruangan', RuanganController::class)
+            ->middleware('feature:tu.academic');
         Route::resource('walikelas', WaliKelasController::class)
-            ->except(['show', 'edit', 'update']);
+            ->except(['show', 'edit', 'update'])
+            ->middleware('feature:tu.academic');
 
          /*
         |--------------------------------------------------------------------------
@@ -241,10 +247,12 @@ Route::middleware([
 
         // Dokumen Sekolah
         Route::get('/dokumen-sekolah', [DokumenController::class, 'sekolah'])
+            ->middleware('feature:tu.documents')
             ->name('dokumen.sekolah');
 
         // Dokumen Siswa
         Route::get('/dokumen-siswa', [DokumenController::class, 'siswa'])
+            ->middleware('feature:tu.documents')
             ->name('dokumen.siswa');
 
         // Form Tambah Dokumen
@@ -272,7 +280,8 @@ Route::middleware([
         | DATA KEPEGAWAIAN
         |--------------------------------------------------------------------------
         */
-        Route::resource('datakepegawaian', DataKepegawaianController::class);
+        Route::resource('datakepegawaian', DataKepegawaianController::class)
+            ->middleware('feature:tu.academic');
         Route::get(
     '/datakepegawaian/export/excel',
     [DataKepegawaianExportController::class, 'export']
@@ -296,39 +305,44 @@ Route::middleware([
         )->name('datakepegawaian.create-account');
 
         Route::get('/pengajuan-surat',[PengajuanSuratController::class, 'index'])
+            ->middleware('feature:tu.documents')
             ->name('pengajuan-surat.index');
 
         Route::get('/pengajuan-surat/create',[PengajuanSuratController::class, 'create'])
+            ->middleware('feature:tu.documents')
             ->name('pengajuan-surat.create');
 
         Route::post('/pengajuan-surat/store',[PengajuanSuratController::class, 'store'])
+            ->middleware('feature:tu.documents')
             ->name('pengajuan-surat.store');
 
         Route::get('/pengajuan-surat/{id}',[PengajuanSuratController::class, 'show'])
+            ->middleware('feature:tu.documents')
             ->name('pengajuan-surat.show');
 
         Route::get('/pengajuan-surat/{id}/edit', [PengajuanSuratController::class, 'edit'])
+            ->middleware('feature:tu.documents')
             ->name('pengajuan-surat.edit');
 
         Route::put(
             '/pengajuan-surat/{id}',
             [PengajuanSuratController::class, 'update']
-        )->name('pengajuan-surat.update');
+        )->middleware('feature:tu.documents')->name('pengajuan-surat.update');
 
         Route::delete(
             '/pengajuan-surat/{id}',
             [PengajuanSuratController::class, 'destroy']
-        )->name('pengajuan-surat.destroy');
+        )->middleware('feature:tu.documents')->name('pengajuan-surat.destroy');
 
         Route::get(
     '/nomor-surat',
     [NomorSuratTuController::class, 'index']
-)->name('nomor-surat.index');
+        )->middleware('feature:tu.documents')->name('nomor-surat.index');
 
 Route::post(
     '/nomor-surat/generate',
     [NomorSuratTuController::class, 'generate']
-)->name('nomor-surat.generate');
+)->middleware('feature:tu.documents')->name('nomor-surat.generate');
 
 Route::get(
     '/kelas/{kelasGrup}/export',
@@ -340,7 +354,7 @@ Route::get(
         Route::resource(
             'ekskul',
             EkskulController::class
-        );
+        )->middleware('feature:tu.academic');
 
         /*
         |--------------------------------------------------------------------------
@@ -349,6 +363,7 @@ Route::get(
         */
         Route::prefix('penempatan-siswa')
             ->name('penempatan-siswa.')
+            ->middleware('feature:tu.academic')
             ->group(function () {
 
                 Route::get('/create', [PenempatanSiswaController::class, 'create'])->name('create');
@@ -383,7 +398,8 @@ Route::get(
         |--------------------------------------------------------------------------
         */
         Route::resource('angkatan', AngkatanController::class)
-            ->except(['show']);
+            ->except(['show'])
+            ->middleware('feature:tu.academic');
 
         Route::post('angkatan/{angkatan}/toggle',
             [AngkatanController::class, 'toggle'])

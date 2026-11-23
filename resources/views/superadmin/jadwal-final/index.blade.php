@@ -4,21 +4,14 @@
 
 @section('content')
 
-<div class="container-fluid py-3">
+<div class="container-fluid dt-siswa-page">
 
-    <div class="card border-0 shadow-sm rounded-4 overflow-hidden mb-4">
-        <div class="card-body p-4 p-lg-5 text-white" style="background: linear-gradient(135deg, #0f4c81 0%, #2563eb 100%);">
-            <div class="d-flex flex-column flex-lg-row justify-content-between align-items-lg-center gap-3">
-                <div>
-                    <h3 class="fw-bold mb-2">Jadwal Resmi Sekolah</h3>
-                    <p class="mb-0 opacity-75">Jadwal resmi sekolah yang telah dipublikasikan dan siap di ekspor PDF.</p>
-                </div>
-                <div class="badge bg-white text-primary px-3 py-2 fs-6">
-                    <i class="bi bi-shield-check me-2"></i> Sinergi-MJ
-                </div>
-            </div>
-        </div>
-    </div>    
+    <x-table.page-header
+        icon="bi-calendar-week"
+        eyebrow="Jadwal Akademik / Final"
+        title="Jadwal Resmi Sekolah"
+        description="Jadwal yang telah dipublikasikan dan siap diekspor ke PDF."
+    />
 
     <form
         action="{{ route('superadmin.jadwal-final.export') }}"

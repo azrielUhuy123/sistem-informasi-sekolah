@@ -4,22 +4,14 @@
 
 @section('content')
 
-<div class="container-fluid">
+<div class="container-fluid dt-siswa-page">
 
-    {{-- HEADER --}}
-    <div class="card border-0 shadow-sm rounded-4 overflow-hidden mb-4">
-        <div class="card-body p-4 p-lg-5 text-white" style="background: linear-gradient(135deg, #0f4c81 0%, #2563eb 100%);">
-            <div class="d-flex flex-column flex-lg-row justify-content-between align-items-lg-center gap-3">
-                <div>
-                    <h3 class="fw-bold mb-2">Kelas {{ $rombel->nama_kelas_label }}</h3>
-                    <p class="mb-0 opacity-75">Angkatan {{ $rombel->kelasGrup->angkatan->tahun }}</p>
-                </div>
-                <div class="badge bg-white text-primary px-3 py-2 fs-6">
-                    <i class="bi bi-shield-check me-2"></i> Sinergi-MJ
-                </div>
-            </div>
-        </div>
-    </div>
+    <x-table.page-header
+        icon="bi-people"
+        eyebrow="Data Akademik / Rombongan Belajar"
+        :title="'Kelas ' . $rombel->nama_kelas_label"
+        :description="'Angkatan ' . $rombel->kelasGrup->angkatan->tahun"
+    />
 
     {{-- ALERT --}}
     <x-alert.flash key="success" type="success"/>
@@ -29,42 +21,37 @@
     <x-table.card
         title="Daftar Siswa {{ $rombel->nama_kelas_label }}"
         subtitle="{{ $totalLaki }} Pria - {{ $totalPerempuan }} Perempuan"
+        :count="$totalSiswa"
+        count-label="data"
     >
-        <x-slot:badge>
-            <span class="badge bg-primary rounded-pill px-2 py-1">
-                {{ $totalSiswa }} <span class="text-badge">Siswa</span>
-            </span>
-        </x-slot:badge>
 
-        <x-slot:actions>
-            <input
-                type="text"
-                id="searchInput"
-                class="form-control table-search"
-                placeholder="Cari siswa..."                
+        <x-slot:toolbar>
+            <x-table.local-toolbar
+                search-id="searchInput"
+                search-label="Cari siswa"
+                search-placeholder="Cari siswa..."
             >
-            <x-button.add
-                :href="route('tu.penempatan-siswa.create', ['kelas_id' => $rombel->id])"
-                label="Tambah Siswa ke Rombel"
-            />
-            
-        </x-slot:actions>
-        <div class="table-responsive">
-            @if($siswa->count())
-                <table class="table table-hover align-middle mb-0">
-                    <thead>
-                        <tr>
-                            <th width="70">Absen</th>
-                            <th>Nama Siswa</th>
-                            <th width="150">NISN</th>
-                            <th width="150">Jenis Kelamin</th>
-                            <th width="150">Tanggal Lahir</th>
-                            <th width="250">Wali</th>
-                            <th width="90">Aksi</th>
-                        </tr>
-                    </thead>
-                    <tbody id="tableSiswaKelas">
-                        @foreach($siswa as $item)
+                <x-button.add
+                    :href="route('tu.penempatan-siswa.create', ['kelas_id' => $rombel->id])"
+                    label="Tambah Siswa ke Rombel"
+                />
+            </x-table.local-toolbar>
+        </x-slot:toolbar>
+        <div class="table-responsive dt-siswa-table-wrap">
+            <table class="table table-hover align-middle dt-table">
+                <thead>
+                    <tr>
+                        <x-table.heading width="70px">Absen</x-table.heading>
+                        <x-table.heading>Nama Siswa</x-table.heading>
+                        <x-table.heading width="150px">NISN</x-table.heading>
+                        <x-table.heading width="150px">Jenis Kelamin</x-table.heading>
+                        <x-table.heading width="150px">Tanggal Lahir</x-table.heading>
+                        <x-table.heading width="250px">Wali</x-table.heading>
+                        <x-table.heading width="90px">Aksi</x-table.heading>
+                    </tr>
+                </thead>
+                <tbody id="tableSiswaKelas">
+                    @forelse($siswa as $item)
                             <tr>
                                 <td>
                                     <span class="badge bg-light text-dark rounded-circle">
@@ -172,15 +159,16 @@
                                     </x-table.actions>                                    
                                 </td>
                             </tr>
-                        @endforeach
-                    </tbody>
-                </table>
-            {{ $siswa->links() }}
-            @else
-                <div class="text-muted text-center">
-                    Belum ada siswa di rombel ini
-                </div>
-            @endif             
+                    @empty
+                        <x-table.empty
+                            :colspan="7"
+                            title="Belum ada siswa di rombel ini"
+                            description="Belum ada siswa aktif pada rombongan belajar ini."
+                        />
+                    @endforelse
+                </tbody>
+            </table>
+            <x-table.pagination :paginator="$siswa" :show-summary="true" />
         </div>
         <div class="d-flex justify-content-between align-items-center mt-4">
             <a href="{{ route('tu.kelas.rombel.index', $rombel->kelas_grup_id) }}" 

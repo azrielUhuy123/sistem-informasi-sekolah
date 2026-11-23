@@ -128,11 +128,22 @@
         class="submenu
         {{ request()->is('superadmin/pengampu-mapel*') ||
         request()->is('superadmin/wali-kelas*') ||
-        request()->is('superadmin/pembina-ekskul*')
+        request()->is('superadmin/pembina-ekskul*') ||
+        request()->is('superadmin/manajemen-penugasan*')
             ? 'show'
             : '' }}"
         id="menuPenugasanGuru"
     >
+
+        <a
+            class="menu-item {{ request()->is('superadmin/manajemen-penugasan*') ? 'active' : '' }}"
+            href="{{ route('superadmin.manajemen-penugasan.index') }}"
+        >
+            <div class="menu-left">
+                <i class="bi bi-sliders"></i>
+                <span>Manajemen Penugasan</span>
+            </div>
+        </a>
 
         <a
             class="menu-item {{ request()->is('superadmin/pengampu-mapel*') ? 'active' : '' }}"
@@ -169,6 +180,18 @@
             </div>
 
         </a>
+
+        @if(auth()->user()->hasFeature('superadmin.assignment'))
+            <a
+                class="menu-item {{ request()->is('superadmin/feature-access*') ? 'active' : '' }}"
+                href="{{ route('superadmin.feature-access.index') }}"
+            >
+                <div class="menu-left">
+                    <i class="bi bi-shield-lock"></i>
+                    <span>Akses Fitur Pengguna</span>
+                </div>
+            </a>
+        @endif
 
     </div>
 

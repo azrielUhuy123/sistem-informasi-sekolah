@@ -4,23 +4,17 @@
 
 @section('content')
 
-<div class="container-fluid">
-
-    {{-- ================= HEADER ================= --}}
-    <div class="card border-0 shadow-sm rounded-4 overflow-hidden mb-4">
-        <div class="card-body p-4 p-lg-5 text-white" style="background: linear-gradient(135deg, #0f4c81 0%, #2563eb 100%);">
-            <div class="d-flex flex-column flex-lg-row justify-content-between align-items-lg-center gap-3">
-                <div>
-                    <h3 class="fw-bold mb-2">Mata Pelajaran</h3>
-                    <p class="mb-0 opacity-75">Daftar Seluruh Mata Pelajaran Sekolah.</p>
-                </div>
-
-                <div class="badge bg-white text-primary px-3 py-2 fs-6">
-                    <i class="bi bi-shield-check me-2"></i> Sinergi-MJ
-                </div>
-            </div>
+<div class="container-fluid dt-siswa-page">
+    <header class="dt-siswa-page-header">
+        <div>
+            <p class="dt-siswa-eyebrow">
+                <i class="bi bi-book-half" aria-hidden="true"></i>
+                Master Data / Mata Pelajaran
+            </p>
+            <h1 class="dt-siswa-page-title">Mata Pelajaran</h1>
+            <p class="dt-siswa-page-description">Daftar dan informasi mata pelajaran sekolah.</p>
         </div>
-    </div>
+    </header>
 
     {{-- ================= ALERT ================= --}}
     <x-alert.flash key="success" type="success" />
@@ -30,73 +24,92 @@
     <x-table.card
         title="Daftar Mata Pelajaran"
         subtitle="Mata pelajaran yang terdata di sekolah"
+        :count="$mata_pelajaran->count()"
+        count-label="data"
     >
 
-        {{-- ================= BADGE JUMLAH ================= --}}
-        <x-slot:badge>
-            <span class="badge bg-primary rounded-pill px-2 py-1">
-                {{ $mata_pelajaran->count() }}
-                <span class="text-badge">Mata Pelajaran</span>
-            </span>
-        </x-slot:badge>
+        <x-slot:toolbar>
+            <x-table.toolbar
+                table-id="superadmin-mapel-table"
+                :action="route('superadmin.mapel.index')"
+                :searchable="true"
+                search-name="q"
+                :search-value="request('q')"
+                search-label="Cari mata pelajaran"
+                search-placeholder="Cari nama atau kode mapel..."
+                filter-name="deleted"
+                :filter-value="$deleted === 'active' ? 'active' : ''"
+                filter-label="Status"
+                filter-menu-title="Filter status"
+                :filter-options="[
+                    ['value' => 'active', 'label' => 'Aktif'],
+                ]"
+            >
+            </x-table.toolbar>
+        </x-slot:toolbar>
+
+        <x-table.chips :criteria="[
+            ['name' => 'q', 'label' => 'Search', 'value' => request('q')],
+            [
+                'name' => 'deleted',
+                'label' => 'Status',
+                'value' => $deleted === 'active' ? $deleted : null,
+                'display' => 'Aktif',
+                'removeValue' => 'all',
+            ],
+        ]" :clear-all-values="['deleted' => 'all']" />
 
         {{-- ================= TABLE ================= --}}
-        <div class="table-responsive">
-            <table class="table table-hover align-middle mb-0">
+        <div
+            class="table-responsive dt-siswa-table-wrap"
+            role="region"
+            aria-label="Daftar mata pelajaran"
+            tabindex="0"
+        >
+            <table id="superadmin-mapel-table" class="table table-hover align-middle dt-table">
+                <caption class="visually-hidden">Daftar mata pelajaran</caption>
 
                 <thead>
                     <tr>
-                        <th width="70">No</th>
-                        <th width="90">Kode</th>
-                        <th>Nama Mata Pelajaran</th>                        
+                        <x-table.heading class="text-center">No</x-table.heading>
+                        <x-table.heading>Kode</x-table.heading>
+                        <x-table.heading>Nama Mata Pelajaran</x-table.heading>
                     </tr>
                 </thead>
 
                 <tbody>
-
                     @forelse ($mata_pelajaran as $row)
-
                         <tr>
-
-                            {{-- No --}}
-                            <td>
-                                <span class="badge bg-light text-dark rounded-circle">
-                                    {{ $loop->iteration }}
-                                </span>
+                            <td class="text-center text-body-secondary">
+                                {{ $loop->iteration }}
                             </td>
-
-                            {{-- Kode --}}
-                            <td>
-                                <span class="badge bg-primary rounded-pill px-2 py-1">
+                            <td class="text-nowrap">
+                                <span class="fw-semibold">
                                     {{ $row->kode_mapel ?? '-' }}
                                 </span>
                             </td>
-
-                            {{-- Nama --}}
                             <td>
-                                <div class="d-flex align-items-center text-muted">
-                                    <i class="bi bi-book-half text-primary me-2"></i>
-                                    {{ $row->nama_mapel }}
-                                </div>
-                            </td>                        
-
-                        </tr>
-
-                    @empty
-
-                        <tr>
-                            <td
-                                colspan="4"
-                                class="text-center text-muted"
-                            >
-                                Tidak ada data mata pelajaran
+                                <span class="fw-semibold">{{ $row->nama_mapel }}</span>
                             </td>
                         </tr>
-
+                    @empty
+                        @if (request()->filled('q'))
+                            <x-table.empty
+                                :colspan="3"
+                                state="no-results"
+                                title="Tidak ada mata pelajaran yang cocok"
+                                description="Ubah kata kunci pencarian, lalu coba lagi."
+                            />
+                        @else
+                            <x-table.empty
+                                :colspan="3"
+                                state="empty"
+                                title="Belum ada data mata pelajaran"
+                                description="Data mata pelajaran belum tersedia."
+                            />
+                        @endif
                     @endforelse
-
                 </tbody>
-
             </table>
         </div>
 

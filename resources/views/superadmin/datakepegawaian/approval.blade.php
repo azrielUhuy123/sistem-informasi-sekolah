@@ -4,30 +4,14 @@
 
 @section('content')
 
-<div class="container-fluid">
+<div class="container-fluid dt-siswa-page">
 
-    {{-- HEADER --}}
-    <div class="card border-0 shadow-sm rounded-4 overflow-hidden mb-4">
-        <div class="card-body p-4 p-lg-5 text-white" style="background: linear-gradient(135deg, #0f4c81 0%, #2563eb 100%);">
-            <div class="d-flex flex-column flex-lg-row justify-content-between align-items-lg-center gap-3">
-
-                <div>
-                    <h3 class="fw-bold mb-2">
-                        Approval Data Kepegawaian
-                    </h3>
-
-                    <p class="mb-0 opacity-75">
-                        Validasi data kepegawaian yang diajukan pengguna sebelum digunakan dalam sistem.
-                    </p>
-                </div>
-
-                <div class="badge bg-white text-primary px-3 py-2 fs-6">
-                    <i class="bi bi-shield-check me-2"></i> Sinergi-MJ
-                </div>
-
-            </div>
-        </div>
-    </div>
+    <x-table.page-header
+        icon="bi-person-vcard"
+        eyebrow="Administrasi / Data Kepegawaian"
+        title="Approval Data Kepegawaian"
+        description="Validasi data kepegawaian yang diajukan pengguna sebelum digunakan dalam sistem."
+    />
 
     {{-- ALERT --}}
     <x-alert.flash key="success" type="success"/>
@@ -37,52 +21,44 @@
     <x-table.card
         title="Daftar Data Kepegawaian"
         subtitle="Seluruh data pegawai yang menunggu proses validasi oleh Kepala Sekolah"
+        :count="$data->count()"
     >
 
-        <x-slot:badge>
-            <span class="badge bg-primary rounded-pill px-2 py-1">
-                {{ $data->count() }}
-                <span class="text-badge">Pegawai</span>
-            </span>
-        </x-slot:badge>
+        <x-slot:toolbar>
+            <x-table.local-toolbar
+                search-id="searchInput"
+                search-label="Cari pegawai"
+                search-placeholder="Cari pegawai..."
+            />
+        </x-slot:toolbar>
 
-        <x-slot:actions>
+        <div class="table-responsive dt-siswa-table-wrap">
 
-            <input
-                type="text"
-                id="searchInput"
-                class="form-control table-search"
-                placeholder="Cari pegawai..."
-            >
-
-        </x-slot:actions>
-
-        <div class="table-responsive">
-
-            <table class="table table-hover align-middle mb-0">
+            <table class="table table-hover align-middle mb-0 dt-table">
+                <caption class="visually-hidden">Data kepegawaian beserta status validasi dan tindakan yang tersedia</caption>
 
                 <thead>
                     <tr>
 
-                        <th width="70">
+                        <x-table.heading width="70">
                             No
-                        </th>
+                        </x-table.heading>
 
-                        <th>
+                        <x-table.heading>
                             Nama Pegawai & NIP
-                        </th>
+                        </x-table.heading>
 
-                        <th width="150">
+                        <x-table.heading width="150">
                             Status
-                        </th>
+                        </x-table.heading>
 
-                        <th width="80">
+                        <x-table.heading width="80">
                             Validasi
-                        </th>
+                        </x-table.heading>
 
-                        <th width="80">
+                        <x-table.heading width="80">
                             Aksi
-                        </th>
+                        </x-table.heading>
 
                     </tr>
                 </thead>
@@ -203,23 +179,11 @@
 
                     @empty
 
-                        <tr>
-
-                            <td colspan="4" class="text-center py-5">
-
-                                <i class="bi bi-folder2-open display-3 text-secondary"></i>
-
-                                <h5 class="fw-bold mt-3">
-                                    Belum Ada Data Kepegawaian
-                                </h5>
-
-                                <p class="text-muted mb-0">
-                                    Tidak terdapat data kepegawaian yang perlu diproses.
-                                </p>
-
-                            </td>
-
-                        </tr>
+                        <x-table.empty
+                            :colspan="5"
+                            title="Belum Ada Data Kepegawaian"
+                            description="Tidak terdapat data kepegawaian yang perlu diproses."
+                        />
 
                     @endforelse
 

@@ -47,6 +47,7 @@
 
     <div class="submenu show" id="menuAkademik">
 
+        @if(auth()->user()->hasFeature('siswa.academic'))
         <a
             class="menu-item
             {{ request()->is('siswa/jadwal*') ? 'active' : '' }}"
@@ -59,8 +60,9 @@
             </div>
 
         </a>
+        @endif
 
-
+        @if(auth()->user()->hasFeature('siswa.academic'))
         <a
             class="menu-item
             {{ request()->is('siswa/nilai*') ? 'active' : '' }}"
@@ -73,7 +75,9 @@
             </div>
 
         </a>
+        @endif
 
+        @if(auth()->user()->hasFeature('siswa.academic'))
         <a
             class="menu-item
             {{ request()->is('siswa/absensi*') ? 'active' : '' }}"
@@ -85,7 +89,9 @@
             </div>
 
         </a>
+        @endif
 
+        @if(auth()->user()->hasFeature('siswa.extracurricular'))
         <a
             class="menu-item
             {{ request()->is('siswa/ekskul*') ? 'active' : '' }}"
@@ -98,7 +104,9 @@
             </div>
 
         </a>
+        @endif
 
+        @if(auth()->user()->hasFeature('siswa.elearning'))
         <a
             class="menu-item
             {{ request()->is('siswa/e-learning*') ? 'active' : '' }}"
@@ -111,6 +119,7 @@
             </div>
 
         </a>
+        @endif
 
     </div>
     {{-- ARSIP & DOKUMEN --}}
@@ -134,6 +143,7 @@
     <div class="submenu" id="menuDokumen">
 
         {{-- DOWNLOAD DOKUMEN --}}
+        @if(auth()->user()->hasFeature('siswa.documents'))
         <a
             class="menu-item
             {{ request()->is('siswa/download-dokumen*') ? 'active' : '' }}"
@@ -146,8 +156,10 @@
             </div>
 
         </a>
+        @endif
 
         {{-- NOMOR SURAT --}}
+        @if(auth()->user()->hasFeature('siswa.letter'))
         <a
             class="menu-item
             {{ request()->is('siswa/nomor-surat*') ? 'active' : '' }}"
@@ -160,6 +172,7 @@
             </div>
 
         </a>
+        @endif
 
     </div>
 

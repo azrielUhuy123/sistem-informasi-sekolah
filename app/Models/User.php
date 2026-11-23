@@ -108,6 +108,94 @@ class User extends Authenticatable
         );
     }
 
+    public function featurePermissions()
+    {
+        return $this->hasMany(UserFeaturePermission::class);
+    }
+
+    public function hasFeature(string $featureKey): bool
+    {
+        if ($this->role === UserRole::SUPERADMIN) {
+            return true;
+        }
+
+        $activeAssignmentKeys = collect();
+        if ($this->pegawai_id) {
+            $activeAssignmentKeys = PenugasanMenu::query()
+                ->whereHas('item.penugasan', function ($query) {
+                    $query->where('status', 'active')
+                        ->where('data_kepegawaian_id', $this->pegawai_id);
+                })
+                ->pluck('menu_key');
+        }
+
+        if ($activeAssignmentKeys->contains($featureKey)) {
+            return true;
+        }
+
+        $assignmentAliases = [
+            'tu.academic' => ['guru.academic', 'tu.academic'],
+            'tu.documents' => ['tu.documents'],
+            'tu.ppdb' => ['tu.ppdb'],
+            'guru.academic' => ['guru.academic'],
+            'guru.extracurricular' => ['guru.extracurricular'],
+        ];
+
+        foreach ($assignmentAliases[$featureKey] ?? [] as $menuKey) {
+            if ($activeAssignmentKeys->contains($menuKey)) {
+                return true;
+            }
+        }
+
+        if ($featureKey === 'guru.academic' && $this->role === UserRole::GURU) {
+            $guru = $this->guru()->first();
+            if ($guru) {
+                $hasLegacyAcademic = WaliKelas::where('guru_id', $guru->id)
+                    ->where('tahun_ajaran_id', current_tahun_id())
+                    ->exists()
+                    || PengampuMapel::where('guru_id', $guru->id)
+                        ->where('tahun_ajaran_id', current_tahun_id())
+                        ->exists();
+                if (! $hasLegacyAcademic) {
+                    return false;
+                }
+            } else {
+                return false;
+            }
+        }
+
+        if ($featureKey === 'guru.extracurricular' && $this->role === UserRole::GURU) {
+            $guru = $this->guru()->first();
+
+            if (! $guru) {
+                return false;
+            }
+
+            $isPembina = \App\Models\PembinaEkskul::where('guru_id', $guru->id)
+                ->where('tahun_ajaran_id', current_tahun_id())
+                ->exists();
+
+            if (! $isPembina) {
+                return false;
+            }
+        }
+
+        $override = $this->featurePermissions()
+            ->where('feature_key', $featureKey)
+            ->first();
+
+        if ($override) {
+            return (bool) $override->allowed;
+        }
+
+        $features = config('feature_access.features', []);
+        $feature = $features[$featureKey] ?? null;
+
+        return is_array($feature)
+            ? in_array($this->role, $feature['roles'] ?? [], true)
+            : false;
+    }
+
     public function getNameAttribute()
     {
         if (array_key_exists('name', $this->attributes)) {

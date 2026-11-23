@@ -20,21 +20,14 @@
 
 @endphp
 
-<div class="container-fluid">
+<div class="container-fluid dt-siswa-page">
 
-    <div class="card border-0 shadow-sm rounded-4 overflow-hidden mb-4">
-        <div class="card-body p-4 p-lg-5 text-white" style="background: linear-gradient(135deg, #0f4c81 0%, #2563eb 100%);">
-            <div class="d-flex flex-column flex-lg-row justify-content-between align-items-lg-center gap-3">
-                <div>
-                    <h3 class="fw-bold mb-2">Monitoring Jadwal</h3>
-                    <p class="mb-0 opacity-75">Monitoring seluruh pengajuan jadwal pembelajaran pada setiap tingkat kelas.</p>
-                </div>
-                <div class="badge bg-white text-primary px-3 py-2 fs-6">
-                    <i class="bi bi-shield-check me-2"></i> Sinergi-MJ
-                </div>
-            </div>
-        </div>
-    </div>    
+    <x-table.page-header
+        icon="bi-calendar-week"
+        eyebrow="Monitoring / Jadwal Pelajaran"
+        title="Monitoring Jadwal"
+        description="Pantau pengajuan jadwal pembelajaran pada setiap tingkat kelas."
+    />
     {{-- Monitoring per tingkat --}}
 
     <div id="monitoring-tingkat-list">
@@ -80,8 +73,8 @@
 
                 <div id="{{ $collapseId }}" class="collapse">
                     <div class="border-top p-3">
-                        <div class="table-responsive">
-                            <table class="table table-hover align-middle mb-0">
+                        <div class="table-responsive dt-siswa-table-wrap">
+                            <table class="table table-hover align-middle mb-0 dt-table">
                                 <thead>
                                     <tr>
                                         <th>Kelas</th>
@@ -151,17 +144,11 @@
                                             </td>
                                         </tr>
                                     @empty
-                                        <tr>
-                                            <td colspan="6">
-                                                <div class="empty-state">
-                                                    <i class="bi bi-calendar-x display-5 text-secondary"></i>
-                                                    <h5 class="mt-3">Belum Ada Jadwal</h5>
-                                                    <p class="text-muted mb-0">
-                                                        Belum terdapat pengajuan jadwal pada tingkat ini.
-                                                    </p>
-                                                </div>
-                                            </td>
-                                        </tr>
+                                        <x-table.empty
+                                            :colspan="6"
+                                            title="Belum Ada Jadwal"
+                                            description="Belum terdapat pengajuan jadwal pada tingkat ini."
+                                        />
                                     @endforelse
                                 </tbody>
                             </table>

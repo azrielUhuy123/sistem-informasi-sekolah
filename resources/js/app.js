@@ -2,6 +2,8 @@ import './bootstrap';
 import 'bootstrap';
 
 import './confirm-modal';
+import './manajemen-penugasan';
+import './table-system';
 
 import { createApp } from 'vue'
 import App from './App.vue'

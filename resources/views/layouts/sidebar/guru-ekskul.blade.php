@@ -5,6 +5,7 @@
 @php
 
     $guru = auth()->user()->guru;
+    $canEkskul = auth()->user()->hasFeature('guru.extracurricular');
 
     $isWaliKelas = \App\Models\WaliKelas::where(
         'guru_id',
@@ -30,6 +31,7 @@
 
     </div>
 
+    @if($canEkskul)
     {{-- DASHBOARD --}}
     <a
         class="menu-item
@@ -50,6 +52,7 @@
         </div>
 
     </a>
+    @endif
 
     {{-- PROFILE --}}
     <a
@@ -71,6 +74,7 @@
 
     </a>
 
+    @if($canEkskul)
     {{-- JADWAL --}}
     <button
         class="menu-item border-0 bg-transparent text-start"
@@ -136,7 +140,9 @@
         </a>
 
     </div>
+    @endif
 
+    @if($canEkskul)
     {{-- EKSKUL --}}
     <button
         class="menu-item border-0 bg-transparent text-start"
@@ -284,5 +290,6 @@
         </a>
 
     </div>
+    @endif
 
 </div>

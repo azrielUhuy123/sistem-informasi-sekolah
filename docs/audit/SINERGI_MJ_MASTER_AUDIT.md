@@ -13,6 +13,7 @@ Dokumen konsolidasi lintas tahap untuk Project Owner dan Lead Architect. Dokumen
 | HEAD saat konsolidasi | `b32f25fc6e28b8e0262fa745e6cf454ea28e6414` (`SINERGI-MJ UPDATE`) |
 | Baseline acuan Tahap 3B | `main` / `b32f25fc6e28b8e0262fa745e6cf454ea28e6414` |
 | Baseline sekarang dibanding Tahap 3B | Branch dan HEAD sama. Status awal memperlihatkan perubahan lokal yang dilaporkan berada pada dokumentasi audit; tidak terlihat perubahan file aplikasi. Source tidak diperiksa ulang menyeluruh untuk konsolidasi ini. |
+| Pembaruan dokumentasi | 22 November 2026: pemeriksaan source terbatas pada relasi akun pegawai, penentuan role, penghapusan data kepegawaian, constraint terkait, dan FK `tahun_ajaran_id`. Database aktif tidak diperiksa. |
 | Status Git sebelum konsolidasi | `M docs/audit/TAHAP_1_INVENTARIS.md`; laporan Tahap 2, 2B–2F, 3, 3A, dan 3B untracked. Tidak tampak file aplikasi berubah. |
 | Output tahap ini | File baru `docs/audit/SINERGI_MJ_MASTER_AUDIT.md`; laporan terdahulu tidak ditimpa. |
 | Status Git sesudah konsolidasi | File master tercatat untracked; `TAHAP_1_INVENTARIS.md` tetap modified dan laporan lokal sebelumnya tetap untracked. Tidak tampak file aplikasi berubah. |
@@ -51,7 +52,7 @@ Menyatukan peta workflow frontend–backend, inventaris modul/role, bukti teknis
 | 3A | [TAHAP_3A_PENDALAMAN_OTORISASI.md](./TAHAP_3A_PENDALAMAN_OTORISASI.md) | Verifikasi ulang dan pemisahan status AUTHZ; menambahkan `AUTHZ-012`. |
 | 3B | [TAHAP_3B_CAKUPAN_AUDIT_OTORISASI.md](./TAHAP_3B_CAKUPAN_AUDIT_OTORISASI.md) | Pemetaan route-action, indeks temuan terkini, statistik cakupan, dan celah route. |
 
-Metode yang tercatat pada laporan sumber adalah pembacaan statis route, middleware, view/form, controller/request, model/relasi, migration, storage reference, dan test yang relevan. Tidak ada laporan tahap yang menjalankan test, build, request aplikasi, migration, seeder, operasi cache, atau query database. Master ini mengonsolidasikan laporan tersebut; tidak menjalankan ulang proses audit.
+Metode yang tercatat pada laporan sumber adalah pembacaan statis route, middleware, view/form, controller/request, model/relasi, migration, storage reference, dan test yang relevan. Tidak ada laporan tahap yang menjalankan test, build, request aplikasi, migration, seeder, operasi cache, atau query database. Pembaruan 22 November 2026 melakukan pembacaan statis terbatas atas relasi akun pegawai, role, penghapusan pegawai, dan constraint penugasan; tidak menjalankan aplikasi atau mengakses database.
 
 ### Batas audit
 
@@ -111,6 +112,8 @@ ID workflow dipertahankan persis sebagaimana pada laporan asal. “Lengkap stati
 | `spmb` | Dipakai pada group dashboard SPMB `routes/web.php:47-48`; tidak ada pada daftar role pusat yang diperiksa Tahap 1/3. | Konflik deklarasi dan jalur login; keberadaan konfigurasi/akun runtime belum dipastikan (`AUTHZ-011`). |
 
 Alias custom yang dicatat pada `bootstrap/app.php` mencakup `role`, `approved`, `forbid.superadmin`, `tahun.aktif`, `guru.mode`, dan `tu.mode`. Laporan Tahap 3 menyebut `approved` tidak terpasang secara seragam, sedangkan mode Guru/TU terutama mengelola session mode. Policy/Gate yang ditemukan tidak dianggap melindungi endpoint bila tidak ada call-site otorisasi pada jalur yang ditelaah. Pengaruh middleware framework, deployment, guard, route cache dan session belum diverifikasi runtime.
+
+**Akun pegawai:** source memodelkan satu kolom `role` pada `User`; pembuatan akun TU menetapkan satu role dari teks jabatan. Admin dan SuperAdmin mengelola nilai role tunggal itu. `User` terhubung ke `DataKepegawaian` melalui `pegawai_id`, dan relasi ke `Guru` menggunakan pasangan `pegawai_id`–`data_kepegawaian_id`. Temuan, batas pembuktian constraint, dan risiko penghapusan dirinci pada §6.8. Bukti: `app/Models/User.php:14-22,86-100`; `app/Http/Controllers/Tu/DataKepegawaianController.php:251-313`; `app/Http/Controllers/Admin/UserController.php:82-96,115-136`; `app/Http/Controllers/SuperAdmin/UserController.php:15-17,31-43`.
 
 ### Ringkasan role × area
 
@@ -237,6 +240,15 @@ Status terkini mengikuti indeks Tahap 3B setelah pendalaman Tahap 3A. `TERKONFIR
 
 Tidak ada `AUTHZ-013` pada konsolidasi ini. Tahap 3B menyatakan tidak menambahkan ID baru karena beberapa observasi tambahan lebih tepat diletakkan sebagai status cakupan/route dispatch. Temuan yang beririsan—misalnya `2D-003`/`AUTHZ-004`, `2D-009`/`AUTHZ-003`, `2C-002`/`AUTHZ-005`, `EXK-T05`/`AUTHZ-007`, `2F-07`/`AUTHZ-006`, `2F-06`/`AUTHZ-009`—tetap memiliki ID masing-masing dan tidak digabungkan.
 
+### 6.8 Akun pegawai, constraint, dan retensi penugasan
+
+| ID | Ringkasan temuan dan bukti | Klasifikasi/status konsolidasi | Tindak lanjut |
+|---|---|---|---|
+| AKUN-001 | `User` memiliki satu atribut `role`; pembuatan akun TU menurunkan satu role dari teks `jabatan`. `User` menghubungkan `pegawai_id` ke `DataKepegawaian` serta `pegawai_id` ke `Guru.data_kepegawaian_id`; `DataKepegawaian` mendeklarasikan `hasOne` ke User dan Guru. Admin dan SuperAdmin memvalidasi/memperbarui satu nilai role. Bukti: `app/Models/User.php:14-22,86-100`; `app/Models/DataKepegawaian.php:79-92`; `app/Models/Guru.php:18-34`; `app/Http/Controllers/Tu/DataKepegawaianController.php:251-313`; `app/Http/Controllers/Admin/UserController.php:82-96,115-136`; `app/Http/Controllers/SuperAdmin/UserController.php:15-17,31-43`. | Fakta source. | Konfirmasi apakah role tunggal memang model akses yang dikehendaki; bukan kesimpulan kebutuhan multi-role. |
+| AKUN-002 | Relasi ORM `hasOne` tidak menetapkan unique constraint. Migration relasi pegawai menetapkan FK, tetapi migration yang diperiksa tidak mendeklarasikan unique untuk `users.pegawai_id` atau `guru.data_kepegawaian_id`. Bukti: `database/migrations/2026_06_19_002923_add_data_kepegawaian_id_to_guru_table.php:13-17`; `database/migrations/2026_06_25_204529_refactor_users_and_guru_relationships.php:14-30`; `database/migrations/2026_08_21_190145_fix_foreign_keys_data_kepegawaian.php:14-33`. | Fakta source; constraint schema aktif belum diverifikasi karena database tidak diakses. | Cocokkan migration efektif dan constraint aktual pada database non-produksi sebelum menetapkan kardinalitas sebagai invariant. |
+| AKUN-003 | `DataKepegawaianController::destroy()` menghapus penugasan wali kelas, pengampu mapel, relasi guru-mapel, pembina ekskul, akun, dan data pegawai dalam transaksi. Migration juga mendeklarasikan cascade pegawai → `users` dan `guru`. Bukti: `app/Http/Controllers/Tu/DataKepegawaianController.php:112-157`; `database/migrations/2026_08_21_190145_fix_foreign_keys_data_kepegawaian.php:14-33`; `app/Models/Guru.php:7-8`. | Fakta source / risiko kehilangan akun dan penugasan; efek database aktif belum diuji. | Tetapkan kebutuhan retensi/nonaktif vs hapus dan verifikasi perilaku pada schema uji. |
+| AKAD-001 | Sejumlah tabel penugasan menyimpan `tahun_ajaran_id` dan memakai FK `cascadeOnDelete`, termasuk `pengajuan_jadwal`, `pengampu_mapel`, dan `pembina_ekskul`. Jika parent tahun ajaran dihapus secara fisik, deklarasi cascade dapat menghapus data terkait, sehingga tidak menjadi perlindungan riwayat. Bukti: `database/migrations/2026_05_07_092325_create_pengajuan_jadwal_table.php:35-37`; `database/migrations/2026_05_14_210710_create_pengampu_mapel_table.php:30-32`; `database/migrations/2026_05_29_015016_create_pembina_ekskul_table.php:23-25`. | Fakta migration / risiko retensi; hanya tabel yang disebut diperiksa. | Inventarisasi kebijakan penghapusan dan arsip untuk semua tabel historis sebelum tindakan operasional. |
+
 ## 7. Pertanyaan kebijakan sekolah yang belum diputuskan
 
 Pertanyaan berikut bukan requirement yang telah disetujui. Tidak ada dasar yang cukup dalam laporan untuk menyebut kebijakan/regulasi tertentu sebagai fakta.
@@ -267,7 +279,7 @@ Verifikasi runtime belum dilakukan. Sebelum memulai, Project Owner perlu menyetu
 2. **Auth dan session:** login admin/SPMB, ketersediaan API verifikasi email, role bypass, penerapan approval/status pada request, dan efek blokir terhadap sesi aktif.
 3. **Scope ID dan assignment:** detail siswa, absensi edit/update, jadwal, surat, jurnal/pembinaan ekskul, membership siswa, dan relasi kelas/tahun/semester. Uji hanya dengan akun serta record fiktif yang disetujui.
 4. **Storage/berkas:** akses URL `public/uploads`, public disk, symlink/web-server rule, file pengganti, validasi mime/ukuran, dan lampiran e-learning. Jangan menggunakan dokumen pribadi atau production.
-5. **Status dan schema:** status `draft` terhadap enum migration, field `validated_file`, arsip dokumen, model soft-delete, dan status anggota. Periksa schema hanya pada database uji; audit terdahulu tidak membaca database.
+5. **Status dan schema:** status `draft` terhadap enum migration, field `validated_file`, arsip dokumen, model soft-delete, status anggota, keunikan `pegawai_id`/`data_kepegawaian_id`, aksi FK pegawai, serta cascade `tahun_ajaran_id` dan perlindungan riwayat. Periksa schema hanya pada database uji; database aktif tidak dibaca.
 6. **Workflow/response UI:** render view yang dirujuk, form method/route binding, form export TU, import kelas, PPDB direct GET/status, serta UI monitoring ekskul.
 7. **Kondisi persaingan yang relevan:** uniqueness nomor surat dan urutan serial. Tidak ada percobaan concurrent atau operasi tulis dalam audit ini.
 
@@ -309,6 +321,7 @@ Angka berikut mempertahankan statistik terbaru dari Tahap 3B. Unit hitungnya ada
 | Tahap 3A | Verifikasi statis ulang `AUTHZ-001`–`011`, mempersempit `AUTHZ-008`, memisahkan runtime dan policy, menambahkan `AUTHZ-012`. |
 | Tahap 3B | Memperluas peta route, mengindeks ulang `AUTHZ-001`–`012`; mencatat target hilang, route ganda, dan angka cakupan dengan 18 entry tidak teralokasi. Tidak mengklaim audit menyeluruh. |
 | Master | Baseline aktual tetap `main`/`b32f25fc...`; konsolidasi laporan saja. Tidak mengubah klasifikasi, memutuskan policy sekolah, atau menyatakan temuan selesai. |
+| Pembaruan 22 November 2026 | Pemeriksaan source terbatas atas akun pegawai, role tunggal, FK/unique relasi, penghapusan pegawai, dan beberapa FK penugasan bertahun ajaran; memperbarui §5, §6.8, dan §8. Tidak mengubah source/migration/database/konfigurasi serta tidak memeriksa database aktif. |
 
 Keputusan konsolidasi:
 

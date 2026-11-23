@@ -4,46 +4,39 @@
 
 @section('content')
 
-<div class="container-fluid">
-    <div class="card border-0 shadow-sm rounded-4 overflow-hidden mb-4">
-        <div class="card-body p-4 p-lg-5 text-white" style="background: linear-gradient(135deg, #0f4c81 0%, #2563eb 100%);">
-            <div class="d-flex flex-column flex-lg-row justify-content-between align-items-lg-center gap-3">
-                <div>
-                    <h3 class="fw-bold mb-2">Mata Pelajaran</h3>
-                    <p class="mb-0 opacity-75">Kelola Data Mata Pelajaran Sekolah.</p>
-                </div>
-                <div class="badge bg-white text-primary px-3 py-2 fs-6">
-                    <i class="bi bi-shield-check me-2"></i> Sinergi-MJ
-                </div>
-            </div>
-        </div>
-    </div>
+<div class="container-fluid dt-siswa-page">
+    <x-table.page-header
+        icon="bi-book-half"
+        eyebrow="Master Data / Mata Pelajaran"
+        title="Mata Pelajaran"
+        description="Daftar dan informasi mata pelajaran sekolah."
+    />
 
     <x-alert.flash key="success" type="success" />
     <x-alert.flash key="error" type="danger" />
  
-    <x-table.card title="Daftar Mata Pelajaran" subtitle="Mata pelajaran yang terdata di sekolah">
-        <x-slot:badge>
-            <span class="badge bg-primary rounded-pill px-2 py-1">
-                {{ $mata_pelajaran->count() }} <span class="text-badge">Mata Pelajaran</span>
-            </span>
-        </x-slot:badge>
+    <x-table.card
+        title="Daftar Mata Pelajaran"
+        subtitle="Mata pelajaran yang terdata di sekolah"
+        :count="$mata_pelajaran->count()"
+        count-label="data"
+    >
 
-        <x-slot:actions>
+        <x-slot:pageActions>
             <x-button.add
                 :href="route('tu.mapel.create')"
                 label="Tambah Mata Pelajaran"
             />            
-        </x-slot:actions>
+        </x-slot:pageActions>
 
-        <div class="table-responsive">
-            <table class="table table-hover align-middle mb-0">
+        <div class="table-responsive dt-siswa-table-wrap">
+            <table class="table table-hover align-middle dt-table">
                 <thead>
                     <tr>
-                        <th width="70">No</th>
-                        <th width="90">Kode</th>
-                        <th>Nama Mata Pelajaran</th>
-                        <th width="90">Aksi</th>
+                        <x-table.heading width="70px" class="text-center">No</x-table.heading>
+                        <x-table.heading width="90px">Kode</x-table.heading>
+                        <x-table.heading>Nama Mata Pelajaran</x-table.heading>
+                        <x-table.heading width="90px">Aksi</x-table.heading>
                     </tr>
                 </thead>
                 <tbody>
@@ -90,9 +83,11 @@
                             </td>
                         </tr>
                     @empty
-                        <tr>
-                            <td colspan="4" class="text-center text-muted">Belum ada data mata pelajaran</td>
-                        </tr>
+                        <x-table.empty
+                            :colspan="4"
+                            title="Belum ada data mata pelajaran"
+                            description="Data mata pelajaran belum tersedia."
+                        />
                     @endforelse
                 </tbody>
             </table>

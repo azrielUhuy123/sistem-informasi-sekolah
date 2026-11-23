@@ -1,22 +1,13 @@
 @extends('layouts.app')
 @section('title', 'Monitoring Jadwal Kelas ' . $kelas->nama_kelas_label)
 @section('content')
-<div class="container-fluid">
-    <div class="card border-0 shadow-sm rounded-4 overflow-hidden mb-4">
-        <div class="card-body p-4 p-lg-5 text-white" style="background: linear-gradient(135deg, #0f4c81 0%, #2563eb 100%);">
-            <div class="d-flex flex-column flex-lg-row justify-content-between align-items-lg-center gap-3">
-                <div>
-                    <h3 class="fw-bold mb-2">Monitoring Jadwal</h3>
-                    <p class="mb-0 opacity-75">Monitoring, validasi, persetujuan, dan publikasi jadwal pelajaran kelas
-                        <strong>{{ $kelas->nama_kelas_label }}</strong>.
-                    </p>
-                </div>
-                <div class="badge bg-white text-primary px-3 py-2 fs-6">
-                    <i class="bi bi-shield-check me-2"></i> Sinergi-MJ
-                </div>
-            </div>
-        </div>
-    </div>
+<div class="container-fluid dt-siswa-page">
+    <x-table.page-header
+        icon="bi-calendar-week"
+        eyebrow="Monitoring / Jadwal Pelajaran"
+        title="Monitoring Jadwal"
+        :description="'Monitoring, validasi, persetujuan, dan publikasi jadwal kelas ' . $kelas->nama_kelas_label . '.'"
+    />
     
     {{-- TOOLBAR --}}
     <div class="card border-0 shadow-sm rounded-4 mb-4">
@@ -134,7 +125,7 @@
     <div class="card border-0 shadow-sm overflow-hidden">
         <div class="card-body">
             {{-- TABLE --}}
-            <div class="table-responsive">
+            <div class="table-responsive dt-siswa-table-wrap">
                 <table class="table table-bordered align-middle text-center modern-grid-table mb-0">
                     <thead>
                         <tr class="table-header">
@@ -231,49 +222,68 @@
         <x-table.card
             title="Daftar Jadwal Pelajaran"
             subtitle="Monitoring seluruh jadwal kelas {{ $kelas->nama_kelas_label }}"
+            :count="$jadwals->count()"
+            count-label="jadwal"
         >
-            <x-slot:badge>
-                <span class="badge bg-primary rounded-pill px-2 py-1">
-                    {{ $jadwals->count() }}
-                    <span class="text-badge">Jadwal</span>
-                </span>
-            </x-slot:badge>
-            <div class="table-responsive">
-                <table class="table table-hover align-middle mb-0">
+            <x-slot:toolbar>
+                <x-table.toolbar
+                    table-id="monitoring-jadwal-detail-table"
+                    :column-toggle="true"
+                    :refreshable="true"
+                    :refresh-url="request()->fullUrl()"
+                >
+                    <x-slot:columnMenu>
+                        <label class="dt-column-menu__option">
+                            <input type="checkbox" data-dt-column="hari">
+                            <span>Hari</span>
+                        </label>
+                        <label class="dt-column-menu__option">
+                            <input type="checkbox" data-dt-column="jam">
+                            <span>Jam</span>
+                        </label>
+                        <label class="dt-column-menu__option">
+                            <input type="checkbox" data-dt-column="guru">
+                            <span>Guru</span>
+                        </label>
+                        <label class="dt-column-menu__option">
+                            <input type="checkbox" data-dt-column="mapel">
+                            <span>Mata Pelajaran</span>
+                        </label>
+                        <label class="dt-column-menu__option">
+                            <input type="checkbox" data-dt-column="status">
+                            <span>Status</span>
+                        </label>
+                        <label class="dt-column-menu__option">
+                            <input type="checkbox" data-dt-column="monitoring">
+                            <span>Monitoring</span>
+                        </label>
+                    </x-slot:columnMenu>
+                </x-table.toolbar>
+            </x-slot:toolbar>
+            <div class="table-responsive dt-siswa-table-wrap">
+                <table id="monitoring-jadwal-detail-table" class="table table-hover align-middle mb-0 dt-table" data-dt-table>
                     <thead>
                         <tr>
-                            <th width="120">
-                                Hari
-                            </th>
-                            <th width="170">
-                                Jam
-                            </th>
-                            <th>
-                                Guru
-                            </th>
-                            <th>
-                                Mata Pelajaran
-                            </th>
-                            <th width="140">
-                                Status
-                            </th>
-                            <th width="140">
-                                Monitoring
-                            </th>
+                            <x-table.heading column="hari" width="120">Hari</x-table.heading>
+                            <x-table.heading column="jam" width="170">Jam</x-table.heading>
+                            <x-table.heading column="guru">Guru</x-table.heading>
+                            <x-table.heading column="mapel">Mata Pelajaran</x-table.heading>
+                            <x-table.heading column="status" width="140">Status</x-table.heading>
+                            <x-table.heading column="monitoring" width="140">Monitoring</x-table.heading>
                         </tr>
                     </thead>
                     <tbody>
                         @forelse ($jadwals as $item)
                             <tr>
                                 {{-- HARI --}}
-                                <td>
+                                <td data-dt-column="hari">
                                     <span class="fw-semibold small text-muted">
                                         <i class="bi bi-calendar3 me-1"></i>
                                         {{ $item->hari->nama ?? '-' }}
                                     </span>
                                 </td>
                                 {{-- JAM --}}
-                                <td>
+                                <td data-dt-column="jam">
                                     <div class="fw-semibold">
                                         Jam {{ $item->jamPelajaran->jam_ke }}
                                     </div>
@@ -284,7 +294,7 @@
                                     </small>
                                 </td>
                                 {{-- GURU --}}
-                                <td>
+                                <td data-dt-column="guru">
                                     <div class="d-flex align-items-center">                                        
                                         <div>
                                             <div class="fw-semibold">
@@ -294,7 +304,7 @@
                                     </div>
                                 </td>
                                 {{-- MATA PELAJARAN --}}
-                                <td>
+                                <td data-dt-column="mapel">
                                     <div class="d-flex align-items-center text-muted">
                                         <i class="bi bi-book-half text-primary me-2"></i>
                                         <span>
@@ -303,7 +313,7 @@
                                     </div>
                                 </td>
                                 {{-- STATUS --}}
-                                <td>
+                                <td data-dt-column="status">
                                     @if ($item->status == 'submitted')
                                         <span class="badge-status pending">
                                             <i class="bi bi-hourglass-split me-2"></i>
@@ -331,7 +341,7 @@
                                     @endif
                                 </td>
                                 {{-- MONITORING --}}
-                                <td>
+                                <td data-dt-column="monitoring">
                                     @if ($item->status == 'submitted')
                                         @if ($conflicts[$item->id] ?? false)
                                             <span class="text-danger">

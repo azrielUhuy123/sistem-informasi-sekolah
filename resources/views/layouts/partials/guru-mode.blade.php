@@ -6,6 +6,8 @@
             ->where('tahun_ajaran_id', current_tahun_id())
             ->exists()
         : false;
+
+    $canEkskul = auth()->user()->hasFeature('guru.extracurricular');
 @endphp
 
 <div>
@@ -38,7 +40,7 @@
                 </a>
             </li>
 
-            @if($isPembinaEkskul)
+            @if($isPembinaEkskul && $canEkskul)
                 <li>
                     <a
                         class="dropdown-item"

@@ -4,25 +4,14 @@
 
 @section('content')
 
-<div class="container-fluid">
+<div class="container-fluid dt-siswa-page">
 
-    <div class="card border-0 shadow-sm rounded-4 overflow-hidden mb-4">
-        <div class="card-body text-white p-4 p-lg-5"
-            style="background:linear-gradient(135deg,#0f4c81,#2563eb);">
-            <div class="d-flex justify-content-between align-items-center flex-wrap">
-                <div>
-                    <h2 class="fw-bold mb-2">Monitoring Kenaikan Kelas</h2>
-                    <p class="mb-0 opacity-75">
-                        Monitoring pengajuan kenaikan kelas yang diajukan oleh wali kelas untuk tahun ajaran aktif.
-                    </p>
-                </div>
-
-                <div class="badge bg-white text-primary px-3 py-2 fs-6">
-                    <i class="bi bi-shield-check me-2"></i> Sinergi-MJ
-                </div>
-            </div>
-        </div>
-    </div>    
+    <x-table.page-header
+        icon="bi-mortarboard"
+        eyebrow="Monitoring / Kenaikan Kelas"
+        title="Monitoring Kenaikan Kelas"
+        description="Pantau pengajuan kenaikan kelas dari wali kelas untuk tahun ajaran aktif."
+    />
 
     <div class="accordion" id="accordionKenaikanKelas">
         @php
@@ -76,8 +65,8 @@
 
                 <div id="{{ $collapseId }}" class="collapse" data-bs-parent="#accordionKenaikanKelas">
                     <div class="border-top p-3">                    
-                        <div class="table-responsive">
-                            <table class="table table-hover align-middle mb-0">
+                        <div class="table-responsive dt-siswa-table-wrap">
+                            <table class="table table-hover align-middle mb-0 dt-table">
                                 <thead>
                                     <tr>                                        
                                         <th>Kelas</th>
@@ -174,16 +163,11 @@
                                             </td>
                                         </tr>
                                     @empty
-                                        <tr>
-                                            <td colspan="6">
-                                                <div class="empty-state">
-                                                <i class="bi bi-calendar-x display-5 text-secondary"></i>
-                                                <h5 class="mt-3">Belum ada data kelas.</h5>
-                                                <p class="text-muted mb-0">
-                                                    Belum terdapat pengajuan kenaikan kelas pada tingkat ini.
-                                                </p>                                                
-                                            </td>
-                                        </tr>
+                                        <x-table.empty
+                                            :colspan="7"
+                                            title="Belum ada data kelas"
+                                            description="Belum terdapat pengajuan kenaikan kelas pada tingkat ini."
+                                        />
                                     @endforelse
                                 </tbody>
                             </table>
