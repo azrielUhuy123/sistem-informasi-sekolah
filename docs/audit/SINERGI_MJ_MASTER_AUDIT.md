@@ -322,13 +322,14 @@ Angka berikut mempertahankan statistik terbaru dari Tahap 3B. Unit hitungnya ada
 | Tahap 3B | Memperluas peta route, mengindeks ulang `AUTHZ-001`–`012`; mencatat target hilang, route ganda, dan angka cakupan dengan 18 entry tidak teralokasi. Tidak mengklaim audit menyeluruh. |
 | Master | Baseline aktual tetap `main`/`b32f25fc...`; konsolidasi laporan saja. Tidak mengubah klasifikasi, memutuskan policy sekolah, atau menyatakan temuan selesai. |
 | Pembaruan 22 November 2026 | Pemeriksaan source terbatas atas akun pegawai, role tunggal, FK/unique relasi, penghapusan pegawai, dan beberapa FK penugasan bertahun ajaran; memperbarui §5, §6.8, dan §8. Tidak mengubah source/migration/database/konfigurasi serta tidak memeriksa database aktif. |
+| Revisi backend SINERGI-MJ V1 | Menghubungkan penugasan aktif ke izin menu individual, membatasi Guru/TU/SPMB legacy melalui middleware route, memetakan akun TU lama menjadi Guru dengan snapshot rollback, dan menyinkronkan tugas operasional hanya dari data tahun ajaran aktif. Role `admin` dipertahankan sebagai role teknis karena masih dipakai route/policy; role SPMB tidak lagi menjadi jalur otorisasi. Validasi memakai database `sekolah_app_testing`; tidak menjalankan migrasi terhadap database produksi. |
 
 Keputusan konsolidasi:
 
 - ID temuan lintas laporan yang tampak berkaitan tetap terpisah; cross-reference dipakai untuk membantu penelusuran.
 - Perilaku source dipisahkan dari akses efektif/runtime dan aturan sekolah.
 - Klaim yang didukung hanya oleh pencarian terbatas ditulis sebagai “tidak ditemukan pada cakupan pencarian”, bukan “tidak ada”.
-- Tidak ada temuan yang ditandai selesai atau diperbaiki.
+- Pada saat master audit ini disusun, tidak ada temuan yang ditandai selesai atau diperbaiki; perubahan V1 dicatat terpisah pada riwayat di atas.
 
 ## 11. Rekomendasi urutan validasi berikutnya
 
@@ -346,3 +347,209 @@ Rekomendasi ini adalah urutan **validasi audit dan keputusan**, bukan persetujua
 ---
 
 Master audit ini merangkum laporan yang tersedia pada baseline yang disebutkan. Referensi ke source code dan nomor baris adalah bukti yang dicatat laporan tahap terkait; perubahan source di luar baseline atau perilaku runtime memerlukan audit/verifikasi baru. Realtime Notification dan Activity Log tetap di luar cakupan.
+
+## 12. Validasi akhir Manajemen Penugasan SINERGI-MJ
+
+Validasi ini membaca source/worktree aktif dan memakai database `sekolah_app_testing`. Semua test dijalankan dengan bootstrap sementara yang menandai skema test sudah termigrasi agar `RefreshDatabase` tidak menjalankan reset atau migration. Tidak ada migration, `migrate:fresh`, atau perubahan data produksi yang dijalankan. Migration penugasan sudah tercatat pada database testing; perubahan file migration saat ini tidak mengubah database yang telah menjalankan versi sebelumnya.
+
+### Otorisasi dan cakupan route
+
+- Skenario izin gabungan, pencabutan parsial, izin ganda, draft, akses URL langsung, dan isolasi antarguru lulus pada `ManajemenPenugasanTest` dan `FeatureAccessTest`.
+- Dari 48 menu terdefinisi, 48 memiliki rujukan route. Seluruh 243 route bernama `guru.*`, `tu.*`, atau `spmb.*` memiliki middleware `menu.route`; 240 memiliki pemetaan menu dan 3 adalah pengecualian profil mandiri: `guru.profile`, `guru.profile.detail`, dan `guru.profile.detail.update`.
+- Tidak ditemukan route namespace tersebut yang tidak terpetakan, menu key yang tidak dikenal, atau menu yang tidak dipakai. Sepuluh route `ppdb.*` pada `routes/ppdb-public.php` tidak memakai otorisasi penugasan karena merupakan informasi/pendaftaran/status publik; tautan status individual tetap memakai middleware `signed`. Route staf PPDB berada di grup `tu.ppdb.*` dan diperiksa bersama route TU.
+- Pemeriksaan target controller menemukan 26 route yang menunjuk method yang tidak ada: TU (`tu.siswa.search`, `tu.guru.search`, `tu.guru.bulk`, `tu.guru.detail`, `tu.guru.create`, `tu.tahun.show`, `tu.tahun.transisi`, `tu.ruangan.show`, `tu.datakepegawaian.detail`, `tu.datakepegawaian.request-account`, `tu.ekskul.show`, `tu.penempatan-siswa.preview-naik-kelas`, `tu.angkatan.toggle`); Guru (`guru.ekskul.index`, `guru.pengajuan-jadwal.show`, `guru.pengajuan-jadwal.edit`, `guru.pengajuan-jadwal.update`, `guru.pengajuan-jadwal.destroy`, `guru.ekskul.jadwal.submit`); PPDB (`tu.ppdb.pengaturan.create`, `tu.ppdb.pengaturan.show`, `tu.ppdb.pengaturan.edit`, `tu.ppdb.pengaturan.update`, `tu.ppdb.pengaturan.destroy`, `tu.ppdb.excel`, `tu.ppdb.pdf`). Middleware menolak pengguna tanpa izin sebelum aksi; pengguna yang memang diberi izin tetap dapat menemui HTTP 500 pada target yang hilang. Ini adalah masalah fungsional legacy yang belum diperbaiki dalam validasi ini.
+
+`User::hasFeature()` untuk Guru hanya memeriksa menu yang dikenal pada penugasan aktif dan relasi Guru yang valid; draft, revoked, override fitur lama, dan role TU tidak memberi akses Guru. Kepsek teknis `superadmin` tetap bypass penuh, sementara Murid memakai daftar fitur role yang terpisah. Role `admin` masih aktif pada route `/admin`, `UserPolicy`, middleware, notifikasi, dan controller; karena itu penghapusan aman belum dapat dilakukan tanpa pemetaan kebijakan serta akun. Kondisi ini masih menyimpang dari target tepat tiga role utama. Alias role `tu` masih tersisa sementara untuk kompatibilitas.
+
+### Rekonsiliasi data legacy dan kesiapan migration
+
+Sinkronisasi migration memakai data tahun ajaran aktif hanya jika dapat menentukan tepat satu tahun aktif. Hasilnya berupa draft tanpa menu; tidak ada Operator/Admin PPDB yang dibuat hanya dari role TU. Sinkronisasi berulang menghindari duplikasi exact item/detail dan mempertahankan pasangan mapel-kelas. Wali kelas yang memiliki lebih dari satu kelas aktif dilewati, dan sumber operasional tidak dihapus. Publikasi penugasan operasional kini juga mensyaratkan tepat satu tahun aktif dan mengirimkan ID tersebut ke sinkronisasi modul lama; parameter request `ta` tidak dapat mengganti tahun sumber. FK penugasan pegawai memakai `restrictOnDelete`; detail master memakai `nullOnDelete`; item/menu memakai cascade. `down()` menolak rollback ketika masih ada riwayat penugasan dan mengembalikan role TU dari snapshot hanya pada rollback yang aman.
+
+Pada MySQL, pembuatan tabel tidak dapat dianggap atomik bersama transaksi sinkronisasi data. Jika sinkronisasi gagal setelah tabel dibuat, migrasi dapat belum tercatat sementara tabel sudah ada; preflight berikutnya akan menolak skema yang telah terbentuk dan memerlukan pemeriksaan/pemulihan manual. Uji terhadap skema dan data representatif harus dilakukan sebelum database utama.
+
+Daftar rekonsiliasi sebelum migration pada database utama:
+
+1. Akun role TU tanpa `pegawai_id`, tanpa data pegawai, atau tanpa relasi Guru valid: role dapat berubah menjadi Guru tetapi tidak otomatis memperoleh akses; identitas/relasi perlu diverifikasi manual.
+2. Tidak ada atau lebih dari satu tahun ajaran aktif: seluruh sinkronisasi legacy dilewati; tentukan tahun sumber secara manual.
+3. Guru dengan beberapa kelas wali aktif: baris dilewati dan perlu penetapan kelas yang benar.
+4. Relasi wali kelas, pengampu mapel, atau pembina ekskul dengan Guru/master yang hilang atau tidak konsisten: tidak boleh ditebak; cocokkan setiap pasangan dan tahun ajaran dengan sumber operasional.
+5. Duplikasi exact pada pengampu/pembina: sinkronisasi menghindari duplikasi penugasan draft, tetapi tetap perlu memastikan duplikasi sumber memang duplikasi administratif, bukan penugasan terpisah.
+6. Database yang sudah menjalankan versi migration sebelumnya: bandingkan skema dan isi penugasan aktual. Karena migration tercatat, perbaikan source tidak akan dijalankan ulang; tentukan migration korektif forward-only setelah rekonsiliasi.
+
+Database produksi tidak diperiksa, sehingga daftar di atas adalah kriteria rekonsiliasi, bukan inventaris akun/baris produksi. Kesiapan migrasi utama belum disetujui.
+
+## 13. Perbaikan target route legacy
+
+Bagian ini memperbarui temuan historis pada §12 setelah menelusuri deklarasi route, controller, view, dan pemanggil yang tersedia di worktree. Route yang masih didukung tidak dihapus untuk menghindari error 500; endpoint tanpa workflow/view/pemakai dan tanpa implementasi bisnis yang valid dikeluarkan secara eksplisit, bukan diganti dengan respons dummy.
+
+| Route | Controller/method lama | Penyebab | Perbaikan | Status |
+|---|---|---|---|---|
+| `tu.siswa.search` | `Tu\SiswaController@ajaxSearch` | Method target belum tersedia; UI membutuhkan pencarian AJAX. | Method `ajaxSearch` ditambahkan dengan validasi dan respons JSON. | Diperbaiki |
+| `tu.guru.search` | `Tu\GuruController@ajaxSearch` | Method target belum tersedia; UI membutuhkan pencarian AJAX. | Method `ajaxSearch` ditambahkan memakai data relasi Guru yang tersedia. | Diperbaiki |
+| `tu.guru.bulk` | `Tu\GuruController@bulkAction` | Tidak ada method maupun pemanggil/workflow bulk Guru yang aktif. | Route dihentikan; tidak ada operasi sukses semu. | Dihentikan |
+| `tu.guru.detail` | `Tu\GuruController@detail` | Alias detail tidak memiliki method. | Alias dipertahankan dan didelegasikan ke `show`. | Diperbaiki |
+| `tu.guru.create` | `Tu\GuruController@create` | Tidak ada halaman/form pembuatan Guru pada workflow yang ditemukan. | Dikeluarkan dari resource; endpoint lain tetap tersedia. | Dihentikan |
+| `tu.tahun.show` | `Tu\TahunAjaranController@show` | Tidak ada method/detail view yang mendukung resource `show`. | Dikeluarkan dari resource. | Dihentikan |
+| `tu.tahun.transisi` | `Tu\TahunAjaranController@masukTransisi` | Workflow lama mengubah status ke `transisi`, yang tidak dipakai alur tahun ajaran aktif. | Route legacy dihapus; alur `tutup` dan `lanjutSemester` yang tersedia tetap dipertahankan. | Dihentikan |
+| `tu.ruangan.show` | `Tu\RuanganController@show` | Tidak ada method atau halaman detail ruangan yang digunakan. | `show` dikecualikan dari resource. | Dihentikan |
+| `tu.datakepegawaian.detail` | `Tu\DataKepegawaianController@detail` | Method alias detail tidak ada, tetapi halaman detail pegawai tersedia. | Diarahkan ke method `show`. | Diperbaiki |
+| `tu.datakepegawaian.request-account` | `Tu\DataKepegawaianController@requestAccount` | Method lama tidak ada; pembuatan akun tersedia melalui `createAccount`. | Alias lama dipertahankan dan diarahkan ke `createAccount`. | Diperbaiki |
+| `tu.ekskul.show` | `Tu\EkskulController@show` | Tidak ada method/detail view yang digunakan. | `show` dikecualikan dari resource. | Dihentikan |
+| `tu.penempatan-siswa.preview-naik-kelas` | `Tu\PenempatanSiswaController@previewNaikKelas` | Preview lama bergantung pada skema/status penempatan yang sudah usang; tidak ditemukan pemakai. | Route legacy dihapus; alur naik kelas/mapping yang tersedia tetap dipertahankan. | Dihentikan |
+| `tu.angkatan.toggle` | `Tu\AngkatanController@toggle` | Method aktif bernama `toggleAktif`. | Diperbaiki agar memanggil `toggleAktif`. | Diperbaiki |
+| `guru.ekskul.index` | `Guru\EkskulController@index` | Dashboard ekskul ada, tetapi method `index` tidak ada. | Alias diarahkan ke method `dashboard` yang digunakan route dashboard. | Diperbaiki |
+| `guru.pengajuan-jadwal.show` | `Guru\PengajuanJadwalController@show` | Workflow resource hanya menyediakan daftar, form buat, dan simpan. | Resource dibatasi ke `index`, `create`, dan `store`. | Dihentikan |
+| `guru.pengajuan-jadwal.edit` | `Guru\PengajuanJadwalController@edit` | Tidak ada workflow edit atau view edit yang aktif. | Resource dibatasi ke aksi yang benar-benar tersedia. | Dihentikan |
+| `guru.pengajuan-jadwal.update` | `Guru\PengajuanJadwalController@update` | Tidak ada workflow update yang aktif. | Resource dibatasi ke aksi yang benar-benar tersedia. | Dihentikan |
+| `guru.pengajuan-jadwal.destroy` | `Guru\PengajuanJadwalController@destroy` | Tidak ada workflow hapus yang aktif. | Resource dibatasi ke aksi yang benar-benar tersedia. | Dihentikan |
+| `guru.ekskul.jadwal.submit` | `Guru\Ekskul\JadwalEkskulController@submit` | Tidak ada method/pemanggil; pengajuan memakai workflow `store` dan perubahan memakai `update`. | Route submit legacy dihapus. | Dihentikan |
+| `tu.ppdb.pengaturan.create` | `PPDB\PengaturanController@create` | Form pengaturan memakai `index` dan `store`, tanpa aksi resource `create`. | Resource tambahan dihapus; route `index`/`store` tetap eksplisit. | Dihentikan |
+| `tu.ppdb.pengaturan.show` | `PPDB\PengaturanController@show` | Tidak ada method/detail view pengaturan. | Resource tambahan dihapus; route `index`/`store` tetap eksplisit. | Dihentikan |
+| `tu.ppdb.pengaturan.edit` | `PPDB\PengaturanController@edit` | Tidak ada workflow edit pengaturan. | Resource tambahan dihapus; route `index`/`store` tetap eksplisit. | Dihentikan |
+| `tu.ppdb.pengaturan.update` | `PPDB\PengaturanController@update` | Tidak ada workflow update pengaturan. | Resource tambahan dihapus; route `index`/`store` tetap eksplisit. | Dihentikan |
+| `tu.ppdb.pengaturan.destroy` | `PPDB\PengaturanController@destroy` | Tidak ada workflow hapus pengaturan. | Resource tambahan dihapus; route `index`/`store` tetap eksplisit. | Dihentikan |
+| `tu.ppdb.excel` | `PPDB\PendaftarController@excel` | Endpoint ekspor lama tidak memiliki method. | Ekspor Excel diimplementasikan memakai service laporan, exporter, dan filter tervalidasi. | Diperbaiki |
+| `tu.ppdb.pdf` | `PPDB\PendaftarController@pdf` | Endpoint ekspor lama tidak memiliki method. | Ekspor PDF diimplementasikan memakai service laporan, template, dan filter tervalidasi. | Diperbaiki |
+
+Sebanyak **9 route diperbaiki** dan **17 route dari temuan 26 dihentikan** setelah tidak ditemukan workflow yang didukung. Satu route tambahan, `tu.tahun.detail`, juga dihentikan karena view tujuan tidak tersedia dan tidak ditemukan pemanggil. Tidak ada dari route tersebut yang dikecualikan dari pemeriksaan otorisasi dengan cara menghapus middleware. Sesudah perubahan, audit runtime menemukan 225 route bernama `guru.*`, `tu.*`, atau `spmb.*`; seluruh 225 memiliki `menu.route`, dan tidak ada target controller/method yang hilang. Pemeriksaan target tidak membuktikan setiap alur bisnis dapat berhasil untuk seluruh kondisi data.
+
+### Hasil pengujian setelah perbaikan route
+
+- Test terarah Manajemen Penugasan dan ekspor PPDB: 34 test, 159 assertion, lulus.
+- Feature Access: 6 test, 13 assertion, lulus.
+- PPDB: 47 test, 269 assertion, lulus.
+- Ekstrakurikuler: 14 test, 129 assertion, lulus.
+- Kelas/Wali Kelas: 20 test, 111 assertion, lulus.
+- Notifikasi: 15 test, 164 assertion, lulus.
+- Akun/autentikasi: 24 test, 84 assertion, 1 gagal pada ekspektasi tautan reset password.
+- Full suite: 239 test, 1.336 assertion, 234 lulus dan 5 gagal. Lima kegagalan adalah tiga `ProfileTest` (target method/HTTP method profil), ekspektasi tautan `/forgot-password`, dan `TahunAjaranSemesterTransitionTest`. Ini sama dengan lima isu yang telah tercatat sebelum perbaikan route; tidak ada controller/fitur di luar cakupan yang diubah untuk menutupi kegagalan tersebut.
+
+Hasil full suite di atas berasal dari database testing `sekolah_app_testing` dengan bootstrap sementara untuk menghindari reset/migrasi. Tidak ada migration atau reset database yang dijalankan. Bootstrap sementara dihapus setelah pengujian.
+
+## 14. Hasil pengujian baseline sebelum perbaikan route
+
+Semua hasil di bawah memakai database test yang sudah tersedia tanpa menjalankan migration:
+
+| Kelompok | Hasil |
+|---|---:|
+| Manajemen Penugasan | 23 test, 120 assertion lulus |
+| Feature Access | 6 test, 13 assertion lulus |
+| PPDB | 45 test, 256 assertion lulus |
+| Ekstrakurikuler | 14 test, 129 assertion lulus |
+| Kelas/Wali Kelas terkait | 20 test, 111 assertion lulus |
+| Notifikasi | 15 test, 164 assertion lulus |
+| Akun dan autentikasi | 24 test, 84 assertion, 1 gagal |
+| Seluruh suite setelah perbaikan tahun ajaran | 233 test, 1.312 assertion, 228 lulus, 5 gagal, 0 error |
+
+Lima kegagalan full suite: `PasswordResetTest` mengharapkan tautan `/forgot-password` yang tidak terdapat pada halaman login saat ini; tiga `ProfileTest` karena method `ProfileController::edit()` tidak ada dan dua request menerima 405; serta `TahunAjaranSemesterTransitionTest::test_cohort_mismatch_is_skipped_and_reported` yang gagal pada assertion. Kegagalan ini tidak diubah karena tidak terbukti disebabkan oleh Manajemen Penugasan. Tidak ditemukan suite mandiri Pengampu Mapel; pasangan legacy diuji melalui test sinkronisasi pada `ManajemenPenugasanTest`.
+
+Kesimpulan pada baseline tersebut: **belum lulus untuk kesiapan produksi**. Temuan target route yang hilang diperbarui pada §13; role `admin` yang masih fungsional, test regresi yang gagal, serta rekonsiliasi data produksi dan status versi migration tetap membutuhkan tindakan lanjutan.
+
+## 15. Audit dampak penghentian route
+
+Audit ulang dilakukan pada source aktif, deklarasi route sebelum perubahan, seluruh Blade/JavaScript/controller/test/dokumentasi repository yang tersedia, serta route matcher Laravel yang aktif. Kolom status di bawah menilai dampak yang dapat dibuktikan dari repository. Integrasi eksternal tidak dapat diverifikasi dari source lokal; oleh karena itu kesimpulan keseluruhan tetap **PERLU PERHATIAN**, meskipun beberapa route aman terhadap pemakai internal yang ditemukan.
+
+| Route | HTTP dan URI sebelumnya | Controller/method sebelumnya | Pemakai, penyebab, dan pengganti yang ditemukan | Ketergantungan / status |
+|---|---|---|---|---|
+| `tu.guru.bulk` | `POST /tu/guru/bulk` | `Tu\GuruController@bulkAction` | Route custom tidak memiliki method. Tidak ditemukan pemakai Blade/JS/controller/test; daftar Guru hanya menautkan detail (`resources/views/tu/guru/index.blade.php`). | Tidak ditemukan pemakai internal; operasi bulk tidak pernah tersedia. **AMAN (internal)** |
+| `tu.guru.create` | `GET /tu/guru/create` | Resource `Tu\GuruController@create` | Method dan form create tidak ada; daftar Guru menautkan `tu.guru.show`, bukan create (`resources/views/tu/guru/index.blade.php`). URI ini sekarang cocok dengan wildcard `tu.guru.show`, bukan action create; bukan endpoint create yang berfungsi. | Tidak ditemukan pemakai internal; URL dapat jatuh ke show dan gagal lookup. **PERLU PERHATIAN** |
+| `tu.tahun.show` | `GET /tu/tahun/{tahun}` | Resource `Tu\TahunAjaranController@show` | Method show dan halaman show tidak ada. Daftar tahun menampilkan data dan aksi tahun aktif, tanpa tautan detail (`resources/views/tu/tahun/index.blade.php`). | Tidak ditemukan pemakai internal; GET pada URI resource yang tersisa tidak menjalankan show. **AMAN (internal)** |
+| `tu.tahun.transisi` | `POST /tu/tahun/transisi` | `Tu\TahunAjaranController@masukTransisi` | Method tidak ada dan form tidak mengirim ke route ini. Halaman tahun menggunakan `tu.tahun.lanjutSemester` dan `tu.tahun.tutup`; keduanya dicakup test transisi/rollover. | Workflow semester/tahun aktif dialihkan dan teruji; tidak ada pemanggil `transisi`. **AMAN (internal)** |
+| `tu.ruangan.show` | `GET /tu/ruangan/{ruangan}` | Resource `Tu\RuanganController@show` | Method show tidak ada dan tidak ditemukan tautan detail. Selain itu, view `tu.ruangan.index/create/edit` yang dirujuk method controller yang masih ada juga tidak ditemukan. | Route show tidak memiliki pemakai internal; workflow Ruangan yang lebih luas sudah tidak dapat dibuktikan berfungsi sebelum penghentian. **PERLU PERHATIAN** |
+| `tu.ekskul.show` | `GET /tu/ekskul/{ekskul}` | Resource `Tu\EkskulController@show` | Method show tidak ada. UI master ekskul memakai index/create/edit/update/destroy (`resources/views/tu/ekskul/index.blade.php`, `create.blade.php`, `edit.blade.php`) dan tidak menautkan detail. | Tidak ditemukan pemakai detail internal; CRUD yang digunakan UI tetap tersedia. **AMAN (internal)** |
+| `tu.penempatan-siswa.preview-naik-kelas` | `GET /tu/penempatan-siswa/preview-naik-kelas` | `Tu\PenempatanSiswaController@previewNaikKelas` | Method dan view preview tidak ada; tidak ditemukan pemanggil. Route `naik-kelas` dan `naik-kelas.mapping` masih ada, tetapi view yang dirujuk controller untuk alur mapping juga tidak ditemukan. Penutupan/rollover tahun menggunakan workflow lain yang diuji. | Tidak terbukti ada pemakai preview; workflow mapping mandiri masih belum terpetakan ujung-ke-ujung. **PERLU PERHATIAN** |
+| `guru.pengajuan-jadwal.show` | `GET /guru/pengajuan-jadwal/{pengajuan_jadwal}` | Resource `Guru\PengajuanJadwalController@show` | Controller hanya menyediakan index/create/store; view resource hanya memakai index/create/store (`resources/views/guru/pengajuan-jadwal/index.blade.php`, `create.blade.php`). Tidak ditemukan tautan show. | Tidak ditemukan pemakai internal; method show memang tidak tersedia. **AMAN (internal)** |
+| `guru.pengajuan-jadwal.edit` | `GET /guru/pengajuan-jadwal/{pengajuan_jadwal}/edit` | Resource `Guru\PengajuanJadwalController@edit` | Tidak ada method/view edit atau tautan edit pada daftar pengajuan. | Tidak ditemukan pemakai internal; method edit tidak tersedia. **AMAN (internal)** |
+| `guru.pengajuan-jadwal.update` | `PUT/PATCH /guru/pengajuan-jadwal/{pengajuan_jadwal}` | Resource `Guru\PengajuanJadwalController@update` | Tidak ada method update atau form update untuk resource tersebut. Form aktif menggunakan store; alur grid `guru.jadwal-saya.*` memiliki mekanisme tersendiri. | Tidak ditemukan pemakai internal; method update tidak tersedia. **AMAN (internal)** |
+| `guru.pengajuan-jadwal.destroy` | `DELETE /guru/pengajuan-jadwal/{pengajuan_jadwal}` | Resource `Guru\PengajuanJadwalController@destroy` | Tidak ada method destroy atau tombol hapus pada view daftar pengajuan. | Tidak ditemukan pemakai internal; method destroy tidak tersedia. **AMAN (internal)** |
+| `guru.ekskul.jadwal.submit` | `POST /guru/ekskul/jadwal/submit` | `Guru\Ekskul\JadwalEkskulController@submit` | Method submit tidak ada dan form tidak memakai route ini. Form membuat draft melalui `guru.ekskul.jadwal.store`; pengajuan/resubmit memakai `update` dari halaman edit. `EkskulJadwalWorkflowTest` memverifikasi alur store/update. | Workflow yang tampak memakai route aktif lain dan teruji; tidak ditemukan pemakai route submit. **AMAN (internal)** |
+| `tu.ppdb.pengaturan.create` | `GET /tu/ppdb/pengaturan/create` | Resource `PPDB\PengaturanController@create` | Controller tidak memiliki create; halaman pengaturan memakai satu form index yang mengirim store (`resources/views/ppdb/pengaturan/index.blade.php`). | Tidak ditemukan pemakai internal; endpoint create tidak diimplementasikan. **AMAN (internal)** |
+| `tu.ppdb.pengaturan.show` | `GET /tu/ppdb/pengaturan/{pengaturan}` | Resource `PPDB\PengaturanController@show` | Controller dan view tidak memiliki halaman detail pengaturan; navigasi hanya ke index. | Tidak ditemukan pemakai internal; endpoint show tidak diimplementasikan. **AMAN (internal)** |
+| `tu.ppdb.pengaturan.edit` | `GET /tu/ppdb/pengaturan/{pengaturan}/edit` | Resource `PPDB\PengaturanController@edit` | Tidak ada method/view edit; nilai pengaturan dimuat kembali pada index berdasarkan `tahun_ajaran_id`. | Tidak ditemukan pemakai internal; pengaturan diubah melalui form index/store. **AMAN (internal)** |
+| `tu.ppdb.pengaturan.update` | `PUT/PATCH /tu/ppdb/pengaturan/{pengaturan}` | Resource `PPDB\PengaturanController@update` | Tidak ada method/form update. `store()` memakai `updateOrCreate`, dan `PpdbQuotaEnforcementTest` menguji simpan/perbarui berdasarkan tahun ajaran. | Workflow simpan/perbarui dialihkan ke store dan teruji; tidak ditemukan pemakai update. **AMAN (internal)** |
+| `tu.ppdb.pengaturan.destroy` | `DELETE /tu/ppdb/pengaturan/{pengaturan}` | Resource `PPDB\PengaturanController@destroy` | Tidak ada method atau tombol hapus pengaturan pada view. | Tidak ditemukan pemakai internal; tidak ada workflow hapus yang diimplementasikan. **AMAN (internal)** |
+| `tu.tahun.detail` | `GET /tu/tahun/{id}/detail` | `Tu\TahunAjaranController@detail` | Method detail masih ada, tetapi mengembalikan view `tu.tahun.detail` yang tidak ditemukan. Tidak ditemukan route helper, hardcoded link, JS, test, atau tautan daftar tahun yang menuju URL ini. Dokumentasi workflow sebelumnya juga mencatat view detail tidak ada. | Tidak ada pemakai internal yang ditemukan; kemungkinan URL lama/bookmark atau caller di luar repository tidak dapat dipastikan. **PERLU PERHATIAN** |
+
+### Cakupan dependency dan matcher
+
+- Pencarian route-name mencakup `app`, `resources`, `tests`, `docs`, `config`, dan `routes`. Tidak ditemukan pemanggil route yang dihentikan pada Blade, JavaScript, controller, atau test. Rujukan yang cocok ditemukan pada laporan audit historis dan catatan workflow saja. Tidak ditemukan Manual Book terpisah pada repository.
+- Tidak ada integrasi eksternal khusus yang mencantumkan route-route ini pada konfigurasi/dokumentasi. Ini tidak membuktikan tidak adanya pemanggil eksternal, bookmark, atau reverse proxy; hal tersebut memerlukan konfirmasi operator/deployment.
+- Pemeriksaan route matcher menemukan seluruh **18 nama route sudah tidak terdaftar**. Beberapa URI statis ditangkap oleh wildcard resource untuk method lain: misalnya `GET /tu/guru/create` cocok ke `tu.guru.show`, sementara request ke URI update resource dengan verb GET menghasilkan method-not-allowed. Pemeriksaan ini memverifikasi target matcher, bukan request terautentikasi atau hasil database; tidak ditemukan dispatch ke action bisnis lama.
+- Dari 225 route aktif bernama `guru.*`, `tu.*`, atau `spmb.*`, seluruh 225 memiliki `auth`, role middleware, dan `menu.route`; 222 dipetakan ke menu dan 3 adalah route profil yang dikecualikan. Tidak ada target controller/method yang hilang.
+- `User::hasFeature()` untuk Guru hanya memutuskan izin dari menu penugasan aktif; role TU legacy selalu ditolak pada pemeriksaan feature. `RoleMiddleware` memang menerima nilai TU pada grup role Guru untuk kompatibilitas, tetapi `TuModeMiddleware` dan `menu.route` tetap menolak karena TU tidak memperoleh feature dari penugasan. `superadmin` adalah identitas teknis Kepsek dan bypass yang disengaja. Tidak ditemukan akses tambahan Guru melalui route pengganti.
+- `UserRole::ADMIN` dan route `/admin` masih ada di luar workflow yang dihentikan. Route bernama `spmb.dashboard` saat ini memakai `auth`, `approved`, `role:guru`, dan `menu.route` (`routes/web.php`); catatan lama tentang `role:spmb` pada laporan otorisasi sebelumnya tidak sesuai dengan deklarasi source aktif. Model tiga jabatan belum konsisten secara global karena role admin masih ada.
+
+### Dampak workflow bisnis
+
+| Workflow | Dampak penghentian | Status |
+|---|---|---|
+| Pengelolaan siswa dan penempatan | Route resource siswa dan operasi penempatan yang dipakai tetap ada; preview legacy tidak memiliki view/pemakai. Rollover dan penempatan diuji melalui test siswa, rombel, dan tahun ajaran. | Tidak ditemukan dampak pemutusan pada alur yang diuji. |
+| Pengelolaan Guru/kepegawaian | Daftar/detail Guru serta resource kepegawaian tetap ada. Route Guru create/bulk yang dihentikan tidak memiliki method/form aktif. Belum ada test khusus untuk alur create Guru. | Perlu konfirmasi proses pembuatan Guru yang dimaksud; tidak ada bukti route create menjadi workflow aktif. |
+| Tahun ajaran/semester dan kenaikan kelas | Form index menggunakan `create`, `aktifkan`, `lanjutSemester`, dan `tutup`; route `transisi` tidak digunakan. `AnnualRolloverTest` lulus; satu test `TahunAjaranSemesterTransitionTest` gagal pada assertion cohort mismatch yang telah dikenal. | Workflow utama tersedia; detail dan mapping naik kelas mandiri belum terpetakan. |
+| Angkatan | Route toggle tidak termasuk route yang dihentikan dan masih mengarah ke `toggleAktif`; sebelumnya diuji pada Manajemen Penugasan. | Tidak terdampak penghentian 18 route. |
+| Ruangan | `tu.ruangan.show` yang dihapus tidak memiliki method/view/pemakai. Namun route CRUD ruangan lain masih merujuk view `tu.ruangan.*` yang tidak ada, dan tidak ada test ruangan khusus. | **BERMASALAH (pre-existing):** fungsi manajemen Ruangan tidak terbukti dapat digunakan. Ini bukan regresi yang disebabkan penghentian `show`; perlu pekerjaan terpisah. |
+| Ekstrakurikuler | Master TU tetap memiliki index/create/edit/store/update/destroy. Jadwal Guru tetap memakai store/edit/update/destroy; test jadwal dan absensi dijalankan. | Tidak ditemukan pemutusan workflow oleh route show/submit yang dihentikan. |
+| Pengajuan jadwal Guru | Resource legacy tetap memiliki index/create/store; operasi show/edit/update/delete tidak diimplementasikan dan tidak digunakan oleh view. Alur `Jadwal Saya` adalah workflow terpisah. Namun `PengajuanJadwalController::index()` mengambil semua record tanpa scope guru, sedangkan `store()` membaca `auth()->user()->guru_id`, yang tidak didefinisikan pada model `User` yang diperiksa. Dokumentasi workflow sebelumnya juga mencatat relasi view/model `jam` yang belum cocok. | Penghentian empat aksi tidak memutus pemakai yang ditemukan, tetapi endpoint index/create/store tetap parsial dan cakupan data/policy belum dipastikan. **PERLU PERHATIAN**; tidak diubah tanpa keputusan apakah daftar memang dimaksudkan bersama. |
+| Pengaturan dan proses PPDB/SPMB | Form pengaturan memakai index/store; proses pendaftar tetap aktif. Export Excel/PDF legacy bukan route yang dihentikan dan mempunyai test download/filter. Smoke test browser menunjukkan halaman publik `/ppdb` merespons 200 dan menyatakan PPDB ditutup. | Tidak ditemukan dampak penghentian; halaman staf autentik tidak diuji di browser karena tidak ada akun uji browser yang diberikan. |
+
+### Pengujian dan kesimpulan audit
+
+Test terarah dijalankan dengan database `sekolah_app_testing` dan bootstrap sementara yang mencegah `RefreshDatabase` menjalankan migration/reset. Hasil: **147 test, 831 assertion, 146 lulus, 1 gagal**. Kegagalan adalah `TahunAjaranSemesterTransitionTest::test_cohort_mismatch_is_skipped_and_reported`, sama dengan kegagalan yang telah diketahui; suite yang mencakup siswa, rombel, annual rollover, ekskul, PPDB, export, akses penugasan, dan feature access lainnya lulus. Tidak ada migration atau operasi reset yang dijalankan; bootstrap sementara dihapus setelah selesai.
+
+**Kesimpulan: PERLU PERHATIAN.** Tidak ditemukan workflow internal yang bergantung pada action-action yang dihentikan dan masih aktif tanpa pengganti. Namun ketergantungan eksternal tidak bisa dibuktikan dari repository, workflow Ruangan memang bermasalah secara terpisah, mapping kenaikan kelas mandiri belum terpetakan, dan test semester mempunyai satu kegagalan lama. Penghentian route dapat diterima untuk pemakai internal yang teridentifikasi setelah pemilik sistem mengonfirmasi tidak ada integrasi/bookmark eksternal dan menyetujui tindak lanjut Ruangan serta test semester.
+
+## 16. Pengajuan Jadwal Guru — pembatasan kepemilikan dan validasi alur
+
+Bagian ini memperbarui temuan Pengajuan Jadwal Guru pada §15 berdasarkan implementasi dan test fitur terbaru.
+
+### Identitas dan perubahan
+
+- Relasi terverifikasi adalah `User.pegawai_id` → `DataKepegawaian.id` → `Guru.data_kepegawaian_id` → `PengajuanJadwal.guru_id`. Tidak ada kolom `users.guru_id` pada skema `sekolah_app_testing`; pemeriksaan skema dilakukan baca-saja.
+- Daftar resource kini dibatasi pada `Auth::user()->guru`; opsi kelas/mapel hanya berasal dari assignment aktif pada tahun yang dipilih. `guru_id` dari request diabaikan.
+- `PengajuanJadwal` resource dan grid `Jadwal Saya` memakai `JadwalDraftService` yang sama untuk assignment, slot terisi, konflik jadwal Guru lintas kelas, kuota JP mapel, batas JP kelas, dan status jadwal terpublikasi. Penyimpanan draft mengunci Guru dan kelas dalam transaksi; submission memvalidasi ulang seluruh draft/rejected sebelum mengubah status.
+- Grid `Jadwal Saya` menolak kelas/mapel di luar assignment Guru. Slot milik Guru lain hanya ditampilkan sebagai “Slot terisi”; mapel/status dan kontrol hapusnya tidak ditampilkan. Penghapusan tetap mencari record berdasarkan `guru_id` login dan hanya mengizinkan status draft/rejected.
+- Resource tetap hanya mendaftarkan index/create/store; route show/edit/update/destroy tidak dihidupkan kembali. View daftar memakai relasi `jamPelajaran` dan kolom `jam_ke`, `mulai`, serta `selesai`.
+- Monitoring dan approval/publish tidak diubah. Route Kepsek tetap berada pada grup `auth` dan `role:superadmin`, sesuai identifier teknis sistem.
+
+### Verifikasi
+
+- Route Jadwal Guru tetap memiliki `auth`, `role:guru`, `guru.mode`, `menu.route`, dan `feature:guru.academic`. Test menolak Guru tanpa menu penugasan individual.
+- `PengajuanJadwalWorkflowTest`: **8 test, 57 assertion lulus**. Cakupan termasuk Guru A/B, manipulasi `guru_id`, pembatasan kelas/mapel, validasi input, kepemilikan hapus, conflict/kuota mapel dan kelas, draft legacy yang tidak valid, serta monitoring–approval–publication Kepsek.
+- Regresi notifikasi jadwal pada `BusinessNotificationTest`: **4 test, 40 assertion lulus**.
+- PHP lint, kompilasi Blade in-memory untuk tiga view terkait, audit route/middleware, dan `git diff --check` lulus. Pengujian memakai skema `sekolah_app_testing` yang sudah ada melalui bootstrap sementara; tidak ada migration atau reset database.
+- Smoke test browser terautentikasi tidak dijalankan karena tidak tersedia akun uji Guru/Kepsek pada sesi ini. Full suite tidak dijalankan pada tahap ini.
+
+**Status: LULUS DENGAN CATATAN.** Kepemilikan data, validasi entry point, proteksi terhadap draft lama yang invalid, serta monitoring dan publication Kepsek terbukti melalui test fitur. Verifikasi browser dan full suite masih diperlukan sebelum menyatakan kesiapan rilis keseluruhan.
+
+## 17. Full Regression Audit
+
+### Metode dan hasil full suite
+
+- Pemeriksaan dilakukan pada **2026-11-23 18:47 +07:00**. `.env.testing` menunjuk ke MySQL database `sekolah_app_testing`. Sebelum tes, port TCP 3306 tidak memiliki listener.
+- Suite dijalankan dengan `C:\laragon\bin\php\php-8.2.29-Win32-vs16-x64\php.exe vendor\bin\phpunit --bootstrap tests\no-refresh-bootstrap.php`. Bootstrap sementara hanya menandai skema sebagai tersedia agar `RefreshDatabase` tidak menjalankan migration/reset; test tetap memerlukan koneksi database untuk membuka transaksi.
+- Hasil: **247 test, 2 assertion, 2 lulus, 0 gagal assertion, 245 error, 0 skipped** (38:38.499). Seluruh 245 error melaporkan `SQLSTATE[HY000] [2002] No connection could be made because the target machine actively refused it`, pada pembukaan koneksi/transaksi `RefreshDatabase`, sebelum isi test dijalankan. Karena itu, angka ini bukan hasil verifikasi regresi fungsional.
+- Baseline terdokumentasi di §14 adalah **239 test, 1.336 assertion, 234 lulus, 5 gagal**. Suite kini bertambah 8 test; hasil saat ini tidak dapat dibandingkan untuk menyimpulkan apakah lima kegagalan baseline berubah karena semua test yang membutuhkan DB berhenti pada kegagalan koneksi.
+- Tidak ada migration atau reset database yang dijalankan. Bootstrap sementara yang dibuat untuk run ini telah dihapus setelah pengujian.
+
+### Lima kegagalan baseline
+
+Kelima test diperiksa secara terpisah, tetapi tidak dapat mencapai assertion karena koneksi MySQL ditolak:
+
+| Area | Run terarah | Hasil run saat ini | Temuan source yang dapat diperiksa | Kesimpulan |
+|---|---|---|---|---|
+| `ProfileTest` (kelas berisi 5 test; baseline mencatat 3 kegagalan) | `--filter ProfileTest` | 5 error koneksi, 0 assertion | Route `GET /profile` menunjuk `ProfileController@edit`, sementara controller tidak menyediakan `edit`. Dua test update memakai `PATCH /profile`, sedangkan route aplikasi adalah `POST /profile/update`, sesuai mismatch method 405 yang tercatat pada baseline. | Mismatch route/test terindikasi dari source; run kali ini tidak dapat mengonfirmasi status runtime. Tidak diubah karena tidak berkaitan dengan jadwal. |
+| Reset password link | `--filter test_reset_password_link_screen_can_be_rendered` | 1 error koneksi, 0 assertion | Baseline menyebut test mengharapkan tautan `/forgot-password`; halaman login memakai pemicu modal bantuan, bukan tautan tersebut. | Kontrak test dan UI berbeda; penyebab perilaku yang dikehendaki belum diverifikasi melalui runtime. Tidak diubah. |
+| Transisi Tahun Ajaran/Semester | `--filter test_cohort_mismatch_is_skipped_and_reported` | 1 error koneksi, 0 assertion | Test mencari teks `"mismatch Angkatan: 1"` sedangkan controller membentuk laporan dengan istilah `"ketidaksesuaian Angkatan"`. Logika sumber melewati placement yang angkatannya tidak cocok. | Potensi mismatch assertion/teks; hasil transisi dan pesan aktual belum dapat diverifikasi. Tidak diubah. |
+
+Run individual di atas mengalami exception database yang sama dengan full suite, sehingga tidak dapat digunakan untuk menyatakan lima kegagalan baseline telah terkonfirmasi atau terselesaikan.
+
+### Dampak lintas modul dan pemeriksaan teknis
+
+- Perubahan workflow jadwal yang tercatat di §16 tetap terbatas pada identitas/ownership Guru, validasi draft bersama, serta relasi jadwal; jalur monitoring dan approval Kepsek tidak diubah. Test terarah sebelumnya untuk `PengajuanJadwalWorkflowTest` (8 test/57 assertion) dan regresi notifikasi jadwal (4 test/40 assertion) tercatat lulus pada §16, tetapi tidak menggantikan full regression.
+- Pemeriksaan source/teknis yang telah dilakukan sebelum run ini: PHP lint file terkait lulus; kompilasi Blade in-memory untuk view jadwal dan login lulus; route list/middleware menunjukkan proteksi Guru dan Kepsek sesuai implementasi; `git diff --check` lulus dengan peringatan konversi CRLF.
+- Tidak ada smoke test browser dalam audit ini. Tidak dilakukan perubahan kode aplikasi untuk mengatasi kegagalan koneksi atau kegagalan baseline.
+- Worktree sudah memiliki banyak perubahan staged, unstaged, dan untracked sebelum audit regresi. Untuk tahap ini hanya dokumen audit yang diperbarui; perubahan lainnya dipertahankan.
+
+**Risiko tersisa:** kesiapan regresi belum dapat dinilai karena MySQL testing tidak berjalan pada host saat pemeriksaan. Status lima kegagalan historis juga belum dapat dibandingkan secara runtime. Temuan mismatch profil, tautan bantuan/reset, dan teks transisi perlu divalidasi terhadap kontrak produk setelah database testing tersedia.
+
+**Status: BELUM DAPAT DINYATAKAN LULUS.** Rekomendasi berikutnya adalah menyalakan/menyediakan service MySQL untuk database testing yang telah disetujui (tanpa migration/reset), lalu mengulang full suite dan kelima test terarah; setelah itu tinjau hanya mismatch yang terbukti melalui assertion/runtime dan ulangi pemeriksaan regresi.

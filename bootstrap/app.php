@@ -22,6 +22,7 @@ return Application::configure(basePath: dirname(__DIR__))
             'guru.mode' => \App\Http\Middleware\GuruModeMiddleware::class,
             'tu.mode' => \App\Http\Middleware\TuModeMiddleware::class,
             'feature' => \App\Http\Middleware\FeatureAccessMiddleware::class,
+            'menu.route' => \App\Http\Middleware\MenuRouteAccessMiddleware::class,
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions): void {

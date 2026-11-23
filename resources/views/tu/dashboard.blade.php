@@ -1,8 +1,9 @@
 @extends('layouts.app')
 
-@section('title', 'Dashboard TU')
+@section('title', 'Dashboard Operator Sekolah')
 
 @section('content')
+@php($user = auth()->user())
 <div class="container-fluid px-0">
     <div class="card border-0 shadow-sm rounded-4 overflow-hidden mb-4">
         <div class="card-body p-4 p-lg-5 text-white" style="background: linear-gradient(135deg, #0f4c81 0%, #2563eb 100%);">
@@ -93,6 +94,7 @@
                     </div>
 
                     <div class="row g-3">
+                        @if($user->hasFeature('operator.classes'))
                         <div class="col-12 col-md-6">
                             <a href="{{ route('tu.kelas.index') }}" class="text-decoration-none">
                                 <div class="border rounded-4 p-3 h-100 quick-link">
@@ -106,7 +108,9 @@
                                 </div>
                             </a>
                         </div>
+                        @endif
 
+                        @if($user->hasFeature('operator.students'))
                         <div class="col-12 col-md-6">
                             <a href="{{ route('tu.siswa.index') }}" class="text-decoration-none">
                                 <div class="border rounded-4 p-3 h-100 quick-link">
@@ -120,7 +124,9 @@
                                 </div>
                             </a>
                         </div>
+                        @endif
 
+                        @if($user->hasFeature('operator.subjects'))
                         <div class="col-12 col-md-6">
                             <a href="{{ route('tu.mapel.index') }}" class="text-decoration-none">
                                 <div class="border rounded-4 p-3 h-100 quick-link">
@@ -134,7 +140,9 @@
                                 </div>
                             </a>
                         </div>
+                        @endif
 
+                        @if($user->hasFeature('operator.documents'))
                         <div class="col-12 col-md-6">
                             <a href="{{ route('tu.dokumen.sekolah') }}" class="text-decoration-none">
                                 <div class="border rounded-4 p-3 h-100 quick-link">
@@ -142,6 +150,7 @@
                                         <div class="rounded-circle bg-info bg-opacity-10 p-2 me-2">
                                             <i class="bi bi-file-earmark-arrow-up text-info"></i>
                                         </div>
+                                        @endif
                                         <h6 class="mb-0 fw-semibold text-dark">Manajemen Dokumen</h6>
                                     </div>
                                     <p class="small text-muted mb-0">Atur dokumen sekolah dan file administrasi penting.</p>
@@ -172,7 +181,7 @@
                         </li>
                         <li class="list-group-item px-0 py-3">
                             <div class="d-flex justify-content-between align-items-center">
-                                <span class="text-muted">Peran akun</span>
+                                <span class="text-muted">Penugasan</span>
                                 <span class="fw-semibold">Operator</span>
                             </div>
                         </li>
@@ -233,7 +242,7 @@
     const chartRole = new Chart(ctx, {
         type: 'bar',
         data: {
-            labels: ['Guru','Siswa','TU','Super Admin'],
+            labels: ['Guru','Murid','Admin Sistem','Kepsek'],
 
             datasets: [
             {
@@ -241,7 +250,7 @@
                 data: [
                     {{ $guruAktif }},
                     {{ $siswaAktif }},
-                    {{ $tuAktif }},
+                    {{ $adminAktif }},
                     {{ $superadminAktif }}
                 ],
                 backgroundColor: '#4CAF50'
@@ -251,7 +260,7 @@
                 data: [
                     {{ $guruNonaktif }},
                     {{ $siswaNonaktif }},
-                    {{ $tuNonaktif }},
+                    {{ $adminNonaktif }},
                     {{ $superadminNonaktif }}
                 ],
                 backgroundColor: '#F44336'

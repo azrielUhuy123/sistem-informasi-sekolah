@@ -5,12 +5,11 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\PPDB\DashboardController;
 use App\Http\Controllers\PPDB\PengaturanController;
 use App\Http\Controllers\PPDB\PendaftarController;
-use App\Http\Controllers\PPDB\LaporanController;
 
 Route::middleware([
         'auth',
         'role:guru',
-        'feature:tu.ppdb'
+        'menu.route'
     ])
     ->prefix('tu/ppdb')
     ->name('tu.ppdb.')
@@ -32,11 +31,6 @@ Route::middleware([
         | PENGATURAN
         |--------------------------------------------------------------------------
         */
-
-        Route::resource(
-            'pengaturan',
-            PengaturanController::class
-        );
 
         Route::get(
             '/pengaturan',

@@ -1,19 +1,19 @@
 @extends('layouts.app')
 
-@section('title', 'Manajemen Admin & TU')
+@section('title', 'Manajemen Pengguna')
 
 @section('content')
 <div class="container-fluid dt-siswa-page">
     <x-table.page-header
         icon="bi-people"
         eyebrow="Manajemen Akun / Pengguna"
-        title="Manajemen Admin & TU"
-        description="Kelola akun administrator dan tata usaha."
+        title="Manajemen Pengguna"
+        description="Kelola akun teknis dan Guru."
     />
 
     <x-table.card
-        title="Manajemen Admin & Tata Usaha"
-        subtitle="Kelola akun administrator dan tata usaha"
+        title="Manajemen Admin dan Guru"
+        subtitle="Kelola akun teknis dan Guru"
         :count="$users->total()"
         count-label="user"
     >
@@ -63,7 +63,7 @@
                         <x-table.empty
                             :colspan="4"
                             title="Belum ada pengguna"
-                            description="Belum ada akun admin atau tata usaha yang dapat ditampilkan."
+                            description="Belum ada akun admin atau Guru yang dapat ditampilkan."
                         />
                     @endforelse
                 </tbody>

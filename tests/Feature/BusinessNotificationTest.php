@@ -37,13 +37,13 @@ class BusinessNotificationTest extends TestCase
         $admin = $this->makeUser('admin');
 
         $this->actingAs($admin)->post(route('admin.users.store'), [
-            'name' => 'New Teacher',
-            'email' => 'new-teacher@example.test',
+            'name' => 'New Administrator',
+            'email' => 'new-admin@example.test',
             'password' => 'password',
-            'role' => 'guru',
+            'role' => 'admin',
         ])->assertRedirect(route('admin.users.index'));
 
-        $pendingUser = User::where('email', 'new-teacher@example.test')->firstOrFail();
+        $pendingUser = User::where('email', 'new-admin@example.test')->firstOrFail();
 
         $this->assertSame('pending', $pendingUser->approval_status);
         $this->assertSame(1, $superAdmin->notifications()->count());
@@ -59,10 +59,10 @@ class BusinessNotificationTest extends TestCase
         ]);
     }
 
-    public function test_tu_created_pending_account_uses_the_same_superadmin_notification(): void
+    public function test_operator_teacher_created_pending_account_uses_the_same_superadmin_notification(): void
     {
         $superAdmin = $this->makeUser('superadmin');
-        $tu = $this->makeUser('tu');
+        $operator = $this->createAssignedTeacher('operator', ['operator.employees']);
         $pegawai = DataKepegawaian::create([
             'nama' => 'Pending Account Teacher',
             'nip' => 'NIP-'.uniqid(),
@@ -71,7 +71,7 @@ class BusinessNotificationTest extends TestCase
             'approval_status' => 'approved',
         ]);
 
-        $this->actingAs($tu)
+        $this->actingAs($operator)
             ->post(route('tu.datakepegawaian.create-account', $pegawai))
             ->assertRedirect();
 
@@ -448,6 +448,14 @@ class BusinessNotificationTest extends TestCase
 
     private function makeUser(string $role, string $approvalStatus = 'approved', bool $active = true): User
     {
+        if ($role === 'tu') {
+            return $this->createAssignedTeacher(
+                'ppdb',
+                ['ppdb.verification', 'ppdb.reenrollment'],
+                ['approval_status' => $approvalStatus, 'is_active' => $active]
+            );
+        }
+
         return User::create([
             'name' => ucfirst($role).' notification test',
             'email' => $role.'-'.uniqid().'@example.test',
@@ -499,7 +507,11 @@ class BusinessNotificationTest extends TestCase
             'approved_at' => now(),
             'is_active' => true,
         ]);
-        $mapel = MataPelajaran::create(['nama_mapel' => 'Matematika']);
+        $this->assignTeacherMenus($teacher, 'guru', ['guru.schedule']);
+        $mapel = MataPelajaran::create([
+            'nama_mapel' => 'Matematika',
+            'jp_per_minggu' => 4,
+        ]);
         $days = [
             HariSekolah::create(['nama' => 'Senin', 'urutan' => 1]),
             HariSekolah::create(['nama' => 'Selasa', 'urutan' => 2]),

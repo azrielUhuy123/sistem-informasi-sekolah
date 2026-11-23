@@ -45,7 +45,10 @@
 
                         <td>{{ $item->hari->nama }}</td>
 
-                        <td>{{ $item->jam->nama }}</td>
+                        <td>
+                            Jam ke {{ $item->jamPelajaran->jam_ke }}
+                            ({{ $item->jamPelajaran->mulai }} - {{ $item->jamPelajaran->selesai }})
+                        </td>
 
                         <td>
                             <span class="badge bg-secondary">

@@ -238,15 +238,6 @@ class PpdbQuotaEnforcementTest extends TestCase
 
     private function makeTu(): User
     {
-        return User::forceCreate([
-            'name' => 'PPDB quota test operator',
-            'email' => 'ppdb-quota-' . bin2hex(random_bytes(4)) . '@example.test',
-            'username' => 'ppdb-quota-tu-' . bin2hex(random_bytes(4)),
-            'password' => 'test-password',
-            'role' => 'tu',
-            'is_active' => true,
-            'approval_status' => 'approved',
-            'approved_at' => now(),
-        ]);
+        return $this->createAssignedTeacher('ppdb', array_keys(config('assignment_menus.types.ppdb.menus')));
     }
 }

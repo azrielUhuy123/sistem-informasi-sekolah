@@ -229,7 +229,11 @@
                                     @endphp
                                     <td style="min-width:140px;">
                                         {{-- ADA JADWAL --}}
-                                        @if($item)
+                                        @if($item && (int) $item->guru_id !== $guruId)
+                                            <div class="rounded-4 py-2 px-4 bg-light text-muted">
+                                                Slot terisi
+                                            </div>
+                                        @elseif($item)
                                             @php
                                                 $statusStyle = match ($item->status) {
                                                     'approved' => [

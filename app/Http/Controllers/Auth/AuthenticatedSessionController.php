@@ -51,59 +51,22 @@ class AuthenticatedSessionController extends Controller
         // 5️⃣ SESSION & REDIRECT
         $request->session()->regenerate();
 
-       if ($user->role === 'guru') {
+        if ($user->role === 'guru') {
+            session(['guru_mode' => $user->hasFeature('ekskul.dashboard') ? 'ekskul' : 'akademik']);
 
-            $guru = $user->guru;
-
-            $isWaliKelas = \App\Models\WaliKelas::where(
-                    'guru_id',
-                    $guru->id
-                )
-                ->where(
-                    'tahun_ajaran_id',
-                    current_tahun_id()
-                )
-                ->exists();
-
-            /*
-            |--------------------------------------------------------------------------
-            | DEFAULT MODE SELALU AKADEMIK
-            |--------------------------------------------------------------------------
-            */
-
-            session([
-                'guru_mode' => 'akademik'
-            ]);
-
-            /*
-            |--------------------------------------------------------------------------
-            | REDIRECT DASHBOARD
-            |--------------------------------------------------------------------------
-            */
-
-            if ($isWaliKelas) {
-
-                return redirect()->route(
-                    'guru.dashboard-walikelas'
-                );
+            if ($user->hasFeature('wali.dashboard')) {
+                return redirect()->route('guru.dashboard-walikelas');
             }
 
-            return redirect()->route(
-                'guru.dashboard-gurubidang'
-            );
-    }
+            return redirect()->route('guru.dashboard-gurubidang');
+        }
 
-    return match ($user->role) {
-
-        'tu' => redirect()->route('tu.dashboard'),
-
-        'superadmin' => redirect()->route('superadmin.dashboard'),
-
-        'siswa' => redirect()->route('siswa.dashboard.index'),
-
-        default => abort(403),
-
-    };
+        return match ($user->role) {
+            'tu' => redirect('/guru/dashboard-gurubidang'),
+            'superadmin' => redirect()->route('superadmin.dashboard'),
+            'siswa' => redirect()->route('siswa.dashboard.index'),
+            default => abort(403),
+        };
 
 
 

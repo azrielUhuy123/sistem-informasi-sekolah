@@ -14,19 +14,16 @@ class LoginResponse implements LoginResponseContract
         // Redirect berdasarkan role
         switch ($user->role) {
             case 'kepsek':
-                return redirect('/kepsek/dashboard');
+            case 'superadmin':
+                return redirect('/superadmin/dashboard');
 
             case 'guru':
-                return redirect('/guru/dashboard');
-
             case 'tu':
-                return redirect('/tu/dashboard');
+                return redirect($user->getDashboardUrl());
 
             case 'murid':
-                return redirect('/murid/dashboard');
-
-            case 'spmb':
-                return redirect('/spmb/dashboard');
+            case 'siswa':
+                return redirect('/siswa/dashboard');
 
             default:
                 return redirect('/dashboard');

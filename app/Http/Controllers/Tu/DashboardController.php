@@ -32,19 +32,19 @@ class DashboardController extends Controller
                                     ->where('is_active',0)
                                     ->count(),
 
+            'adminAktif'    => User::where('role','admin')
+                                    ->where('is_active',1)
+                                    ->count(),
+
+            'adminNonaktif' => User::where('role','admin')
+                                    ->where('is_active',0)
+                                    ->count(),
+
             'siswaAktif'    => User::where('role','siswa')
                                     ->where('is_active',1)
                                     ->count(),
 
             'siswaNonaktif' => User::where('role','siswa')
-                                    ->where('is_active',0)
-                                    ->count(),
-
-            'tuAktif'       => User::where('role','tu')
-                                    ->where('is_active',1)
-                                    ->count(),
-
-            'tuNonaktif'    => User::where('role','tu')
                                     ->where('is_active',0)
                                     ->count(),
 

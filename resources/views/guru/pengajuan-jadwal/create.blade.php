@@ -104,7 +104,7 @@
                     @foreach($jam as $item)
 
                         <option value="{{ $item->id }}"
-                            {{ request('jam_id') == $item->id ? 'selected' : '' }}>
+                            {{ old('jam_pelajaran_id', request('jam_id')) == $item->id ? 'selected' : '' }}>
 
                             Jam ke {{ $item->jam_ke }}
                             ({{ $item->mulai }} - {{ $item->selesai }})

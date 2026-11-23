@@ -58,8 +58,8 @@ class User extends Authenticatable
         return match ($this->role) {
             UserRole::SUPERADMIN => '/superadmin/dashboard',
             UserRole::ADMIN => '/admin/dashboard',
-            UserRole::TU => '/tu/dashboard',
-            UserRole::GURU => '/guru/dashboard',
+            UserRole::TU => '/guru/dashboard-gurubidang',
+            UserRole::GURU => '/guru/dashboard-gurubidang',
             UserRole::MURID => '/siswa/dashboard',
             default => '/dashboard',
         };
@@ -119,65 +119,34 @@ class User extends Authenticatable
             return true;
         }
 
-        $activeAssignmentKeys = collect();
-        if ($this->pegawai_id) {
-            $activeAssignmentKeys = PenugasanMenu::query()
+        if ($this->role === UserRole::GURU) {
+            if (! $this->pegawai_id || ! $this->guru()->exists()) {
+                return false;
+            }
+
+            $knownAssignmentMenus = collect(config('assignment_menus.types', []))
+                ->flatMap(fn ($type) => array_keys($type['menus'] ?? []));
+            if (! $knownAssignmentMenus->contains($featureKey)) {
+                return false;
+            }
+
+            return PenugasanMenu::query()
+                ->where('menu_key', $featureKey)
                 ->whereHas('item.penugasan', function ($query) {
                     $query->where('status', 'active')
                         ->where('data_kepegawaian_id', $this->pegawai_id);
                 })
-                ->pluck('menu_key');
-        }
-
-        if ($activeAssignmentKeys->contains($featureKey)) {
-            return true;
-        }
-
-        $assignmentAliases = [
-            'tu.academic' => ['guru.academic', 'tu.academic'],
-            'tu.documents' => ['tu.documents'],
-            'tu.ppdb' => ['tu.ppdb'],
-            'guru.academic' => ['guru.academic'],
-            'guru.extracurricular' => ['guru.extracurricular'],
-        ];
-
-        foreach ($assignmentAliases[$featureKey] ?? [] as $menuKey) {
-            if ($activeAssignmentKeys->contains($menuKey)) {
-                return true;
-            }
-        }
-
-        if ($featureKey === 'guru.academic' && $this->role === UserRole::GURU) {
-            $guru = $this->guru()->first();
-            if ($guru) {
-                $hasLegacyAcademic = WaliKelas::where('guru_id', $guru->id)
-                    ->where('tahun_ajaran_id', current_tahun_id())
-                    ->exists()
-                    || PengampuMapel::where('guru_id', $guru->id)
-                        ->where('tahun_ajaran_id', current_tahun_id())
-                        ->exists();
-                if (! $hasLegacyAcademic) {
-                    return false;
-                }
-            } else {
-                return false;
-            }
-        }
-
-        if ($featureKey === 'guru.extracurricular' && $this->role === UserRole::GURU) {
-            $guru = $this->guru()->first();
-
-            if (! $guru) {
-                return false;
-            }
-
-            $isPembina = \App\Models\PembinaEkskul::where('guru_id', $guru->id)
-                ->where('tahun_ajaran_id', current_tahun_id())
                 ->exists();
+        }
 
-            if (! $isPembina) {
-                return false;
-            }
+        if ($this->role === UserRole::TU) {
+            return false;
+        }
+
+        $features = config('feature_access.features', []);
+        $feature = $features[$featureKey] ?? null;
+        if (! is_array($feature)) {
+            return false;
         }
 
         $override = $this->featurePermissions()
@@ -188,12 +157,18 @@ class User extends Authenticatable
             return (bool) $override->allowed;
         }
 
-        $features = config('feature_access.features', []);
-        $feature = $features[$featureKey] ?? null;
+        return in_array($this->role, $feature['roles'] ?? [], true);
+    }
 
-        return is_array($feature)
-            ? in_array($this->role, $feature['roles'] ?? [], true)
-            : false;
+    public function hasAnyAssignmentMenu(array $menuKeys): bool
+    {
+        foreach ($menuKeys as $menuKey) {
+            if ($this->hasFeature($menuKey)) {
+                return true;
+            }
+        }
+
+        return false;
     }
 
     public function getNameAttribute()

@@ -82,6 +82,30 @@ class SiswaController extends Controller
         ));
     }
 
+    public function ajaxSearch(Request $request)
+    {
+        $validated = $request->validate([
+            'q' => ['nullable', 'string', 'max:100'],
+            'search' => ['nullable', 'string', 'max:100'],
+        ]);
+        $keyword = trim($validated['q'] ?? $validated['search'] ?? '');
+
+        $siswa = Siswa::query()
+            ->select(['id', 'nama', 'nis', 'nisn'])
+            ->when($keyword !== '', function ($query) use ($keyword) {
+                $query->where(function ($query) use ($keyword) {
+                    $query->where('nama', 'like', "%{$keyword}%")
+                        ->orWhere('nis', 'like', "%{$keyword}%")
+                        ->orWhere('nisn', 'like', "%{$keyword}%");
+                });
+            })
+            ->orderBy('nama')
+            ->limit(50)
+            ->get();
+
+        return response()->json($siswa);
+    }
+
     /**
      * CREATE
      * - WAJIB kelas_id (rombel)

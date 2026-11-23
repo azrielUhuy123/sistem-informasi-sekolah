@@ -30,10 +30,54 @@ class GuruController extends Controller
         );
     }
 
+    public function ajaxSearch(Request $request)
+    {
+        $validated = $request->validate([
+            'q' => ['nullable', 'string', 'max:100'],
+            'search' => ['nullable', 'string', 'max:100'],
+        ]);
+        $keyword = trim($validated['q'] ?? $validated['search'] ?? '');
+
+        $gurus = Guru::query()
+            ->with([
+                'pegawai:id,nama,nip,jenis_kelamin',
+                'mapels:id,nama_mapel',
+            ])
+            ->whereHas('pegawai')
+            ->when($keyword !== '', function ($query) use ($keyword) {
+                $query->where(function ($query) use ($keyword) {
+                    $query->whereHas('pegawai', function ($query) use ($keyword) {
+                        $query->where('nama', 'like', "%{$keyword}%")
+                            ->orWhere('nip', 'like', "%{$keyword}%")
+                            ->orWhere('jenis_kelamin', 'like', "%{$keyword}%");
+                    });
+                    $query->orWhereHas('mapels', fn ($query) => $query
+                        ->where('nama_mapel', 'like', "%{$keyword}%"));
+                });
+            })
+            ->orderBy('id')
+            ->limit(50)
+            ->get()
+            ->map(fn (Guru $guru) => [
+                'id' => $guru->id,
+                'nama' => $guru->pegawai?->nama,
+                'nip' => $guru->pegawai?->nip,
+                'jenis_kelamin' => $guru->pegawai?->jenis_kelamin,
+                'mapel' => $guru->mapels->pluck('nama_mapel')->implode(', '),
+            ]);
+
+        return response()->json($gurus);
+    }
+
     public function show($id)
     {
         $pegawai = Guru::with('pegawai')->findOrFail($id);
         return view('tu.guru.show', compact('pegawai'));
+    }
+
+    public function detail($id)
+    {
+        return $this->show($id);
     }
 
     public function store(Request $request)

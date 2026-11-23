@@ -3,6 +3,10 @@
 namespace Database\Seeders;
 
 use App\Models\DataKepegawaian;
+use App\Models\Guru;
+use App\Models\Penugasan;
+use App\Models\PenugasanItem;
+use App\Models\PenugasanMenu;
 use App\Models\User;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\Hash;
@@ -29,7 +33,7 @@ class TestingSeeder extends Seeder
                 'nip' => '9000000000000001',
             ],
             [
-                'nama' => 'QA PPDB Admin',
+                'nama' => 'QA Guru PPDB',
                 'status_kepegawaian' => 'NON_PNS',
                 'approval_status' => 'approved',
             ]
@@ -48,14 +52,14 @@ class TestingSeeder extends Seeder
         $adminValues = [
             'pegawai_id' => $pegawai->id,
             'password' => Hash::make('qa_admin_123'),
-            'role' => 'tu',
+            'role' => 'guru',
             'is_active' => true,
             'approval_status' => 'approved',
             'approved_at' => now(),
         ];
 
         if (Schema::hasColumn('users', 'name')) {
-            $adminValues['name'] = 'QA PPDB Admin';
+            $adminValues['name'] = 'QA Guru PPDB';
         }
 
         if (Schema::hasColumn('users', 'email')) {
@@ -63,5 +67,21 @@ class TestingSeeder extends Seeder
         }
 
         $admin->forceFill($adminValues)->save();
+        Guru::firstOrCreate(['data_kepegawaian_id' => $pegawai->id]);
+
+        $assignment = Penugasan::firstOrCreate(
+            ['data_kepegawaian_id' => $pegawai->id, 'status' => 'active'],
+            ['published_at' => now()]
+        );
+        $item = PenugasanItem::firstOrCreate([
+            'penugasan_id' => $assignment->id,
+            'type' => 'ppdb',
+        ]);
+        foreach (['ppdb.dashboard', 'ppdb.applicants', 'ppdb.verification', 'ppdb.reenrollment'] as $menuKey) {
+            PenugasanMenu::firstOrCreate([
+                'penugasan_item_id' => $item->id,
+                'menu_key' => $menuKey,
+            ]);
+        }
     }
 }

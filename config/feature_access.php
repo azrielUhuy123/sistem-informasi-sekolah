@@ -4,15 +4,15 @@ return [
     'features' => [
         'tu.ppdb' => [
             'label' => 'Operasional PPDB',
-            'roles' => ['tu'],
+            'roles' => [],
         ],
         'tu.academic' => [
             'label' => 'Administrasi Akademik TU',
-            'roles' => ['tu'],
+            'roles' => [],
         ],
         'tu.documents' => [
             'label' => 'Dokumen dan Surat TU',
-            'roles' => ['tu'],
+            'roles' => [],
         ],
         'guru.academic' => [
             'label' => 'Pembelajaran dan Akademik Guru',

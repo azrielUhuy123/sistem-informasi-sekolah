@@ -24,7 +24,7 @@
         <label>Role</label>
         <select class="form-select" name="role">
             <option value="admin" {{ $user->role=='admin'?'selected':'' }}>Admin</option>
-            <option value="tu" {{ $user->role=='tu'?'selected':'' }}>Tata Usaha</option>
+            <option value="guru" {{ $user->role=='guru'?'selected':'' }}>Guru</option>
         </select>
     </div>
 

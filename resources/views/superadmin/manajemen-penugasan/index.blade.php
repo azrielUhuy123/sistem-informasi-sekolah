@@ -91,7 +91,6 @@
             <div class="d-flex flex-wrap gap-2 mb-3 assignment-filter" id="employeeFilter">
                 <button type="button" class="btn btn-outline-secondary btn-sm active" data-filter="all">Semua Pegawai</button>
                 <button type="button" class="btn btn-outline-secondary btn-sm" data-filter="guru">Guru</button>
-                <button type="button" class="btn btn-outline-secondary btn-sm" data-filter="tendik">Tenaga Kependidikan</button>
             </div>
 
             <div class="row g-3 align-items-end">
@@ -104,8 +103,8 @@
                             @php
                                 $isGuru = (bool) $employee->guru;
                                 $role = $employee->user?->role;
-                                $category = $isGuru ? 'guru' : 'tendik';
-                                $identity = $role === 'superadmin' ? 'Kepala Sekolah' : ($isGuru ? 'Guru' : 'Tenaga Kependidikan');
+                                $category = 'guru';
+                                $identity = 'Guru';
                             @endphp
                             <option
                                 value="{{ $employee->id }}"
@@ -255,81 +254,7 @@
                     Pilih penugasan terlebih dahulu untuk mengatur hak akses menu.
                 </p>
                 <div class="row g-3">
-                    @php
-                        $assignmentMenus = [
-                            'operator' => [
-                                'title' => 'Operator Sekolah',
-                                'menus' => [
-                                    ['Kelola Tahun Ajaran', 'Mengatur periode tahun ajaran yang digunakan sekolah.'],
-                                    ['Kelas dan Rombel', 'Mengelola kelompok kelas dan rombel.'],
-                                    ['Data Siswa', 'Mengelola data dan penempatan siswa.'],
-                                    ['Data Guru', 'Melihat dan mengelola data guru.'],
-                                    ['Mata Pelajaran', 'Mengelola daftar mata pelajaran.'],
-                                    ['Jadwal Kelas', 'Melihat dan mengelola jadwal kelas.'],
-                                    ['Ekstrakurikuler', 'Mengelola data kegiatan ekstrakurikuler.'],
-                                    ['Arsip Dokumen dan Surat', 'Mengelola dokumen serta pengajuan dan nomor surat.'],
-                                    ['Data Kepegawaian', 'Melihat dan mengelola data pegawai.'],
-                                    ['Kelola Akun', 'Mengatur status dan kata sandi akun pengguna.'],
-                                ],
-                            ],
-                            'ppdb' => [
-                                'title' => 'Admin PPDB',
-                                'menus' => [
-                                    ['Dashboard PPDB', 'Melihat ringkasan proses PPDB.'],
-                                    ['Data Pendaftar', 'Melihat dan memproses data pendaftar.'],
-                                    ['Data Diterima', 'Mengelola pendaftar yang dinyatakan diterima.'],
-                                    ['Data Ditolak', 'Melihat pendaftar yang ditolak.'],
-                                    ['Daftar Ulang', 'Mengelola konfirmasi daftar ulang.'],
-                                    ['Penempatan Kelas', 'Menempatkan peserta diterima ke kelas.'],
-                                    ['Verifikasi Pendaftar', 'Memverifikasi kelengkapan pendaftar.'],
-                                    ['Pengaturan PPDB', 'Mengatur periode, kuota, dan pengaturan PPDB.'],
-                                ],
-                            ],
-                            'wali' => [
-                                'title' => 'Wali Kelas',
-                                'menus' => [
-                                    ['Dashboard Wali Kelas', 'Melihat ringkasan kelas yang menjadi tanggung jawab.'],
-                                    ['Kelas Saya', 'Melihat daftar siswa pada kelas bimbingan.'],
-                                    ['Absensi Kelas', 'Mengelola dan merekap absensi siswa.'],
-                                    ['Nilai', 'Mengelola nilai siswa pada kelas bimbingan.'],
-                                    ['Pengembangan Siswa', 'Melihat dan mencatat perkembangan siswa.'],
-                                    ['Rapor', 'Melihat dan mencetak rapor siswa.'],
-                                    ['Kenaikan Kelas', 'Mengajukan keputusan kenaikan kelas.'],
-                                ],
-                            ],
-                            'guru' => [
-                                'title' => 'Guru Bidang Studi',
-                                'menus' => [
-                                    ['Dashboard Guru', 'Melihat ringkasan tugas pembelajaran.'],
-                                    ['Jadwal Saya', 'Melihat dan mengajukan jadwal mengajar.'],
-                                    ['Status Validasi', 'Melihat status validasi jadwal.'],
-                                    ['Absensi Kelas', 'Mengelola absensi mata pelajaran.'],
-                                    ['Nilai', 'Mengelola nilai mata pelajaran.'],
-                                    ['Pengembangan Siswa', 'Melihat dan mencatat perkembangan siswa.'],
-                                    ['E-Learning', 'Mengelola forum dan materi pembelajaran.'],
-                                    ['Arsip Dokumen', 'Melihat dokumen yang tersedia.'],
-                                    ['Pengajuan Surat', 'Mengajukan surat sebagai guru.'],
-                                    ['Nomor Surat', 'Membuat nomor surat yang digunakan guru.'],
-                                    ['Rekap Bulanan', 'Melihat rekap absensi bulanan.'],
-                                    ['Rekap Semester', 'Melihat rekap absensi semester.'],
-                                ],
-                            ],
-                            'ekskul' => [
-                                'title' => 'Pembina Ekstrakurikuler',
-                                'menus' => [
-                                    ['Dashboard Ekstrakurikuler', 'Melihat ringkasan kegiatan ekskul.'],
-                                    ['Jadwal Ekskul', 'Mengelola jadwal kegiatan.'],
-                                    ['Status Validasi Jadwal', 'Melihat hasil validasi jadwal ekskul.'],
-                                    ['Pendaftaran Anggota', 'Mengelola anggota baru ekskul.'],
-                                    ['Daftar Anggota', 'Melihat seluruh anggota ekskul.'],
-                                    ['Absensi Ekstrakurikuler', 'Mengelola kehadiran anggota ekskul.'],
-                                    ['Rekap Absensi', 'Melihat rekap kehadiran ekskul.'],
-                                    ['Jurnal Kegiatan', 'Mengisi dan melihat jurnal kegiatan.'],
-                                    ['Catatan Pembinaan', 'Mengelola catatan pembinaan anggota.'],
-                                ],
-                            ],
-                        ];
-                    @endphp
+                    @php($assignmentMenus = config('assignment_menus.types', []))
                     @foreach($assignmentMenus as $assignmentKey => $assignment)
                         <div class="col-xl-6 d-none" data-menu-panel="{{ $assignmentKey }}">
                             <div class="assignment-menu-panel is-disabled p-3 h-100">
@@ -346,15 +271,14 @@
                                     </div>
                                 </div>
                                 <div class="assignment-menu-body row g-2">
-                                    @foreach($assignment['menus'] as $menuIndex => $menu)
+                                    @foreach($assignment['menus'] as $menuKey => $menu)
                                         <div class="col-md-6">
                                             <label class="menu-access-option d-flex align-items-start gap-2 h-100">
                                                 <input
                                                     type="checkbox"
                                                     class="form-check-input mt-1 menu-access-checkbox"
                                                     data-menu-assignment="{{ $assignmentKey }}"
-                                                    value="{{ $menu[0] }}"
-                                                    checked
+                                                    value="{{ $menuKey }}"
                                                     disabled
                                                 >
                                                 <span>

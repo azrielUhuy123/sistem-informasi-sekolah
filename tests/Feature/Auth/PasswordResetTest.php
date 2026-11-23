@@ -110,7 +110,7 @@ class PasswordResetTest extends TestCase
         });
     }
 
-    public function test_students_are_directed_to_tu_instead_of_public_reset_email(): void
+    public function test_students_are_rejected_from_public_reset_email(): void
     {
         Notification::fake();
         $user = $this->makeStudentUser();
@@ -177,11 +177,7 @@ class PasswordResetTest extends TestCase
     public function test_non_student_password_reset_behavior_is_unchanged(): void
     {
         Notification::fake();
-        $user = User::factory()->create([
-            'role' => 'tu',
-            'approval_status' => 'approved',
-            'is_active' => true,
-        ]);
+        $user = $this->createAssignedTeacher('operator', ['operator.accounts']);
 
         $this->post(route('password.email'), ['email' => $user->email]);
 
@@ -242,10 +238,6 @@ class PasswordResetTest extends TestCase
 
     private function makeNonStudentUser(): User
     {
-        return User::factory()->create([
-            'role' => 'tu',
-            'approval_status' => 'approved',
-            'is_active' => true,
-        ]);
+        return $this->createAssignedTeacher('operator', ['operator.accounts']);
     }
 }

@@ -128,8 +128,8 @@ class BusinessNotificationService
 
     public function notifyPendingPpdbRegistration(PpdbPendaftar $pendaftar): void
     {
-        foreach ($this->activeApprovedTuUsers() as $tuUser) {
-            $tuUser->notify(new SinergiNotification(
+        foreach ($this->activeApprovedUsersWithPpdbMenu('ppdb.verification') as $user) {
+            $user->notify(new SinergiNotification(
                 title: 'Pendaftaran PPDB menunggu verifikasi',
                 message: "Pendaftar {$pendaftar->no_pendaftaran} ({$pendaftar->nama}) menunggu verifikasi.",
                 category: 'ppdb',
@@ -144,8 +144,8 @@ class BusinessNotificationService
 
     public function notifyPpdbDaftarUlangSubmitted(PpdbPendaftar $pendaftar): void
     {
-        foreach ($this->activeApprovedTuUsers() as $tuUser) {
-            $tuUser->notify(new SinergiNotification(
+        foreach ($this->activeApprovedUsersWithPpdbMenu('ppdb.reenrollment') as $user) {
+            $user->notify(new SinergiNotification(
                 title: 'Daftar ulang PPDB perlu dikonfirmasi',
                 message: "Pendaftar {$pendaftar->no_pendaftaran} ({$pendaftar->nama}) telah menyelesaikan daftar ulang.",
                 category: 'ppdb',
@@ -158,12 +158,16 @@ class BusinessNotificationService
         }
     }
 
-    private function activeApprovedTuUsers(): \Illuminate\Database\Eloquent\Collection
+    private function activeApprovedUsersWithPpdbMenu(string $menuKey): \Illuminate\Database\Eloquent\Collection
     {
         return User::query()
-            ->where('role', UserRole::TU)
+            ->where('role', UserRole::GURU)
             ->where('is_active', true)
             ->where('approval_status', 'approved')
+            ->whereHas('pegawai.penugasans', fn ($query) => $query
+                ->where('status', 'active')
+                ->whereHas('items.menus', fn ($menuQuery) => $menuQuery
+                    ->where('menu_key', $menuKey)))
             ->get();
     }
 

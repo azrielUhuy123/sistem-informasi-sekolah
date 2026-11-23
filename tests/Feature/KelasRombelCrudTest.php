@@ -41,16 +41,7 @@ class KelasRombelCrudTest extends TestCase
             'kelas_master_id' => $this->kelasMaster->id,
         ]);
 
-        $this->actingAs(User::forceCreate([
-            'name' => 'Operator TU Rombel',
-            'email' => 'tu-rombel-' . bin2hex(random_bytes(4)) . '@example.test',
-            'username' => 'tu-rombel-' . bin2hex(random_bytes(4)),
-            'password' => 'test-password',
-            'role' => 'tu',
-            'is_active' => true,
-            'approval_status' => 'approved',
-            'approved_at' => now(),
-        ]));
+        $this->actingAs($this->createAssignedTeacher('operator', ['operator.classes']));
     }
 
     public function test_tu_can_create_a_rombel_inside_a_kelas_grup(): void

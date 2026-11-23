@@ -73,16 +73,7 @@ class PpdbDaftarUlangCohortTest extends TestCase
 
     private function makeTu(): User
     {
-        return User::forceCreate([
-            'name' => 'PPDB daftar ulang test operator',
-            'email' => 'ppdb-daful-' . bin2hex(random_bytes(4)) . '@example.test',
-            'username' => 'ppdb-daful-tu-' . random_int(100000, 999999),
-            'password' => 'test-password',
-            'role' => 'tu',
-            'is_active' => true,
-            'approval_status' => 'approved',
-            'approved_at' => now(),
-        ]);
+        return $this->createAssignedTeacher('ppdb', array_keys(config('assignment_menus.types.ppdb.menus')));
     }
 
     private function makeAcceptedPendaftar(TahunAjaran $tahunAjaran): PpdbPendaftar

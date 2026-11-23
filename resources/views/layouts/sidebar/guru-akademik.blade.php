@@ -4,18 +4,15 @@
 
 @php
 
-    $guru = auth()->user()->guru;
-    $canAcademic = auth()->user()->hasFeature('guru.academic');
-
-    $isWaliKelas = \App\Models\WaliKelas::where(
-        'guru_id',
-        $guru?->id
-    )
-    ->where(
-        'tahun_ajaran_id',
-        current_tahun_id()
-    )
-    ->exists();
+    $user = auth()->user();
+    $canSchedule = $user->hasAnyAssignmentMenu(['guru.schedule', 'guru.schedule_status']);
+    $canClass = $user->hasAnyAssignmentMenu([
+        'wali.classes', 'guru.attendance', 'wali.attendance',
+        'guru.grades', 'wali.grades', 'guru.development', 'wali.development',
+        'wali.promotion',
+    ]);
+    $canReports = $user->hasAnyAssignmentMenu(['guru.monthly_report', 'guru.semester_report']);
+    $canDocuments = $user->hasAnyAssignmentMenu(['guru.documents', 'guru.letters', 'guru.letter_numbers']);
 
 @endphp
 
@@ -29,11 +26,11 @@
         MAIN GURU
     </div>
 
-    @if($canAcademic)
+    @if($user->hasFeature('guru.dashboard') || $user->hasFeature('wali.dashboard'))
     <a
         class="menu-item
         {{ request()->is('guru/dashboard*') ? 'active' : '' }}"
-        href="{{ $isWaliKelas
+        href="{{ $user->hasFeature('wali.dashboard')
             ? route('guru.dashboard-walikelas')
             : route('guru.dashboard-gurubidang') }}"
     >
@@ -46,7 +43,6 @@
     </a>
     @endif
 
-    @if($canAcademic)
     <a
         class="menu-item
         {{ request()->is('guru/profile*') ?  : '' }}"
@@ -59,6 +55,7 @@
 
     </a>
     
+    @if($user->hasFeature('guru.elearning'))
     <a
         class="menu-item
         {{ request()->is('guru/e-learning*') ?  : '' }}"
@@ -72,7 +69,7 @@
     </a>
     @endif
 
-    @if($canAcademic)
+    @if($canSchedule)
     <button class="menu-item border-0 bg-transparent text-start"
             onclick="toggleMenu('menuJadwal','arrowJadwal')">
         <div class="menu-left">
@@ -85,6 +82,7 @@
 
     <div class="submenu" id="menuJadwal">
 
+        @if($user->hasFeature('guru.schedule'))
         <a class="menu-item {{ request()->is('guru/jadwal-saya*') ?  : '' }}"
            href="{{ route('guru.jadwal-saya.index') }}">
             <div class="menu-left">
@@ -92,7 +90,9 @@
                 <span>Jadwal Saya</span>
             </div>
         </a>
+        @endif
 
+        @if($user->hasFeature('guru.schedule_status'))
         <a class="menu-item {{ request()->is('guru/status-validasi*') ?  : '' }}"
            href="{{ route('guru.status-validasi.index') }}">
             <div class="menu-left">
@@ -100,11 +100,12 @@
                 <span>Status Validasi</span>
             </div>
         </a>
+        @endif
 
     </div>
     @endif
 
-    @if($canAcademic)
+    @if($canClass)
     <button class="menu-item border-0 bg-transparent text-start"
             onclick="toggleMenu('menuKelas','arrowKelas')">
         <div class="menu-left">
@@ -116,7 +117,7 @@
     </button>
 
     <div class="submenu" id="menuKelas">
-        @if($isWaliKelas)
+        @if($user->hasFeature('wali.classes'))
             <a class="menu-item {{ request()->is('guru/kelas-saya*') ?  : '' }}"
             href="{{ route('guru.kelas-saya') }}">
                 <div class="menu-left">
@@ -125,6 +126,7 @@
                 </div>
             </a>
         @endif
+        @if($user->hasAnyAssignmentMenu(['guru.attendance', 'wali.attendance']))
         <a class="menu-item {{ request()->is('guru/absensi*') ?  : '' }}"
            href="{{ route('guru.absensi.index') }}">
             <div class="menu-left">
@@ -132,7 +134,9 @@
                 <span>Absensi Kelas</span>
             </div>
         </a>
+        @endif
 
+        @if($user->hasAnyAssignmentMenu(['guru.grades', 'wali.grades']))
         <a class="menu-item {{ request()->is('guru/nilai*') ?  : '' }}"
            href="{{ route('guru.nilai.index') }}">
             <div class="menu-left">
@@ -140,7 +144,9 @@
                 <span>Nilai</span>
             </div>
         </a>
+        @endif
 
+        @if($user->hasAnyAssignmentMenu(['guru.development', 'wali.development']))
         <a class="menu-item {{ request()->is('guru/perkembangan*') ?  : '' }}"
            href="{{ route('guru.perkembangan.index') }}">
             <div class="menu-left">
@@ -148,8 +154,9 @@
                 <span>Pengembangan Siswa</span>
             </div>
         </a>
+        @endif
 
-        @if($isWaliKelas)
+        @if($user->hasFeature('wali.promotion'))
             <a class="menu-item {{ request()->is('guru/kenaikan*') ?  : '' }}"
             href="{{ route('guru.kenaikan.index') }}">
                 <div class="menu-left">
@@ -162,7 +169,7 @@
     </div>
     @endif
 
-    @if($canAcademic)
+    @if($canReports)
     <button class="menu-item border-0 bg-transparent text-start"
             onclick="toggleMenu('menuAbsen','arrowAbsen')">
         <div class="menu-left">
@@ -173,6 +180,7 @@
         <i class="bi bi-chevron-right dropdown-arrow" id="arrowAbsen"></i>
     </button>
     <div class="submenu" id="menuAbsen">
+        @if($user->hasFeature('guru.monthly_report'))
         <a
             class="menu-item
             {{ request()->is('guru/rekap-bulanan*') ?  : '' }}"
@@ -183,6 +191,8 @@
                 <span>Rekap Bulanan</span>
             </div>
         </a>
+        @endif
+        @if($user->hasFeature('guru.semester_report'))
         <a
             class="menu-item
             {{ request()->is('guru/rekap-semester*') ? 'active' : '' }}"
@@ -193,11 +203,12 @@
                 <span>Rekap Semester</span>
             </div>
         </a>
+        @endif
     </div>
     @endif
 
     {{-- DOKUMEN --}}
-    @if($canAcademic)
+    @if($canDocuments)
     <button
         class="menu-item border-0 bg-transparent text-start"
         onclick="toggleMenu('menuDokumen','arrowDokumen')"
@@ -207,8 +218,6 @@
             <i class="bi bi-folder2-open"></i>
             <span>Dokumen</span>
         </div>
-        @endif
-
         <i class="bi bi-chevron-right dropdown-arrow"
         id="arrowDokumen"></i>
 
@@ -217,6 +226,7 @@
     <div class="submenu show"
         id="menuDokumen">
 
+        @if($user->hasFeature('guru.documents'))
         <a
             class="menu-item
             {{ request()->is('guru/dokumen*') ?  : '' }}"
@@ -229,7 +239,9 @@
             </div>
 
         </a>
+        @endif
 
+        @if($user->hasFeature('guru.letters'))
             <a
                 class="menu-item
                 {{ request()->is('guru/pengajuan-surat*') ?  : '' }}"
@@ -242,7 +254,9 @@
                 </div>
 
             </a>
+        @endif
 
+        @if($user->hasFeature('guru.letter_numbers'))
             <a
                 class="menu-item
                 {{ request()->is('guru/nomor-surat*') ?  : '' }}"
@@ -254,7 +268,9 @@
                 </div>
 
             </a>
+        @endif
 
     </div>
+    @endif
 
 </div>

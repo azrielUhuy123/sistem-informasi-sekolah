@@ -44,7 +44,7 @@ Route::get('/dashboard', function () {
 
 // SPMB
 use App\Http\Controllers\Spmb\DashboardController as SpmbDashboard;
-Route::middleware(['auth', 'role:spmb'])->group(function () {
+Route::middleware(['auth', 'approved', 'role:guru', 'menu.route'])->group(function () {
     Route::get('/spmb/dashboard', [SpmbDashboard::class, 'index'])->name('spmb.dashboard');
 });
 

@@ -85,7 +85,7 @@ class UserController extends Controller
             'name' => 'required',
             'email' => 'required|email|unique:users',
             'password' => 'required|min:6',
-            'role' => 'required|in:admin,tu,guru',
+            'role' => 'required|in:admin',
         ]);
 
         $user = User::create([
@@ -123,7 +123,6 @@ class UserController extends Controller
         $validated = $request->validate([
             'name'  => 'required|string|max:100',
             'email' => 'required|email|unique:users,email,' . $user->id,
-            'role'  => 'required|in:admin,tu',
             'password' => 'nullable|min:6',
         ]);
 

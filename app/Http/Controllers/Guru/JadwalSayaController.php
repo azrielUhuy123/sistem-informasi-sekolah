@@ -6,35 +6,50 @@ use App\Http\Controllers\Controller;
 use App\Models\HariSekolah;
 use App\Models\JamPelajaran;
 use App\Models\Kelas;
-use App\Models\KelasMaster;
-use App\Models\MataPelajaran;
 use App\Models\PengajuanJadwal;
-use App\Models\PengampuMapel;
 use App\Models\TahunAjaran;
-use App\Models\WaliKelas;
 use App\Services\BusinessNotificationService;
+use App\Services\JadwalDraftService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 
 class JadwalSayaController extends Controller
 {
-    public function index(Request $request)
+    public function index(Request $request, JadwalDraftService $drafts)
     {
         $guru = Auth::user()->guru;
 
         abort_unless($guru, 403, 'Akun guru belum terhubung.');
 
-        $pengampu = $this->buildPengampuOptions($guru);
+        $pengampu = $drafts->optionsFor($guru);
 
         $selectedKelas = $request->integer('kelas_id');
 
         if (! $selectedKelas) {
-            $selectedKelas = $guru->waliKelas?->kelas_id
+            $selectedKelas = $pengampu->firstWhere('sumber', 'wali_kelas')?->kelas_id
                 ?? $pengampu->first()?->kelas_id;
         }
 
+        if (
+            $selectedKelas &&
+            ! $pengampu->contains(fn ($item) => (int) $item->kelas_id === $selectedKelas)
+        ) {
+            abort(403, 'Anda tidak memiliki akses ke kelas ini.');
+        }
+
         $selectedMapel = $request->integer('mapel_id');
+
+        if (
+            $selectedKelas &&
+            $selectedMapel &&
+            ! $pengampu->contains(fn ($item) =>
+                (int) $item->kelas_id === $selectedKelas &&
+                (int) $item->mata_pelajaran_id === $selectedMapel
+            )
+        ) {
+            abort(403, 'Anda tidak memiliki assignment mapel ini.');
+        }
 
         $kelas = null;
 
@@ -52,6 +67,7 @@ class JadwalSayaController extends Controller
 
         $haris = HariSekolah::orderBy('urutan')->get();
         $jams = JamPelajaran::orderBy('jam_ke')->get();
+        $guruId = $guru->id;
 
         $jadwal = collect();
 
@@ -125,6 +141,7 @@ class JadwalSayaController extends Controller
 
         return view('guru.jadwal-saya.index', compact(
             'pengampu',
+            'guruId',
             'selectedKelas',
             'selectedMapel',
             'selectedJP',
@@ -137,7 +154,7 @@ class JadwalSayaController extends Controller
         ));
     }
 
-    public function pilihSlot(Request $request)
+    public function pilihSlot(Request $request, JadwalDraftService $drafts)
     {
         $guru = Auth::user()->guru;
 
@@ -150,71 +167,16 @@ class JadwalSayaController extends Controller
             'jam_id' => 'required|integer|exists:jam_pelajaran,id',
         ]);
 
-        $kelas = Kelas::with([
-            'kelasGrup.kelasMaster'
-        ])->findOrFail($request->kelas_id);
-
-        if (! $this->guruBolehAksesKelas($guru->id, $kelas->id)) {
-            return back()->with('error', 'Anda tidak memiliki akses ke kelas ini.');
-        }
-
-        if (! $this->guruBolehAksesMapelUntukKelas($guru->id, $kelas->id, $request->mapel_id)) {
-            return back()->with('error', 'Anda tidak memiliki assignment mapel ini.');
-        }
-
-        $published = PengajuanJadwal::where('kelas_id', $kelas->id)
-            ->where('tahun_ajaran_id', current_tahun_id())
-            ->where('status', 'published')
-            ->exists();
-
-        if ($published) {
-            return back()->with('error', 'Jadwal sudah dipublish');
-        }
-
-        $mapel = MataPelajaran::findOrFail($request->mapel_id);
-
-        $exists = PengajuanJadwal::where([
-                'kelas_id' => $kelas->id,
-                'hari_id' => $request->hari_id,
-                'jam_pelajaran_id' => $request->jam_id,
-            ])
-            ->where('tahun_ajaran_id', current_tahun_id())
-            ->exists();
-
-        if ($exists) {
-            return back()->with('error', 'Slot sudah terisi');
-        }
-
-        $currentJP = PengajuanJadwal::where('kelas_id', $kelas->id)
-            ->where('mapel_id', $mapel->id)
-            ->where('tahun_ajaran_id', current_tahun_id())
-            ->count();
-
-        if ($currentJP >= $mapel->jp_per_minggu) {
-            return back()->with('error', 'JP mapel sudah penuh');
-        }
-
-        $totalJP = PengajuanJadwal::where('kelas_id', $kelas->id)
-            ->where('tahun_ajaran_id', current_tahun_id())
-            ->count();
-
-        $maxJP = max_jp_kelas(
-            $kelas->kelasGrup?->kelasMaster?->tingkat
-        );
-
-        if ($totalJP >= $maxJP) {
-            return back()->with('error', 'Total JP kelas sudah penuh');
-        }
-
-        PengajuanJadwal::create([
-            'guru_id' => $guru->id,
-            'kelas_id' => $kelas->id,
-            'mapel_id' => $request->mapel_id,
-            'hari_id' => $request->hari_id,
-            'jam_pelajaran_id' => $request->jam_id,
-            'tahun_ajaran_id' => current_tahun_id(),
-            'status' => 'draft',
+        $error = $drafts->createDraft($guru, [
+            'kelas_id' => $request->integer('kelas_id'),
+            'mapel_id' => $request->integer('mapel_id'),
+            'hari_id' => $request->integer('hari_id'),
+            'jam_pelajaran_id' => $request->integer('jam_id'),
         ]);
+
+        if ($error) {
+            return back()->with('error', $error);
+        }
 
         return back()->with('success', 'Slot berhasil dipilih');
     }
@@ -245,7 +207,7 @@ class JadwalSayaController extends Controller
         return back()->with('success', 'Slot berhasil dihapus');
     }
 
-    public function submitJadwal(Request $request)
+    public function submitJadwal(Request $request, JadwalDraftService $drafts)
     {
         $guru = Auth::user()->guru;
 
@@ -259,11 +221,15 @@ class JadwalSayaController extends Controller
             'kelasGrup.kelasMaster'
         ])->findOrFail($request->kelas_id);
 
-        if (! $this->guruBolehAksesKelas($guru->id, $kelas->id)) {
-            return back()->with('error', 'Anda tidak memiliki akses ke kelas ini.');
+        $tahunAjaranId = (int) current_tahun_id();
+
+        if (! $tahunAjaranId) {
+            return back()->with('error', 'Tahun ajaran aktif belum tersedia.');
         }
 
-        $tahunAjaranId = current_tahun_id();
+        if (! $drafts->teacherCanAccessClass($guru->id, $kelas->id, $tahunAjaranId)) {
+            return back()->with('error', 'Anda tidak memiliki akses ke kelas ini.');
+        }
 
         $published = PengajuanJadwal::where('kelas_id', $kelas->id)
             ->where('tahun_ajaran_id', $tahunAjaranId)
@@ -274,19 +240,26 @@ class JadwalSayaController extends Controller
             return back()->with('error', 'Jadwal sudah dipublish');
         }
 
-        $submittedCount = DB::transaction(function () use ($guru, $kelas, $tahunAjaranId) {
-            $drafts = PengajuanJadwal::where('guru_id', $guru->id)
+        $result = DB::transaction(function () use ($guru, $kelas, $tahunAjaranId, $drafts) {
+            $items = PengajuanJadwal::with('mapel')
+                ->where('guru_id', $guru->id)
                 ->where('kelas_id', $kelas->id)
                 ->where('tahun_ajaran_id', $tahunAjaranId)
                 ->whereIn('status', ['draft', 'rejected'])
                 ->lockForUpdate()
                 ->get();
 
-            if ($drafts->isEmpty()) {
-                return 0;
+            if ($items->isEmpty()) {
+                return ['count' => 0, 'error' => null];
             }
 
-            foreach ($drafts as $item) {
+            $error = $drafts->validateSubmission($guru, $kelas, $items, $tahunAjaranId);
+
+            if ($error) {
+                return ['count' => 0, 'error' => $error];
+            }
+
+            foreach ($items as $item) {
                 $item->update(['status' => 'submitted']);
             }
 
@@ -295,105 +268,20 @@ class JadwalSayaController extends Controller
             app(BusinessNotificationService::class)->notifyScheduleSubmitted(
                 $kelas,
                 $academicYear,
-                $drafts->count(),
+                $items->count(),
             );
 
-            return $drafts->count();
+            return ['count' => $items->count(), 'error' => null];
         });
 
-        if ($submittedCount === 0) {
+        if ($result['error']) {
+            return back()->with('error', $result['error']);
+        }
+
+        if ($result['count'] === 0) {
             return back()->with('error', 'Tidak ada jadwal untuk disubmit');
         }
 
         return back()->with('success', 'Jadwal berhasil disubmit');
-    }
-
-    private function buildPengampuOptions($guru)
-    {
-        $options = collect();
-
-        $pengampuRows = PengampuMapel::with([
-                'kelas.kelasGrup.kelasMaster',
-                'mapel'
-            ])
-            ->where('guru_id', $guru->id)
-            ->where('tahun_ajaran_id', current_tahun_id())
-            ->get();
-
-        foreach ($pengampuRows as $row) {
-            $options->put($row->kelas_id . '-' . $row->mata_pelajaran_id, $row);
-        }
-
-        $waliKelas = WaliKelas::with([
-                'kelas.kelasGrup.kelasMaster'
-            ])
-            ->where('guru_id', $guru->id)
-            ->where('tahun_ajaran_id', current_tahun_id())
-            ->first();
-
-        if ($waliKelas?->kelas) {
-            $mapelInti = MataPelajaran::whereIn(
-                'nama_mapel',
-                [
-                    'Bahasa Indonesia',
-                    'Matematika',
-                    'Pendidikan Pancasila',
-                    'Ilmu Pengetahuan Alam dan Sosial',
-                ]
-            )->get();
-
-            foreach ($mapelInti as $mapel) {
-                $fakePengampu = new PengampuMapel();
-
-                $fakePengampu->kelas_id = $waliKelas->kelas->id;
-                $fakePengampu->mata_pelajaran_id = $mapel->id;
-
-                $fakePengampu->setRelation('kelas', $waliKelas->kelas);
-                $fakePengampu->setRelation('mapel', $mapel);
-
-                $options->put(
-                    $waliKelas->kelas->id . '-' . $mapel->id,
-                    $fakePengampu
-                );
-            }
-        }
-
-        return $options->values();
-    }
-
-    private function guruBolehAksesKelas(int $guruId, int $kelasId): bool
-    {
-        $waliKelasId = WaliKelas::where('guru_id', $guruId)
-            ->where('tahun_ajaran_id', current_tahun_id())
-            ->value('kelas_id');
-
-        if ((int) $waliKelasId === (int) $kelasId) {
-            return true;
-        }
-
-        return PengampuMapel::where('guru_id', $guruId)
-            ->where('kelas_id', $kelasId)
-            ->where('tahun_ajaran_id', current_tahun_id())
-            ->exists();
-    }
-
-    private function guruBolehAksesMapelUntukKelas(int $guruId, int $kelasId, int $mapelId): bool
-    {
-        $waliKelasId = WaliKelas::where('guru_id', $guruId)
-            ->where('tahun_ajaran_id', current_tahun_id())
-            ->value('kelas_id');
-            
-        // Jika guru adalah wali kelas dari kelas tersebut,
-        // maka boleh mengatur mapel inti.
-        if ((int)$waliKelasId === (int)$kelasId) {
-
-            return true;
-        }
-         // Selain wali kelas, harus menjadi guru pengampu.
-        return PengampuMapel::where('guru_id', $guruId)
-            ->where('kelas_id', $kelasId)
-            ->where('mata_pelajaran_id', $mapelId)
-            ->where('tahun_ajaran_id', current_tahun_id())
-            ->exists();
     }
 }

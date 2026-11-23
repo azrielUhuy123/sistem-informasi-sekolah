@@ -244,7 +244,7 @@ class EkskulJadwalWorkflowTest extends TestCase
 
         $this->actingAs($fixture['guruUser'])
             ->post(route('superadmin.monitoring-ekskul.approve', $fixture['ekskul']))
-            ->assertRedirect('/guru/dashboard');
+            ->assertRedirect('/guru/dashboard-gurubidang');
 
         $this->assertSame('submitted', $submitted->fresh()->status);
 
@@ -408,6 +408,11 @@ class EkskulJadwalWorkflowTest extends TestCase
             'approval_status' => 'approved',
             'is_active' => true,
             'pegawai_id' => $pegawai->id,
+        ]);
+        $this->assignTeacherMenus($user, 'ekskul', [
+            'ekskul.dashboard',
+            'ekskul.schedule',
+            'ekskul.schedule_status',
         ]);
 
         return compact('record', 'user');

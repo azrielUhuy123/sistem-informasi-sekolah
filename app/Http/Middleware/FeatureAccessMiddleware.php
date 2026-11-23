@@ -16,7 +16,11 @@ class FeatureAccessMiddleware
             abort(401);
         }
 
-        $featureKeys = array_map('trim', explode(',', $features));
+        $routeName = $request->route()?->getName();
+        $menuKeys = $routeName
+            ? MenuRouteAccessMiddleware::menuKeysForRoute($routeName)
+            : [];
+        $featureKeys = $menuKeys ?: array_map('trim', explode(',', $features));
 
         foreach ($featureKeys as $featureKey) {
             if ($user->hasFeature($featureKey)) {

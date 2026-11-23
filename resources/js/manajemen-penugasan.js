@@ -404,7 +404,7 @@ document.addEventListener('DOMContentLoaded', function () {
         document.querySelectorAll('.subject-checkbox, .guru-class-checkbox, .ekskul-checkbox')
             .forEach(function (checkbox) { checkbox.checked = false; });
         document.querySelectorAll('.menu-access-checkbox').forEach(function (checkbox) {
-            checkbox.checked = true;
+            checkbox.checked = false;
         });
         document.getElementById('formValidationError').classList.add('d-none');
         document.getElementById('formModeNotice').classList.add('d-none');

@@ -17,6 +17,34 @@ class EkskulAbsensiTest extends TestCase
 {
     use RefreshDatabase;
 
+    public function test_attendance_report_uses_its_own_menu_permission(): void
+    {
+        $teacher = $this->createAssignedTeacher('ekskul', ['ekskul.attendance_report']);
+        $tahun = TahunAjaran::create([
+            'tahun' => '2026/2027',
+            'semester' => 'ganjil',
+            'status' => 'aktif',
+        ]);
+        $ekskul = Ekskul::create([
+            'nama' => 'Basket',
+            'hari' => 'Senin',
+            'jam_mulai' => '08:00:00',
+            'jam_selesai' => '10:00:00',
+        ]);
+        PembinaEkskul::create([
+            'guru_id' => $teacher->guru->id,
+            'ekskul_id' => $ekskul->id,
+            'tahun_ajaran_id' => $tahun->id,
+        ]);
+
+        $this->actingAs($teacher)
+            ->get(route('guru.ekskul.absensi.rekap'))
+            ->assertOk();
+        $this->actingAs($teacher)
+            ->get(route('guru.ekskul.absensi.index'))
+            ->assertForbidden();
+    }
+
     public function test_guru_absensi_page_handles_deleted_member_records(): void
     {
         $pegawai = DataKepegawaian::create([
@@ -37,6 +65,7 @@ class EkskulAbsensiTest extends TestCase
             'is_active' => true,
             'approval_status' => 'approved',
         ]);
+        $this->assignTeacherMenus($user, 'ekskul', ['ekskul.attendance']);
 
         $tahun = TahunAjaran::create([
             'tahun' => '2026/2027',
@@ -97,6 +126,7 @@ class EkskulAbsensiTest extends TestCase
             'is_active' => true,
             'approval_status' => 'approved',
         ]);
+        $this->assignTeacherMenus($user, 'ekskul', ['ekskul.coaching']);
 
         $tahun = TahunAjaran::create([
             'tahun' => '2026/2027',

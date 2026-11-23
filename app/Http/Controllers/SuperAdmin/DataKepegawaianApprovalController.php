@@ -49,7 +49,7 @@ class DataKepegawaianApprovalController extends Controller
                     => UserRole::GURU,
 
                 str_contains($jabatan, 'tu')
-                    => UserRole::TU,
+                    => UserRole::GURU,
 
                 str_contains($jabatan, 'kepala sekolah')
                     => UserRole::SUPERADMIN,

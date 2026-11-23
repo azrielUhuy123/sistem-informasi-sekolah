@@ -38,7 +38,8 @@ use App\Http\Controllers\Tu\JadwalFinalController;
 Route::middleware([
         'auth',
         'role:guru',
-        'tu.mode'
+        'tu.mode',
+        'menu.route',
     ])
     ->prefix('tu')
     ->name('tu.')
@@ -136,7 +137,9 @@ Route::middleware([
         | SISWA
         |--------------------------------------------------------------------------
         */
-        Route::get('/siswa/search/ajax', [SiswaController::class, 'ajaxSearch'])->name('siswa.search');
+        Route::get('/siswa/search/ajax', [SiswaController::class, 'ajaxSearch'])
+            ->middleware('feature:tu.academic')
+            ->name('siswa.search');
         Route::post('/siswa/bulk', [SiswaController::class, 'bulkAction'])->name('siswa.bulk');
         Route::post('/siswa/import', [SiswaController::class, 'importExcel'])->name('siswa.import');
         Route::post('/siswa/{id}/restore', [SiswaController::class, 'restore'])->name('siswa.restore');
@@ -160,10 +163,12 @@ Route::middleware([
         | GURU
         |--------------------------------------------------------------------------
         */
-        Route::get('/guru/search/ajax', [GuruController::class, 'ajaxSearch'])->name('guru.search');
-        Route::post('/guru/bulk', [GuruController::class, 'bulkAction'])->name('guru.bulk');
+        Route::get('/guru/search/ajax', [GuruController::class, 'ajaxSearch'])
+            ->middleware('feature:tu.academic')
+            ->name('guru.search');
         Route::get('/guru/{id}/detail', [GuruController::class, 'detail'])->name('guru.detail');
         Route::resource('guru', GuruController::class)
+            ->except(['create'])
             ->middleware('feature:tu.academic');
 
         /*
@@ -210,12 +215,9 @@ Route::middleware([
         Route::post('/tahun/bulk', [TahunAjaranController::class, 'bulkAction'])->name('tahun.bulk');
         Route::post('/tahun/{id}/restore', [TahunAjaranController::class, 'restore'])->name('tahun.restore');
         Route::delete('/tahun/{id}/force-delete', [TahunAjaranController::class, 'forceDelete'])->name('tahun.forceDelete');
-        Route::get('/tahun/{id}/detail', [TahunAjaranController::class, 'detail'])->name('tahun.detail');
         Route::resource('tahun', TahunAjaranController::class)
+            ->except(['show'])
             ->middleware('feature:tu.academic');
-        Route::post('/tahun/transisi',
-            [TahunAjaranController::class, 'masukTransisi']
-        )->name('tahun.transisi');
 
         Route::post('/tahun/tutup',
             [TahunAjaranController::class, 'tutupTahun']
@@ -234,6 +236,7 @@ Route::middleware([
         |--------------------------------------------------------------------------
         */
         Route::resource('ruangan', RuanganController::class)
+            ->except(['show'])
             ->middleware('feature:tu.academic');
         Route::resource('walikelas', WaliKelasController::class)
             ->except(['show', 'edit', 'update'])
@@ -288,7 +291,7 @@ Route::middleware([
 )->name('datakepegawaian.export.excel');
 
         Route::get('/datakepegawaian/{id}/detail',
-            [DataKepegawaianController::class, 'detail'])
+            [DataKepegawaianController::class, 'show'])
             ->name('datakepegawaian.detail');
 
         Route::patch('/datakepegawaian/{id}/read-message',[DataKepegawaianController::class, 'readMessage'])
@@ -296,7 +299,7 @@ Route::middleware([
 
         Route::post(
             '/datakepegawaian/{pegawai}/request-account',
-            [DataKepegawaianController::class, 'requestAccount']
+            [DataKepegawaianController::class, 'createAccount']
         )->name('datakepegawaian.request-account');
 
         Route::post(
@@ -354,7 +357,7 @@ Route::get(
         Route::resource(
             'ekskul',
             EkskulController::class
-        )->middleware('feature:tu.academic');
+        )->except(['show'])->middleware('feature:tu.academic');
 
         /*
         |--------------------------------------------------------------------------
@@ -369,8 +372,6 @@ Route::get(
                 Route::get('/create', [PenempatanSiswaController::class, 'create'])->name('create');
                 Route::post('/', [PenempatanSiswaController::class, 'store'])->name('store');
                 Route::post('/naik-kelas', [PenempatanSiswaController::class, 'naikKelas'])->name('naik-kelas');
-                Route::get('/preview-naik-kelas', [PenempatanSiswaController::class, 'previewNaikKelas'])
-                    ->name('preview-naik-kelas');
                 Route::post('/{penempatan}/keluarkan',
                     [PenempatanSiswaController::class, 'keluarkan']
                 )->name('keluarkan');
@@ -402,7 +403,7 @@ Route::get(
             ->middleware('feature:tu.academic');
 
         Route::post('angkatan/{angkatan}/toggle',
-            [AngkatanController::class, 'toggle'])
+            [AngkatanController::class, 'toggleAktif'])
             ->name('angkatan.toggle');
 
         Route::prefix('akun')

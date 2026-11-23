@@ -7,6 +7,9 @@ use App\Models\DataKepegawaian;
 use App\Models\User;
 use App\Services\BusinessNotificationService;
 use App\Models\Guru;
+use App\Models\PembinaEkskul;
+use App\Models\PengampuMapel;
+use App\Models\WaliKelas;
 use Illuminate\Support\Facades\Hash;
 use Carbon\Carbon;
 use App\Enums\UserRole;
@@ -119,7 +122,28 @@ class DataKepegawaianController extends Controller
             'user',
         ])->findOrFail($id);
 
+        $guru = Guru::withTrashed()
+            ->where('data_kepegawaian_id', $pegawai->id)
+            ->first();
+        $hasLegacyAssignmentHistory = $guru && (
+            WaliKelas::where('guru_id', $guru->id)->exists()
+            || PengampuMapel::where('guru_id', $guru->id)->exists()
+            || PembinaEkskul::where('guru_id', $guru->id)->exists()
+            || $guru->mapels()->exists()
+        );
+
+        if (
+            $pegawai->penugasans()->where('status', '!=', 'draft')->exists()
+            || $hasLegacyAssignmentHistory
+        ) {
+            return back()->with(
+                'error',
+                'Pegawai dengan riwayat penugasan tidak dapat dihapus.'
+            );
+        }
+
         DB::transaction(function () use ($pegawai) {
+            $pegawai->penugasans()->where('status', 'draft')->delete();
 
             // =========================
             // GURU
@@ -268,55 +292,46 @@ class DataKepegawaianController extends Controller
 
         }
 
-        $jabatan = strtolower($pegawai->jabatan);
+        $jabatan = strtolower((string) $pegawai->jabatan);
 
-        $role = match (true) {
-
-            str_contains($jabatan, 'kepala sekolah')
-                => UserRole::SUPERADMIN,
-
-            str_contains($jabatan, 'operator')
-                => UserRole::TU,
-
-            str_contains($jabatan, 'guru')
-                => UserRole::GURU,
-
-            default => null,
-
-        };
-
-        if (!$role) {
-
-            return back()->with(
-                'error',
-                'Role tidak dikenali.'
-            );
-
-        }
+        $role = str_contains($jabatan, 'kepala sekolah')
+            ? UserRole::SUPERADMIN
+            : UserRole::GURU;
 
         $password = Carbon::parse(
             $pegawai->tanggal_lahir
         )->format('Ymd');
 
-        $user = User::create([
+        $user = DB::transaction(function () use ($pegawai, $role, $password) {
+            $lockedEmployee = DataKepegawaian::query()
+                ->lockForUpdate()
+                ->findOrFail($pegawai->id);
 
-            'pegawai_id' => $pegawai->id,
+            if ($lockedEmployee->user) {
+                return null;
+            }
 
-            'name' => $pegawai->nama,
+            $user = User::create([
+                'pegawai_id' => $lockedEmployee->id,
+                'name' => $lockedEmployee->nama,
+                'email' => 'pegawai'.$lockedEmployee->id.'@internal.local',
+                'username' => $lockedEmployee->nip,
+                'password' => Hash::make($password),
+                'role' => $role,
+                'approval_status' => 'pending',
+                'is_active' => false,
+            ]);
 
-            'email' => 'pegawai'.$pegawai->id.'@internal.local',
+            if ($role === UserRole::GURU) {
+                Guru::firstOrCreate(['data_kepegawaian_id' => $lockedEmployee->id]);
+            }
 
-            'username' => $pegawai->nip,
+            return $user;
+        });
 
-            'password' => Hash::make($password),
-
-            'role' => $role,
-
-            'approval_status' => 'pending',
-
-            'is_active' => false,
-
-        ]);
+        if (! $user) {
+            return back()->with('error', 'Pegawai sudah memiliki akun.');
+        }
 
         if ($user->approval_status === 'pending') {
             app(BusinessNotificationService::class)->notifyPendingAccount($user);

@@ -119,7 +119,7 @@ class PpdbDiterimaResendEmailTest extends TestCase
         $this->assertSame($newEmail, $pendaftar->fresh()->email);
     }
 
-    public function test_resend_endpoint_requires_authentication_and_tu_role(): void
+    public function test_resend_endpoint_requires_authentication_and_ppdb_menu_access(): void
     {
         $pendaftar = $this->makePendaftar('diterima', 'accepted@example.test');
         $url = route('tu.ppdb.diterima.resend-email', $pendaftar);
@@ -129,7 +129,7 @@ class PpdbDiterimaResendEmailTest extends TestCase
 
         $this->actingAs($this->makeUser('guru'))
             ->postJson($url, ['email' => 'updated@example.test'])
-            ->assertRedirect('/guru/dashboard');
+            ->assertForbidden();
     }
 
     private function makePendaftar(string $status, string $email): PpdbPendaftar
@@ -173,6 +173,10 @@ class PpdbDiterimaResendEmailTest extends TestCase
 
     private function makeUser(string $role): User
     {
+        if ($role === 'tu') {
+            return $this->createAssignedTeacher('ppdb', ['ppdb.accepted']);
+        }
+
         return User::forceCreate([
             'name' => 'PPDB resend test operator',
             'email' => 'ppdb-resend-' . bin2hex(random_bytes(4)) . '@example.test',

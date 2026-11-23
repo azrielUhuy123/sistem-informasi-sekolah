@@ -4,64 +4,36 @@ namespace App\Http\Middleware;
 
 use Closure;
 use Illuminate\Http\Request;
-use App\Models\PembinaEkskul;
 
 class GuruModeMiddleware
 {
     public function handle(Request $request, Closure $next)
     {
-        /*
-        |--------------------------------------------------------------------------
-        | DEFAULT MODE
-        |--------------------------------------------------------------------------
-        */
+        $user = $request->user();
+        if ($user?->role === 'superadmin') {
+            return $next($request);
+        }
+        abort_unless($user && in_array($user->role, ['guru', 'tu'], true), 403);
 
-        if (! session()->has('guru_mode')) {
+        $academicMenus = array_merge(
+            array_keys(config('assignment_menus.types.wali.menus', [])),
+            array_keys(config('assignment_menus.types.guru.menus', []))
+        );
+        $hasAcademicAccess = $user->hasAnyAssignmentMenu($academicMenus);
+        $hasExtracurricularAccess = $user->hasAnyAssignmentMenu(
+            array_keys(config('assignment_menus.types.ekskul.menus', []))
+        );
 
-            session([
-                'guru_mode' => 'akademik'
-            ]);
-
+        $mode = session('guru_mode');
+        if ($mode === 'ekskul' && ! $hasExtracurricularAccess) {
+            $mode = 'akademik';
+        } elseif ($mode !== 'ekskul' && ! $hasAcademicAccess && $hasExtracurricularAccess) {
+            $mode = 'ekskul';
+        } elseif (! in_array($mode, ['akademik', 'ekskul'], true)) {
+            $mode = $hasAcademicAccess ? 'akademik' : 'ekskul';
         }
 
-        /*
-        |--------------------------------------------------------------------------
-        | CEK PEMBINA EKSKUL
-        |--------------------------------------------------------------------------
-        */
-
-        $guru = auth()->user()?->guru;
-
-        if ($guru) {
-
-            $isPembina = PembinaEkskul::where(
-                    'guru_id',
-                    $guru->id
-                )
-                ->where(
-                    'tahun_ajaran_id',
-                    current_tahun_id()
-                )
-                ->exists();
-
-            /*
-            |--------------------------------------------------------------------------
-            | JIKA BUKAN PEMBINA TAPI MODE MASIH EKSKUL
-            |--------------------------------------------------------------------------
-            */
-
-            if (
-                session('guru_mode') === 'ekskul'
-                && ! $isPembina
-            ) {
-
-                session([
-                    'guru_mode' => 'akademik'
-                ]);
-
-            }
-
-        }
+        session(['guru_mode' => $mode]);
 
         return $next($request);
     }

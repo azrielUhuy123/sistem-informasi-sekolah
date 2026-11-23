@@ -33,10 +33,7 @@
 
             <div class="mb-3">
                 <label>Role</label>
-                <select name="role" class="form-control" required>
-                    <option value="admin" {{ $user->role=='admin'?'selected':'' }}>Admin</option>
-                    <option value="tu" {{ $user->role=='tu'?'selected':'' }}>Tata Usaha</option>
-                </select>
+                <p class="form-control-plaintext mb-0">{{ $user->role }}</p>
             </div>
 
             <div class="mb-3">

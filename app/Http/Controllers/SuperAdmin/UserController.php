@@ -12,7 +12,7 @@ class UserController extends Controller
 {
     public function index()
     {
-        $users = User::whereIn('role', ['admin', 'tu'])
+        $users = User::whereIn('role', ['admin', 'guru'])
             ->paginate(10);
 
         return view('superadmin.users.index', compact('users'));
@@ -37,7 +37,7 @@ class UserController extends Controller
         $request->validate([
             'name' => 'required',
             'email' => 'required|email',
-            'role' => 'required|in:admin,tu',
+            'role' => 'required|in:admin,guru',
         ]);
 
         $user->update($request->only('name', 'email', 'role'));

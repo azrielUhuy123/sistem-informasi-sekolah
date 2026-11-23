@@ -34,13 +34,8 @@
 
             <div class="mb-3">
                 <label>Role</label>
-                <select name="role" class="form-control" required>
-                    <option value="">-- Pilih Role --</option>
-                    <option value="admin">Admin</option>
-                    <option value="tu">Tata Usaha</option>
-                    <option value="guru">Guru</option>
-                    <option value="murid">Murid</option>
-                </select>
+                <input type="hidden" name="role" value="admin">
+                <p class="form-control-plaintext mb-0">Admin sistem (akun teknis)</p>
             </div>
 
             <button class="btn btn-primary">Simpan</button>

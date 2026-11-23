@@ -14,23 +14,21 @@ class FeatureAccessController extends Controller
     public function index(Request $request)
     {
         $users = User::with('pegawai')
-            ->where('role', '!=', 'superadmin')
+            ->where('role', 'siswa')
             ->orderBy('name')
             ->paginate(15)
             ->withQueryString();
 
-        $features = config('feature_access.features', []);
+        $features = $this->studentFeatures();
 
         return view('superadmin.feature-access.index', compact('users', 'features'));
     }
 
     public function edit(User $user)
     {
-        if ($user->role === 'superadmin') {
-            abort(403);
-        }
+        abort_unless($user->role === 'siswa', 403);
 
-        $features = config('feature_access.features', []);
+        $features = $this->studentFeatures();
         $permissions = UserFeaturePermission::where('user_id', $user->id)
             ->get()
             ->keyBy('feature_key');
@@ -51,11 +49,9 @@ class FeatureAccessController extends Controller
 
     public function update(Request $request, User $user)
     {
-        if ($user->role === 'superadmin') {
-            abort(403);
-        }
+        abort_unless($user->role === 'siswa', 403);
 
-        $featureKeys = array_keys(config('feature_access.features', []));
+        $featureKeys = array_keys($this->studentFeatures());
 
         $request->validate([
             'permissions' => ['nullable', 'array'],
@@ -65,7 +61,7 @@ class FeatureAccessController extends Controller
         $selected = $request->input('permissions', []);
 
         DB::transaction(function () use ($user, $featureKeys, $selected) {
-            $features = config('feature_access.features', []);
+            $features = $this->studentFeatures();
 
             UserFeaturePermission::where('user_id', $user->id)
                 ->whereIn('feature_key', $featureKeys)
@@ -93,5 +89,14 @@ class FeatureAccessController extends Controller
         return redirect()
             ->route('superadmin.feature-access.edit', $user)
             ->with('success', 'Akses fitur berhasil diperbarui.');
+    }
+
+    private function studentFeatures(): array
+    {
+        return array_filter(
+            config('feature_access.features', []),
+            fn ($feature, $key) => str_starts_with($key, 'siswa.'),
+            ARRAY_FILTER_USE_BOTH
+        );
     }
 }

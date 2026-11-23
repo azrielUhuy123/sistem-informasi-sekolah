@@ -12,7 +12,7 @@ class AkunPasswordResetTest extends TestCase
 {
     use RefreshDatabase;
 
-    public function test_tu_reset_restores_student_password_to_date_of_birth(): void
+    public function test_assigned_operator_teacher_can_reset_student_password_to_date_of_birth(): void
     {
         $student = User::factory()->create([
             'role' => 'siswa',
@@ -30,13 +30,9 @@ class AkunPasswordResetTest extends TestCase
         ]);
         $student->forceFill(['siswa_id' => $siswa->id])->save();
 
-        $tu = User::factory()->create([
-            'role' => 'tu',
-            'approval_status' => 'approved',
-            'is_active' => true,
-        ]);
+        $operatorTeacher = $this->createAssignedTeacher('operator', ['operator.accounts']);
 
-        $this->actingAs($tu)
+        $this->actingAs($operatorTeacher)
             ->post(route('tu.akun.reset-password', $student))
             ->assertSessionHas('success', 'Password berhasil direset.');
 

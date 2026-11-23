@@ -27,12 +27,11 @@ use App\Http\Controllers\Elearning\ElearningKomentarController;
 use App\Http\Controllers\Elearning\ElearningKomentarReplyController;
 use App\Http\Controllers\ProfileController;
 use Illuminate\Support\Facades\Session;
-use App\Models\PembinaEkskul;
 use Illuminate\Support\Facades\Auth;
 
 Route::prefix('guru')
     ->name('guru.')
-    ->middleware(['auth', 'role:guru', 'guru.mode'])
+    ->middleware(['auth', 'role:guru', 'guru.mode', 'menu.route'])
     ->group(function () {
 
         Route::get(
@@ -44,37 +43,19 @@ Route::prefix('guru')
             '/switch-mode/{mode}',
             function ($mode) {
 
-                $guru = Auth::user()->guru;
+                $user = Auth::user();
 
                 if ($mode === 'akademik') {
-
                     session([
                         'guru_mode' => 'akademik'
                     ]);
-
                     return back();
                 }
 
-                if ($mode === 'ekskul') {
-
-                    $isPembina = PembinaEkskul::where(
-                        'guru_id',
-                        $guru->id
-                    )
-                    ->where(
-                        'tahun_ajaran_id',
-                        current_tahun_id()
-                    )
-                    ->exists();
-
-                    if ($isPembina) {
-
-                        session([
-                            'guru_mode' => 'ekskul'
-                        ]);
-
-                    }
-
+                if ($mode === 'ekskul' && $user->hasAnyAssignmentMenu(
+                    array_keys(config('assignment_menus.types.ekskul.menus', []))
+                )) {
+                    session(['guru_mode' => 'ekskul']);
                     return back();
                 }
 
@@ -89,7 +70,7 @@ Route::prefix('guru')
 
         Route::get(
             '/ekskul',
-            [EkskulController::class, 'index']
+            [EkskulController::class, 'dashboard']
         )->middleware('feature:guru.extracurricular')->name('ekskul.index');
 
         /*
@@ -194,7 +175,8 @@ Route::prefix('guru')
         Route::resource(
             'pengajuan-jadwal',
             PengajuanJadwalController::class
-        )->middleware('feature:guru.academic');
+        )->only(['index', 'create', 'store'])
+            ->middleware('feature:guru.academic');
 
         Route::get(
             '/kelas-saya',
@@ -354,11 +336,6 @@ Route::prefix('guru')
             '/ekskul/jadwal/store',
             [JadwalEkskulController::class, 'store']
         )->middleware('feature:guru.extracurricular')->name('ekskul.jadwal.store');
-
-        Route::post(
-            '/ekskul/jadwal/submit',
-            [JadwalEkskulController::class, 'submit']
-        )->middleware('feature:guru.extracurricular')->name('ekskul.jadwal.submit');
 
         Route::get(
             '/ekskul/status-validasi',

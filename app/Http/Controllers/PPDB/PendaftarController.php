@@ -106,6 +106,26 @@ class PendaftarController extends Controller
         );
     }
 
+    public function excel(Request $request, PpdbReportService $reportService)
+    {
+        $filters = $this->validatedReportFilters($request);
+
+        return Excel::download(
+            new RekapPpdbExport($reportService->export($filters)),
+            'rekap-ppdb.xlsx'
+        );
+    }
+
+    public function pdf(Request $request, PpdbReportService $reportService)
+    {
+        $filters = $this->validatedReportFilters($request);
+
+        return Pdf::loadView('ppdb.pendaftar.export-pdf', [
+            'data' => $reportService->export($filters),
+            'filters' => $filters,
+        ])->download('rekap-ppdb.pdf');
+    }
+
     public function resendEmailDiterima(Request $request, PpdbPendaftar $pendaftar)
     {
         if ($pendaftar->status !== 'diterima') {
@@ -625,5 +645,15 @@ class PendaftarController extends Controller
         );
     }
 
-    
+    private function validatedReportFilters(Request $request): array
+    {
+        return $request->validate([
+            'tahun_ajaran_id' => ['nullable', 'integer', 'exists:tahun_ajaran,id'],
+            'status' => ['nullable', 'string', 'in:pending,verifikasi,diterima,ditolak'],
+            'jenis_kelamin' => ['nullable', 'string', 'in:L,P'],
+            'tanggal_mulai' => ['nullable', 'date'],
+            'tanggal_selesai' => ['nullable', 'date', 'after_or_equal:tanggal_mulai'],
+            'search' => ['nullable', 'string', 'max:100'],
+        ]);
+    }
 }

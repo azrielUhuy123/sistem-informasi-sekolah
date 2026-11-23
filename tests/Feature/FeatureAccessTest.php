@@ -2,6 +2,8 @@
 
 namespace Tests\Feature;
 
+use App\Models\DataKepegawaian;
+use App\Models\Guru;
 use App\Models\User;
 use App\Models\UserFeaturePermission;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -11,110 +13,7 @@ class FeatureAccessTest extends TestCase
 {
     use RefreshDatabase;
 
-    public function test_role_default_allows_feature(): void
-    {
-        $tu = User::factory()->create([
-            'role' => 'tu',
-            'approval_status' => 'approved',
-            'is_active' => true,
-        ]);
-
-        $this->assertSame('tu', $tu->role);
-        $features = config('feature_access.features', []);
-        $this->assertContains('tu', $features['tu.ppdb']['roles'] ?? []);
-        $this->assertTrue($tu->hasFeature('tu.ppdb'));
-    }
-
-    public function test_explicit_denial_overrides_role_default(): void
-    {
-        $tu = User::factory()->create([
-            'role' => 'tu',
-            'approval_status' => 'approved',
-            'is_active' => true,
-        ]);
-
-        UserFeaturePermission::create([
-            'user_id' => $tu->id,
-            'feature_key' => 'tu.ppdb',
-            'allowed' => false,
-        ]);
-
-        $this->assertFalse($tu->hasFeature('tu.ppdb'));
-    }
-
-    public function test_superadmin_bypasses_feature_override(): void
-    {
-        $superadmin = User::factory()->create([
-            'role' => 'superadmin',
-            'approval_status' => 'approved',
-            'is_active' => true,
-        ]);
-
-        $this->assertTrue($superadmin->hasFeature('tu.ppdb'));
-    }
-
-    public function test_feature_middleware_rejects_explicit_denial(): void
-    {
-        $tu = User::factory()->create([
-            'role' => 'tu',
-            'approval_status' => 'approved',
-            'is_active' => true,
-        ]);
-
-        UserFeaturePermission::create([
-            'user_id' => $tu->id,
-            'feature_key' => 'tu.ppdb',
-            'allowed' => false,
-        ]);
-
-        $this->actingAs($tu)
-            ->get('/tu/ppdb/dashboard')
-            ->assertForbidden();
-    }
-
-    public function test_superadmin_can_open_feature_access_menu(): void
-    {
-        $superadmin = User::factory()->create([
-            'role' => 'superadmin',
-            'approval_status' => 'approved',
-            'is_active' => true,
-        ]);
-
-        $this->actingAs($superadmin)
-            ->get(route('superadmin.feature-access.index'))
-            ->assertOk();
-    }
-
-    public function test_superadmin_can_store_explicit_feature_denial(): void
-    {
-        $superadmin = User::factory()->create([
-            'role' => 'superadmin',
-            'approval_status' => 'approved',
-            'is_active' => true,
-        ]);
-
-        $tu = User::factory()->create([
-            'role' => 'tu',
-            'approval_status' => 'approved',
-            'is_active' => true,
-        ]);
-
-        $this->actingAs($superadmin)
-            ->put(route('superadmin.feature-access.update', $tu), [
-                'permissions' => [],
-            ])
-            ->assertRedirect();
-
-        $this->assertDatabaseHas('user_feature_permissions', [
-            'user_id' => $tu->id,
-            'feature_key' => 'tu.ppdb',
-            'allowed' => false,
-        ]);
-
-        $this->assertFalse($tu->fresh()->hasFeature('tu.ppdb'));
-    }
-
-    public function test_siswa_feature_denial_rejects_direct_route_access(): void
+    public function test_student_role_defaults_and_explicit_denial_are_supported(): void
     {
         $student = User::factory()->create([
             'role' => 'siswa',
@@ -122,33 +21,112 @@ class FeatureAccessTest extends TestCase
             'is_active' => true,
         ]);
 
+        $this->assertTrue($student->hasFeature('siswa.academic'));
+
         UserFeaturePermission::create([
             'user_id' => $student->id,
             'feature_key' => 'siswa.academic',
             'allowed' => false,
         ]);
 
+        $this->assertFalse($student->fresh()->hasFeature('siswa.academic'));
         $this->actingAs($student)
             ->get(route('siswa.jadwal.index'))
             ->assertForbidden();
     }
 
-    public function test_guru_feature_denial_rejects_direct_route_access(): void
+    public function test_teacher_cannot_get_access_from_legacy_feature_or_permission_override(): void
     {
-        $guruUser = User::factory()->create([
+        $employee = DataKepegawaian::create(['nama' => 'Guru Tanpa Penugasan']);
+        Guru::create(['data_kepegawaian_id' => $employee->id]);
+        $teacher = User::factory()->create([
             'role' => 'guru',
+            'pegawai_id' => $employee->id,
+            'approval_status' => 'approved',
+            'is_active' => true,
+        ]);
+        UserFeaturePermission::create([
+            'user_id' => $teacher->id,
+            'feature_key' => 'tu.ppdb',
+            'allowed' => true,
+        ]);
+
+        $this->assertSame('/guru/dashboard-gurubidang', $teacher->getDashboardUrl());
+        $this->assertFalse($teacher->hasFeature('tu.ppdb'));
+        $this->assertFalse($teacher->hasFeature('guru.academic'));
+        $this->actingAs($teacher)
+            ->get(route('tu.ppdb.dashboard'))
+            ->assertForbidden();
+    }
+
+    public function test_legacy_tu_dashboard_redirect_is_compatible_but_has_no_permissions(): void
+    {
+        $legacyUser = User::factory()->create([
+            'role' => 'tu',
             'approval_status' => 'approved',
             'is_active' => true,
         ]);
 
-        UserFeaturePermission::create([
-            'user_id' => $guruUser->id,
-            'feature_key' => 'guru.academic',
-            'allowed' => false,
+        $this->assertSame('/guru/dashboard-gurubidang', $legacyUser->getDashboardUrl());
+        $this->assertFalse($legacyUser->hasFeature('tu.academic'));
+    }
+
+    public function test_kepsek_keeps_full_menu_access_and_students_cannot_open_management_routes(): void
+    {
+        $kepsek = User::factory()->create([
+            'role' => 'superadmin',
+            'approval_status' => 'approved',
+            'is_active' => true,
+        ]);
+        $student = User::factory()->create([
+            'role' => 'siswa',
+            'approval_status' => 'approved',
+            'is_active' => true,
         ]);
 
-        $this->actingAs($guruUser)
-            ->get(route('guru.dashboard-gurubidang'))
+        $this->assertTrue($kepsek->hasFeature('operator.students'));
+        $this->actingAs($student)
+            ->get(route('superadmin.manajemen-penugasan.index'))
+            ->assertRedirect();
+    }
+
+    public function test_feature_access_ui_is_limited_to_students(): void
+    {
+        $kepsek = User::factory()->create([
+            'role' => 'superadmin',
+            'approval_status' => 'approved',
+            'is_active' => true,
+        ]);
+        $employee = DataKepegawaian::create(['nama' => 'Guru UI']);
+        Guru::create(['data_kepegawaian_id' => $employee->id]);
+        $teacher = User::factory()->create([
+            'role' => 'guru',
+            'pegawai_id' => $employee->id,
+            'approval_status' => 'approved',
+            'is_active' => true,
+        ]);
+
+        $this->actingAs($kepsek)
+            ->get(route('superadmin.feature-access.edit', $teacher))
             ->assertForbidden();
+    }
+
+    public function test_generic_admin_account_form_cannot_create_tu_or_other_employee_roles(): void
+    {
+        $admin = User::factory()->create([
+            'role' => 'admin',
+            'approval_status' => 'approved',
+            'is_active' => true,
+        ]);
+
+        $this->actingAs($admin)
+            ->postJson(route('admin.users.store'), [
+                'name' => 'Akun TU Baru',
+                'email' => 'operator@example.test',
+                'password' => 'password',
+                'password_confirmation' => 'password',
+                'role' => 'tu',
+            ])
+            ->assertUnprocessable();
     }
 }

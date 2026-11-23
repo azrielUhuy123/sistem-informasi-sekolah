@@ -1,13 +1,11 @@
 @php
-    $guru = auth()->user()->guru;
-
-    $isPembinaEkskul = $guru
-        ? \App\Models\PembinaEkskul::where('guru_id', $guru->id)
-            ->where('tahun_ajaran_id', current_tahun_id())
-            ->exists()
-        : false;
-
-    $canEkskul = auth()->user()->hasFeature('guru.extracurricular');
+    $hasAcademic = auth()->user()->hasAnyAssignmentMenu(array_merge(
+        array_keys(config('assignment_menus.types.wali.menus', [])),
+        array_keys(config('assignment_menus.types.guru.menus', []))
+    ));
+    $canEkskul = auth()->user()->hasAnyAssignmentMenu(
+        array_keys(config('assignment_menus.types.ekskul.menus', []))
+    );
 @endphp
 
 <div>
@@ -22,7 +20,7 @@
             class="btn btn-light border w-100 text-center dropdown-toggle mb-4"
             data-bs-toggle="dropdown">
 
-            @if(session('guru_mode') == 'ekskul' && $isPembinaEkskul)
+            @if(session('guru_mode') == 'ekskul' && $canEkskul)
                 Pembina Ekskul
             @else
                 Akademik
@@ -32,15 +30,13 @@
 
         <ul class="dropdown-menu w-100">
 
-            <li>
-                <a
-                    class="dropdown-item"
-                    href="{{ route('guru.switch-mode', 'akademik') }}">
-                    Akademik
-                </a>
-            </li>
+            @if($hasAcademic)
+                <li>
+                    <a class="dropdown-item" href="{{ route('guru.switch-mode', 'akademik') }}">Akademik</a>
+                </li>
+            @endif
 
-            @if($isPembinaEkskul && $canEkskul)
+            @if($canEkskul)
                 <li>
                     <a
                         class="dropdown-item"

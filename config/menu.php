@@ -22,24 +22,17 @@ return [
         ],
     ],
 
-    UserRole::TU => [
-        [
-            'label' => 'Data Siswa',
-            'route' => 'tu.siswa.index',
-        ],
-    ],
-
     UserRole::GURU => [
         [
             'label' => 'Dashboard',
-            'route' => 'guru.dashboard',
+            'route' => 'guru.dashboard-gurubidang',
         ],
     ],
 
     UserRole::MURID => [
         [
             'label' => 'Dashboard',
-            'route' => 'murid.dashboard',
+            'route' => 'siswa.dashboard.index',
         ],
     ],
 

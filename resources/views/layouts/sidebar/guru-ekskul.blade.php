@@ -4,18 +4,13 @@
 
 @php
 
-    $guru = auth()->user()->guru;
-    $canEkskul = auth()->user()->hasFeature('guru.extracurricular');
-
-    $isWaliKelas = \App\Models\WaliKelas::where(
-        'guru_id',
-        $guru?->id
-    )
-    ->where(
-        'tahun_ajaran_id',
-        current_tahun_id()
-    )
-    ->exists();
+    $user = auth()->user();
+    $canEkskul = $user->hasAnyAssignmentMenu(array_keys(config('assignment_menus.types.ekskul.menus', [])));
+    $canEkskulSchedule = $user->hasAnyAssignmentMenu(['ekskul.schedule', 'ekskul.schedule_status']);
+    $canEkskulOperations = $user->hasAnyAssignmentMenu([
+        'ekskul.registration', 'ekskul.members', 'ekskul.attendance',
+        'ekskul.attendance_report', 'ekskul.journal', 'ekskul.coaching',
+    ]);
 
 @endphp
 
@@ -31,7 +26,7 @@
 
     </div>
 
-    @if($canEkskul)
+    @if($user->hasFeature('ekskul.dashboard'))
     {{-- DASHBOARD --}}
     <a
         class="menu-item
@@ -74,7 +69,7 @@
 
     </a>
 
-    @if($canEkskul)
+    @if($canEkskulSchedule)
     {{-- JADWAL --}}
     <button
         class="menu-item border-0 bg-transparent text-start"
@@ -102,6 +97,7 @@
 
     <div class="submenu" id="menuJadwalEkskul">
 
+        @if($user->hasFeature('ekskul.schedule'))
         <a
             class="menu-item
             {{ request()->is('guru/ekskul/jadwal*') ? 'active' : '' }}"
@@ -119,7 +115,9 @@
             </div>
 
         </a>
+        @endif
 
+        @if($user->hasFeature('ekskul.schedule_status'))
         <a
             class="menu-item
             {{ request()->is('guru/ekskul/status-validasi*') ? 'active' : '' }}"
@@ -138,11 +136,12 @@
             </div>
 
         </a>
+        @endif
 
     </div>
     @endif
 
-    @if($canEkskul)
+    @if($canEkskulOperations)
     {{-- EKSKUL --}}
     <button
         class="menu-item border-0 bg-transparent text-start"
@@ -170,6 +169,7 @@
 
     <div class="submenu show" id="menuEkskul">
 
+        @if($user->hasFeature('ekskul.registration'))
         <a
             class="menu-item
             {{ request()->is('guru/ekskul/anggota*') ? 'active' : '' }}"
@@ -189,7 +189,9 @@
             </div>
 
         </a>
+        @endif
 
+        @if($user->hasFeature('ekskul.members'))
         <a
             class="menu-item
             {{ request()->is('guru/ekskul/daftar-anggota*') ? 'active' : '' }}"
@@ -209,7 +211,9 @@
             </div>
 
         </a>
+        @endif
 
+        @if($user->hasFeature('ekskul.attendance'))
         <a
             class="menu-item
             {{ request()->is('guru/ekskul/absensi*') ? 'active' : '' }}"
@@ -229,7 +233,9 @@
             </div>
 
         </a>
+        @endif
 
+        @if($user->hasFeature('ekskul.attendance_report'))
         <a
             class="menu-item
             {{ request()->is('guru/ekskul/absensi*') ? 'active' : '' }}"
@@ -249,7 +255,9 @@
             </div>
 
         </a>
+        @endif
 
+        @if($user->hasFeature('ekskul.journal'))
             <a
                 class="menu-item
                 {{ request()->is('guru/ekskul/jurnal*') ? 'active' : '' }}"
@@ -269,7 +277,9 @@
             </div>
 
         </a>
+        @endif
 
+        @if($user->hasFeature('ekskul.coaching'))
         <a
             class="menu-item
             {{ request()->is('guru/ekskul/catatan-pembinaan*') ? 'active' : '' }}"
@@ -288,6 +298,7 @@
             </div>
 
         </a>
+        @endif
 
     </div>
     @endif

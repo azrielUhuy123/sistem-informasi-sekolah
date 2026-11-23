@@ -1,3 +1,9 @@
+@php
+    $user = auth()->user();
+    $hasPpdb = $user->hasAnyAssignmentMenu(array_keys(config('assignment_menus.types.ppdb.menus', [])));
+    $hasOperator = $user->hasAnyAssignmentMenu(array_keys(config('assignment_menus.types.operator.menus', [])));
+@endphp
+
 <div>
 
     <div class="sidebar-title">
@@ -13,7 +19,7 @@
             data-bs-toggle="dropdown"
         >
 
-            @if(session('tu_mode') == 'ppdb')
+            @if(session('tu_mode') == 'ppdb' && $hasPpdb)
 
                 PPDB
 
@@ -27,6 +33,7 @@
 
         <ul class="dropdown-menu w-100">
 
+            @if($hasOperator)
             <li>
 
                 <a
@@ -39,17 +46,13 @@
                 </a>
 
             </li>
+            @endif
 
+            @if($hasPpdb)
             <li>
-                @if(auth()->user()->hasFeature('tu.ppdb'))
-                    <a
-                        class="dropdown-item"
-                        href="{{ route('tu.switch-mode', 'ppdb') }}"
-                    >
-                        PPDB
-                    </a>
-                @endif
+                <a class="dropdown-item" href="{{ route('tu.switch-mode', 'ppdb') }}">PPDB</a>
             </li>
+            @endif
 
         </ul>
 

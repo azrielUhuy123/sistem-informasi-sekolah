@@ -3,11 +3,13 @@
 namespace Tests\Feature;
 
 use App\Exports\PpdbDiterimaExport;
+use App\Exports\RekapPpdbExport;
 use App\Models\PpdbPendaftar;
 use App\Models\TahunAjaran;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Maatwebsite\Excel\Facades\Excel;
+use Barryvdh\DomPDF\Facade\Pdf;
 use Tests\TestCase;
 
 class PpdbDiterimaExportTest extends TestCase
@@ -91,6 +93,58 @@ class PpdbDiterimaExportTest extends TestCase
             ->assertSessionHasErrors('tahun_ajaran_id');
     }
 
+    public function test_legacy_excel_report_route_downloads_a_filtered_report(): void
+    {
+        $tahunAjaran = $this->makeTahunAjaran('2026/2027', 'aktif');
+        $pending = $this->makePendaftar($tahunAjaran, 'pending');
+        $this->makePendaftar($tahunAjaran, 'diterima');
+        Excel::fake();
+
+        $this->actingAs($this->makeTu())
+            ->get(route('tu.ppdb.excel', [
+                'tahun_ajaran_id' => $tahunAjaran->id,
+                'status' => 'pending',
+            ]))
+            ->assertOk();
+
+        Excel::assertDownloaded('rekap-ppdb.xlsx');
+
+        $export = new RekapPpdbExport(
+            app(\App\Services\PpdbReportService::class)->export([
+                'tahun_ajaran_id' => $tahunAjaran->id,
+                'status' => 'pending',
+            ])
+        );
+        $this->assertSame([$pending->id], $export->collection()->modelKeys());
+        $this->assertSame([
+            'No',
+            'No. Pendaftaran',
+            'Nama Lengkap',
+            'NIK',
+            'Jenis Kelamin',
+            'Tanggal Pendaftaran',
+            'Tahun Ajaran',
+            'Status',
+        ], $export->headings());
+    }
+
+    public function test_legacy_pdf_report_route_downloads_and_validates_filters(): void
+    {
+        $tahunAjaran = $this->makeTahunAjaran('2026/2027', 'aktif');
+        $this->makePendaftar($tahunAjaran, 'diterima');
+
+        $this->actingAs($this->makeTu())
+            ->get(route('tu.ppdb.pdf', ['tahun_ajaran_id' => $tahunAjaran->id]))
+            ->assertOk()
+            ->assertHeader('content-type', 'application/pdf')
+            ->assertHeader('content-disposition', 'attachment; filename=rekap-ppdb.pdf');
+
+        $this->actingAs($this->makeTu())
+            ->get(route('tu.ppdb.pdf', ['status' => 'unknown']))
+            ->assertRedirect()
+            ->assertSessionHasErrors('status');
+    }
+
     public function test_accepted_page_filters_by_year_and_keeps_the_filter_in_pagination_links(): void
     {
         $tahunA = $this->makeTahunAjaran('2026/2027', 'aktif');
@@ -148,15 +202,6 @@ class PpdbDiterimaExportTest extends TestCase
 
     private function makeTu(): User
     {
-        return User::forceCreate([
-            'name' => 'PPDB export test operator',
-            'email' => 'ppdb-export-' . bin2hex(random_bytes(4)) . '@example.test',
-            'username' => 'ppdb-export-tu-' . bin2hex(random_bytes(4)),
-            'password' => 'test-password',
-            'role' => 'tu',
-            'is_active' => true,
-            'approval_status' => 'approved',
-            'approved_at' => now(),
-        ]);
+        return $this->createAssignedTeacher('ppdb', array_keys(config('assignment_menus.types.ppdb.menus')));
     }
 }
