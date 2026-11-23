@@ -53,9 +53,16 @@
 
         <div class="d-grid gap-3 d-sm-flex justify-content-center">
             @if($setting?->status == 'dibuka')
-                <a href="{{ route('ppdb.alur') }}" class="btn btn-light btn-lg btn-hero">
-                    Mulai Mendaftar
-                </button>
+                
+                    <button class="btn btn-light btn-lg btn-hero dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+                        Mulai Mendaftar
+                    </button>
+                    <ul class="dropdown-menu">
+                        <li><a class="dropdown-item" href="{{ route('ppdb.alur') }}">Peserta Didik Baru</a></li>
+                        <li><hr class="dropdown-divider"></li>
+                        <li><a class="dropdown-item" href="#">Peserta Didik Pindahan</a></li>                        
+                    </ul>                    
+                
             @else
                 <button class="btn btn-secondary btn-lg btn-hero" disabled>
                     PPDB Ditutup
