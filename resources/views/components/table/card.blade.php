@@ -56,17 +56,6 @@
 
             </div>
 
-            @if ((isset($pageActions) && $pageActions->isNotEmpty()) || (isset($actions) && $actions->isNotEmpty()))
-                <div class="table-card-actions dt-card-actions">
-                    @isset($pageActions)
-                        {{ $pageActions }}
-                    @endisset
-                    @isset($actions)
-                        {{ $actions }}
-                    @endisset
-                </div>
-            @endif
-
         </div>
 
     </div>

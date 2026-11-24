@@ -22,7 +22,7 @@ class EkskulAbsensiTest extends TestCase
         $teacher = $this->createAssignedTeacher('ekskul', ['ekskul.attendance_report']);
         $tahun = TahunAjaran::create([
             'tahun' => '2026/2027',
-            'semester' => 'ganjil',
+            'semester' => 'Ganjil',
             'status' => 'aktif',
         ]);
         $ekskul = Ekskul::create([
@@ -69,7 +69,7 @@ class EkskulAbsensiTest extends TestCase
 
         $tahun = TahunAjaran::create([
             'tahun' => '2026/2027',
-            'semester' => 'ganjil',
+            'semester' => 'Ganjil',
             'status' => 'aktif',
         ]);
 
@@ -89,6 +89,7 @@ class EkskulAbsensiTest extends TestCase
         $siswa = Siswa::create([
             'nama' => 'Siswa Hilang',
             'nis' => '10001',
+            'jenis_kelamin' => 'L',
         ]);
 
         EkskulSiswa::create([
@@ -130,7 +131,7 @@ class EkskulAbsensiTest extends TestCase
 
         $tahun = TahunAjaran::create([
             'tahun' => '2026/2027',
-            'semester' => 'ganjil',
+            'semester' => 'Ganjil',
             'status' => 'aktif',
         ]);
 
@@ -150,6 +151,7 @@ class EkskulAbsensiTest extends TestCase
         $siswa = Siswa::create([
             'nama' => 'Siswa Hilang',
             'nis' => '10002',
+            'jenis_kelamin' => 'L',
         ]);
 
         EkskulSiswa::create([

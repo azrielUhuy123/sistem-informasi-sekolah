@@ -54,6 +54,14 @@
         </div>
 
     </a>
+
+    <a class="menu-item {{ request()->is('guru/pegawai/perubahan*') ? 'active' : '' }}"
+       href="{{ route('guru.pegawai-changes.index') }}">
+        <div class="menu-left">
+            <i class="bi bi-person-vcard"></i>
+            <span>Perubahan Data Pegawai</span>
+        </div>
+    </a>
     
     @if($user->hasFeature('guru.elearning'))
     <a

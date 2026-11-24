@@ -22,7 +22,11 @@ class SinergiNotificationTest extends TestCase
 
         $storedNotification = $user->notifications()->sole();
 
-        $this->assertDatabaseCount('notifications', 1);
+        $this->assertDatabaseHas('notifications', [
+            'id' => $storedNotification->getKey(),
+            'notifiable_type' => User::class,
+            'notifiable_id' => $user->getKey(),
+        ]);
         $this->assertSame(User::class, $storedNotification->notifiable_type);
         $this->assertSame((string) $user->getKey(), (string) $storedNotification->notifiable_id);
         $this->assertSame(SinergiNotification::class, $storedNotification->type);

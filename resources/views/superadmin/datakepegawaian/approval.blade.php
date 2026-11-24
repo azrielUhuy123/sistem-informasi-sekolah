@@ -29,34 +29,60 @@
                 search-id="searchInput"
                 search-label="Cari pegawai"
                 search-placeholder="Cari pegawai..."
-            />
+                table-id="dt-superadmin-kepegawaian"
+                :column-toggle="true"
+                :refreshable="true"
+                :refresh-url="request()->fullUrl()"
+            >
+                <x-slot:columnMenu>
+                    @foreach ([
+                        'number' => 'No',
+                        'employee' => 'Nama Pegawai & NIP',
+                        'status' => 'Status',
+                        'approval' => 'Validasi',
+                        'action' => 'Aksi',
+                    ] as $column => $label)
+                        <label class="dt-column-menu__option">
+                            <input type="checkbox" data-dt-column="{{ $column }}" checked>
+                            <span>{{ $label }}</span>
+                        </label>
+                    @endforeach
+                </x-slot:columnMenu>
+            </x-table.local-toolbar>
         </x-slot:toolbar>
 
         <div class="table-responsive dt-siswa-table-wrap">
 
-            <table class="table table-hover align-middle mb-0 dt-table">
+            <table id="dt-superadmin-kepegawaian" class="table table-hover align-middle mb-0 dt-table">
                 <caption class="visually-hidden">Data kepegawaian beserta status validasi dan tindakan yang tersedia</caption>
+                <colgroup>
+                    <col data-dt-column="number">
+                    <col data-dt-column="employee">
+                    <col data-dt-column="status">
+                    <col data-dt-column="approval">
+                    <col data-dt-column="action">
+                </colgroup>
 
                 <thead>
                     <tr>
 
-                        <x-table.heading width="70">
+                        <x-table.heading width="70" column="number">
                             No
                         </x-table.heading>
 
-                        <x-table.heading>
+                        <x-table.heading column="employee">
                             Nama Pegawai & NIP
                         </x-table.heading>
 
-                        <x-table.heading width="150">
+                        <x-table.heading width="150" column="status">
                             Status
                         </x-table.heading>
 
-                        <x-table.heading width="80">
+                        <x-table.heading width="80" column="approval">
                             Validasi
                         </x-table.heading>
 
-                        <x-table.heading width="80">
+                        <x-table.heading width="80" column="action">
                             Aksi
                         </x-table.heading>
 
@@ -70,7 +96,7 @@
                         <tr>
 
                             {{-- NOMOR --}}
-                            <td>
+                            <td data-dt-column="number">
 
                                 <span class="badge bg-light text-dark rounded-circle">
                                     {{ $loop->iteration }}
@@ -79,7 +105,7 @@
                             </td>
 
                             {{-- PEGAWAI --}}
-                            <td>
+                            <td data-dt-column="employee">
 
                                 <div class="d-flex align-items-center">
 
@@ -107,7 +133,7 @@
                             </td>
 
                             {{-- STATUS --}}
-                            <td>
+                            <td data-dt-column="status">
 
                                 @if($row->approval_status == 'approved')
 
@@ -133,7 +159,7 @@
                                 @endif
 
                             </td>
-                            <td>
+                            <td data-dt-column="approval">
                             {{-- VALIDASI --}}
                                 @if($row->approval_status != 'approved')                                
                                     <form
@@ -166,7 +192,7 @@
                             </td>
 
                             {{-- AKSI --}}
-                            <td>                                
+                            <td data-dt-column="action">
                                 <a
                                     class="btn btn-primary btn-sm rounded-pill px-3 py-0"
                                     href="{{ route('superadmin.datakepegawaian.show', $row->id) }}"
@@ -290,33 +316,6 @@
 
 </div>
 
-{{-- SEARCH --}}
-<script>
-
-    const searchInput =
-        document.getElementById('searchInput');
-
-    searchInput.addEventListener('keyup', function () {
-
-        const keyword =
-            this.value.toLowerCase();
-
-        const rows =
-            document.querySelectorAll('#tablePegawai tr');
-
-        rows.forEach(row => {
-
-            const text =
-                row.innerText.toLowerCase();
-
-            row.style.display =
-                text.includes(keyword)
-                    ? ''
-                    : 'none';
-
-        });
-
-    });
 
 </script>
 

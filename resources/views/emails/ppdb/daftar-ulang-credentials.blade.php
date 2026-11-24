@@ -11,8 +11,12 @@
         <p>Yth. {{ $studentName }},</p>
         <p>Akun siswa Anda telah dibuat. Gunakan informasi berikut untuk login:</p>
         <p><strong>Username / NIS:</strong> {{ $nis }}</p>
-        <p><strong>Password awal:</strong> {{ $initialPassword }}</p>
-        <p>Segera ganti password setelah login untuk menjaga keamanan akun Anda.</p>
+        <p>Untuk mengaktifkan akun dan membuat password baru, gunakan tautan satu kali berikut:</p>
+        <p style="text-align:center;margin:28px 0">
+            <a href="{{ $resetUrl }}" style="display:inline-block;padding:12px 20px;background:#0d6efd;color:#fff;text-decoration:none;border-radius:6px">
+                Aktivasi Akun Siswa
+            </a>
+        </p>
         <p>Email ini hanya berisi informasi akun. Jika memerlukan bantuan, silakan hubungi TU/operator sekolah.</p>
     </main>
 </body>

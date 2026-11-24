@@ -51,7 +51,7 @@ class FeatureAccessTest extends TestCase
             'allowed' => true,
         ]);
 
-        $this->assertSame('/guru/dashboard-gurubidang', $teacher->getDashboardUrl());
+        $this->assertSame('/guru/pegawai/perubahan', $teacher->getDashboardUrl());
         $this->assertFalse($teacher->hasFeature('tu.ppdb'));
         $this->assertFalse($teacher->hasFeature('guru.academic'));
         $this->actingAs($teacher)
@@ -67,8 +67,50 @@ class FeatureAccessTest extends TestCase
             'is_active' => true,
         ]);
 
-        $this->assertSame('/guru/dashboard-gurubidang', $legacyUser->getDashboardUrl());
+        $this->assertSame('/', $legacyUser->getDashboardUrl());
         $this->assertFalse($legacyUser->hasFeature('tu.academic'));
+    }
+
+    public function test_operator_login_uses_an_assigned_operator_route_instead_of_the_guru_dashboard(): void
+    {
+        $operator = $this->createAssignedTeacher('operator', ['operator.employees']);
+        $operator->pegawai()->update(['nip' => '198001020095']);
+
+        $response = $this->post(route('login'), [
+            'username' => '198001020095',
+            'password' => 'test-password',
+        ]);
+
+        $response->assertRedirect(route('tu.pegawai-changes.index'));
+        $this->get(route('tu.pegawai-changes.index'))->assertOk();
+    }
+
+    public function test_guru_without_academic_assignment_lands_on_own_employee_workflow(): void
+    {
+        $employee = DataKepegawaian::create([
+            'nama' => 'Guru Tanpa Penugasan',
+            'nip' => '198001020094',
+        ]);
+        Guru::create(['data_kepegawaian_id' => $employee->id]);
+        $teacher = User::factory()->create([
+            'name' => $employee->nama,
+            'email' => 'guru-tanpa-penugasan@example.test',
+            'username' => $employee->nip,
+            'password' => 'teacher-password-123',
+            'role' => 'guru',
+            'pegawai_id' => $employee->id,
+            'approval_status' => 'approved',
+            'is_active' => true,
+        ]);
+
+        $response = $this->post(route('login'), [
+            'username' => $employee->nip,
+            'password' => 'teacher-password-123',
+        ]);
+
+        $response->assertRedirect(route('guru.pegawai-changes.index'));
+        $this->get(route('guru.pegawai-changes.index'))->assertOk();
+        $this->assertAuthenticatedAs($teacher);
     }
 
     public function test_kepsek_keeps_full_menu_access_and_students_cannot_open_management_routes(): void

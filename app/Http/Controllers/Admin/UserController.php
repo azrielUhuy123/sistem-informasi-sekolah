@@ -149,6 +149,14 @@ class UserController extends Controller
             return back()->withErrors('Tidak boleh menonaktifkan akun sendiri');
         }
 
+        if (! $user->is_active) {
+            abort_unless(
+                $user->approval_status === 'approved' && ! $user->must_change_password,
+                409,
+                'Akun harus disetujui dan menyelesaikan aktivasi sebelum diaktifkan.'
+            );
+        }
+
         $user->update([
             'is_active' => ! $user->is_active
         ]);

@@ -6,7 +6,7 @@
 <div class="container-fluid dt-siswa-page assignment-page">
     <x-table.page-header
         icon="bi-person-check"
-        eyebrow="Manajemen / Penugasan"
+        eyebrow="Manajemen Penugasan"
         title="Manajemen Penugasan"
         description="Atur tanggung jawab dan akses pendukung setiap pegawai dalam satu tempat."
     />
@@ -18,43 +18,88 @@
             :count="0"
             count-id="assignmentRecordCount"
         >
-            <x-slot:actions>
-                <div class="assignment-table-toolbar">
-                    <input
-                        type="search"
-                        id="assignmentSearch"
-                        class="form-control table-search"
-                        placeholder="Cari pegawai atau penugasan..."
+            <x-slot:toolbar>
+                <x-table.local-toolbar
+                    search-id="assignmentSearch"
+                    search-label="Cari pegawai atau penugasan"
+                    search-placeholder="Cari pegawai atau penugasan..."
+                    table-id="dt-superadmin-assignment-table"
+                >
+                    <x-table.local-filter
+                        id="assignmentStatusFilter"
+                        label="Status"
+                        menu-title="Filter status"
+                        :options="[
+                            ['value' => 'Draft', 'label' => 'Draft'],
+                            ['value' => 'Aktif', 'label' => 'Aktif'],
+                            ['value' => 'Dicabut', 'label' => 'Dicabut'],
+                        ]"
+                    />
+                    <x-table.column-controls
+                        table-id="dt-superadmin-assignment-table"
+                        :column-toggle="true"
+                        :refreshable="true"
+                        :refresh-url="request()->fullUrl()"
                     >
-                    <select id="assignmentStatusFilter" class="form-select assignment-status-filter" aria-label="Filter status">
-                        <option value="">Semua Status</option>
-                        <option value="Draft">Draft</option>
-                        <option value="Aktif">Aktif</option>
-                        <option value="Dicabut">Dicabut</option>
-                    </select>
-                    <button type="button" class="btn btn-outline-primary rounded-3" id="publishSelectedDrafts" disabled>
-                        <i class="bi bi-send-check me-2"></i>Publikasikan Penugasan
-                        <span class="badge bg-primary ms-1" id="selectedDraftCount">0</span>
-                    </button>
-                    <button type="button" class="btn btn-primary rounded-3" id="addAssignment">
-                        <i class="bi bi-plus-lg me-2"></i>Tambah Penugasan
-                    </button>
-                </div>
-            </x-slot:actions>
+                        <x-slot:columnMenu>
+                            @foreach ([
+                                'number' => 'No',
+                                'select' => 'Pilih',
+                                'employee' => 'Pegawai',
+                                'type' => 'Penugasan',
+                                'details' => 'Rincian',
+                                'status' => 'Status',
+                                'actions' => 'Aksi',
+                            ] as $column => $label)
+                                <label class="dt-column-menu__option">
+                                    <input type="checkbox" data-dt-column="{{ $column }}" checked>
+                                    <span>{{ $label }}</span>
+                                </label>
+                            @endforeach
+                        </x-slot:columnMenu>
+                    </x-table.column-controls>
+                    <div class="assignment-page-actions">
+                        <button type="button" class="btn btn-outline-primary" id="publishSelectedDrafts" disabled>
+                            <i class="bi bi-send-check me-2"></i>Publikasi
+                            <span class="badge bg-primary ms-1" id="selectedDraftCount">0</span>
+                        </button>
+                        <button type="button" class="btn btn-primary" id="addAssignment">
+                            <i class="bi bi-plus-lg me-2"></i>Tambah
+                        </button>
+                    </div>
+                </x-table.local-toolbar>
+            </x-slot:toolbar>
+
+
+            <div
+                id="assignmentFilterChips"
+                class="dt-filter-chips d-none"
+                role="group"
+                aria-label="Filter aktif"
+            ></div>
 
             <div class="table-responsive dt-siswa-table-wrap">
-                <table class="table table-hover align-middle mb-0 dt-table">
+                <table id="dt-superadmin-assignment-table" class="table table-hover align-middle mb-0 dt-table assignment-table">
+                    <colgroup>
+                        <col class="assignment-column-number" data-dt-column="number">
+                        <col class="assignment-column-select" data-dt-column="select">
+                        <col class="assignment-column-employee" data-dt-column="employee">
+                        <col class="assignment-column-type" data-dt-column="type">
+                        <col class="assignment-column-details" data-dt-column="details">
+                        <col class="assignment-column-status" data-dt-column="status">
+                        <col class="assignment-column-actions" data-dt-column="actions">
+                    </colgroup>
                     <thead>
                         <tr>
-                            <th width="70">No</th>
-                            <th width="50" class="text-center">
-                                <input type="checkbox" class="form-check-input" id="selectAllDrafts" aria-label="Pilih semua draft pada halaman" disabled>
+                            <x-table.heading class="text-center" column="number">No</x-table.heading>
+                            <th class="text-center" data-dt-column="select">
+                                <input type="checkbox" class="form-check-input assignment-table-select" id="selectAllDrafts" aria-label="Pilih semua draft pada halaman" disabled>
                             </th>
-                            <th width="240">Pegawai</th>
-                            <th width="190">Penugasan</th>
-                            <th>Rincian</th>
-                            <th width="160">Status</th>
-                            <th width="300">Aksi</th>
+                            <x-table.heading column="employee">Pegawai</x-table.heading>
+                            <x-table.heading column="type">Penugasan</x-table.heading>
+                            <x-table.heading column="details">Rincian</x-table.heading>
+                            <x-table.heading class="text-center" column="status">Status</x-table.heading>
+                            <x-table.heading class="text-center" column="actions">Aksi</x-table.heading>
                         </tr>
                     </thead>
                     <tbody id="assignmentTableBody">

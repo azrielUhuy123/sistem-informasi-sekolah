@@ -1,4 +1,4 @@
-import { Modal } from 'bootstrap';
+import { Dropdown, Modal } from 'bootstrap';
 
 document.addEventListener('DOMContentLoaded', function () {
     const employeeSelect = document.getElementById('employeeSelect');
@@ -15,6 +15,10 @@ document.addEventListener('DOMContentLoaded', function () {
         ? window.assignmentInitialRecords.map(function (record) { return record; })
         : [];
     const selectedDraftIds = new Set();
+    const appliedStatusFilters = new Set();
+    const statusFilter = document.getElementById('assignmentStatusFilter');
+    const statusFilterOptions = [...statusFilter.querySelectorAll('[data-local-filter-option]')];
+    const statusFilterChips = document.getElementById('assignmentFilterChips');
     const pageSize = 10;
     let activeFilter = 'all';
     let currentPage = 1;
@@ -22,6 +26,7 @@ document.addEventListener('DOMContentLoaded', function () {
     let formBaseline = '';
     let pendingAction = null;
     let nextRecordNumber = 1;
+    let appliedSearch = '';
     const baseUrl = '/superadmin/manajemen-penugasan';
     const csrfToken = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content');
 
@@ -269,16 +274,68 @@ document.addEventListener('DOMContentLoaded', function () {
         return '<span class="badge-status ' + (classes[status] || 'draft') + '">' + escapeHtml(status) + '</span>';
     }
 
+    function syncStatusFilterOptions() {
+        statusFilterOptions.forEach(function (checkbox) {
+            checkbox.checked = appliedStatusFilters.has(checkbox.value);
+        });
+    }
+
+    function renderStatusFilterChips() {
+        statusFilterChips.replaceChildren();
+        statusFilterChips.classList.toggle('d-none', appliedStatusFilters.size === 0 && appliedSearch === '');
+
+        if (appliedSearch !== '') {
+            const chip = document.createElement('span');
+            chip.className = 'dt-filter-chip';
+            const label = document.createElement('span');
+            label.textContent = 'Search: ' + appliedSearch;
+            const remove = document.createElement('a');
+            remove.href = '#';
+            remove.setAttribute('aria-label', 'Hapus Search');
+            remove.title = 'Hapus Search';
+            remove.dataset.removeAssignmentSearch = '';
+            remove.innerHTML = '<i class="bi bi-x" aria-hidden="true"></i>';
+            chip.append(label, remove);
+            statusFilterChips.append(chip);
+        }
+
+        appliedStatusFilters.forEach(function (status) {
+            const chip = document.createElement('span');
+            chip.className = 'dt-filter-chip';
+
+            const label = document.createElement('span');
+            label.textContent = 'Status: ' + status;
+
+            const remove = document.createElement('a');
+            remove.href = '#';
+            remove.setAttribute('aria-label', 'Hapus filter Status ' + status);
+            remove.title = 'Hapus filter Status ' + status;
+            remove.dataset.removeAssignmentStatus = status;
+            remove.innerHTML = '<i class="bi bi-x" aria-hidden="true"></i>';
+
+            chip.append(label, remove);
+            statusFilterChips.append(chip);
+        });
+
+        if (appliedStatusFilters.size > 0 || appliedSearch !== '') {
+            const clearAll = document.createElement('a');
+            clearAll.href = '#';
+            clearAll.className = 'dt-filter-chips__clear';
+            clearAll.dataset.clearAssignmentFilters = '';
+            clearAll.textContent = 'Hapus semua';
+            statusFilterChips.append(clearAll);
+        }
+    }
+
     function actionButton(id, action, label, style) {
         return '<button type="button" class="btn btn-sm ' + style + '" data-action="' + action +
             '" data-id="' + escapeHtml(id) + '">' + escapeHtml(label) + '</button>';
     }
 
     function visibleRecords() {
-        const term = document.getElementById('assignmentSearch').value.trim().toLowerCase();
-        const status = document.getElementById('assignmentStatusFilter').value;
+        const term = appliedSearch.toLowerCase();
         return records.filter(function (record) {
-            if (status && record.status !== status) return false;
+            if (appliedStatusFilters.size > 0 && !appliedStatusFilters.has(record.status)) return false;
             const searchable = [
                 record.employee.name,
                 record.employee.nip,
@@ -370,14 +427,14 @@ document.addEventListener('DOMContentLoaded', function () {
                         (selectedDraftIds.has(record.id) ? ' checked' : '') + '>'
                     : '';
                 return '<tr>' +
-                    '<td>' + (startIndex + index + 1) + '</td>' +
-                    '<td class="text-center">' + selection + '</td>' +
-                    '<td><div class="fw-semibold">' + escapeHtml(employee.name) + '</div>' +
+                    '<td data-dt-column="number">' + (startIndex + index + 1) + '</td>' +
+                    '<td class="text-center" data-dt-column="select">' + selection + '</td>' +
+                    '<td data-dt-column="employee"><div class="fw-semibold">' + escapeHtml(employee.name) + '</div>' +
                     (employee.nip ? '<small class="text-muted">NIP ' + escapeHtml(employee.nip) + '</small>' : '') + '</td>' +
-                    '<td>' + (assignments.length ? assignments.map(escapeHtml).join('<br>') : '<span class="text-muted">Belum dipilih</span>') + '</td>' +
-                    '<td>' + (details.length ? details.map(escapeHtml).join('<br>') : '<span class="text-muted">—</span>') + '</td>' +
-                    '<td>' + statusBadge(record.status) + '</td>' +
-                    '<td><div class="d-flex flex-wrap justify-content-end gap-1">' + actions + '</div></td>' +
+                    '<td data-dt-column="type">' + (assignments.length ? assignments.map(escapeHtml).join('<br>') : '<span class="text-muted">Belum dipilih</span>') + '</td>' +
+                    '<td data-dt-column="details">' + (details.length ? details.map(escapeHtml).join('<br>') : '<span class="text-muted">—</span>') + '</td>' +
+                    '<td data-dt-column="status">' + statusBadge(record.status) + '</td>' +
+                    '<td data-dt-column="actions"><div class="d-flex flex-wrap justify-content-end gap-1">' + actions + '</div></td>' +
                     '</tr>';
             }).join('');
         }
@@ -615,11 +672,49 @@ document.addEventListener('DOMContentLoaded', function () {
         renderTable();
     });
 
-    document.getElementById('assignmentSearch').addEventListener('input', function () {
+    document.getElementById('assignmentSearch').addEventListener('keydown', function (event) {
+        if (event.key !== 'Enter') return;
+        event.preventDefault();
+        appliedSearch = this.value.trim();
         currentPage = 1;
+        renderStatusFilterChips();
         renderTable();
     });
-    document.getElementById('assignmentStatusFilter').addEventListener('change', function () {
+    statusFilter.addEventListener('show.bs.dropdown', syncStatusFilterOptions);
+    statusFilter.addEventListener('hidden.bs.dropdown', syncStatusFilterOptions);
+    statusFilter.querySelector('[data-local-filter-reset]').addEventListener('click', function () {
+        statusFilterOptions.forEach(function (checkbox) { checkbox.checked = false; });
+    });
+    statusFilter.querySelector('[data-local-filter-apply]').addEventListener('click', function () {
+        appliedStatusFilters.clear();
+        statusFilterOptions.forEach(function (checkbox) {
+            if (checkbox.checked) appliedStatusFilters.add(checkbox.value);
+        });
+        currentPage = 1;
+        renderStatusFilterChips();
+        Dropdown.getOrCreateInstance(statusFilter.querySelector('[data-bs-toggle="dropdown"]')).hide();
+        renderTable();
+    });
+    statusFilterChips.addEventListener('click', function (event) {
+        const remove = event.target.closest('[data-remove-assignment-status]');
+        const removeSearch = event.target.closest('[data-remove-assignment-search]');
+        const clearAll = event.target.closest('[data-clear-assignment-filters]');
+        if (!remove && !clearAll && !removeSearch) return;
+        event.preventDefault();
+
+        if (clearAll) {
+            appliedStatusFilters.clear();
+            appliedSearch = '';
+            document.getElementById('assignmentSearch').value = '';
+        } else if (removeSearch) {
+            appliedSearch = '';
+            document.getElementById('assignmentSearch').value = '';
+        } else {
+            appliedStatusFilters.delete(remove.dataset.removeAssignmentStatus);
+        }
+
+        syncStatusFilterOptions();
+        renderStatusFilterChips();
         currentPage = 1;
         renderTable();
     });

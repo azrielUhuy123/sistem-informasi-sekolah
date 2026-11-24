@@ -138,6 +138,12 @@ class LoginRequest extends FormRequest
 
         }
 
+        if ($user->must_change_password) {
+            throw ValidationException::withMessages([
+                'username' => 'Akun harus diaktivasi melalui tautan pengaturan password.',
+            ]);
+        }
+
         if (!$user->is_active) {
 
             throw ValidationException::withMessages([

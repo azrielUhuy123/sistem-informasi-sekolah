@@ -54,15 +54,11 @@ class AuthenticatedSessionController extends Controller
         if ($user->role === 'guru') {
             session(['guru_mode' => $user->hasFeature('ekskul.dashboard') ? 'ekskul' : 'akademik']);
 
-            if ($user->hasFeature('wali.dashboard')) {
-                return redirect()->route('guru.dashboard-walikelas');
-            }
-
-            return redirect()->route('guru.dashboard-gurubidang');
+            return redirect($user->getDashboardUrl());
         }
 
         return match ($user->role) {
-            'tu' => redirect('/guru/dashboard-gurubidang'),
+            'tu' => redirect($user->getDashboardUrl()),
             'superadmin' => redirect()->route('superadmin.dashboard'),
             'siswa' => redirect()->route('siswa.dashboard.index'),
             default => abort(403),

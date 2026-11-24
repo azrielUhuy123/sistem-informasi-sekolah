@@ -23,6 +23,7 @@ class User extends Authenticatable
         'approved_at',
         'approved_by',
         'is_active',
+        'must_change_password',
     ];
 
     protected $hidden = [
@@ -36,6 +37,8 @@ class User extends Authenticatable
             'email_verified_at' => 'datetime',
             'approved_at' => 'datetime',
             'password' => 'hashed',
+            'is_active' => 'boolean',
+            'must_change_password' => 'boolean',
         ];
     }
 
@@ -55,11 +58,32 @@ class User extends Authenticatable
 
     public function getDashboardUrl()
     {
+        if ($this->role === UserRole::GURU) {
+            foreach ([
+                'wali.dashboard' => '/guru/dashboard-walikelas',
+                'operator.dashboard' => '/tu/dashboard',
+                'ppdb.dashboard' => '/tu/ppdb/dashboard',
+                'ekskul.dashboard' => '/guru/ekskul/dashboard',
+                'guru.dashboard' => '/guru/dashboard-gurubidang',
+                'operator.employees' => '/tu/pegawai/perubahan',
+                'operator.accounts' => '/tu/akun',
+            ] as $menu => $url) {
+                if ($this->hasFeature($menu)) {
+                    return $url;
+                }
+            }
+
+            if ($this->pegawai_id && $this->guru()->exists()) {
+                return '/guru/pegawai/perubahan';
+            }
+
+            return '/';
+        }
+
         return match ($this->role) {
             UserRole::SUPERADMIN => '/superadmin/dashboard',
             UserRole::ADMIN => '/admin/dashboard',
-            UserRole::TU => '/guru/dashboard-gurubidang',
-            UserRole::GURU => '/guru/dashboard-gurubidang',
+            UserRole::TU => '/',
             UserRole::MURID => '/siswa/dashboard',
             default => '/dashboard',
         };
@@ -134,6 +158,7 @@ class User extends Authenticatable
                 ->where('menu_key', $featureKey)
                 ->whereHas('item.penugasan', function ($query) {
                     $query->where('status', 'active')
+                        ->whereNotNull('published_at')
                         ->where('data_kepegawaian_id', $this->pegawai_id);
                 })
                 ->exists();

@@ -11,7 +11,7 @@ class PpdbDaftarUlangCredentialsMail extends Mailable
     public function __construct(
         public string $studentName,
         public string $nis,
-        public string $initialPassword,
+        public string $resetUrl,
     ) {}
 
     public function envelope(): Envelope
@@ -28,7 +28,7 @@ class PpdbDaftarUlangCredentialsMail extends Mailable
             with: [
                 'studentName' => $this->studentName,
                 'nis' => $this->nis,
-                'initialPassword' => $this->initialPassword,
+                'resetUrl' => $this->resetUrl,
             ],
         );
     }

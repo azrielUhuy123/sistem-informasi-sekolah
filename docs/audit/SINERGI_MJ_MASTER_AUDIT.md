@@ -120,7 +120,7 @@ Alias custom yang dicatat pada `bootstrap/app.php` mencakup `role`, `approved`, 
 `Route` menunjukkan deklarasi group; bukan jaminan semua baris record dibatasi. `Controller` berarti terdapat pembatasan data pada sebagian method yang ditelusuri. `Belum` berarti tidak semua operasi telah diaudit.
 
 | Area | Admin | Superadmin | TU | Guru | Siswa | SPMB |
-|---|---|---|---|---|---|---|
+|---|---|---|---|---|---|
 | Dashboard/akun | Admin group; beberapa target dibatasi. | Group superadmin; bypass middleware role lintas group juga berlaku. | Akun lintas role dapat ditargetkan pada operasi TU yang diperiksa. | Tidak ada manajemen akun yang ditemukan pada route guru. | Tidak ada manajemen akun siswa pada group siswa yang diperiksa. | Route meminta `role:spmb`; definisi/akses belum dipastikan. |
 | Data master/administrasi | Tidak ditemukan CRUD TU pada group admin yang ditelaah. | Sebagian pengelolaan dan penetapan. | Route TU mencakup siswa, guru, kelas, tahun, mapel, dokumen, kepegawaian dan area lain. | Tidak ditemukan operasi master TU pada group guru. | Baca data pribadi/akademik pada route siswa. | Belum dipetakan. |
 | Jadwal akademik | Tidak ditemukan operasi utama. | Monitoring/keputusan/publikasi dan jadwal final. | Baca/ekspor jadwal final. | Draft dan pengajuan; beberapa endpoint perlu pembatasan scope. | GET jadwal dipautkan ke penempatan aktif di controller yang dibaca. | Belum dipetakan. |
@@ -531,6 +531,83 @@ Bagian ini memperbarui temuan Pengajuan Jadwal Guru pada §15 berdasarkan implem
 - Baseline terdokumentasi di §14 adalah **239 test, 1.336 assertion, 234 lulus, 5 gagal**. Suite kini bertambah 8 test; hasil saat ini tidak dapat dibandingkan untuk menyimpulkan apakah lima kegagalan baseline berubah karena semua test yang membutuhkan DB berhenti pada kegagalan koneksi.
 - Tidak ada migration atau reset database yang dijalankan. Bootstrap sementara yang dibuat untuk run ini telah dihapus setelah pengujian.
 
+## 18. Penutupan Temuan Keamanan Provisioning Akun Pegawai
+
+Bagian ini mencatat implementasi dan validasi Tahap 5E. Laporan rinci: [`TAHAP_5E_PENUTUPAN_TEMUAN_KEAMANAN.md`](./TAHAP_5E_PENUTUPAN_TEMUAN_KEAMANAN.md).
+
+### Perbaikan
+
+- Password awal akun pegawai tidak lagi berasal dari tanggal lahir. Akun dibuat pending/nonaktif dan wajib menyelesaikan setup password melalui token reset satu kali sebelum dapat aktif.
+- Reset password TU tidak lagi mengganti password menjadi tanggal lahir. Tautan berbasis token Laravel diterbitkan hanya pada respons Operator berwenang, bersifat `no-store`, dan target Superadmin ditolak.
+- Operator pada setiap request sensitif harus memiliki role dasar Guru, status approved/active, serta assignment `operator` aktif dan published dengan menu yang sesuai. Status akun dimuat ulang dari database untuk memutus sesi yang statusnya telah dicabut.
+- Approval dan seluruh endpoint toggle status tidak dapat mengaktifkan akun sebelum setup password. Endpoint Operator tidak dapat membuat akun Superadmin dari jabatan Kepala Sekolah.
+- Redirect login memilih halaman yang sesuai dengan menu assignment; Guru tanpa assignment akademik menuju workflow data pegawainya sendiri.
+
+### Validasi
+
+- Migration aditif `2026_11_24_004200_add_must_change_password_to_users` diterapkan hanya ke MySQL QA `sekolah_app_pegawai_qa` (MySQL 8.0.30); default `false` mempertahankan status akun lama.
+- Test terarah provisioning/reset/workflow/assignment: **84 test, 520 assertion lulus**; test redirect dan notifikasi tambahan: **16 test, 139 assertion lulus**.
+- Full regression suite MySQL QA: **272 test, 1.564 assertion lulus, 0 failed/error/skipped**. PHPUnit menjalankan test dalam transaksi tanpa migration/reset.
+- Browser QA merespons HTTP 200 pada halaman login lokal. Alur terautentikasi belum diulang pada Tahap 5E karena credential QA tidak digunakan/ditampilkan.
+- Tidak ada perubahan ke `.env`, produksi, atau database selain penambahan kolom QA; tidak ada reset, rollback, penghapusan data, commit, atau push.
+
+**Status: LULUS DENGAN CATATAN.** Provisioning akun pegawai dan kontrol sesi/assignment lulus test. Risiko yang belum diselesaikan: provisioning siswa PPDB masih memakai tanggal lahir sebagai password awal dan mengirimkannya melalui email; perlu keputusan terpisah agar perubahan kebijakan onboarding siswa tidak dilakukan sepihak. Penyerahan tautan aktivasi pegawai melalui kanal aman dan browser smoke test terautentikasi juga belum diverifikasi.
+
+## 19. Verifikasi Akhir Tahap 5E
+
+Bagian ini menutup temuan keamanan Tahap 5E dan mencatat verifikasi aktual.
+
+### Temuan dan perbaikan
+
+Security review menemukan satu temuan HIGH: sesi Superadmin yang diblokir masih dapat mencapai `unblock()` dan mengaktifkan akun. Perbaikan dilakukan pada middleware, route, dan controller:
+
+- Middleware `EnsureUserApproved` memuat ulang akun dari database dan kini memeriksa approval, aktivasi, serta password setup untuk Superadmin.
+- Grup route `superadmin` memakai middleware `approved`.
+- `UserApprovalController::approve/reject/block/unblock` memuat ulang aktor, menolak aktor yang tidak aktif/belum disetujui/belum menyelesaikan setup, dan menolak pemrosesan akun sendiri.
+- Route Guru utama dan unduhan bukti memakai pemeriksaan status approved pada sesi aktif.
+- Test menambahkan pencabutan akses untuk bukti privat dan monitoring Kepsek.
+
+### Verifikasi database dan test
+
+- Target MySQL QA terverifikasi `sekolah_app_pegawai_qa`, MySQL 8.0.30, `127.0.0.1:3306`.
+- Migration aktivasi `must_change_password` tercatat Ran pada QA.
+- Pengujian terarah: **48 test, 275 assertion lulus**.
+- Full regression: **273 test, 1.597 assertion lulus, 0 failed, 0 errors, 0 skipped**.
+- PHP lint dan `git diff --check` lulus.
+- Tidak ada migration/reset/destructive cleanup, `.env`/`.env.testing` tidak diubah.
+
+### Browser dan risiko residual
+
+- Server QA lokal `http://127.0.0.1:8015` kembali hidup.
+- Browser berhasil login sebagai Guru fiktif dan membuka riwayat serta form perubahan data pegawai.
+- Smoke browser lintas peran tidak dapat diselesaikan sepenuhnya karena keterbatasan pengendalian cookies/session browser automation.
+- Redirect peran dan pencabutan sesi diverifikasi melalui PHPUnit, bukan browser lintas peran.
+- Risiko residual: password awal siswa PPDB berbasis tanggal lahir, keterbatasan browser smoke, dan MariaDB belum diuji.
+
+**Status: LULUS DENGAN CATATAN.** Temuan HIGH Tahap 5E tertutup dan terverifikasi; browser lintas peran serta onboarding siswa tetap memiliki catatan yang tidak disembunyikan.
+
+## 20. Audit dan Penutupan Risiko PPDB/SPMB
+
+Tahap 6 memeriksa dan memperbaiki jalur PPDB/SPMB yang tersisa pada [`TAHAP_6_AUDIT_KEAMANAN_PPDB.md`](./TAHAP_6_AUDIT_KEAMANAN_PPDB.md).
+
+### Temuan dan perbaikan
+
+- Dokumen identitas PPDB baru disimpan pada disk private `local`. Download dokumen wajib melalui route PPDB terotorisasi; view verifikasi tidak lagi memakai URL public storage.
+- Bukti pendaftaran menggunakan temporary signed route dan tidak dapat dibuka melalui nomor pendaftaran unsigned.
+- Lookup status publik ditambah throttle dan respons generik.
+- Daftar ulang publik tidak lagi mengubah status dari nomor+DOB. Sistem menerbitkan token random SHA-256 30 menit yang dikirim melalui email dan hanya dapat dipakai sekali.
+- Konfirmasi siswa tidak lagi membuat password dari tanggal lahir. Akun dibuat inactive dan wajib reset password melalui token.
+- Grup route PPDB admin ditambah middleware `approved`, sehingga status akun aktif/disetujui diperiksa pada sesi.
+
+### Validasi
+
+- Migration aditif token daftar ulang diterapkan hanya pada QA `sekolah_app_pegawai_qa`.
+- Pengujian PPDB terarah: **43 test, 274 assertion lulus**.
+- Full regression: **276 test, 1.636 assertion lulus, 0 failed, 0 errors, 0 skipped**.
+- Test membuktikan private download, unsigned-bukti rejection, status throttle, token expiry/reuse, otorisasi role, dan alur normal PPDB.
+
+**Status: LULUS DENGAN CATATAN.** File lama yang sudah tersimpan pada public disk belum dipindahkan atau dihapus secara destruktif. Inventarisasi dan migrasi kompatibilitas file lama memerlukan persetujuan operasional; penggunaan/unggahan baru sudah private.
+
 ### Lima kegagalan baseline
 
 Kelima test diperiksa secara terpisah, tetapi tidak dapat mencapai assertion karena koneksi MySQL ditolak:
@@ -553,3 +630,139 @@ Run individual di atas mengalami exception database yang sama dengan full suite,
 **Risiko tersisa:** kesiapan regresi belum dapat dinilai karena MySQL testing tidak berjalan pada host saat pemeriksaan. Status lima kegagalan historis juga belum dapat dibandingkan secara runtime. Temuan mismatch profil, tautan bantuan/reset, dan teks transisi perlu divalidasi terhadap kontrak produk setelah database testing tersedia.
 
 **Status: BELUM DAPAT DINYATAKAN LULUS.** Rekomendasi berikutnya adalah menyalakan/menyediakan service MySQL untuk database testing yang telah disetujui (tanpa migration/reset), lalu mengulang full suite dan kelima test terarah; setelah itu tinjau hanya mismatch yang terbukti melalui assertion/runtime dan ulangi pemeriksaan regresi.
+
+### Pemulihan database testing — 2026-11-23
+
+- Laragon MySQL 8.0.30 aktif dari direktori instalasi Laragon. Tidak ditemukan service Windows MySQL/MariaDB terdaftar; proses `mysqld` berjalan dan mendengarkan pada port 3306 (port tambahan 33060 juga aktif). TCP `127.0.0.1:3306` berhasil; tidak ditemukan konflik listener pada port database yang dikonfigurasi.
+- `.env.testing` dan konfigurasi runtime Laravel sama-sama memilih koneksi `mysql`, host `127.0.0.1`, port `3306`, dan database `sekolah_app_testing`. `phpunit.xml` menetapkan `APP_ENV=testing` tanpa override DB; config cache tidak ada. Validasi PDO hanya-baca berhasil dan `SELECT DATABASE()` mengembalikan database yang disetujui. Tidak ada kredensial yang dicatat.
+- Penyebab penolakan koneksi sebelumnya adalah tidak adanya listener MySQL pada port 3306 saat audit pukul 18:47. Saat follow-up ini, proses dan koneksi telah tersedia.
+- Sebelum test, perilaku `RefreshDatabase` diverifikasi: tanpa perlindungan, test pertama dapat memanggil `migrate:fresh`. Test terarah memakai bootstrap sementara yang menandai skema sudah dimuat, sehingga test tetap memakai transaksi rollback dan tidak menjalankan migrasi/reset. Tidak ditemukan operasi truncate/drop pada rangkaian test terarah.
+- Hasil terarah dengan koneksi tersedia:
+
+| Test | Hasil |
+|---|---:|
+| `ProfileTest` | 5 test, 15 assertion; 2 lulus, 3 gagal (route `edit` tidak tersedia dan dua request `PATCH` mendapat 405) |
+| Test reset password link | 1 test, 5 assertion; gagal karena halaman login tidak menyertakan URL `/forgot-password` yang diharapkan |
+| Test cohort mismatch | 1 test, 3 assertion; gagal pada teks pesan `"mismatch Angkatan: 1"` |
+| `PengajuanJadwalWorkflowTest` | 8 test, 57 assertion; lulus |
+| Regresi notifikasi jadwal (`BusinessNotificationTest`) | 4 test, 40 assertion; lulus |
+
+  Total run terarah: **19 test, 120 assertion; 14 lulus dan 5 gagal**. Tiga kegagalan baseline kini terkonfirmasi sebagai ketidaksesuaian route/ekspektasi test yang telah dijelaskan di atas; tidak ada source aplikasi atau test yang diubah. Tidak dilakukan browser smoke test.
+- Full suite belum diulang pada tahap pemulihan ini. **Lingkungan database siap untuk Full Regression Audit** dengan pemeriksaan target database dan bootstrap aman yang sama; jangan gunakan runner yang dapat menjalankan `migrate:fresh` pada skema/data yang tersedia.
+- Helper bootstrap sementara telah dihapus setelah test. Perubahan tahap ini hanya memperbarui catatan audit; tidak ada migration, reset, penghapusan data, atau perubahan kredensial.
+
+### Full suite final — 2026-11-23
+
+- Sebelum run, koneksi diuji lagi melalui bootstrap Laravel dan `SELECT DATABASE()`; konfigurasi runtime adalah `mysql@127.0.0.1:3306/sekolah_app_testing`. Port TCP aktif dan config cache tidak ada.
+- Command: `C:\laragon\bin\php\php-8.2.29-Win32-vs16-x64\php.exe vendor\bin\phpunit --bootstrap tests\no-refresh-bootstrap.php --log-junit <file-temporer>`.
+- Bootstrap menetapkan `RefreshDatabaseState::$migrated = true`, sehingga `RefreshDatabase` tidak memanggil `migrate:fresh`; setiap test database tetap membuka transaksi dan me-rollback saat teardown. Pencarian suite tidak menemukan pemanggilan migrasi/reset/truncate eksplisit; seeder yang melakukan `truncate` tidak dipanggil. Tidak ada migration, reset, atau penghapusan data.
+- Hasil PHPUnit: **247 test, 1.393 assertion, 242 passed, 5 failed, 0 errors, 0 skipped**, durasi **45,735 detik**. Semua 247 test dieksekusi. PHPUnit keluar dengan status 1 karena lima assertion failure.
+
+#### Perbandingan dan konsistensi
+
+| Pembanding | Test | Assertion | Passed | Failed | Errors / skipped |
+|---|---:|---:|---:|---:|---:|
+| Baseline sebelum perubahan terkait | 239 | 1.336 | 234 | 5 | 0 / 0 |
+| Run terarah pada pemulihan database | 19 | 120 | 14 | 5 | 0 / 0 |
+| Full suite final | 247 | 1.393 | 242 | 5 | 0 / 0 |
+
+Kelima failure full suite sama dengan failure baseline dan run terarah; tidak ada failure baru atau test yang tidak tereksekusi. Jumlah 8 test dan 57 assertion tambahan lulus. Tidak ditemukan perbedaan antara hasil isolated dan full suite untuk lima failure tersebut.
+
+#### Rincian seluruh failure
+
+| Test | Penyebab teknis dan bukti source | Klasifikasi |
+|---|---|---|
+| `PasswordResetTest::test_reset_password_link_screen_can_be_rendered` — [test](../../tests/Feature/Auth/PasswordResetTest.php), [login view](../../resources/views/auth/login.blade.php) | Assertion test meminta URL `route('password.request')` pada halaman login. View hanya membuka modal bantuan melalui `javascript:void(0)` dan tidak merender URL reset; assertion pada test gagal. | Failure baseline; ketidaksesuaian kontrak test dan UI, bukan error koneksi. |
+| `ProfileTest::test_profile_page_is_displayed` — [test](../../tests/Feature/ProfileTest.php), [routes](../../routes/web.php), [controller](../../app/Http/Controllers/ProfileController.php) | `GET /profile` diarahkan ke `ProfileController@edit`, sedangkan controller tidak memiliki method `edit` (method yang tersedia antara lain `index` dan `detail`); request berakhir HTTP 500. | Failure baseline; target route tidak cocok dengan controller. |
+| `ProfileTest::test_profile_information_can_be_updated` — [test](../../tests/Feature/ProfileTest.php), [routes](../../routes/web.php) | Test mengirim `PATCH /profile`, tetapi route update yang tersedia adalah `POST /profile/update`; respons aktual HTTP 405. | Failure baseline; method/URI test berbeda dari route aktif. |
+| `ProfileTest::test_email_verification_status_is_unchanged_when_the_email_address_is_unchanged` — [test](../../tests/Feature/ProfileTest.php), [routes](../../routes/web.php) | Memakai `PATCH /profile` yang sama, sehingga mendapat HTTP 405 sebelum assertion email terverifikasi tercapai. | Failure baseline; mismatch yang sama dengan test update profil. |
+| `TahunAjaranSemesterTransitionTest::test_cohort_mismatch_is_skipped_and_reported` — [test](../../tests/Feature/TahunAjaranSemesterTransitionTest.php), [controller](../../app/Http/Controllers/Tu/TahunAjaranController.php) | Test mengharapkan substring `mismatch Angkatan: 1`; `ringkasanTransisi()` menghasilkan frasa `dilewati karena ketidaksesuaian Angkatan: 1`. Assertion pesan gagal. | Failure baseline; mismatch teks assertion. Tidak ada bukti kegagalan koneksi atau error runtime lain. |
+
+Tidak ada implementasi yang diubah pada tahap ini. Bukti menunjukkan kegagalan tetap pada test/route/UI yang sama seperti baseline; audit ini tidak mengubah atau melemahkan test untuk menutupi hasil.
+
+**Status kesiapan:** full suite kini dapat dijalankan pada database testing dengan mekanisme aman, tetapi **sistem belum dapat dinyatakan lulus seluruh test** selama lima failure baseline tersebut masih ada. Penanganan berikutnya perlu menetapkan kontrak yang benar untuk profil, tautan reset di login, dan redaksi pesan transisi, lalu memperbarui source atau ekspektasi test pada tahap terpisah sesuai keputusan produk. Bootstrap dan file laporan JUnit temporer telah dibersihkan; tidak ada perubahan aplikasi/test, commit, atau push.
+
+## 18. Penyelesaian lima baseline failure
+
+### Analisis dan keputusan
+
+1. **GET profil:** `/profile` adalah halaman profil akun umum yang dipakai oleh dropdown admin/superadmin, navigasi, dan tautan notifikasi. View `profile.edit` dan partial Breeze tersedia, sedangkan profil informasi Guru/Murid tetap memakai endpoint terpisah `/guru/profile` dan `/siswa/profile`. Route umum kini memanggil `ProfileController::edit`, yang merender view tersebut untuk akun login; tidak mengalihkan halaman profil Guru.
+2. **Update profil:** form aktual memakai `route('profile.update')` dengan method override `PATCH`, mengirim `name` dan `email`; `ProfileUpdateRequest` memang memvalidasi dua field itu. Kontrak diselaraskan menjadi `PATCH /profile` → `ProfileController::update`. Handler mengisi hanya data tervalidasi, mengosongkan `email_verified_at` hanya bila email berubah, lalu kembali ke `profile.edit` dengan status yang dipakai view. Route name `profile.update` dipertahankan. Route `POST /profile/update` dan `updateInformasi` lama tidak memiliki pemanggil lain di repository; audit `app`, `resources/views`, `routes`, dan `tests` menemukan hanya form Breeze tersebut, yang melakukan PATCH dan tidak mengirim `telepon`/`alamat`. Endpoint lama diganti, tidak dipertahankan sebagai endpoint duplikat. Integrasi eksternal di luar repository tidak dapat dipastikan.
+3. **Reset password:** `routes/auth.php`, `PasswordResetLinkController`, view permintaan reset, dan test membuktikan alur self-service aktif untuk akun non-Siswa. Siswa tetap diarahkan menghubungi TU/operator di controller permintaan maupun penyimpanan password. Link “Lupa kata sandi?” ditambahkan pada login; modal “Butuh Bantuan?” tetap tersedia. Kebijakan autentikasi dan pengecualian Siswa tidak diubah.
+4. **Transisi semester:** implementasi membandingkan `siswa.angkatan_id` dengan cohort kelas, menghitung placement mismatch dan melewatinya, tanpa membuat placement Genap untuk mismatch. Ringkasan UI menggunakan istilah Indonesia `ketidaksesuaian Angkatan`; hanya ekspektasi teks test yang diselaraskan. Pemeriksaan cohort, status semester, dan data placement tidak diubah.
+
+### File yang diubah
+
+- [routes/web.php](../../routes/web.php)
+- [ProfileController.php](../../app/Http/Controllers/ProfileController.php)
+- [login.blade.php](../../resources/views/auth/login.blade.php)
+- [TahunAjaranSemesterTransitionTest.php](../../tests/Feature/TahunAjaranSemesterTransitionTest.php)
+- Dokumen audit ini.
+
+### Hasil pengujian
+
+Database dikonfirmasi kembali sebagai `sekolah_app_testing` di `127.0.0.1:3306`. Semua test dijalankan menggunakan bootstrap aman yang menandai skema sudah tersedia dan membuat transaksi rollback; tidak ada migration, `migrate:fresh`, reset, atau penghapusan data.
+
+| Kelompok | Hasil |
+|---|---:|
+| Lima test yang sebelumnya gagal, dijalankan satu per satu | 5 test, 23 assertion; lulus |
+| `ProfileTest` | 5 test, 21 assertion; lulus |
+| Seluruh test `tests/Feature/Auth` | 23 test, 78 assertion; lulus |
+| `TahunAjaranSemesterTransitionTest` | 6 test, 31 assertion; lulus |
+| Full suite | **247 test, 1.403 assertion; 247 lulus, 0 gagal, 0 error, 0 skipped** (37,096 detik) |
+
+#### Perbandingan dengan hasil sebelumnya
+
+| Hasil | Test | Assertion | Passed | Failed |
+|---|---:|---:|---:|---:|
+| Baseline historis | 239 | 1.336 | 234 | 5 |
+| Sebelum penyelesaian ini | 247 | 1.393 | 242 | 5 |
+| Sesudah penyelesaian ini | 247 | 1.403 | 247 | 0 |
+
+Kelima failure baseline terselesaikan; tidak ada failure baru. Assertion bertambah 10 dibanding full suite sebelumnya karena test yang dahulu berhenti pada kegagalan kini melanjutkan pemeriksaan. Delapan test tambahan yang sudah ada tetap lulus.
+
+**Status:** seluruh suite lulus. Risiko yang tersisa adalah integrasi eksternal tak terdokumentasi yang mungkin masih mengirim request ke `POST /profile/update`; tidak ditemukan pemanggil internal, dan route name `profile.update` tetap kompatibel untuk frontend yang memakai nama route. Tidak dilakukan browser smoke test manual; render halaman profil dan login tercakup oleh Feature Test.
+
+## 19. Workflow perubahan Data Pegawai — implementasi (23 November 2026)
+
+### Relasi dan keputusan field
+
+- Identitas akun mengikuti relasi aktual `users.pegawai_id → data_kepegawaian.id`; relasi Guru adalah `guru.data_kepegawaian_id → data_kepegawaian.id`. Pemilik pengajuan selalu diambil dari akun login, bukan dari parameter request.
+- Field yang boleh diajukan Guru didefinisikan eksplisit di `config/employee_profile_changes.php`: identitas (nama, NIP, NUPTK), data pribadi/keluarga (tempat/tanggal lahir, agama, jenis kelamin, status kawin), pendidikan/pengalaman (ijazah terakhir, pengalaman mengajar), dan sertifikasi. NIP/NUPTK, tanggal lahir, status kawin, ijazah, dan sertifikasi mensyaratkan dokumen bukti.
+- Karena login pegawai mencari akun melalui NIP, perubahan nama juga menyinkronkan `users.name`. Keunikan NIP divalidasi saat pengajuan dan persetujuan serta diperkuat unique index; migration memeriksa duplikasi lama dan berhenti dengan pesan eksplisit tanpa menghapus/mengubah data jika ditemukan.
+- Alamat dan kontak tidak dimasukkan karena kolom tersebut tidak tersedia pada schema `data_kepegawaian` yang diperiksa. Jabatan, status kerja, SK/pangkat, masa kerja, gaji, tugas administratif, dan penugasan tetap dikelola melalui jalur Operator.
+
+### Alur yang diterapkan
+
+1. Guru yang akunnya aktif/disetujui dan mempunyai relasi Guru dapat mengajukan hanya perubahan untuk pegawainya sendiri. Snapshot nilai lama disimpan saat submit; perubahan identitas dari request body diabaikan.
+2. Setiap field menjadi item terpisah dengan status, bukti privat, alasan, pemeriksa, dan keputusan berwaktu. Perubahan data resmi berjalan dalam transaksi setelah snapshot dinyatakan masih cocok. Snapshot basi ditolak dan dicatat agar Guru dapat mengajukan nilai terbaru tanpa menimpa data baru.
+3. Verifikasi dibatasi pada akun Guru aktif dengan assignment aktif bertipe `operator` dan menu `operator.employees`; Operator tidak dapat memverifikasi pengajuannya sendiri. Field yang ditolak dapat diajukan ulang sebagai item baru dan tertaut ke item asal.
+4. Status request dihitung dari status item, termasuk `partially_processed` bila hasilnya campuran. Notifikasi dikirim kepada Operator terkait dan Guru pemohon. Nama pemohon disimpan sebagai snapshot agar riwayat tetap terbaca bila akun dihapus; FK akun menjadi null dan FK pegawai mencegah penghapusan data yang masih memiliki riwayat. Kepsek menggunakan role teknis `superadmin` untuk monitoring lintas Guru yang bersifat read-only; tidak ada approval tahap kedua pada workflow ini.
+5. Bukti disimpan pada disk privat `local`, tidak diletakkan pada disk publik, dan hanya diunduh melalui endpoint terautentikasi dengan pemeriksaan pemilik, Operator aktif, atau Kepsek.
+6. Form profil Guru tidak lagi mengubah kolom resmi Data Kepegawaian secara langsung; email akun tetap dapat diperbarui terpisah. Form dan endpoint edit TU untuk pegawai yang sudah ada hanya menerima field administratif. Pembuatan data onboarding dan approval onboarding legacy tidak dihapus.
+
+### File yang berubah untuk workflow
+
+- Model, migration, konfigurasi, dan service: `DataKepegawaian.php`, `PegawaiChangeRequest.php`, `PegawaiChangeItem.php`, `PegawaiChangeDecision.php`, `2026_11_23_215900_enforce_unique_employee_nip.php`, `2026_11_23_220000_create_pegawai_change_workflow_tables.php`, `employee_profile_changes.php`, `PegawaiChangeWorkflow.php`.
+- Endpoint dan routing: `ProfileController.php`, `DataKepegawaianController.php`, `PegawaiChangeController.php`, `PegawaiChangeVerificationController.php`, `PegawaiChangeMonitoringController.php`, `BusinessNotificationService.php`, `assignment_menus.php`, `guru.php`, `tu.php`, `superadmin.php`, `web.php`.
+- UI: form profil, form edit administrasi TU, sidebar Guru/Operator/Kepsek, dan view daftar/buat/detail/antrean/monitoring pada `resources/views/{guru,tu,superadmin}/pegawai-changes`.
+- Test: `tests/Feature/PegawaiChangeWorkflowTest.php`.
+
+### Validasi dan batas
+
+| Pemeriksaan | Hasil |
+|---|---|
+| Workflow perubahan Data Pegawai | **12 test, 59 assertion; lulus** |
+| Feature access, manajemen penugasan, dan profil | **38 test, 165 assertion; lulus** |
+| Gabungan test terarah | **50 test, 224 assertion; lulus** |
+| PHP lint | Seluruh file PHP yang berubah lulus |
+| Route list | Endpoint Guru, Operator, Kepsek, serta bukti privat terdaftar; role/assignment diperiksa di middleware/controller/service |
+| Blade | `view:cache` berhasil; hasil cache dibersihkan |
+| `git diff --check` | Lulus; Git hanya memberi peringatan normal konversi CRLF pada sebagian file |
+| Database | Pengujian dijalankan pada SQLite `:memory:` terisolasi. `RefreshDatabase` hanya memigrasikan database sementara tersebut; database `sekolah_app_testing`/produksi tidak dikoneksikan atau diubah. Migration baru belum diterapkan ke database persisten. |
+| Browser/manual smoke test | Tidak dilakukan |
+| Full test suite | Tidak dijalankan pada tahap implementasi ini |
+
+**Risiko tersisa:** migration harus diterapkan melalui prosedur deployment/QA yang disetujui sebelum workflow digunakan pada database persisten. Migration unique NIP akan menolak penerapan bila ada nilai NIP duplikat; lakukan rekonsiliasi resmi sebelum deployment, tanpa penghapusan otomatis. Perilaku khusus MySQL/MariaDB belum diverifikasi pada tahap ini. Full suite aplikasi dan browser smoke test masih perlu dijalankan pada lingkungan QA yang aman. Daftar allowlist field mengikuti kolom aktif yang ditemukan; penambahan field alamat/kontak memerlukan schema dan keputusan terpisah.
+
+**Status workflow:** **LULUS DENGAN CATATAN** untuk pengujian terarah dan isolasi pemilik pada SQLite memori. Belum dinyatakan siap produksi sebelum migration, full regression suite, dan smoke test pada QA terkontrol tervalidasi.

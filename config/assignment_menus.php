@@ -107,6 +107,7 @@ return [
         'tu.akun.*' => ['operator.accounts'],
         'tu.search' => ['operator.search'],
         'tu.search.ajax' => ['operator.search'],
+        'tu.pegawai-changes.*' => ['operator.employees'],
 
         'tu.ppdb.dashboard' => ['ppdb.dashboard'],
         'tu.ppdb.pendaftar.*' => ['ppdb.applicants'],
@@ -156,5 +157,9 @@ return [
         'guru.profile',
         'guru.profile.detail',
         'guru.profile.detail.update',
+        'guru.pegawai-changes.index',
+        'guru.pegawai-changes.create',
+        'guru.pegawai-changes.store',
+        'guru.pegawai-changes.show',
     ],
 ];

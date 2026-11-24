@@ -7,12 +7,69 @@ use App\Models\Ekskul;
 use App\Models\Kelas;
 use App\Models\KeputusanKenaikan;
 use App\Models\PpdbPendaftar;
+use App\Models\PegawaiChangeItem;
+use App\Models\PegawaiChangeRequest;
 use App\Models\User;
 use App\Notifications\SinergiNotification;
 use Illuminate\Support\Collection;
 
 class BusinessNotificationService
 {
+    public function notifyPegawaiChangeSubmitted(PegawaiChangeRequest $changeRequest): void
+    {
+        $changeRequest->loadMissing(['pegawai', 'items']);
+        $operators = User::query()
+            ->where('role', UserRole::GURU)
+            ->where('approval_status', 'approved')
+            ->where('is_active', true)
+            ->whereHas('pegawai.penugasans', fn ($query) => $query
+                ->where('status', 'active')
+                ->whereHas('items', fn ($itemQuery) => $itemQuery
+                    ->where('type', 'operator')
+                    ->whereHas('menus', fn ($menuQuery) => $menuQuery
+                        ->where('menu_key', 'operator.employees'))))
+            ->where('pegawai_id', '!=', $changeRequest->data_kepegawaian_id)
+            ->get();
+
+        foreach ($operators as $operator) {
+            $operator->notify(new SinergiNotification(
+                title: 'Pengajuan perubahan data pegawai',
+                message: "{$changeRequest->pegawai->nama} mengajukan {$changeRequest->items->count()} perubahan data pegawai.",
+                category: 'user',
+                priority: 'action_required',
+                actionUrl: route('tu.pegawai-changes.show', $changeRequest),
+                actionLabel: 'Tinjau pengajuan',
+                entityType: PegawaiChangeRequest::class,
+                entityId: $changeRequest->getKey(),
+            ));
+        }
+    }
+
+    public function notifyPegawaiChangeDecision(PegawaiChangeItem $item): void
+    {
+        $item->loadMissing(['changeRequest.submittedBy']);
+        $user = $item->changeRequest->submittedBy;
+        if (! $user) {
+            return;
+        }
+
+        $label = config('employee_profile_changes.fields.'.$item->field.'.label', $item->field);
+        $approved = $item->status === 'approved';
+
+        $user->notify(new SinergiNotification(
+            title: $approved ? 'Perubahan data pegawai disetujui' : 'Perubahan data pegawai ditolak',
+            message: $approved
+                ? "Perubahan {$label} telah disetujui dan diterapkan."
+                : "Perubahan {$label} ditolak. Alasan: {$item->rejection_reason}",
+            category: 'user',
+            priority: $approved ? 'success' : 'warning',
+            actionUrl: route('guru.pegawai-changes.show', $item->changeRequest),
+            actionLabel: 'Lihat status pengajuan',
+            entityType: PegawaiChangeItem::class,
+            entityId: $item->getKey(),
+        ));
+    }
+
     public function notifyPendingAccount(User $pendingUser): void
     {
         $superAdmins = User::query()

@@ -32,6 +32,13 @@
             <span>Data Kepegawaian</span>
         </div>
     </a>
+    <a class="menu-item {{ request()->is('superadmin/data-kepegawaian*', 'superadmin/perubahan-data-kepegawaian*') ? 'active' : '' }}"
+        href="{{ route('superadmin.pegawai-changes.employees') }}">
+        <div class="menu-left">
+            <i class="bi bi-clipboard-data"></i>
+            <span>Monitoring Perubahan Pegawai</span>
+        </div>
+    </a>
 
     {{-- Master Data --}}
     <button

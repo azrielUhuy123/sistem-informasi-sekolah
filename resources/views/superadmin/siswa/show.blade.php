@@ -228,10 +228,43 @@
                             :count="$siswa->penempatan->count()"
                             count-label="riwayat"
                         >
+                            <x-slot:toolbar>
+                                <x-table.local-toolbar
+                                    search-id="searchRiwayatKelasSiswa"
+                                    search-label="Cari riwayat kelas"
+                                    search-placeholder="Cari tahun atau kelas..."
+                                    table-id="dt-superadmin-riwayat-kelas-siswa"
+                                    :column-toggle="true"
+                                    :refreshable="true"
+                                    :refresh-url="request()->fullUrl()"
+                                >
+                                    <x-slot:columnMenu>
+                                        @foreach ([
+                                            'tahun' => 'Tahun Ajaran',
+                                            'kelas' => 'Kelas',
+                                            'tanggal_masuk' => 'Tanggal Masuk',
+                                            'tanggal_keluar' => 'Tanggal Keluar',
+                                            'status' => 'Status',
+                                        ] as $column => $label)
+                                            <label class="dt-column-menu__option">
+                                                <input type="checkbox" data-dt-column="{{ $column }}" checked>
+                                                <span>{{ $label }}</span>
+                                            </label>
+                                        @endforeach
+                                    </x-slot:columnMenu>
+                                </x-table.local-toolbar>
+                            </x-slot:toolbar>
 
                             <div class="table-responsive dt-siswa-table-wrap">
 
-                                <table class="table table-hover align-middle mb-0 dt-table">
+                                <table id="dt-superadmin-riwayat-kelas-siswa" class="table table-hover align-middle mb-0 dt-table">
+                                    <colgroup>
+                                        <col data-dt-column="tahun">
+                                        <col data-dt-column="kelas">
+                                        <col data-dt-column="tanggal_masuk">
+                                        <col data-dt-column="tanggal_keluar">
+                                        <col data-dt-column="status">
+                                    </colgroup>
 
                                     <thead>
                                         <tr>

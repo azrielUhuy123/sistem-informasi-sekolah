@@ -73,16 +73,46 @@
 
                 <div id="{{ $collapseId }}" class="collapse">
                     <div class="border-top p-3">
+                        <x-table.toolbar
+                            table-id="dt-superadmin-monitoring-jadwal-{{ $slug }}"
+                            :column-toggle="true"
+                            :refreshable="true"
+                            :refresh-url="request()->fullUrl()"
+                        >
+                            <x-slot:columnMenu>
+                                @foreach ([
+                                    'class' => 'Kelas',
+                                    'rejected' => 'Total Ditolak',
+                                    'approved' => 'Total Diterima',
+                                    'status' => 'Status',
+                                    'schedule_count' => 'Jumlah Jadwal',
+                                    'action' => 'Aksi',
+                                ] as $column => $label)
+                                    <label class="dt-column-menu__option">
+                                        <input type="checkbox" data-dt-column="{{ $column }}" checked>
+                                        <span>{{ $label }}</span>
+                                    </label>
+                                @endforeach
+                            </x-slot:columnMenu>
+                        </x-table.toolbar>
                         <div class="table-responsive dt-siswa-table-wrap">
-                            <table class="table table-hover align-middle mb-0 dt-table">
+                            <table id="dt-superadmin-monitoring-jadwal-{{ $slug }}" class="table table-hover align-middle mb-0 dt-table">
+                                <colgroup>
+                                    <col data-dt-column="class">
+                                    <col data-dt-column="rejected">
+                                    <col data-dt-column="approved">
+                                    <col data-dt-column="status">
+                                    <col data-dt-column="schedule_count">
+                                    <col data-dt-column="action">
+                                </colgroup>
                                 <thead>
                                     <tr>
-                                        <th>Kelas</th>
-                                        <th width="140">Total Ditolak</th>
-                                        <th width="140">Total Diterima</th>
-                                        <th width="180">Status</th>
-                                        <th width="140">Jumlah Jadwal</th>
-                                        <th width="120">Aksi</th>
+                                        <th data-dt-column="class">Kelas</th>
+                                        <th width="140" data-dt-column="rejected">Total Ditolak</th>
+                                        <th width="140" data-dt-column="approved">Total Diterima</th>
+                                        <th width="180" data-dt-column="status">Status</th>
+                                        <th width="140" data-dt-column="schedule_count">Jumlah Jadwal</th>
+                                        <th width="120" data-dt-column="action">Aksi</th>
                                     </tr>
                                 </thead>
                                 <tbody>
@@ -116,24 +146,24 @@
                                         @endphp
 
                                         <tr>
-                                            <td>
+                                            <td data-dt-column="class">
                                                 <div class="fw-semibold">{{ $itemKelas->nama_kelas_label }}</div>
                                             </td>
-                                            <td>
+                                            <td data-dt-column="rejected">
                                                 {{ $rejected }}
                                             </td>
-                                            <td>
+                                            <td data-dt-column="approved">
                                                 {{ $approved }}
                                             </td>
-                                            <td>
+                                            <td data-dt-column="status">
                                                 @if ($status == 'published')
                                                     <span class="badge-status selesai">Publish</span>
                                                 @else ($status == 'submitted')
                                                     <span class="badge-status pending">Pending</span>                                                
                                                 @endif
                                             </td>
-                                            <td>{{ $total }}</td>
-                                            <td>
+                                            <td data-dt-column="schedule_count">{{ $total }}</td>
+                                            <td data-dt-column="action">
                                                 <a
                                                     href="{{ route('superadmin.monitoring-jadwal.show', $itemKelas->id) }}"
                                                     class="btn btn-primary btn-sm rounded-pill px-3 py-0"

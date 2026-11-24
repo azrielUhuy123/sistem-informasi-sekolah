@@ -26,6 +26,9 @@ use Barryvdh\DomPDF\Facade\Pdf;
 use Maatwebsite\Excel\Facades\Excel;
 
 use App\Enums\UserRole;
+use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Str;
+use Illuminate\Support\Facades\Password;
 
 class PendaftarController extends Controller
 {
@@ -48,6 +51,30 @@ class PendaftarController extends Controller
             'ppdb.pendaftar.show',
             compact('pendaftar')
         );
+    }
+
+    public function document(PpdbPendaftar $pendaftar, string $field)
+    {
+        abort_unless(in_array($field, [
+            'kartu_keluarga',
+            'ktp',
+            'ijazah',
+            'akta_lahir',
+            'kartu_kip',
+            'foto',
+        ], true), 404);
+
+        $path = $pendaftar->{$field};
+        abort_unless(is_string($path) && $path !== '', 404);
+        abort_unless(Storage::disk('local')->exists($path), 404);
+
+        $filename = 'ppdb-'.$pendaftar->id.'-'.$field.'.'.pathinfo($path, PATHINFO_EXTENSION);
+
+        return Storage::disk('local')->download($path, $filename, [
+            'X-Content-Type-Options' => 'nosniff',
+            'Cache-Control' => 'no-store, private',
+            'Pragma' => 'no-cache',
+        ]);
     }
 
     public function verifikasi()
@@ -415,10 +442,6 @@ class PendaftarController extends Controller
 
             $nis = $this->generateNis($pendaftar);
 
-            $password = \Carbon\Carbon::parse(
-                $pendaftar->tanggal_lahir
-            )->format('dmY');
-
             /*
             |--------------------------------------------------------------------------
             | Buat Akun User
@@ -433,15 +456,21 @@ class PendaftarController extends Controller
 
                 'username' => $nis,
 
-                'password' => Hash::make($password),
+                'password' => Hash::make(Str::random(64)),
 
                 'role' => UserRole::MURID,
 
-                'is_active' => true,
+                'is_active' => false,
 
                 'approval_status' => 'approved',
 
                 'approved_at' => now(),
+                'must_change_password' => true,
+            ]);
+
+            $resetUrl = route('password.reset', [
+                'token' => Password::createToken($user),
+                'email' => $user->email,
             ]);
 
             /*
@@ -501,7 +530,7 @@ class PendaftarController extends Controller
                     'recipient' => $pendaftar->email,
                     'student_name' => $pendaftar->nama,
                     'nis' => $nis,
-                    'initial_password' => $password,
+                    'reset_url' => $resetUrl,
                 ],
             ];
         });
@@ -524,7 +553,7 @@ class PendaftarController extends Controller
                 new PpdbDaftarUlangCredentialsMail(
                     $result['credentials']['student_name'],
                     $result['credentials']['nis'],
-                    $result['credentials']['initial_password'],
+                    $result['credentials']['reset_url'],
                 )
             );
         } catch (\Throwable $exception) {
@@ -534,8 +563,6 @@ class PendaftarController extends Controller
                 'pendaftar_id' => $pendaftar->getKey(),
                 'exception' => get_class($exception),
             ]);
-        } finally {
-            unset($result['credentials']['initial_password']);
         }
 
         $response = back()->with(

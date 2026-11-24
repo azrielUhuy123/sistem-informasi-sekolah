@@ -125,18 +125,49 @@
         subtitle="Daftar guru yang menjadi pembina ekstrakurikuler"
         :count="$pembina->count()"
     >
+        <x-slot:toolbar>
+            <x-table.local-toolbar
+                search-id="searchPembinaEkskul"
+                search-label="Cari pembina ekstrakurikuler"
+                search-placeholder="Cari guru atau ekstrakurikuler..."
+                table-id="dt-superadmin-pembina-ekskul"
+                :column-toggle="true"
+                :refreshable="true"
+                :refresh-url="request()->fullUrl()"
+            >
+                <x-slot:columnMenu>
+                    @foreach ([
+                        'number' => 'No',
+                        'teacher' => 'Nama Guru',
+                        'extracurricular' => 'Ekstrakurikuler',
+                        'action' => 'Aksi',
+                    ] as $column => $label)
+                        <label class="dt-column-menu__option">
+                            <input type="checkbox" data-dt-column="{{ $column }}" checked>
+                            <span>{{ $label }}</span>
+                        </label>
+                    @endforeach
+                </x-slot:columnMenu>
+            </x-table.local-toolbar>
+        </x-slot:toolbar>
 
         <div class="table-responsive dt-siswa-table-wrap">
 
-            <table class="table table-hover align-middle dt-table">
+            <table id="dt-superadmin-pembina-ekskul" class="table table-hover align-middle dt-table">
                 <caption class="visually-hidden">Daftar guru pembina ekstrakurikuler</caption>
+                <colgroup>
+                    <col data-dt-column="number">
+                    <col data-dt-column="teacher">
+                    <col data-dt-column="extracurricular">
+                    <col data-dt-column="action">
+                </colgroup>
 
                 <thead>
                     <tr>
-                        <x-table.heading width="70px">No</x-table.heading>
-                        <x-table.heading>Nama Guru</x-table.heading>
-                        <x-table.heading width="150px">Ekstrakurikuler</x-table.heading>
-                        <x-table.heading width="100px">Aksi</x-table.heading>
+                        <x-table.heading width="70px" column="number">No</x-table.heading>
+                        <x-table.heading column="teacher">Nama Guru</x-table.heading>
+                        <x-table.heading width="150px" column="extracurricular">Ekstrakurikuler</x-table.heading>
+                        <x-table.heading width="100px" column="action">Aksi</x-table.heading>
                     </tr>
                 </thead>
 
@@ -147,14 +178,14 @@
                         <tr>
 
                             {{-- NO --}}
-                            <td>
+                            <td data-dt-column="number">
                                 <span class="badge bg-light text-dark rounded-circle">
                                     {{ $loop->iteration }}
                                 </span>
                             </td>
 
                             {{-- GURU --}}
-                            <td>
+                            <td data-dt-column="teacher">
 
                                 <div class="d-flex align-items-center">
 
@@ -182,7 +213,7 @@
                             </td>
 
                             {{-- EKSTRAKURIKULER --}}
-                            <td>
+                            <td data-dt-column="extracurricular">
 
                                 <div class="d-flex align-items-center text-muted">
                                     <i class="bi bi-star-fill text-primary me-2"></i>                              
@@ -192,7 +223,7 @@
                             </td>
 
                             {{-- AKSI --}}
-                            <td>
+                            <td data-dt-column="action">
                                 <form
                                     action="{{ route('superadmin.pembina-ekskul.destroy', $p->id) }}"
                                     method="POST"

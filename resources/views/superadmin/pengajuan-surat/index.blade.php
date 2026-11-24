@@ -29,38 +29,66 @@
                 search-id="searchInput"
                 search-label="Cari dokumen"
                 search-placeholder="Cari dokumen..."
-            />
+                table-id="dt-superadmin-pengajuan-surat"
+                :column-toggle="true"
+                :refreshable="true"
+                :refresh-url="request()->fullUrl()"
+            >
+                <x-slot:columnMenu>
+                    @foreach ([
+                        'number' => 'No',
+                        'document' => 'Nama Dokumen',
+                        'category' => 'Kategori',
+                        'sender' => 'Pengirim',
+                        'status' => 'Status',
+                        'action' => 'Aksi',
+                    ] as $column => $label)
+                        <label class="dt-column-menu__option">
+                            <input type="checkbox" data-dt-column="{{ $column }}" checked>
+                            <span>{{ $label }}</span>
+                        </label>
+                    @endforeach
+                </x-slot:columnMenu>
+            </x-table.local-toolbar>
         </x-slot:toolbar>
 
         <div class="table-responsive dt-siswa-table-wrap">
 
-            <table class="table table-hover align-middle mb-0 dt-table">
+            <table id="dt-superadmin-pengajuan-surat" class="table table-hover align-middle mb-0 dt-table">
                 <caption class="visually-hidden">Daftar pengajuan surat, pengirim, status validasi, dan tindakan</caption>
+                <colgroup>
+                    <col data-dt-column="number">
+                    <col data-dt-column="document">
+                    <col data-dt-column="category">
+                    <col data-dt-column="sender">
+                    <col data-dt-column="status">
+                    <col data-dt-column="action">
+                </colgroup>
 
                 <thead>
                     <tr>
 
-                        <x-table.heading width="70">
+                        <x-table.heading width="70" column="number">
                             No
                         </x-table.heading>
 
-                        <x-table.heading>
+                        <x-table.heading column="document">
                             Nama Dokumen
                         </x-table.heading>
 
-                        <x-table.heading width="150">
+                        <x-table.heading width="150" column="category">
                             Kategori
                         </x-table.heading>
 
-                        <x-table.heading width="150">
+                        <x-table.heading width="150" column="sender">
                             Pengirim
                         </x-table.heading>
 
-                        <x-table.heading width="150">
+                        <x-table.heading width="150" column="status">
                             Status
                         </x-table.heading>
 
-                        <x-table.heading width="90">
+                        <x-table.heading width="90" column="action">
                             Aksi
                         </x-table.heading>
 
@@ -82,7 +110,7 @@
                         <tr>
 
                             {{-- NOMOR --}}
-                            <td>
+                            <td data-dt-column="number">
 
                                 <span class="badge bg-light text-dark rounded-circle">
                                     {{ $loop->iteration }}
@@ -91,7 +119,7 @@
                             </td>
 
                             {{-- NAMA DOKUMEN --}}
-                            <td>
+                            <td data-dt-column="document">
 
                                 <div class="d-flex align-items-center">
 
@@ -108,7 +136,7 @@
                             </td>
 
                             {{-- KATEGORI --}}
-                            <td>
+                            <td data-dt-column="category">
 
                                 <span class="badge bg-teal rounded-pill px-3 py-2">
                                     {{ $row->kategori_surat }}
@@ -117,14 +145,14 @@
                             </td>
 
                             {{-- PENGIRIM --}}
-                            <td>
+                            <td data-dt-column="sender">
 
                                 <x-table.role-badge :role="$row->pengirim" />
 
                             </td>
 
                             {{-- STATUS --}}
-                            <td>
+                            <td data-dt-column="status">
 
                                 @if($row->status == 'draft')
 
@@ -152,7 +180,7 @@
                             </td>
 
                             {{-- AKSI --}}
-                            <td>
+                            <td data-dt-column="action">
                                 <a
                                     class="btn btn-primary btn-sm rounded-pill px-3 py-0"
                                     href="{{ route('superadmin.pengajuan-surat.show', $row->id) }}"
@@ -183,35 +211,6 @@
 
 </div>
 
-{{-- SEARCH --}}
-<script>
-
-    const searchInput =
-        document.getElementById('searchInput');
-
-    searchInput.addEventListener('keyup', function () {
-
-        const keyword =
-            this.value.toLowerCase();
-
-        const rows =
-            document.querySelectorAll(
-                '#tablePengajuan tr'
-            );
-
-        rows.forEach(row => {
-
-            const text =
-                row.innerText.toLowerCase();
-
-            row.style.display =
-                text.includes(keyword)
-                    ? ''
-                    : 'none';
-
-        });
-
-    });
 
 </script>
 

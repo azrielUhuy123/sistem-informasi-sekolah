@@ -114,6 +114,14 @@
 
         <div class="table-responsive dt-siswa-table-wrap">
                 <table id="monitoring-kenaikan-table" class="table table-hover align-middle mb-0 dt-table" data-dt-table>
+                    <colgroup>
+                        <col data-dt-column="absen">
+                        <col data-dt-column="siswa">
+                        <col data-dt-column="keputusan">
+                        <col data-dt-column="catatan_wali">
+                        <col data-dt-column="status_approval">
+                        <col data-dt-column="catatan_kepsek">
+                    </colgroup>
                     <thead>
                         <tr>
                             <x-table.heading column="absen" width="70">Absen</x-table.heading>

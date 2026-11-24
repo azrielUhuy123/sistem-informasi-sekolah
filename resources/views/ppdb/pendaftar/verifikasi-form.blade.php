@@ -77,7 +77,7 @@
                                     @if($pendaftar->kartu_keluarga)
 
                                         <a
-                                            href="{{ asset('storage/'.$pendaftar->kartu_keluarga) }}"
+                                            href="{{ route('tu.ppdb.pendaftar.document', ['pendaftar' => $pendaftar, 'field' => 'kartu_keluarga']) }}"
                                             target="_blank"
                                             class="btn btn-primary btn-sm rounded-3"
                                         >
@@ -105,7 +105,7 @@
                                     @if($pendaftar->ktp)
 
                                         <a
-                                            href="{{ asset('storage/'.$pendaftar->ktp) }}"
+                                            href="{{ route('tu.ppdb.pendaftar.document', ['pendaftar' => $pendaftar, 'field' => 'ktp']) }}"
                                             target="_blank"
                                             class="btn btn-primary btn-sm rounded-3"
                                         >
@@ -133,7 +133,7 @@
                                     @if($pendaftar->ijazah)
 
                                         <a
-                                            href="{{ asset('storage/'.$pendaftar->ijazah) }}"
+                                            href="{{ route('tu.ppdb.pendaftar.document', ['pendaftar' => $pendaftar, 'field' => 'ijazah']) }}"
                                             target="_blank"
                                             class="btn btn-primary btn-sm rounded-3"
                                         >
@@ -161,7 +161,7 @@
                                     @if($pendaftar->akta_lahir)
 
                                         <a
-                                            href="{{ asset('storage/'.$pendaftar->akta_lahir) }}"
+                                            href="{{ route('tu.ppdb.pendaftar.document', ['pendaftar' => $pendaftar, 'field' => 'akta_lahir']) }}"
                                             target="_blank"
                                             class="btn btn-primary btn-sm rounded-3"
                                         >
@@ -189,7 +189,7 @@
                                     @if($pendaftar->kartu_kip)
 
                                         <a
-                                            href="{{ asset('storage/'.$pendaftar->kartu_kip) }}"
+                                            href="{{ route('tu.ppdb.pendaftar.document', ['pendaftar' => $pendaftar, 'field' => 'kartu_kip']) }}"
                                             target="_blank"
                                             class="btn btn-primary btn-sm rounded-3"
                                         >
@@ -217,7 +217,7 @@
                                     @if($pendaftar->foto)
 
                                         <a
-                                            href="{{ asset('storage/'.$pendaftar->foto) }}"
+                                            href="{{ route('tu.ppdb.pendaftar.document', ['pendaftar' => $pendaftar, 'field' => 'foto']) }}"
                                             target="_blank"
                                             class="btn btn-primary btn-sm rounded-3"
                                         >

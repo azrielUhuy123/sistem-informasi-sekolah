@@ -172,6 +172,15 @@
         <div class="table-responsive dt-siswa-table-wrap">
 
             <table id="monitoring-ekskul-schedule-table" class="table table-hover align-middle mb-0 dt-table" data-dt-table>
+                <colgroup>
+                    <col data-dt-column="nomor">
+                    <col data-dt-column="hari">
+                    <col data-dt-column="jam_mulai">
+                    <col data-dt-column="jam_selesai">
+                    <col data-dt-column="status">
+                    <col data-dt-column="bentrok">
+                    <col data-dt-column="catatan">
+                </colgroup>
 
                 <thead>
                     <tr>

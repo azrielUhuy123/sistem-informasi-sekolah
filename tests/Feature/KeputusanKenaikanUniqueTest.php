@@ -396,11 +396,20 @@ class KeputusanKenaikanUniqueTest extends TestCase
             ]);
             $this->fail('The unique business key should reject the second decision.');
         } catch (QueryException $exception) {
-            $this->assertSame(1062, (int) ($exception->errorInfo[1] ?? 0));
-            $this->assertStringContainsString(
-                'keputusan_kenaikan_siswa_tahun_unique',
-                $exception->getMessage()
-            );
+            $this->assertSame('23000', (string) ($exception->errorInfo[0] ?? ''));
+            if (DB::connection()->getDriverName() === 'sqlite') {
+                $this->assertSame(19, (int) ($exception->errorInfo[1] ?? 0));
+                $this->assertStringContainsString(
+                    'UNIQUE constraint failed: keputusan_kenaikan.siswa_id, keputusan_kenaikan.tahun_ajaran_id',
+                    $exception->getMessage()
+                );
+            } else {
+                $this->assertSame(1062, (int) ($exception->errorInfo[1] ?? 0));
+                $this->assertStringContainsString(
+                    'keputusan_kenaikan_siswa_tahun_unique',
+                    $exception->getMessage()
+                );
+            }
         }
 
         $this->assertSame(1, KeputusanKenaikan::where('siswa_id', $fixture['siswa']->id)
@@ -410,6 +419,12 @@ class KeputusanKenaikanUniqueTest extends TestCase
 
     public function test_writer_handles_a_concurrent_duplicate_insert_without_generic_error(): void
     {
+        if (DB::connection()->getDriverName() !== 'mysql') {
+            $this->markTestSkipped(
+                'This concurrency regression verifies MySQL/MariaDB duplicate-key recovery and must run on that database driver.'
+            );
+        }
+
         $fixture = $this->makeWriterFixture();
         $raceInserted = false;
         $siswaId = $fixture['siswa']->id;

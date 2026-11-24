@@ -244,9 +244,10 @@ class EkskulJadwalWorkflowTest extends TestCase
 
         $this->actingAs($fixture['guruUser'])
             ->post(route('superadmin.monitoring-ekskul.approve', $fixture['ekskul']))
-            ->assertRedirect('/guru/dashboard-gurubidang');
+            ->assertRedirect(route('guru.ekskul.dashboard'));
 
         $this->assertSame('submitted', $submitted->fresh()->status);
+        $this->get(route('guru.ekskul.dashboard'))->assertOk();
 
         $this->actingAs($fixture['superAdmin'])
             ->post(route('superadmin.monitoring-ekskul.approve', $fixture['ekskul']))

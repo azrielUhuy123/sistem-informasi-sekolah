@@ -131,17 +131,50 @@
         subtitle="Ringkasan guru beserta jumlah mata pelajaran dan kelas yang diampu"
         :count="$pengampu->count()"
     >
+        <x-slot:toolbar>
+            <x-table.local-toolbar
+                search-id="searchPengampuMapel"
+                search-label="Cari pengampu mata pelajaran"
+                search-placeholder="Cari guru atau mata pelajaran..."
+                table-id="dt-superadmin-pengampu-mapel"
+                :column-toggle="true"
+                :refreshable="true"
+                :refresh-url="request()->fullUrl()"
+            >
+                <x-slot:columnMenu>
+                    @foreach ([
+                        'number' => 'No',
+                        'teacher' => 'Guru',
+                        'subjects' => 'Mata Pelajaran',
+                        'classes' => 'Total Kelas',
+                        'action' => 'Aksi',
+                    ] as $column => $label)
+                        <label class="dt-column-menu__option">
+                            <input type="checkbox" data-dt-column="{{ $column }}" checked>
+                            <span>{{ $label }}</span>
+                        </label>
+                    @endforeach
+                </x-slot:columnMenu>
+            </x-table.local-toolbar>
+        </x-slot:toolbar>
 
         <div class="table-responsive dt-siswa-table-wrap">
-            <table class="table table-hover align-middle dt-table">
+            <table id="dt-superadmin-pengampu-mapel" class="table table-hover align-middle dt-table">
                 <caption class="visually-hidden">Ringkasan guru pengampu mata pelajaran dan kelas</caption>
+                <colgroup>
+                    <col data-dt-column="number">
+                    <col data-dt-column="teacher">
+                    <col data-dt-column="subjects">
+                    <col data-dt-column="classes">
+                    <col data-dt-column="action">
+                </colgroup>
                 <thead>
                     <tr>
-                        <x-table.heading width="70px">No</x-table.heading>
-                        <x-table.heading>Guru</x-table.heading>
-                        <x-table.heading>Mata Pelajaran</x-table.heading>
-                        <x-table.heading>Total Kelas</x-table.heading>
-                        <x-table.heading width="100px">Aksi</x-table.heading>
+                        <x-table.heading width="70px" column="number">No</x-table.heading>
+                        <x-table.heading column="teacher">Guru</x-table.heading>
+                        <x-table.heading column="subjects">Mata Pelajaran</x-table.heading>
+                        <x-table.heading column="classes">Total Kelas</x-table.heading>
+                        <x-table.heading width="100px" column="action">Aksi</x-table.heading>
                     </tr>
                 </thead>
                 <tbody>
@@ -152,8 +185,8 @@
                             $totalKelas = $assignments->pluck('kelas_id')->unique()->count();
                         @endphp
                         <tr>
-                            <td><span class="badge bg-light text-dark rounded-circle">{{ $loop->iteration }}</span></td>
-                            <td>
+                            <td data-dt-column="number"><span class="badge bg-light text-dark rounded-circle">{{ $loop->iteration }}</span></td>
+                            <td data-dt-column="teacher">
                                 <div class="d-flex align-items-center">
                                     <div class="rounded-circle bg-primary-subtle text-primary d-flex align-items-center justify-content-center me-3" style="width: 48px; height: 48px;">
                                         <i class="bi bi-person-fill fs-4"></i>
@@ -164,7 +197,7 @@
                                     </div>
                                 </div>
                             </td>
-                            <td>                            
+                            <td data-dt-column="subjects">
                                 <div class="d-flex align-items-center text-muted">
                                     <i class="bi bi-book-half text-primary me-2"></i>
                                     @foreach ($uniqueMapel as $mapelItem)
@@ -172,7 +205,7 @@
                                     @endforeach
                                 </div>
                             </td>
-                            <td>                               
+                            <td data-dt-column="classes">
                                 @if($totalKelas  == 0)
                                     <span class="badge-status selesai">
                                         0 kelas
@@ -191,7 +224,7 @@
                                     </span>
                                 @endif
                             </td>                            
-                            <td>
+                            <td data-dt-column="action">
                                 <form action="{{ route('superadmin.pengampu-mapel.destroy', $first->id) }}" method="POST">
                                     @csrf
                                     @method('DELETE')

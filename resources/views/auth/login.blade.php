@@ -328,7 +328,7 @@
             </div>
 
             <!-- Forgot -->
-            <div class="login-extra">
+            <div class="login-extra">                
                 <a href="javascript:void(0)" onclick="openHelpModal()">
                     Butuh Bantuan?
                 </a>

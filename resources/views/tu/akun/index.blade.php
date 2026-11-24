@@ -122,7 +122,7 @@
                                             <i class="bi bi-eye me-2"></i> Detail
                                         </a>
                                     </li>
-                                    @if(in_array($item->role, ['guru', 'tu', 'siswa', 'superadmin']))
+                                    @if(in_array($item->role, ['guru', 'siswa'], true))
                                         <form
                                             method="POST"
                                             action="{{ route('tu.akun.reset-password', $item) }}"
@@ -133,11 +133,11 @@
                                                 class="dropdown-item
                                                 btn-confirm"
                                                 data-title="RESET PASSWORD AKUN INI?"
-                                                data-message="Akun ini passowrdnya akan direset kembali ke tanggal lahir."
+                                                data-message="Akan membuat tautan reset satu kali yang harus diberikan kepada pemilik akun melalui kanal aman."
                                                 data-button="btn-danger"
                                             >
                                                 <i class="bi bi-key me-2"></i>
-                                                Reset Password
+                                                Buat Tautan Reset Password
                                             </button>
                                         </form>
                                     @endif

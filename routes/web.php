@@ -5,6 +5,13 @@ use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\GatewayController;
 use App\Http\Controllers\NotificationController;
 
+Route::middleware(['auth', 'approved'])->group(function () {
+    Route::get(
+        '/employee-change-items/{item}/evidence',
+        [\App\Http\Controllers\Guru\PegawaiChangeController::class, 'evidence']
+    )->name('pegawai-changes.evidence');
+});
+
 Route::middleware('auth')->group(function () {
     Route::get('/notifications', [NotificationController::class, 'index'])
         ->name('notifications.index');
@@ -53,13 +60,10 @@ Route::middleware(['auth', 'approved', 'role:guru', 'menu.route'])->group(functi
 | PROFILE (BREEZE)
 |--------------------------------------------------------------------------
 */
-Route::middleware('auth')->group(function () {
+Route::middleware(['auth', 'approved'])->group(function () {
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
+    Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
-    Route::post(
-        '/profile/update',
-        [ProfileController::class, 'updateInformasi']
-    )->name('profile.update');
 });
 
 /*

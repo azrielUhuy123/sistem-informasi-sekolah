@@ -15,6 +15,10 @@ use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
 use App\Mail\PpdbPendaftaranMail;
 use Illuminate\Support\Facades\URL;
+use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Password;
+use Illuminate\Support\Str;
+use App\Mail\PpdbDaftarUlangTokenMail;
 
 
 class PublicController extends Controller
@@ -184,7 +188,7 @@ class PublicController extends Controller
                 'foto' => 'ppdb/foto',
             ] as $field => $directory) {
                 if ($request->hasFile($field)) {
-                    $uploadedFiles[$field] = $request->file($field)->store($directory, 'public');
+                    $uploadedFiles[$field] = $request->file($field)->store($directory, 'local');
                 }
             }
 
@@ -375,6 +379,12 @@ class PublicController extends Controller
             ]
         );
 
+        $buktiUrl = URL::temporarySignedRoute(
+            'ppdb.bukti',
+            now()->addDays(7),
+            ['no' => $pendaftar->no_pendaftaran]
+        );
+
         $emailSent = $this->sendPpdbEmail($pendaftar, $statusUrl);
 
         if ($pendaftar->status === 'pending') {
@@ -390,10 +400,7 @@ class PublicController extends Controller
             }
         }
 
-        $response = redirect()->route(
-            'ppdb.bukti',
-            $pendaftar->no_pendaftaran
-        );
+        $response = redirect($buktiUrl);
 
         if (!$emailSent) {
             $response->with(
@@ -446,7 +453,7 @@ class PublicController extends Controller
                 ->withInput()
                 ->with(
                     'error',
-                    'Nomor pendaftaran atau tanggal lahir tidak sesuai.'
+                    'Data tidak dapat diverifikasi. Gunakan tautan status yang dikirim melalui email atau hubungi sekolah.'
                 );
         }
 
@@ -503,92 +510,99 @@ class PublicController extends Controller
     )
     {
         $request->validate([
-                'no_pendaftaran' => ['required', 'string'],
-                'tanggal_lahir' => ['required', 'date'],
+            'no_pendaftaran' => ['required', 'string', 'max:100'],
+            'tanggal_lahir' => ['required', 'date'],
+            'email' => ['required', 'email', 'max:255'],
         ]);
 
-            $noPendaftaran = $request->input('no_pendaftaran');
-            $tanggalLahir = $request->input('tanggal_lahir');
-
-            $updated = DB::transaction(function () use ($noPendaftaran, $tanggalLahir) {
-            $updated = PpdbPendaftar::where(
-                'no_pendaftaran',
-                    $noPendaftaran
-                )
-                ->whereDate(
-                    'tanggal_lahir',
-                    $tanggalLahir
-            )
-            ->where(
-                'status',
-                'diterima'
-            )
+        $pendaftar = PpdbPendaftar::query()
+            ->where('no_pendaftaran', $request->input('no_pendaftaran'))
+            ->whereDate('tanggal_lahir', $request->input('tanggal_lahir'))
+            ->where('email', $request->input('email'))
+            ->where('status', 'diterima')
             ->where(function ($query) {
-                $query
-                    ->whereNull('status_daftar_ulang')
+                $query->whereNull('status_daftar_ulang')
                     ->orWhere('status_daftar_ulang', '!=', 'sudah');
             })
-            ->update([
-                'status_daftar_ulang' => 'sudah',
-                'tanggal_daftar_ulang' => now(),
+            ->first();
+
+        if ($pendaftar) {
+            $token = Str::random(48);
+            $pendaftar->update([
+                'daftar_ulang_token_hash' => hash('sha256', $token),
+                'daftar_ulang_token_expires_at' => now()->addMinutes(30),
+                'daftar_ulang_token_used_at' => null,
             ]);
 
-            if ($updated > 0) {
-                $pendaftar = PpdbPendaftar::where(
-                    'no_pendaftaran',
-                    $noPendaftaran
+            Mail::to($pendaftar->email)->send(
+                new PpdbDaftarUlangTokenMail(
+                    $pendaftar,
+                    route('ppdb.daftar-ulang.token', ['token' => $token])
                 )
-                ->whereDate(
-                    'tanggal_lahir',
-                    $tanggalLahir
-                )
-                ->where('status', 'diterima')
-                ->where('status_daftar_ulang', 'sudah')
-                ->firstOrFail();
-
-                app(BusinessNotificationService::class)
-                    ->notifyPpdbDaftarUlangSubmitted($pendaftar);
-            }
-
-            return $updated;
-        });
-
-        if ($updated === 0) {
-            $alreadyConfirmed = PpdbPendaftar::where(
-                'no_pendaftaran',
-                $noPendaftaran
-            )
-            ->whereDate(
-                'tanggal_lahir',
-                $tanggalLahir
-            )
-            ->where(
-                'status',
-                'diterima'
-            )
-            ->where(
-                'status_daftar_ulang',
-                'sudah'
-            )
-            ->exists();
-
-            if ($alreadyConfirmed) {
-                return back()->with(
-                    'error',
-                    'Daftar ulang sudah pernah dikonfirmasi.'
-                );
-            }
-
-            return back()->withInput()->with(
-                'error',
-                'Nomor pendaftaran atau tanggal lahir tidak sesuai, atau pendaftar belum memenuhi syarat daftar ulang.'
             );
         }
 
         return back()->with(
             'success',
-            'Daftar ulang berhasil'
+            'Jika data cocok, tautan daftar ulang satu kali dikirim melalui email yang terdaftar.'
         );
+    }
+
+    public function daftarUlangTokenForm(string $token)
+    {
+        $hash = hash('sha256', $token);
+        $pendaftar = PpdbPendaftar::query()
+            ->where('daftar_ulang_token_hash', $hash)
+            ->where('status', 'diterima')
+            ->where('daftar_ulang_token_used_at', null)
+            ->where('daftar_ulang_token_expires_at', '>', now())
+            ->first();
+
+        abort_unless($pendaftar, 404, 'Tautan daftar ulang tidak valid atau telah kedaluwarsa.');
+
+        return view('ppdb.public.daftar-ulang-token', [
+            'pendaftar' => $pendaftar,
+            'token' => $token,
+        ]);
+    }
+
+    public function konfirmasiDaftarUlangToken(Request $request, string $token)
+    {
+        $hash = hash('sha256', $token);
+
+        $updated = DB::transaction(function () use ($hash) {
+            $pendaftar = PpdbPendaftar::query()
+                ->where('daftar_ulang_token_hash', $hash)
+                ->where('status', 'diterima')
+                ->where('daftar_ulang_token_used_at', null)
+                ->where('daftar_ulang_token_expires_at', '>', now())
+                ->lockForUpdate()
+                ->first();
+
+            if (! $pendaftar) {
+                return false;
+            }
+
+            $pendaftar->update([
+                'status_daftar_ulang' => 'sudah',
+                'tanggal_daftar_ulang' => now(),
+                'daftar_ulang_token_used_at' => now(),
+                'daftar_ulang_token_hash' => null,
+            ]);
+
+            app(BusinessNotificationService::class)
+                ->notifyPpdbDaftarUlangSubmitted($pendaftar);
+
+            return true;
+        });
+
+        if (! $updated) {
+            return redirect()->route('ppdb.daftar-ulang')
+                ->with('error', 'Tautan daftar ulang tidak valid, telah kedaluwarsa, atau sudah digunakan.');
+        }
+
+        return redirect()->route('ppdb.daftar-ulang')
+            ->with('success', 'Daftar ulang berhasil dikonfirmasi.');
     }
 
     public function statusByLink(PpdbPendaftar $pendaftar)

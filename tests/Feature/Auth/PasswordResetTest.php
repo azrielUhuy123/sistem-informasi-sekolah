@@ -121,30 +121,16 @@ class PasswordResetTest extends TestCase
         Notification::assertNothingSent();
     }
 
-    public function test_student_reset_link_and_submission_are_rejected(): void
+    public function test_students_cannot_request_a_public_password_reset_link(): void
     {
         Notification::fake();
         $user = $this->makeStudentUser();
 
-        Password::sendResetLink(['email' => $user->email]);
+        $this->post(route('password.email'), ['email' => $user->email])
+            ->assertSessionHasErrors('email');
 
-        Notification::assertSentTo($user, ResetPassword::class, function ($notification) use ($user) {
-            $this->get(route('password.reset', [
-                'token' => $notification->token,
-                'email' => $user->email,
-            ]))
-                ->assertRedirect(route('password.request'))
-                ->assertSessionHasErrors('email');
-
-            $this->post(route('password.store'), [
-                'token' => $notification->token,
-                'email' => $user->email,
-                'password' => 'new-password-123',
-                'password_confirmation' => 'new-password-123',
-            ])->assertSessionHasErrors('email');
-
-            return true;
-        });
+        Notification::assertNothingSent();
+        $this->assertDatabaseMissing('password_reset_tokens', ['email' => $user->email]);
     }
 
     public function test_expired_reset_token_is_rejected(): void

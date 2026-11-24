@@ -37,17 +37,42 @@
                     'value' => $item->kategori_surat,
                     'label' => $item->kategori_surat,
                 ])->all()"
+                :column-toggle="true"
+                :refreshable="true"
+                :refresh-url="request()->fullUrl()"
             >
-                <x-slot:controls>
-                    <label class="visually-hidden" for="searchInput">Cari dokumen pada daftar yang ditampilkan</label>
-                    <input
-                        type="text"
-                        id="searchInput"
-                        class="form-control table-search"
-                        placeholder="Cari Dokumen..."
-                        aria-label="Cari dokumen pada daftar yang ditampilkan"
-                    >
-                </x-slot:controls>
+                <x-slot:searchControl>
+                    <div class="dt-toolbar__search">
+                        <label
+                            class="visually-hidden"
+                            for="searchInput"
+                        >
+                            Cari dokumen pada daftar yang ditampilkan
+                        </label>
+                        <i class="bi bi-search dt-toolbar__search-icon" aria-hidden="true"></i>
+                        <input
+                            type="text"
+                            id="searchInput"
+                            class="form-control dt-toolbar__control table-search"
+                            placeholder="Cari Dokumen..."
+                            aria-label="Cari dokumen pada daftar yang ditampilkan"
+                            data-dt-local-search
+                        >
+                    </div>
+                </x-slot:searchControl>
+                <x-slot:columnMenu>
+                    @foreach ([
+                        'number' => 'No',
+                        'name' => 'Nama Dokumen',
+                        'category' => 'Kategori',
+                        'action' => 'Aksi',
+                    ] as $column => $label)
+                        <label class="dt-column-menu__option">
+                            <input type="checkbox" data-dt-column="{{ $column }}" checked>
+                            <span>{{ $label }}</span>
+                        </label>
+                    @endforeach
+                </x-slot:columnMenu>
             </x-table.toolbar>
         </x-slot:toolbar>
 
@@ -61,22 +86,28 @@
 
             <table id="dt-superadmin-dokumen" class="table table-hover align-middle mb-0 dt-table">
                 <caption class="visually-hidden">Arsip template dokumen sekolah dan tautan unduhan</caption>
+                <colgroup>
+                    <col data-dt-column="number">
+                    <col data-dt-column="name">
+                    <col data-dt-column="category">
+                    <col data-dt-column="action">
+                </colgroup>
 
                 <thead>
                     <tr>
-                        <x-table.heading width="70">
+                        <x-table.heading width="70" column="number">
                             No
                         </x-table.heading>
 
-                        <x-table.heading>
+                        <x-table.heading column="name">
                             Nama Dokumen
                         </x-table.heading>
 
-                        <x-table.heading width="170">
+                        <x-table.heading width="170" column="category">
                             Kategori
                         </x-table.heading>
 
-                        <x-table.heading width="120">
+                        <x-table.heading width="120" column="action">
                             Aksi
                         </x-table.heading>
                     </tr>
@@ -89,14 +120,14 @@
                         <tr>
 
                             {{-- NOMOR --}}
-                            <td>
+                            <td data-dt-column="number">
                                 <span class="badge bg-light text-dark rounded-circle">
                                     {{ $loop->iteration }}
                                 </span>
                             </td>
 
                             {{-- NAMA DOKUMEN --}}
-                            <td>
+                            <td data-dt-column="name">
 
                                 <div class="d-flex align-items-center">
 
@@ -120,7 +151,7 @@
                             </td>
 
                             {{-- KATEGORI --}}
-                            <td>
+                            <td data-dt-column="category">
 
                                 @if($row->kategori_surat)
 
@@ -139,7 +170,7 @@
                             </td>
 
                             {{-- AKSI --}}
-                            <td>
+                            <td data-dt-column="action">
 
                                 <a
                                     href="{{ asset('uploads/dokumen/' . $row->file) }}"
@@ -175,34 +206,5 @@
 
 </div>
 
-{{-- SEARCH --}}
-<script>
-
-    const searchInput =
-        document.getElementById('searchInput');
-
-    searchInput.addEventListener('keyup', function () {
-
-        const keyword =
-            this.value.toLowerCase();
-
-        const rows =
-            document.querySelectorAll('#tableDokumen tr');
-
-        rows.forEach(row => {
-
-            const text =
-                row.innerText.toLowerCase();
-
-            row.style.display =
-                text.includes(keyword)
-                ? ''
-                : 'none';
-
-        });
-
-    });
-
-</script>
 
 @endsection

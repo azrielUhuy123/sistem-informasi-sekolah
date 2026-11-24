@@ -4,8 +4,9 @@ namespace App\Http\Controllers\Tu;
 
 use App\Http\Controllers\Controller;
 use App\Models\User;
+use App\Services\PegawaiChangeWorkflow;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Password;
 
 class AkunController extends Controller
 {
@@ -47,58 +48,43 @@ class AkunController extends Controller
         );
     }
 
-    public function resetPassword(User $user)
+    public function resetPassword(Request $request, User $user, PegawaiChangeWorkflow $workflow)
     {
-        $tanggalLahir = null;
+        $workflow->assertActiveOperator($request->user(), 'operator.accounts');
 
-        if ($user->role == 'guru' || $user->role == 'tu' || $user->role == 'superadmin') {
+        abort_unless(in_array($user->role, ['guru', 'siswa'], true), 403);
+        abort_unless($user->approval_status === 'approved', 409, 'Akun harus disetujui sebelum reset password.');
 
-            $tanggalLahir = optional($user->pegawai)->tanggal_lahir;
-
-        }
-
-        if ($user->role == 'siswa') {
-
-            $tanggalLahir = optional($user->siswa)->tanggal_lahir;
-
-        }
-
-        if (!$tanggalLahir) {
-
-            return back()->with(
-                'error',
-                'Tanggal lahir tidak ditemukan.'
-            );
-
-        }
-
-        $password = \Carbon\Carbon::parse($tanggalLahir)
-            ->format('dmY');
-
-        $user->update([
-            'password' => Hash::make($password)
+        $token = Password::createToken($user);
+        $resetUrl = route('password.reset', [
+            'token' => $token,
+            'email' => $user->email,
         ]);
 
-        return back()->with(
-            'success',
-            'Password berhasil direset.'
-        );
+        return response()
+            ->view('tu.akun.password-reset-link', compact('resetUrl', 'user'))
+            ->header('Cache-Control', 'no-store, private')
+            ->header('Pragma', 'no-cache')
+            ->header('Referrer-Policy', 'no-referrer')
+            ->header('X-Robots-Tag', 'noindex, nofollow');
     }
 
-    public function toggleStatus(
-        User $user
-    )
+    public function toggleStatus(Request $request, User $user, PegawaiChangeWorkflow $workflow)
     {
-        $user->update([
+        $workflow->assertActiveOperator($request->user(), 'operator.accounts');
 
-            'is_active'
-                => !$user->is_active
+        abort_unless(in_array($user->role, ['guru', 'siswa'], true), 403);
 
-        ]);
+        if (! $user->is_active) {
+            abort_unless(
+                $user->approval_status === 'approved' && ! $user->must_change_password,
+                409,
+                'Akun harus disetujui dan menyelesaikan aktivasi sebelum diaktifkan.'
+            );
+        }
 
-        return back()->with(
-            'success',
-            'Status akun berhasil diubah'
-        );
+        $user->update(['is_active' => ! $user->is_active]);
+
+        return back()->with('success', 'Status akun berhasil diubah');
     }
 }

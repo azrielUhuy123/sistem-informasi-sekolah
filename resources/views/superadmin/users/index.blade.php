@@ -18,7 +18,12 @@
         count-label="user"
     >
         <x-slot:toolbar>
-            <x-table.toolbar table-id="dt-superadmin-users-table" :column-toggle="true">
+            <x-table.toolbar
+                table-id="dt-superadmin-users-table"
+                :column-toggle="true"
+                :refreshable="true"
+                :refresh-url="request()->fullUrl()"
+            >
                 <x-slot:columnMenu>
                     @foreach ([
                         'name' => 'Nama',
@@ -37,6 +42,12 @@
 
         <div class="table-responsive dt-siswa-table-wrap">
             <table id="dt-superadmin-users-table" class="table table-hover align-middle dt-table">
+                <colgroup>
+                    <col data-dt-column="name">
+                    <col data-dt-column="email">
+                    <col data-dt-column="role">
+                    <col data-dt-column="action">
+                </colgroup>
                 <thead>
                     <tr>
                         <x-table.heading column="name">Nama</x-table.heading>

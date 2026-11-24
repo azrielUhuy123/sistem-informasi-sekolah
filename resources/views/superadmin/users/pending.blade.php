@@ -25,7 +25,12 @@
     >
 
         <x-slot:toolbar>
-            <x-table.toolbar table-id="dt-superadmin-users-pending-table" :column-toggle="true">
+            <x-table.toolbar
+                table-id="dt-superadmin-users-pending-table"
+                :column-toggle="true"
+                :refreshable="true"
+                :refresh-url="request()->fullUrl()"
+            >
                 <x-slot:columnMenu>
                     @foreach ([
                         'number' => 'No',
@@ -47,6 +52,14 @@
         <div class="table-responsive dt-siswa-table-wrap">
 
             <table id="dt-superadmin-users-pending-table" class="table table-hover align-middle mb-0 dt-table">
+                <colgroup>
+                    <col data-dt-column="number">
+                    <col data-dt-column="user">
+                    <col data-dt-column="role">
+                    <col data-dt-column="status">
+                    <col data-dt-column="registered">
+                    <col data-dt-column="action">
+                </colgroup>
 
                 <thead>
                     <tr>

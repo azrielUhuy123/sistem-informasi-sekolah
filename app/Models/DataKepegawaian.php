@@ -70,6 +70,7 @@ class DataKepegawaian extends Model
 
         'masa_kerja_golongan' => 'integer',
         'masa_kerja_keseluruhan' => 'integer',
+        'pengalaman_tahun' => 'integer',
         'jam_mengajar' => 'integer',
 
         'gaji_pokok' => 'decimal:2',
@@ -95,5 +96,10 @@ class DataKepegawaian extends Model
     public function penugasans()
     {
         return $this->hasMany(Penugasan::class, 'data_kepegawaian_id');
+    }
+
+    public function pegawaiChangeRequests()
+    {
+        return $this->hasMany(PegawaiChangeRequest::class, 'data_kepegawaian_id');
     }
 }

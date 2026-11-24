@@ -145,15 +145,42 @@
                                     data-bs-parent="#accordionTingkat{{ $tingkatKey }}"
                                 >
                                     <div class="border-top p-3">
+                                        <x-table.local-toolbar
+                                            search-id="search-jadwal-final-{{ $k->id }}"
+                                            :searchable="false"
+                                            table-id="dt-superadmin-jadwal-final-{{ $k->id }}"
+                                            :column-toggle="true"
+                                            :refreshable="true"
+                                            :refresh-url="request()->fullUrl()"
+                                        >
+                                            <x-slot:columnMenu>
+                                                <label class="dt-column-menu__option">
+                                                    <input type="checkbox" data-dt-column="time" checked>
+                                                    <span>Jam</span>
+                                                </label>
+                                                @foreach($hariList as $hari)
+                                                    <label class="dt-column-menu__option">
+                                                        <input type="checkbox" data-dt-column="day-{{ $hari->id }}" checked>
+                                                        <span>{{ $hari->nama }}</span>
+                                                    </label>
+                                                @endforeach
+                                            </x-slot:columnMenu>
+                                        </x-table.local-toolbar>
                                         <div class="table-responsive">
-                                            <table class="table table-hover align-middle text-center mb-0">
+                                            <table id="dt-superadmin-jadwal-final-{{ $k->id }}" class="table table-hover align-middle text-center mb-0">
+                                                <colgroup>
+                                                    <col data-dt-column="time">
+                                                    @foreach($hariList as $hari)
+                                                        <col data-dt-column="day-{{ $hari->id }}">
+                                                    @endforeach
+                                                </colgroup>
                                                 <thead>
                                                     <tr>
-                                                        <th class="text-center" width="150">
+                                                        <th class="text-center" width="150" data-dt-column="time">
                                                             Jam
                                                         </th>
                                                         @foreach($hariList as $hari)
-                                                            <th>
+                                                            <th data-dt-column="day-{{ $hari->id }}">
                                                                 {{ $hari->nama }}
                                                             </th>
                                                         @endforeach
@@ -162,7 +189,7 @@
                                                 <tbody>
                                                     @foreach($jamList as $jamPelajaran)
                                                         <tr>
-                                                            <td class="fw-bold text-primary">
+                                                            <td class="fw-bold text-primary" data-dt-column="time">
                                                                 {{ substr($jamPelajaran->mulai,0,5) }}
                                                                 -
                                                                 {{ substr($jamPelajaran->selesai,0,5) }}
@@ -175,7 +202,7 @@
                                                                         ->where('jam_pelajaran_id', $jamPelajaran->id)
                                                                         ->first();
                                                                 @endphp
-                                                                <td style="min-width:220px;">
+                                                                <td style="min-width:220px;" data-dt-column="day-{{ $hari->id }}">
                                                                     @if($jadwal)
                                                                         <div class="schedule-card">
                                                                             <div class="schedule-mapel">

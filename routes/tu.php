@@ -29,6 +29,7 @@ use App\Http\Controllers\Tu\NomorSuratTuController;
 use App\Http\Controllers\Tu\EkskulController;
 use App\Http\Controllers\Tu\AkunController;
 use App\Http\Controllers\Tu\JadwalFinalController;
+use App\Http\Controllers\Tu\PegawaiChangeVerificationController;
 
 /*
 |--------------------------------------------------------------------------
@@ -37,6 +38,7 @@ use App\Http\Controllers\Tu\JadwalFinalController;
 */
 Route::middleware([
         'auth',
+        'approved',
         'role:guru',
         'tu.mode',
         'menu.route',
@@ -293,6 +295,15 @@ Route::middleware([
         Route::get('/datakepegawaian/{id}/detail',
             [DataKepegawaianController::class, 'show'])
             ->name('datakepegawaian.detail');
+
+        Route::get('/pegawai/perubahan', [PegawaiChangeVerificationController::class, 'index'])
+            ->name('pegawai-changes.index');
+        Route::get('/pegawai/perubahan/{pegawaiChangeRequest}', [PegawaiChangeVerificationController::class, 'show'])
+            ->name('pegawai-changes.show');
+        Route::patch('/pegawai/perubahan/item/{item}/approve', [PegawaiChangeVerificationController::class, 'approve'])
+            ->name('pegawai-changes.approve');
+        Route::patch('/pegawai/perubahan/item/{item}/reject', [PegawaiChangeVerificationController::class, 'reject'])
+            ->name('pegawai-changes.reject');
 
         Route::patch('/datakepegawaian/{id}/read-message',[DataKepegawaianController::class, 'readMessage'])
             ->name('datakepegawaian.read-message');

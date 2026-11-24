@@ -124,16 +124,43 @@
     @if ($view == 'grid')
     <div class="card border-0 shadow-sm overflow-hidden">
         <div class="card-body">
+            <x-table.local-toolbar
+                search-id="search-monitoring-jadwal-grid"
+                :searchable="false"
+                table-id="monitoring-jadwal-grid-table"
+                :column-toggle="true"
+                :refreshable="true"
+                :refresh-url="request()->fullUrl()"
+            >
+                <x-slot:columnMenu>
+                    <label class="dt-column-menu__option">
+                        <input type="checkbox" data-dt-column="jam" checked>
+                        <span>Jam</span>
+                    </label>
+                    @foreach ($haris as $hari)
+                        <label class="dt-column-menu__option">
+                            <input type="checkbox" data-dt-column="hari-{{ $hari->id }}" checked>
+                            <span>{{ $hari->nama }}</span>
+                        </label>
+                    @endforeach
+                </x-slot:columnMenu>
+            </x-table.local-toolbar>
             {{-- TABLE --}}
             <div class="table-responsive dt-siswa-table-wrap">
-                <table class="table table-bordered align-middle text-center modern-grid-table mb-0">
+                <table id="monitoring-jadwal-grid-table" class="table table-bordered align-middle text-center modern-grid-table mb-0">
+                    <colgroup>
+                        <col data-dt-column="jam">
+                        @foreach ($haris as $hari)
+                            <col data-dt-column="hari-{{ $hari->id }}">
+                        @endforeach
+                    </colgroup>
                     <thead>
                         <tr class="table-header">
-                            <th>
+                            <th data-dt-column="jam">
                                 Jam
                             </th>
                             @foreach ($haris as $hari)
-                                <th>
+                                <th data-dt-column="hari-{{ $hari->id }}">
                                     {{ $hari->nama }}
                                 </th>
                             @endforeach
@@ -143,7 +170,7 @@
                         @foreach ($jams as $jam)
                             <tr>
                                 {{-- JAM --}}
-                                <td class="bg-light fw-semibold">
+                                <td class="bg-light fw-semibold" data-dt-column="jam">
                                     <strong>
                                         Jam {{ $jam->jam_ke }}
                                     </strong>
@@ -163,7 +190,7 @@
                                             $bgColor = '#dc3545'; // bentrok
                                         }
                                     @endphp
-                                    <td style="min-width: 140px;">
+                                    <td style="min-width: 140px;" data-dt-column="hari-{{ $hari->id }}">
                                         @if ($item)
                                             <div class="text-white rounded-4 py-2 px-4"
                                                 style="background: {{ $bgColor }};"
@@ -262,6 +289,14 @@
             </x-slot:toolbar>
             <div class="table-responsive dt-siswa-table-wrap">
                 <table id="monitoring-jadwal-detail-table" class="table table-hover align-middle mb-0 dt-table" data-dt-table>
+                    <colgroup>
+                        <col data-dt-column="hari">
+                        <col data-dt-column="jam">
+                        <col data-dt-column="guru">
+                        <col data-dt-column="mapel">
+                        <col data-dt-column="status">
+                        <col data-dt-column="monitoring">
+                    </colgroup>
                     <thead>
                         <tr>
                             <x-table.heading column="hari" width="120">Hari</x-table.heading>

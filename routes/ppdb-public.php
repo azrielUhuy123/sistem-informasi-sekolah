@@ -30,7 +30,7 @@ Route::prefix('ppdb')
         Route::get(
             '/bukti/{no}',
             [PublicController::class, 'bukti']
-        )->where('no', '.*')->name('bukti');
+        )->where('no', '.*')->middleware('signed')->name('bukti');
 
         Route::get(
             '/status',
@@ -40,7 +40,7 @@ Route::prefix('ppdb')
         Route::post(
             '/status',
             [PublicController::class, 'cekStatus']
-        )->name('status.cek');
+        )->middleware('throttle:5,1')->name('status.cek');
 
         Route::get(
             '/daftar-ulang',
@@ -51,6 +51,16 @@ Route::prefix('ppdb')
             '/daftar-ulang',
             [PublicController::class, 'simpanDaftarUlang']
         )->name('daftar-ulang.simpan');
+
+        Route::get(
+            '/daftar-ulang/token/{token}',
+            [PublicController::class, 'daftarUlangTokenForm']
+        )->name('daftar-ulang.token');
+
+        Route::post(
+            '/daftar-ulang/token/{token}',
+            [PublicController::class, 'konfirmasiDaftarUlangToken']
+        )->middleware('throttle:10,1')->name('daftar-ulang.token.simpan');
 
         Route::get(
             '/status/{pendaftar}',

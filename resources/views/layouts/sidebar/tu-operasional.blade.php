@@ -110,6 +110,10 @@
         <a class="menu-item" href="{{ route('tu.datakepegawaian.index') }}">
             <div class="menu-left"><i class="bi bi-people-fill"></i><span>Data Kepegawaian</span></div>
         </a>
+        <a class="menu-item {{ request()->is('tu/pegawai/perubahan*') ? 'active' : '' }}"
+            href="{{ route('tu.pegawai-changes.index') }}">
+            <div class="menu-left"><i class="bi bi-person-check"></i><span>Verifikasi Perubahan</span></div>
+        </a>
     @endif
 
     @if($canAccounts)

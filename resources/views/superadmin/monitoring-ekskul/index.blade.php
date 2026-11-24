@@ -50,6 +50,12 @@
         <div class="table-responsive dt-siswa-table-wrap">
 
             <table id="monitoring-ekskul-table" class="table table-hover align-middle mb-0 dt-table" data-dt-table>
+                <colgroup>
+                    <col data-dt-column="nomor">
+                    <col data-dt-column="ekskul">
+                    <col data-dt-column="pembina">
+                    <col data-dt-column="aksi">
+                </colgroup>
 
                 <thead>
                     <tr>

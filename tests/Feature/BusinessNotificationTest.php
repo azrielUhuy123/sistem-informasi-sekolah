@@ -18,6 +18,7 @@ use App\Models\TahunAjaran;
 use App\Models\User;
 use App\Models\WaliKelas;
 use App\Mail\PpdbPendaftaranMail;
+use App\Mail\PpdbDaftarUlangTokenMail;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\DB;
@@ -390,7 +391,14 @@ class BusinessNotificationTest extends TestCase
         $this->post(route('ppdb.daftar-ulang.simpan'), [
             'no_pendaftaran' => $pendaftar->no_pendaftaran,
             'tanggal_lahir' => '2018-01-01',
-        ])->assertRedirect()->assertSessionHas('success', 'Daftar ulang berhasil');
+            'email' => $pendaftar->email,
+        ])->assertRedirect()->assertSessionHas('success');
+        Mail::assertSent(PpdbDaftarUlangTokenMail::class, 1);
+        $tokenMail = Mail::sent(PpdbDaftarUlangTokenMail::class)[0];
+        $token = basename(parse_url($tokenMail->actionUrl, PHP_URL_PATH));
+        $this->post(route('ppdb.daftar-ulang.token.simpan', ['token' => $token]))
+            ->assertRedirect(route('ppdb.daftar-ulang'))
+            ->assertSessionHas('success', 'Daftar ulang berhasil dikonfirmasi.');
 
         $pendaftar->refresh();
         $this->assertSame('sudah', $pendaftar->status_daftar_ulang);
@@ -412,7 +420,7 @@ class BusinessNotificationTest extends TestCase
         ];
         $this->assertNotification($firstTu, $expected);
         $this->assertNotification($secondTu, $expected);
-        Mail::assertNothingSent();
+        Mail::assertSent(PpdbDaftarUlangTokenMail::class, 1);
     }
 
     public function test_already_completed_daftar_ulang_retry_does_not_create_another_notification(): void
@@ -421,10 +429,13 @@ class BusinessNotificationTest extends TestCase
         $tu = $this->makeUser('tu');
         $pendaftar = $this->makeAcceptedPendaftar($tahun, 'sudah');
 
+        Mail::fake();
         $this->post(route('ppdb.daftar-ulang.simpan'), [
             'no_pendaftaran' => $pendaftar->no_pendaftaran,
             'tanggal_lahir' => '2018-01-01',
-        ])->assertRedirect()->assertSessionHas('error', 'Daftar ulang sudah pernah dikonfirmasi.');
+            'email' => $pendaftar->email,
+        ])->assertRedirect()->assertSessionHas('success');
+        Mail::assertNothingSent();
 
         $this->assertSame(0, $tu->notifications()->count());
     }
@@ -436,10 +447,16 @@ class BusinessNotificationTest extends TestCase
         $otherTu = $this->makeUser('tu');
         $pendaftar = $this->makeAcceptedPendaftar($tahun);
 
+        Mail::fake();
         $this->post(route('ppdb.daftar-ulang.simpan'), [
             'no_pendaftaran' => $pendaftar->no_pendaftaran,
             'tanggal_lahir' => '2018-01-01',
+            'email' => $pendaftar->email,
         ])->assertRedirect()->assertSessionHas('success');
+        $tokenMail = Mail::sent(PpdbDaftarUlangTokenMail::class)[0];
+        $token = basename(parse_url($tokenMail->actionUrl, PHP_URL_PATH));
+        $this->post(route('ppdb.daftar-ulang.token.simpan', ['token' => $token]))
+            ->assertSessionHas('success');
 
         $notification = $recipient->notifications()->sole();
         $this->assertNull($otherTu->notifications()->find($notification->getKey()));
@@ -573,6 +590,7 @@ class BusinessNotificationTest extends TestCase
             'kecamatan' => 'Test district',
             'kabupaten' => 'Test regency',
             'provinsi' => 'Test province',
+            'email' => 'ppdb-daftar-ulang-' . bin2hex(random_bytes(4)) . '@example.test',
         ]);
     }
 

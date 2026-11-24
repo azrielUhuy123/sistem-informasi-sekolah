@@ -13,7 +13,9 @@ class MataPelajaranController extends Controller
      */
     public function index(Request $request)
     {
-        $deleted = $request->query('deleted', 'active');
+        $deletedValues = $request->input('deleted', []);
+        $deletedValues = is_array($deletedValues) ? $deletedValues : ($request->filled('deleted') ? [$request->deleted] : []);
+        $deleted = in_array('active', $deletedValues, true) ? 'active' : $request->query('deleted', 'active');
 
         if ($deleted === '') {
             $deleted = 'all';

@@ -20,19 +20,6 @@ class NewPasswordController extends Controller
      */
     public function create(Request $request): View|RedirectResponse
     {
-        $email = $request->query('email');
-
-        if (
-            is_string($email)
-            && User::where('email', $email)->where('role', 'siswa')->exists()
-        ) {
-            return redirect()->route('password.request')
-                ->withInput(['email' => $email])
-                ->withErrors([
-                    'email' => 'Siswa yang lupa password harus menghubungi TU/operator.',
-                ]);
-        }
-
         return view('auth.reset-password', ['request' => $request]);
     }
 
@@ -49,12 +36,6 @@ class NewPasswordController extends Controller
             'password' => ['required', 'confirmed', Rules\Password::defaults()],
         ]);
 
-        if (User::where('email', $request->input('email'))->where('role', 'siswa')->exists()) {
-            return back()->withInput($request->only('email'))->withErrors([
-                'email' => 'Siswa yang lupa password harus menghubungi TU/operator.',
-            ]);
-        }
-
         // Here we will attempt to reset the user's password. If it is successful we
         // will update the password on an actual user model and persist it to the
         // database. Otherwise we will parse the error and return the response.
@@ -64,6 +45,11 @@ class NewPasswordController extends Controller
                 $user->forceFill([
                     'password' => Hash::make($request->password),
                     'remember_token' => Str::random(60),
+                    'must_change_password' => false,
+                    'is_active' => $user->must_change_password
+                        && $user->approval_status === 'approved'
+                            ? true
+                            : $user->is_active,
                 ])->save();
 
                 event(new PasswordReset($user));

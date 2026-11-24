@@ -5,6 +5,7 @@ use App\Http\Controllers\Guru\DashboardGuruBidangController;
 use App\Http\Controllers\Guru\PengajuanJadwalController;
 use App\Http\Controllers\Guru\JadwalSayaController;
 use App\Http\Controllers\Guru\StatusValidasiController;
+use App\Http\Controllers\Guru\PegawaiChangeController;
 use App\Http\Controllers\Guru\DokumenGuruController;
 use App\Http\Controllers\Guru\PengajuanSuratController;
 use App\Http\Controllers\Guru\NomorSuratGuruController;
@@ -31,14 +32,28 @@ use Illuminate\Support\Facades\Auth;
 
 Route::prefix('guru')
     ->name('guru.')
-    ->middleware(['auth', 'role:guru', 'guru.mode', 'menu.route'])
+    ->middleware(['auth', 'approved', 'role:guru'])
+    ->group(function () {
+        Route::get('/pegawai/perubahan', [PegawaiChangeController::class, 'index'])
+            ->name('pegawai-changes.index');
+        Route::get('/pegawai/perubahan/create', [PegawaiChangeController::class, 'create'])
+            ->name('pegawai-changes.create');
+        Route::post('/pegawai/perubahan', [PegawaiChangeController::class, 'store'])
+            ->name('pegawai-changes.store');
+        Route::get('/pegawai/perubahan/{pegawaiChangeRequest}', [PegawaiChangeController::class, 'show'])
+            ->name('pegawai-changes.show');
+    });
+
+Route::prefix('guru')
+    ->name('guru.')
+    ->middleware(['auth', 'approved', 'role:guru', 'guru.mode', 'menu.route'])
     ->group(function () {
 
         Route::get(
             '/dashboard-gurubidang',
             [DashboardGuruBidangController::class, 'index']
         )->middleware('feature:guru.academic')->name('dashboard-gurubidang');
-        
+
         Route::get(
             '/switch-mode/{mode}',
             function ($mode) {

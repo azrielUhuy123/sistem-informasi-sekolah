@@ -28,11 +28,13 @@ class SiswaController extends Controller
             });
         }
 
-        if ($request->status == 'aktif') {
+        $statuses = $request->input('status', []);
+        $statuses = is_array($statuses) ? $statuses : ($request->filled('status') ? [$request->status] : []);
+        $hasAktif = in_array('aktif', $statuses, true);
+        $hasNonaktif = in_array('nonaktif', $statuses, true);
+        if ($hasAktif && ! $hasNonaktif) {
             $query->whereNull('deleted_at');
-        }
-
-        if ($request->status == 'nonaktif') {
+        } elseif ($hasNonaktif && ! $hasAktif) {
             $query->onlyTrashed();
         }
 

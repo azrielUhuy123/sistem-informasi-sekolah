@@ -25,14 +25,24 @@ use App\Http\Controllers\SuperAdmin\SiswaController;
 use App\Http\Controllers\SuperAdmin\KenaikanKelasController;
 use App\Http\Controllers\SuperAdmin\FeatureAccessController;
 use App\Http\Controllers\SuperAdmin\ManajemenPenugasanController;
+use App\Http\Controllers\SuperAdmin\PegawaiChangeMonitoringController;
 
-Route::middleware(['auth', 'role:superadmin'])
+Route::middleware(['auth', 'approved', 'role:superadmin'])
     ->prefix('superadmin')
     ->name('superadmin.')
     ->group(function () {
 
         Route::get('/dashboard', [DashboardController::class, 'index'])
             ->name('dashboard');
+
+        Route::get('/data-kepegawaian', [PegawaiChangeMonitoringController::class, 'employees'])
+            ->name('pegawai-changes.employees');
+        Route::get('/data-kepegawaian/{pegawai}/perubahan', [PegawaiChangeMonitoringController::class, 'employee'])
+            ->name('pegawai-changes.employee');
+        Route::get('/perubahan-data-kepegawaian', [PegawaiChangeMonitoringController::class, 'index'])
+            ->name('pegawai-changes.index');
+        Route::get('/perubahan-data-kepegawaian/{pegawaiChangeRequest}', [PegawaiChangeMonitoringController::class, 'show'])
+            ->name('pegawai-changes.show');
 
         Route::get('/users', [UserController::class, 'index'])
             ->name('users.index');

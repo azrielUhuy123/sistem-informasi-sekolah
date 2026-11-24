@@ -11,10 +11,18 @@
             && isset($criterion['name'], $criterion['label'])
     )->values();
 
-    $activeCriteria = $validCriteria->filter(
-        fn ($criterion) => is_scalar($criterion['value'] ?? null)
-            && filled($criterion['value'])
-    )->values();
+    $activeCriteria = collect();
+    foreach ($validCriteria as $criterion) {
+        $values = is_array($criterion['value'] ?? null)
+            ? array_values(array_filter($criterion['value'], 'filled'))
+            : (filled($criterion['value'] ?? null) ? [$criterion['value']] : []);
+        foreach ($values as $value) {
+            $chip = $criterion;
+            $chip['value'] = $value;
+            $chip['removeValue'] = $value;
+            $activeCriteria->push($chip);
+        }
+    }
 
     $clearParameters = $validCriteria->pluck('name')->unique()->all();
     $clearAllQuery = request()->query();
@@ -37,8 +45,15 @@
         @foreach ($activeCriteria as $criterion)
             @php
                 $query = request()->query();
-                if (array_key_exists('removeValue', $criterion)) {
-                    $query[$criterion['name']] = $criterion['removeValue'];
+                $requestValues = request()->query($criterion['name']);
+                if (is_array($requestValues)) {
+                    $query[$criterion['name']] = array_values(array_filter(
+                        $requestValues,
+                        fn ($value) => (string) $value !== (string) $criterion['removeValue']
+                    ));
+                    if ($query[$criterion['name']] === []) {
+                        unset($query[$criterion['name']]);
+                    }
                 } else {
                     unset($query[$criterion['name']]);
                 }

@@ -13,12 +13,10 @@ class DokumenSuperAdminController extends Controller
         $query = Dokumen::where('jenis_dokumen', 'sekolah');
 
         // FILTER KATEGORI
-        if ($request->kategori) {
-
-            $query->where(
-                'kategori_surat',
-                $request->kategori
-            );
+        $kategoriValues = $request->input('kategori', []);
+        $kategoriValues = is_array($kategoriValues) ? $kategoriValues : ($request->filled('kategori') ? [$request->kategori] : []);
+        if (count($kategoriValues) > 0) {
+            $query->whereIn('kategori_surat', $kategoriValues);
         }
 
         // DATA DOKUMEN

@@ -20,6 +20,10 @@ class MasterAkademikAwalSeederTest extends TestCase
 
     public function test_master_academic_seeder_is_idempotent_and_creates_only_requested_master_data(): void
     {
+        $kelasCountBefore = Kelas::withTrashed()->count();
+        $siswaCountBefore = Siswa::withTrashed()->count();
+        $penempatanCountBefore = PenempatanSiswa::count();
+        $ppdbCountBefore = PpdbPendaftar::count();
         $this->seed(MasterAkademikAwalSeeder::class);
         $this->seed(MasterAkademikAwalSeeder::class);
 
@@ -45,9 +49,9 @@ class MasterAkademikAwalSeederTest extends TestCase
             ]);
         }
 
-        $this->assertSame(0, Kelas::withTrashed()->count());
-        $this->assertSame(0, Siswa::withTrashed()->count());
-        $this->assertSame(0, PenempatanSiswa::count());
-        $this->assertSame(0, PpdbPendaftar::count());
+        $this->assertSame($kelasCountBefore, Kelas::withTrashed()->count());
+        $this->assertSame($siswaCountBefore, Siswa::withTrashed()->count());
+        $this->assertSame($penempatanCountBefore, PenempatanSiswa::count());
+        $this->assertSame($ppdbCountBefore, PpdbPendaftar::count());
     }
 }

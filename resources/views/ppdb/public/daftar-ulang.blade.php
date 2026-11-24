@@ -105,9 +105,7 @@
                     @endif
 
                     <div class="alert alert-info">
-
-                        Masukkan nomor pendaftaran dan tanggal lahir anak sesuai data pendaftaran PPDB.
-
+                        Masukkan nomor pendaftaran, tanggal lahir, dan email terdaftar. Tautan konfirmasi satu kali akan dikirim melalui email.
                     </div>
 
                     <form
@@ -153,12 +151,24 @@
 
                         </div>
 
+                        <div class="mb-4">
+                            <label for="email" class="form-label">Email Terdaftar</label>
+                            <input
+                                type="email"
+                                id="email"
+                                name="email"
+                                class="form-control form-control-lg"
+                                value="{{ old('email') }}"
+                                required
+                            >
+                        </div>
+
                         <button
                             type="submit"
                             class="btn btn-primary btn-lg w-100"
                         >
 
-                            Konfirmasi Daftar Ulang
+                            Kirim Tautan Daftar Ulang
 
                         </button>
 

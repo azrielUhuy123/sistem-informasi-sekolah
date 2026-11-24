@@ -20,24 +20,54 @@
         :count="$waliKelas->count()"
     >
 
-        <x-slot:pageActions>
-            <x-button.add
-                :href="route('superadmin.wali-kelas.create')"
-                label="Assign Wali Kelas"
-            />
-        </x-slot:pageActions>
+        <x-slot:toolbar>
+            <x-table.toolbar
+                table-id="dt-superadmin-wali-kelas"
+                :column-toggle="true"
+                :refreshable="true"
+                :refresh-url="request()->fullUrl()"
+            >
+                <x-slot:actions>
+                    <x-button.add
+                        :href="route('superadmin.wali-kelas.create')"
+                        label="Assign Wali Kelas"
+                    />
+                </x-slot:actions>
+                <x-slot:columnMenu>
+                    @foreach ([
+                        'number' => 'No',
+                        'teacher' => 'Nama Guru',
+                        'class' => 'Kelas',
+                        'academic_year' => 'Tahun Ajaran',
+                        'action' => 'Aksi',
+                    ] as $column => $label)
+                        <label class="dt-column-menu__option">
+                            <input type="checkbox" data-dt-column="{{ $column }}" checked>
+                            <span>{{ $label }}</span>
+                        </label>
+                    @endforeach
+                </x-slot:columnMenu>
+            </x-table.toolbar>
+        </x-slot:toolbar>
 
         <div class="table-responsive dt-siswa-table-wrap">
-            <table class="table table-hover align-middle dt-table">
+            <table id="dt-superadmin-wali-kelas" class="table table-hover align-middle dt-table">
                 <caption class="visually-hidden">Daftar guru yang ditugaskan sebagai wali kelas</caption>
+                <colgroup>
+                    <col data-dt-column="number">
+                    <col data-dt-column="teacher">
+                    <col data-dt-column="class">
+                    <col data-dt-column="academic_year">
+                    <col data-dt-column="action">
+                </colgroup>
 
                 <thead>
                     <tr>
-                        <x-table.heading width="70px">No</x-table.heading>
-                        <x-table.heading>Nama Guru</x-table.heading>
-                        <x-table.heading>Kelas</x-table.heading>
-                        <x-table.heading width="220px">Tahun Ajaran</x-table.heading>
-                        <x-table.heading width="130px">Aksi</x-table.heading>
+                        <x-table.heading width="70px" column="number">No</x-table.heading>
+                        <x-table.heading column="teacher">Nama Guru</x-table.heading>
+                        <x-table.heading column="class">Kelas</x-table.heading>
+                        <x-table.heading width="220px" column="academic_year">Tahun Ajaran</x-table.heading>
+                        <x-table.heading width="130px" column="action">Aksi</x-table.heading>
                     </tr>
                 </thead>
 
@@ -48,14 +78,14 @@
                         <tr>
 
                             {{-- NO --}}
-                            <td>
+                            <td data-dt-column="number">
                                 <span class="badge bg-light text-dark rounded-circle">
                                     {{ $loop->iteration }}
                                 </span>
                             </td>
 
                             {{-- GURU --}}
-                            <td>
+                            <td data-dt-column="teacher">
                                 <div class="d-flex align-items-center">
 
                                     <div
@@ -81,14 +111,14 @@
                             </td>
 
                             {{-- KELAS --}}
-                            <td> 
+                            <td data-dt-column="class">
                                 <div class="fw-bold border text-label text-center bg-light rounded-3 px-2 py-2">
                                     {{ $item->kelas->nama_kelas_label ?? '-' }}
                                 </div>
                             </td>
 
                             {{-- TAHUN AJARAN --}}
-                            <td>
+                            <td data-dt-column="academic_year">
 
                                 @if($item->tahunAjaran)
 
@@ -109,7 +139,7 @@
                             </td>
 
                             {{-- AKSI --}}
-                            <td>
+                            <td data-dt-column="action">
 
                                 <form
                                     action="{{ route('superadmin.wali-kelas.destroy', $item->id) }}"

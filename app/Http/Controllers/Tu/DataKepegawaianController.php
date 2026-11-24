@@ -6,21 +6,23 @@ use App\Http\Controllers\Controller;
 use App\Models\DataKepegawaian;
 use App\Models\User;
 use App\Services\BusinessNotificationService;
+use App\Services\PegawaiChangeWorkflow;
 use App\Models\Guru;
 use App\Models\PembinaEkskul;
 use App\Models\PengampuMapel;
 use App\Models\WaliKelas;
 use Illuminate\Support\Facades\Hash;
-use Carbon\Carbon;
 use App\Enums\UserRole;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Str;
 
 class DataKepegawaianController extends Controller
 {
     // LIST DATA
-    public function index()
+    public function index(Request $request, PegawaiChangeWorkflow $workflow)
     {
+        $workflow->assertActiveOperator($request->user());
         $data = DataKepegawaian::orderBy('created_at', 'asc')->get();
 
         $belumApprove = DataKepegawaian::whereIn('approval_status', [
@@ -35,14 +37,16 @@ class DataKepegawaianController extends Controller
     }
 
     // FORM TAMBAH
-    public function create()
+    public function create(Request $request, PegawaiChangeWorkflow $workflow)
     {
+        $workflow->assertActiveOperator($request->user());
         return view('tu.datakepegawaian.create');
     }
 
     // SIMPAN DATA BARU
-    public function store(Request $request)
+    public function store(Request $request, PegawaiChangeWorkflow $workflow)
 {
+    $workflow->assertActiveOperator($request->user());
     $validated = $this->validateData($request);
 
     // NORMALISASI GAJI
@@ -64,25 +68,28 @@ class DataKepegawaianController extends Controller
 }
 
     // DETAIL DATA
-    public function show($id)
+    public function show(Request $request, PegawaiChangeWorkflow $workflow, $id)
     {
+        $workflow->assertActiveOperator($request->user());
         $pegawai = DataKepegawaian::findOrFail($id);
         return view('tu.datakepegawaian.detail', compact('pegawai'));
     }
 
     // FORM EDIT
-    public function edit($id)
+    public function edit(Request $request, PegawaiChangeWorkflow $workflow, $id)
     {
+        $workflow->assertActiveOperator($request->user());
         $pegawai = DataKepegawaian::findOrFail($id);
         return view('tu.datakepegawaian.edit', compact('pegawai'));
     }
 
     // UPDATE DATA
-   public function update(Request $request, $id)
+   public function update(Request $request, PegawaiChangeWorkflow $workflow, $id)
 {
+    $workflow->assertActiveOperator($request->user());
     $pegawai = DataKepegawaian::findOrFail($id);
 
-    $validated = $this->validateData($request);
+    $validated = $this->validateAdministrativeData($request);
 
     // NORMALISASI GAJI
     if ($request->filled('gaji_pokok')) {
@@ -112,8 +119,9 @@ class DataKepegawaianController extends Controller
 }
 
     // HAPUS DATA
-    public function destroy($id)
+    public function destroy(Request $request, PegawaiChangeWorkflow $workflow, $id)
     {
+        $workflow->assertActiveOperator($request->user());
         $pegawai = DataKepegawaian::with([
             'guru.waliKelas',
             'guru.pengampuMapel',
@@ -133,12 +141,14 @@ class DataKepegawaianController extends Controller
         );
 
         if (
+            $pegawai->pegawaiChangeRequests()->exists()
+            ||
             $pegawai->penugasans()->where('status', '!=', 'draft')->exists()
             || $hasLegacyAssignmentHistory
         ) {
             return back()->with(
                 'error',
-                'Pegawai dengan riwayat penugasan tidak dapat dihapus.'
+                'Pegawai dengan riwayat perubahan atau penugasan tidak dapat dihapus.'
             );
         }
 
@@ -197,7 +207,7 @@ class DataKepegawaianController extends Controller
         return $request->validate([
             // IDENTITAS
             'nama' => 'required|string|max:255',
-            'nip' => 'nullable|string|max:50',
+            'nip' => 'nullable|string|max:50|unique:data_kepegawaian,nip',
             'nuptk' => 'nullable|string|max:50',
             'tempat_lahir' => 'nullable|string|max:100',
             'tanggal_lahir' => 'nullable|date',
@@ -242,6 +252,30 @@ class DataKepegawaianController extends Controller
         ]);
     }
 
+    private function validateAdministrativeData(Request $request): array
+    {
+        return $request->validate([
+            'jabatan' => ['nullable', 'string', 'max:100'],
+            'status_kepegawaian' => ['nullable', 'in:PNS,NON_PNS'],
+            'mulai_kerja' => ['nullable', 'date'],
+            'sk_terakhir_no' => ['nullable', 'string', 'max:100'],
+            'sk_terakhir_tmt' => ['nullable', 'date'],
+            'sk_berkala_no' => ['nullable', 'string', 'max:100'],
+            'sk_berkala_tmt' => ['nullable', 'date'],
+            'sk_terakhir_pangkat' => ['nullable', 'string', 'max:50'],
+            'sk_berkala_pangkat' => ['nullable', 'string', 'max:50'],
+            'masa_kerja_gol_th' => ['nullable', 'integer', 'min:0'],
+            'masa_kerja_gol_bln' => ['nullable', 'integer', 'min:0', 'max:11'],
+            'masa_kerja_total_th' => ['nullable', 'integer', 'min:0'],
+            'masa_kerja_total_bln' => ['nullable', 'integer', 'min:0', 'max:11'],
+            'mengajar_kelas' => ['nullable', 'string', 'max:100'],
+            'jam_mengajar' => ['nullable', 'integer', 'min:0'],
+            'gaji_pokok' => ['nullable', 'numeric', 'min:0'],
+            'tugas_tambahan' => ['nullable', 'string', 'max:255'],
+            'keterangan' => ['nullable', 'string'],
+        ]);
+    }
+
     public function approval()
     {
         $data = DataKepegawaian::where('approval_status', 'pending')
@@ -272,8 +306,10 @@ class DataKepegawaianController extends Controller
             'success' => true
         ]);
     }
-    public function createAccount(DataKepegawaian $pegawai)
+    public function createAccount(Request $request, DataKepegawaian $pegawai, PegawaiChangeWorkflow $workflow)
     {
+        $workflow->assertActiveOperator($request->user());
+
         if ($pegawai->approval_status !== 'approved') {
 
             return back()->with(
@@ -292,20 +328,23 @@ class DataKepegawaianController extends Controller
 
         }
 
-        $jabatan = strtolower((string) $pegawai->jabatan);
+        abort_if(
+            str_contains(strtolower((string) $pegawai->jabatan), 'kepala sekolah'),
+            403,
+            'Akun Kepala Sekolah harus disiapkan oleh Superadmin.'
+        );
 
-        $role = str_contains($jabatan, 'kepala sekolah')
-            ? UserRole::SUPERADMIN
-            : UserRole::GURU;
-
-        $password = Carbon::parse(
-            $pegawai->tanggal_lahir
-        )->format('Ymd');
-
-        $user = DB::transaction(function () use ($pegawai, $role, $password) {
+        $user = DB::transaction(function () use ($pegawai) {
             $lockedEmployee = DataKepegawaian::query()
                 ->lockForUpdate()
                 ->findOrFail($pegawai->id);
+
+            abort_unless($lockedEmployee->approval_status === 'approved', 409, 'Pegawai belum disetujui.');
+            abort_if(
+                str_contains(strtolower((string) $lockedEmployee->jabatan), 'kepala sekolah'),
+                403,
+                'Akun Kepala Sekolah harus disiapkan oleh Superadmin.'
+            );
 
             if ($lockedEmployee->user) {
                 return null;
@@ -316,15 +355,14 @@ class DataKepegawaianController extends Controller
                 'name' => $lockedEmployee->nama,
                 'email' => 'pegawai'.$lockedEmployee->id.'@internal.local',
                 'username' => $lockedEmployee->nip,
-                'password' => Hash::make($password),
-                'role' => $role,
+                'password' => Hash::make(Str::random(64)),
+                'role' => UserRole::GURU,
                 'approval_status' => 'pending',
                 'is_active' => false,
+                'must_change_password' => true,
             ]);
 
-            if ($role === UserRole::GURU) {
-                Guru::firstOrCreate(['data_kepegawaian_id' => $lockedEmployee->id]);
-            }
+            Guru::firstOrCreate(['data_kepegawaian_id' => $lockedEmployee->id]);
 
             return $user;
         });

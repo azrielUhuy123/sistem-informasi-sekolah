@@ -8,6 +8,7 @@ use App\Http\Controllers\PPDB\PendaftarController;
 
 Route::middleware([
         'auth',
+        'approved',
         'role:guru',
         'menu.route'
     ])
@@ -57,6 +58,12 @@ Route::middleware([
             '/pendaftar/{pendaftar}',
             [PendaftarController::class, 'show']
         )->name('pendaftar.show');
+
+        Route::get(
+            '/pendaftar/{pendaftar}/dokumen/{field}',
+            [PendaftarController::class, 'document']
+        )->whereIn('field', ['kartu_keluarga', 'ktp', 'ijazah', 'akta_lahir', 'kartu_kip', 'foto'])
+            ->name('pendaftar.document');
 
                         Route::get('/excel', [PendaftarController::class,'excel'])
                     ->name('excel');

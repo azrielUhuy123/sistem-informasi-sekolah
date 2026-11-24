@@ -92,7 +92,7 @@ class TahunAjaranSemesterTransitionTest extends TestCase
         $this->from('/tu/tahun')
             ->post('/tu/tahun/lanjut-semester')
             ->assertRedirect('/tu/tahun')
-            ->assertSessionHas('success', fn (string $message) => str_contains($message, 'mismatch Angkatan: 1'));
+            ->assertSessionHas('success', fn (string $message) => str_contains($message, 'ketidaksesuaian Angkatan: 1'));
 
         $this->assertNull($fixture['placement']->fresh()->tanggal_keluar);
         $this->assertSame(

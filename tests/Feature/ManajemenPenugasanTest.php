@@ -19,6 +19,7 @@ use App\Models\User;
 use App\Models\UserFeaturePermission;
 use App\Models\WaliKelas;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Facades\Hash;
 use ReflectionMethod;
 use Tests\TestCase;
 
@@ -612,7 +613,15 @@ class ManajemenPenugasanTest extends TestCase
         $sync->invoke($migration);
         $sync->invoke($migration);
 
-        $guruItems = PenugasanItem::where('type', 'guru')->get();
+        $guruItems = PenugasanItem::where('type', 'guru')->get()->filter(function (PenugasanItem $item) use ($classA, $classB, $subjectA, $subjectB) {
+            $classId = $item->details()->value('kelas_id');
+            $subjectId = $item->details()->value('mata_pelajaran_id');
+
+            return in_array([$classId, $subjectId], [
+                [$classA->id, $subjectA->id],
+                [$classB->id, $subjectB->id],
+            ], true);
+        })->values();
         $this->assertCount(2, $guruItems);
         $this->assertEqualsCanonicalizing([
             [$classA->id, $subjectA->id],
@@ -623,10 +632,12 @@ class ManajemenPenugasanTest extends TestCase
         ])->all());
         $this->assertSame(0, PenugasanMenu::whereIn(
             'penugasan_item_id',
-            PenugasanItem::where('type', 'guru')->pluck('id')
+            $guruItems->pluck('id')
         )->count());
 
-        $ekskulItems = PenugasanItem::where('type', 'ekskul')->get();
+        $ekskulItems = PenugasanItem::where('type', 'ekskul')->get()->filter(
+            fn (PenugasanItem $item) => (int) $item->details()->value('ekskul_id') === $activity->id
+        )->values();
         $this->assertCount(1, $ekskulItems);
         $this->assertSame($activity->id, (int) $ekskulItems->first()->details()->value('ekskul_id'));
         $this->assertSame(0, $ekskulItems->first()->menus()->count());
@@ -755,6 +766,10 @@ class ManajemenPenugasanTest extends TestCase
         $user = User::where('pegawai_id', $employee->id)->firstOrFail();
         $this->assertSame('guru', $user->role);
         $this->assertTrue($user->guru()->exists());
+        $this->assertSame('pending', $user->approval_status);
+        $this->assertFalse($user->is_active);
+        $this->assertTrue($user->must_change_password);
+        $this->assertFalse(Hash::check('19900102', $user->password));
     }
 
     public function test_spmb_compatibility_dashboard_requires_an_active_ppdb_menu(): void

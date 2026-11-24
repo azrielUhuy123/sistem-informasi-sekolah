@@ -15,6 +15,27 @@ use App\Models\PpdbPendaftar;
 
 class ProfileController extends Controller
 {
+    public function edit(Request $request): View
+    {
+        return view('profile.edit', [
+            'user' => $request->user(),
+        ]);
+    }
+
+    public function update(ProfileUpdateRequest $request): RedirectResponse
+    {
+        $user = $request->user();
+        $user->fill($request->validated());
+
+        if ($user->isDirty('email')) {
+            $user->email_verified_at = null;
+        }
+
+        $user->save();
+
+        return Redirect::route('profile.edit')->with('status', 'profile-updated');
+    }
+
     /**
      * Display the user's profile form.
      */
@@ -145,46 +166,6 @@ class ProfileController extends Controller
     }
 
     /**
-     * Update the user's profile information.
-     */
-    public function updateInformasi(
-        Request $request
-    )
-    {
-        $request->validate([
-
-            'email' =>
-                'nullable|email',
-
-            'telepon' =>
-                'nullable|string|max:30',
-
-            'alamat' =>
-                'nullable|string|max:1000',
-        ]);
-
-        $user = Auth::user();
-        /** @var \App\Models\User $user */
-
-        $user->update([
-
-            'email' =>
-                $request->email,
-
-            'telepon' =>
-                $request->telepon,
-
-            'alamat' =>
-                $request->alamat,
-        ]);
-
-        return back()->with(
-            'success',
-            'Profil berhasil diperbarui'
-        );
-    }
-
-    /**
      * Update detail profile guru.
      */
     public function updateDetail(Request $request): RedirectResponse
@@ -279,111 +260,25 @@ class ProfileController extends Controller
         |--------------------------------------------------------------------------
         */
 
-        $request->validate([
-            'nama'                 => 'required|string|max:255',
-            'email'                => 'nullable|email|max:255',
+        abort_unless($user->role === 'guru' && $user->guru && $user->pegawai, 403);
 
-            'nip'                  => 'nullable|string|max:255',
-            'nuptk'                => 'nullable|string|max:255',
-            'tempat_lahir'         => 'nullable|string|max:255',
-            'tanggal_lahir'        => 'nullable|date',
+        $validated = $request->validate([
+            'email' => ['nullable', 'email', 'max:255', 'unique:users,email,'.$user->id],
+        ]);
 
-            'jabatan'              => 'nullable|string|max:255',
-            'status_kepegawaian'   => 'nullable|string|max:255',
-            'ijazah_terakhir'      => 'nullable|string|max:255',
-            'mengajar_kelas'       => 'nullable|string|max:255',
-            'pengalaman_tahun'     => 'nullable|integer',
-            'gaji_pokok'           => 'nullable|numeric',
-
-            'agama'                => 'nullable|string|max:100',
-            'jenis_kelamin'        => 'nullable|in:L,P',
-            'status_kawin'         => 'nullable|in:K,TK',
-
-            'sk_terakhir_pangkat'  => 'nullable|string|max:255',
-            'sk_terakhir_no'       => 'nullable|string|max:255',
-            'sk_terakhir_tmt'      => 'nullable|date',
-
-            'sk_berkala_pangkat'   => 'nullable|string|max:255',
-            'sk_berkala_no'        => 'nullable|string|max:255',
-        'sk_berkala_tmt'       => 'nullable|date',
-
-        'mulai_kerja'          => 'nullable|date',
-
-        'masa_kerja_gol_th'    => 'nullable|integer',
-        'masa_kerja_gol_bln'   => 'nullable|integer',
-
-        'masa_kerja_total_th'  => 'nullable|integer',
-        'masa_kerja_total_bln' => 'nullable|integer',
-
-        'jam_mengajar'         => 'nullable|integer',
-        'tugas_tambahan'       => 'nullable|string|max:255',
-
-        'nomor_sertifikasi'    => 'nullable|string|max:255',
-        'tahun_sertifikasi'    => 'nullable|digits:4',
-
-        'keterangan'           => 'nullable|string',
-    ]);
-
-    if (!$user->guru || !$user->guru->pegawai) {
-        return back()->with(
-            'error',
-            'Data kepegawaian tidak ditemukan.'
-        );
-    }
-
-    $pegawai = $user->guru->pegawai;
-
-    $pegawai->update($request->only([
-        'nama',
-        'nip',
-        'nuptk',
-        'tempat_lahir',
-        'tanggal_lahir',
-
-        'jabatan',
-        'status_kepegawaian',
-        'ijazah_terakhir',
-        'mengajar_kelas',
-        'pengalaman_tahun',
-        'gaji_pokok',
-
-        'agama',
-        'jenis_kelamin',
-        'status_kawin',
-
-        'sk_terakhir_pangkat',
-        'sk_terakhir_no',
-        'sk_terakhir_tmt',
-
-        'sk_berkala_pangkat',
-        'sk_berkala_no',
-        'sk_berkala_tmt',
-
-        'mulai_kerja',
-
-        'masa_kerja_gol_th',
-        'masa_kerja_gol_bln',
-        'masa_kerja_total_th',
-        'masa_kerja_total_bln',
-
-        'jam_mengajar',
-        'tugas_tambahan',
-
-        'nomor_sertifikasi',
-        'tahun_sertifikasi',
-
-        'keterangan',
-    ]));
-
-    $user->update([
-        'email' => $request->email,
-    ]);
+        if (array_key_exists('email', $validated)) {
+            $user->email = $validated['email'];
+            if ($user->isDirty('email')) {
+                $user->email_verified_at = null;
+            }
+            $user->save();
+        }
 
     return redirect()
         ->route('guru.profile.detail')
         ->with(
             'success',
-            'Profil berhasil diperbarui.'
+            'Email profil berhasil diperbarui. Perubahan data kepegawaian diajukan melalui menu Perubahan Data Pegawai.'
         );
 }
 

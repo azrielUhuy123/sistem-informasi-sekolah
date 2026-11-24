@@ -12,6 +12,21 @@ use Illuminate\Support\Facades\DB;
 
 class UserApprovalController extends Controller
 {
+    private function assertActiveActor(): void
+    {
+        $actor = User::query()->find(Auth::id());
+
+        abort_unless(
+            $actor
+                && $actor->role === 'superadmin'
+                && $actor->approval_status === 'approved'
+                && $actor->is_active
+                && ! $actor->must_change_password,
+            403,
+            'Akun Kepala Sekolah tidak aktif atau belum disetujui.'
+        );
+    }
+
     /**
      * Tampilkan user yang menunggu approval
      */
@@ -66,6 +81,8 @@ class UserApprovalController extends Controller
 
     public function approve(User $user)
     {
+            $this->assertActiveActor();
+            abort_if($user->getKey() === Auth::id(), 403, 'Tidak boleh memproses akun sendiri.');
             DB::transaction(function () use ($user) {
                 $user = User::whereKey($user->getKey())
                     ->lockForUpdate()
@@ -76,7 +93,7 @@ class UserApprovalController extends Controller
                     'approval_status' => 'approved',
                     'approved_at'      => now(),
                     'approved_by'      => Auth::id(),
-                    'is_active'        => true,
+                    'is_active'        => ! $user->must_change_password,
                 ]);
 
                 if (
@@ -106,6 +123,8 @@ class UserApprovalController extends Controller
     
     public function reject(User $user)
     {
+        $this->assertActiveActor();
+        abort_if($user->getKey() === Auth::id(), 403, 'Tidak boleh memproses akun sendiri.');
         $user->update([
             'approval_status' => 'rejected',
             'is_active'       => false,
@@ -117,6 +136,8 @@ class UserApprovalController extends Controller
 
     public function block(User $user)
     {
+        $this->assertActiveActor();
+        abort_if($user->getKey() === Auth::id(), 403, 'Tidak boleh memblokir akun sendiri.');
         $user->update([
             'is_active' => false
         ]);
@@ -127,6 +148,14 @@ class UserApprovalController extends Controller
 
     public function unblock(User $user)
     {
+        $this->assertActiveActor();
+        abort_if($user->getKey() === Auth::id(), 403, 'Tidak boleh mengaktifkan akun sendiri.');
+        abort_unless(
+            $user->approval_status === 'approved' && ! $user->must_change_password,
+            409,
+            'Akun harus disetujui dan menyelesaikan aktivasi sebelum diaktifkan.'
+        );
+
         $user->update([
             'is_active' => true
         ]);
