@@ -23,13 +23,11 @@
                 :refreshable="true"
                 :refresh-url="request()->fullUrl()"
             >
-                <x-slot:navigation>
-                    <div class="nav nav-pills gap-1" role="tablist">
-                        <a class="nav-link" role="tab" aria-selected="false" href="{{ route('superadmin.pegawai-changes.employees') }}">Data Pegawai</a>
-                        <a class="nav-link" role="tab" aria-selected="false" href="{{ route('superadmin.datakepegawaian.approval') }}">Pegawai Baru</a>
-                        <a class="nav-link active" role="tab" aria-selected="true" href="{{ route('superadmin.pegawai-changes.index') }}">Perubahan Data</a>
-                    </div>
-                </x-slot:navigation>
+                <div class="nav nav-pills gap-1" role="tablist">
+                    <a class="btn btn-outline-secondary dt-toolbar__button" role="tab" aria-selected="true" href="{{ route('superadmin.pegawai-changes.employees') }}">Data Pegawai</a>
+                    <a class="btn btn-outline-secondary dt-toolbar__button" role="tab" aria-selected="false" href="{{ route('superadmin.datakepegawaian.approval') }}">Pegawai Baru</a>
+                    <a class="btn btn-primary dt-toolbar__button" role="tab" aria-selected="false" href="{{ route('superadmin.pegawai-changes.index') }}">Perubahan Data</a>
+                </div>  
                 <x-slot:columnMenu>
                     @foreach ([
                         'created' => 'Tanggal',
@@ -55,7 +53,7 @@
                 <col data-dt-column="status">
                 <col data-dt-column="action">
             </colgroup>
-            <thead><tr><th data-dt-column="created">Tanggal</th><th data-dt-column="employee">Pegawai</th><th data-dt-column="items">Jumlah item</th><th data-dt-column="status">Status</th><th data-dt-column="action"></th></tr></thead>
+            <thead><tr><th data-dt-column="created">Tanggal</th><th data-dt-column="employee">Pegawai</th><th data-dt-column="items">Jumlah item</th><th data-dt-column="status">Status</th><th data-dt-column="action">Aksi</th></tr></thead>
             <tbody>
                 @forelse ($requests as $changeRequest)
                     <tr>
@@ -63,7 +61,7 @@
                         <td data-dt-column="employee">{{ $changeRequest->pegawai->nama }}</td>
                         <td data-dt-column="items">{{ $changeRequest->items->count() }}</td>
                         <td data-dt-column="status">{{ str_replace('_', ' ', ucfirst($changeRequest->status)) }}</td>
-                        <td data-dt-column="action"><a href="{{ route('superadmin.pegawai-changes.show', $changeRequest) }}">Pantau</a></td>
+                        <td data-dt-column="action"><a class="btn btn-sm btn-outline-primary dt-siswa-detail" href="{{ route('superadmin.pegawai-changes.show', $changeRequest) }}">Pantau <i class="bi bi-activity"></i></a></td>
                     </tr>
                 @empty
                     <x-table.empty :colspan="5" title="Belum ada pengajuan perubahan data." />

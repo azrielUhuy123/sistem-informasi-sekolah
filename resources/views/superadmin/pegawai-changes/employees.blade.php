@@ -22,18 +22,16 @@
                 :column-toggle="true"
                 :refreshable="true"
                 :refresh-url="request()->fullUrl()"
-            >
-                <x-slot:navigation>
-                    <div class="nav nav-pills gap-1" role="tablist">
-                        <a class="nav-link active" role="tab" aria-selected="true" href="{{ route('superadmin.pegawai-changes.employees') }}">Data Pegawai</a>
-                        <a class="nav-link" role="tab" aria-selected="false" href="{{ route('superadmin.datakepegawaian.approval') }}">Pegawai Baru</a>
-                        <a class="nav-link" role="tab" aria-selected="false" href="{{ route('superadmin.pegawai-changes.index') }}">Perubahan Data</a>
-                    </div>
-                </x-slot:navigation>
+            >            
+                <div class="nav nav-pills gap-1" role="tablist">
+                    <a class="btn btn-primary dt-toolbar__button" role="tab" aria-selected="true" href="{{ route('superadmin.pegawai-changes.employees') }}">Data Pegawai</a>
+                    <a class="btn btn-outline-secondary dt-toolbar__button" role="tab" aria-selected="false" href="{{ route('superadmin.datakepegawaian.approval') }}">Pegawai Baru</a>
+                    <a class="btn btn-outline-secondary dt-toolbar__button" role="tab" aria-selected="false" href="{{ route('superadmin.pegawai-changes.index') }}">Perubahan Data</a>
+                </div>            
                 <x-slot:columnMenu>
                     @foreach ([
-                        'employee' => 'Pegawai',
                         'nip' => 'NIP',
+                        'employee' => 'Pegawai',                        
                         'position' => 'Jabatan',
                         'history' => 'Riwayat perubahan',
                         'action' => 'Aksi',
@@ -49,23 +47,23 @@
     <div class="table-responsive dt-siswa-table-wrap">
         <table id="dt-superadmin-monitoring-pegawai" class="table table-hover align-middle dt-table">
             <colgroup>
-                <col data-dt-column="employee">
                 <col data-dt-column="nip">
+                <col data-dt-column="employee">                
                 <col data-dt-column="position">
                 <col data-dt-column="history">
                 <col data-dt-column="action">
             </colgroup>
-            <thead><tr><th data-dt-column="employee">Pegawai</th><th data-dt-column="nip">NIP</th><th data-dt-column="position">Jabatan</th><th data-dt-column="history">Riwayat perubahan</th><th data-dt-column="action"></th></tr></thead>
+            <thead><tr><th data-dt-column="nip">NIP</th><th data-dt-column="employee">Pegawai</th><th data-dt-column="position">Jabatan</th><th data-dt-column="history">Riwayat perubahan</th><th data-dt-column="action">Aksi</th></tr></thead>
             <tbody>
                 @forelse ($employees as $employee)
                     <tr>
-                        <td data-dt-column="employee">{{ $employee->nama }}</td>
                         <td data-dt-column="nip">{{ $employee->nip ?? '—' }}</td>
+                        <td data-dt-column="employee">{{ $employee->nama }}</td>                        
                         <td data-dt-column="position">{{ $employee->jabatan ?? '—' }}</td>
                         <td data-dt-column="history">{{ $employee->pegawai_change_requests_count }}</td>
                         <td data-dt-column="action">
                             <div class="d-flex flex-wrap gap-2">
-                                <a class="btn btn-sm btn-outline-primary" href="{{ route('superadmin.datakepegawaian.show', $employee) }}">Profil</a>
+                                <a class="btn btn-sm btn-outline-primary dt-siswa-detail" href="{{ route('superadmin.datakepegawaian.show', $employee) }}">Detail <i class="bi bi-arrow-up-right" aria-hidden="true"></i></a>
                                 <a class="btn btn-sm btn-outline-secondary" href="{{ route('superadmin.pegawai-changes.employee', $employee) }}">Riwayat</a>
                             </div>
                         </td>
