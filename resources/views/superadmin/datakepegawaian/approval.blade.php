@@ -5,12 +5,19 @@
 @section('content')
 
 <div class="container-fluid dt-siswa-page">
+    <nav aria-label="Breadcrumb" class="mb-3">
+        <ol class="breadcrumb mb-0">
+            <li class="breadcrumb-item">Kepala Sekolah</li>
+            <li class="breadcrumb-item">Manajemen Kepegawaian</li>
+            <li class="breadcrumb-item active" aria-current="page">Pegawai Baru</li>
+        </ol>
+    </nav>
 
     <x-table.page-header
         icon="bi-person-vcard"
-        eyebrow="Administrasi / Data Kepegawaian"
-        title="Approval Data Kepegawaian"
-        description="Validasi data kepegawaian yang diajukan pengguna sebelum digunakan dalam sistem."
+        eyebrow="Manajemen Kepegawaian"
+        title="Pegawai Baru"
+        description="Validasi pengajuan data kepegawaian baru sebelum digunakan dalam sistem."
     />
 
     {{-- ALERT --}}
@@ -34,6 +41,13 @@
                 :refreshable="true"
                 :refresh-url="request()->fullUrl()"
             >
+                <x-slot:navigation>
+                    <div class="nav nav-pills gap-1" role="tablist">
+                        <a class="nav-link" role="tab" aria-selected="false" href="{{ route('superadmin.pegawai-changes.employees') }}">Data Pegawai</a>
+                        <a class="nav-link active" role="tab" aria-selected="true" href="{{ route('superadmin.datakepegawaian.approval') }}">Pegawai Baru</a>
+                        <a class="nav-link" role="tab" aria-selected="false" href="{{ route('superadmin.pegawai-changes.index') }}">Perubahan Data</a>
+                    </div>
+                </x-slot:navigation>
                 <x-slot:columnMenu>
                     @foreach ([
                         'number' => 'No',

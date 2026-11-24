@@ -1,3 +1,4 @@
+
 @extends('layouts.app')
 
 @section('title', 'Guru & Wali Kelas')
@@ -13,23 +14,175 @@
         description="Kelola data guru dan wali kelas sekolah."
     />
 
-    {{-- TABLE --}}
     <x-table.card
         title="Daftar Guru"
         subtitle="Daftar seluruh guru pada SDN Mekar Jaya"
-        :count="$gurus->count()"
+        :count="$gurus->total()"
+        count-label="data"
     >
 
         <x-slot:toolbar>
-            <x-table.local-toolbar
-                search-id="searchInput"
-                search-label="Cari guru"
-                search-placeholder="Cari guru..."
+            <x-table.toolbar
                 table-id="dt-superadmin-guru"
+                :action="route('superadmin.guru.index')"
+                :searchable="true"
+                search-name="q"
+                :search-value="request('q')"
+                search-label="Cari guru"
+                search-placeholder="Cari nama atau NIP guru..."
+                :filters="true"
+                filter-label="Filter"
+                filter-menu-title="Filter data guru"
                 :column-toggle="true"
                 :refreshable="true"
                 :refresh-url="request()->fullUrl()"
             >
+
+                {{-- FILTER BERTINGKAT --}}
+                <div
+                    class="dropdown"
+                    data-bs-auto-close="outside"
+                >
+                    <button
+                        type="button"
+                        class="btn btn-outline-secondary dt-toolbar__button dropdown-toggle"
+                        data-bs-toggle="dropdown"
+                        aria-expanded="false"
+                    >
+                        <i class="bi bi-funnel me-1"></i>
+                        Filter
+                        @if (
+                            request()->has('status')
+                            || request()->has('mapel_count')
+                            || request()->has('class_count')
+                        )
+                            <span class="badge bg-primary ms-1">
+                                {{
+                                    count((array) request('status', []))
+                                    + count((array) request('mapel_count', []))
+                                    + count((array) request('class_count', []))
+                                }}
+                            </span>
+                        @endif
+                    </button>
+
+                    <div
+                        class="dropdown-menu dt-column-menu p-3"
+                        style="width: 280px; max-height: 480px; overflow-y: auto;"
+                    >
+
+                        {{-- STATUS AKADEMIK --}}
+                        <fieldset class="mb-3">
+                            <legend class="dt-column-menu__title">
+                                Status Akademik
+                            </legend>
+
+                            @foreach ([
+                                'Wali Kelas',
+                                'Guru Bidang',
+                            ] as $status)
+                                <label class="dt-column-menu__option">
+                                    <input
+                                        type="checkbox"
+                                        name="status[]"
+                                        value="{{ $status }}"
+                                        @checked(
+                                            in_array(
+                                                $status,
+                                                (array) request('status', [])
+                                            )
+                                        )
+                                    >
+                                    <span>{{ $status }}</span>
+                                </label>
+                            @endforeach
+                        </fieldset>
+
+                        <hr>
+
+                        {{-- JUMLAH MAPEL --}}
+                        <fieldset class="mb-3">
+                            <legend class="dt-column-menu__title">
+                                Mata Pelajaran
+                            </legend>
+
+                            @foreach ([
+                                '0 Mapel',
+                                '1 Mapel',
+                                '2 Mapel',
+                                '3 Mapel',
+                                '4+ Mapel',
+                            ] as $mapel)
+                                <label class="dt-column-menu__option">
+                                    <input
+                                        type="checkbox"
+                                        name="mapel_count[]"
+                                        value="{{ $mapel }}"
+                                        @checked(
+                                            in_array(
+                                                $mapel,
+                                                (array) request('mapel_count', [])
+                                            )
+                                        )
+                                    >
+                                    <span>{{ $mapel }}</span>
+                                </label>
+                            @endforeach
+                        </fieldset>
+
+                        <hr>
+
+                        {{-- TOTAL KELAS --}}
+                        <fieldset class="mb-3">
+                            <legend class="dt-column-menu__title">
+                                Total Kelas
+                            </legend>
+
+                            @foreach ([
+                                '0 Kelas',
+                                '1–4 Kelas',
+                                '5–7 Kelas',
+                                '8–14 Kelas',
+                                '15+ Kelas',
+                            ] as $kelas)
+                                <label class="dt-column-menu__option">
+                                    <input
+                                        type="checkbox"
+                                        name="class_count[]"
+                                        value="{{ $kelas }}"
+                                        @checked(
+                                            in_array(
+                                                $kelas,
+                                                (array) request('class_count', [])
+                                            )
+                                        )
+                                    >
+                                    <span>{{ $kelas }}</span>
+                                </label>
+                            @endforeach
+                        </fieldset>
+
+                        <hr>
+
+                        <div class="d-flex justify-content-between gap-2">
+                            <a
+                                href="{{ route('superadmin.guru.index', request()->only('q')) }}"
+                                class="btn btn-outline-secondary btn-sm"
+                            >
+                                Reset
+                            </a>
+
+                            <button
+                                type="submit"
+                                class="btn btn-primary btn-sm"
+                            >
+                                Terapkan
+                            </button>
+                        </div>
+
+                    </div>
+                </div>
+
                 <x-slot:columnMenu>
                     @foreach ([
                         'number' => 'No',
@@ -40,146 +193,182 @@
                         'action' => 'Aksi',
                     ] as $column => $label)
                         <label class="dt-column-menu__option">
-                            <input type="checkbox" data-dt-column="{{ $column }}" checked>
+                            <input
+                                type="checkbox"
+                                data-dt-column="{{ $column }}"
+                                checked
+                            >
                             <span>{{ $label }}</span>
                         </label>
                     @endforeach
                 </x-slot:columnMenu>
-            </x-table.local-toolbar>
+
+            </x-table.toolbar>
         </x-slot:toolbar>
 
-        <div class="table-responsive dt-siswa-table-wrap">
-            <table id="dt-superadmin-guru" class="table table-hover align-middle dt-table">
-                <caption class="visually-hidden">Daftar seluruh guru</caption>
+        {{-- FILTER CHIPS --}}
+        <x-table.chips
+            :criteria="[
+                [
+                    'name' => 'q',
+                    'label' => 'Pencarian',
+                    'value' => request('q'),
+                ],
+                [
+                    'name' => 'status',
+                    'label' => 'Status',
+                    'value' => request('status', []),
+                ],
+                [
+                    'name' => 'mapel_count',
+                    'label' => 'Mata Pelajaran',
+                    'value' => request('mapel_count', []),
+                ],
+                [
+                    'name' => 'class_count',
+                    'label' => 'Total Kelas',
+                    'value' => request('class_count', []),
+                ],
+            ]"
+        />
+
+        <div
+            class="table-responsive dt-siswa-table-wrap"
+            role="region"
+            aria-label="Daftar guru"
+            tabindex="0"
+        >
+            <table
+                id="dt-superadmin-guru"
+                class="table table-hover align-middle dt-table dt-siswa-table"
+            >
+                <caption class="visually-hidden">
+                    Daftar seluruh guru
+                </caption>
+
                 <colgroup>
-                    <col data-dt-column="number">
-                    <col data-dt-column="teacher">
-                    <col data-dt-column="academic_status">
-                    <col data-dt-column="subjects">
-                    <col data-dt-column="classes">
-                    <col data-dt-column="action">
+                    <col class="dt-siswa-col-number" data-dt-column="number">
+                    <col class="dt-siswa-col-name" data-dt-column="teacher">
+                    <col class="dt-siswa-col-nisn" data-dt-column="academic_status">
+                    <col class="dt-siswa-col-class" data-dt-column="subjects">
+                    <col class="dt-siswa-col-status" data-dt-column="classes">
+                    <col class="dt-siswa-col-action" data-dt-column="action">
                 </colgroup>
 
                 <thead>
                     <tr>
-                        <x-table.heading width="70px" column="number">No</x-table.heading>
-                        <x-table.heading column="teacher">Nama Guru</x-table.heading>
-                        <x-table.heading width="200px" column="academic_status">Status Akademik</x-table.heading>
-                        <x-table.heading width="500px" column="subjects">Mata Pelajaran</x-table.heading>
-                        <x-table.heading width="100px" column="classes">Total Kelas</x-table.heading>
-                        <x-table.heading width="130px" column="action">Aksi</x-table.heading>
+                        <x-table.heading
+                            width="70px"
+                            column="number"
+                        >
+                            No
+                        </x-table.heading>
+
+                        <x-table.heading column="teacher">
+                            Nama Guru
+                        </x-table.heading>
+
+                        <x-table.heading
+                            width="200px"
+                            column="academic_status"
+                        >
+                            Status Akademik
+                        </x-table.heading>
+
+                        <x-table.heading
+                            width="500px"
+                            column="subjects"
+                        >
+                            Mata Pelajaran
+                        </x-table.heading>
+
+                        <x-table.heading
+                            width="100px"
+                            column="classes"
+                        >
+                            Total Kelas
+                        </x-table.heading>
+
+                        <x-table.heading
+                            width="130px"
+                            column="action"
+                        >
+                            Aksi
+                        </x-table.heading>
                     </tr>
                 </thead>
 
                 <tbody id="tableGuru">
 
-                    @forelse($gurus as $guru)
+                    @forelse ($gurus as $guru)
 
                         <tr>
 
-                            {{-- NO --}}
-                            <td data-dt-column="number">
-                                <span class="badge bg-light text-dark rounded-circle">
-                                    {{ $loop->iteration }}
-                                </span>
+                            {{-- NOMOR --}}
+                            <td
+                                class="text-center text-body-secondary"
+                                data-dt-column="number"
+                            >
+                                {{ $loop->iteration + ($gurus->currentPage() - 1) * $gurus->perPage() }}
                             </td>
 
                             {{-- NAMA GURU --}}
-                            <td data-dt-column="teacher">
-                                <div class="d-flex align-items-center">
+                            <th scope="row" class="dt-siswa-identity-cell" data-dt-column="teacher">
+                                <div class="dt-siswa-identity">
+                                    <span class="dt-siswa-avatar" aria-hidden="true">
+                                        <i class="bi bi-person-fill"></i>
+                                    </span>
 
-                                    <div
-                                        class="rounded-circle bg-primary-subtle text-primary d-flex align-items-center justify-content-center me-3"
-                                        style="width: 48px; height: 48px;"
-                                    >
-                                        <i class="bi bi-person-fill fs-4"></i>
-                                    </div>
-
-                                    <div>
-                                        <div class="fw-semibold">
+                                    <span class="dt-siswa-identity-copy">
+                                        <span class="dt-siswa-name">
                                             {{ $guru->pegawai?->nama ?? $guru->nama ?? '-' }}
-                                        </div>
-
-                                        <small class="text-muted">
+                                        </span>                                        
+                                        <span class="dt-siswa-meta">
                                             NIP : {{ $guru->pegawai?->nip ?? $guru->nip ?? '-' }}
-                                        </small>
-                                    </div>
+                                        </span>
+                                    </span>
+
                                 </div>
-                            </td>
+                            </th>
 
                             {{-- STATUS AKADEMIK --}}
                             <td data-dt-column="academic_status">
-                                @if($guru->waliKelas)
-
+                                @if ($guru->filter_status === 'Wali Kelas')
                                     <span class="text-gold fw-semibold">
                                         Wali Kelas
                                     </span>
-
                                 @else
-
                                     <span class="text-teal fw-semibold">
                                         Guru Bidang
                                     </span>
-
                                 @endif
                             </td>
 
                             {{-- MATA PELAJARAN --}}
                             <td data-dt-column="subjects">
                                 <div class="fw-semibold small mb-1">
-                                    {{ $guru->waliKelas ? 4 : $guru->pengampuMapel->filter(fn ($pengampu) => $pengampu->mapel)->unique('mapel_id')->count() }} Mapel
-                                </div>                                
+                                    {{ $guru->jumlah_mapel }} Mapel
+                                </div>
                             </td>
-                            
-                            {{-- KELAS --}}
+
+                            {{-- TOTAL KELAS --}}
                             <td data-dt-column="classes">
-                                @php
-                                    $kelasWali = $guru->waliKelas?->kelas;
-
-                                    $kelasMengajar = $guru->pengampuMapel
-                                        ->pluck('kelas')
-                                        ->filter()
-                                        ->unique('id');
-
-                                    $semuaKelas = collect();
-
-                                    if ($kelasWali) {
-                                        $semuaKelas->push($kelasWali);
-                                    }
-
-                                    foreach ($kelasMengajar as $kelas) {
-                                        if (!$kelasWali || $kelas->id != $kelasWali->id) {
-                                            $semuaKelas->push($kelas);
-                                        }
-                                    }
-
-                                    $jumlahKelas = $semuaKelas->count();
-                                @endphp
-
-                                @if($jumlahKelas == 0)
-
+                                @if ($guru->jumlah_kelas === 0)
                                     <span class="badge-status selesai">
                                         0 kelas
                                     </span>
-
-                                @elseif($jumlahKelas >= 15)
-
+                                @elseif ($guru->jumlah_kelas >= 15)
                                     <span class="badge-status nonaktif">
-                                        {{ $jumlahKelas }} Kelas
+                                        {{ $guru->jumlah_kelas }} Kelas
                                     </span>
-
-                                @elseif($jumlahKelas >= 8)
-
+                                @elseif ($guru->jumlah_kelas >= 8)
                                     <span class="badge-status pending">
-                                        {{ $jumlahKelas }} Kelas
+                                        {{ $guru->jumlah_kelas }} Kelas
                                     </span>
-
                                 @else
-
                                     <span class="badge-status aktif">
-                                        {{ $jumlahKelas }} Kelas
+                                        {{ $guru->jumlah_kelas }} Kelas
                                     </span>
- 
                                 @endif
                             </td>
 
@@ -187,10 +376,10 @@
                             <td data-dt-column="action">
                                 <a
                                     href="{{ route('superadmin.guru.show', $guru) }}"
-                                    class="btn btn-primary btn-sm rounded-pill px-3 py-0"
+                                    class="btn btn-outline-primary dt-siswa-detail"
                                 >
                                     Detail
-                                    <i class="bi bi-chevron-right ms-1"></i>
+                                    <i class="bi bi-arrow-up-right" aria-hidden="true"></i>
                                 </a>
                             </td>
 
@@ -198,11 +387,26 @@
 
                     @empty
 
-                        <x-table.empty
-                            :colspan="6"
-                            title="Belum ada data guru."
-                            description=""
-                        />
+                        @if (
+                            request()->filled('q')
+                            || request()->has('status')
+                            || request()->has('mapel_count')
+                            || request()->has('class_count')
+                        )
+                            <x-table.empty
+                                :colspan="6"
+                                state="no-results"
+                                title="Tidak ada guru yang cocok"
+                                description="Ubah kata kunci atau kriteria filter, lalu coba lagi."
+                            />
+                        @else
+                            <x-table.empty
+                                :colspan="6"
+                                state="empty"
+                                title="Belum ada data guru"
+                                description="Data guru belum tersedia."
+                            />
+                        @endif
 
                     @endforelse
 
@@ -211,10 +415,16 @@
             </table>
         </div>
 
+        {{-- PAGINATION --}}
+        <div class="dt-siswa-pagination">
+            <x-table.pagination
+                :paginator="$gurus"
+                :show-summary="true"
+            />
+        </div>
+
     </x-table.card>
 
 </div>
-
-{{-- SEARCH --}}
 
 @endsection

@@ -24,17 +24,96 @@
                     search-label="Cari pegawai atau penugasan"
                     search-placeholder="Cari pegawai atau penugasan..."
                     table-id="dt-superadmin-assignment-table"
-                >
-                    <x-table.local-filter
-                        id="assignmentStatusFilter"
-                        label="Status"
-                        menu-title="Filter status"
-                        :options="[
-                            ['value' => 'Draft', 'label' => 'Draft'],
-                            ['value' => 'Aktif', 'label' => 'Aktif'],
-                            ['value' => 'Dicabut', 'label' => 'Dicabut'],
-                        ]"
-                    />
+                >                    
+                    <div class="dt-toolbar__filter">
+                        <div
+                            class="dropdown"
+                            id="assignmentStatusFilter"
+                            data-local-filter-dropdown
+                        >
+                            <button
+                                type="button"
+                                class="btn btn-outline-secondary dt-toolbar__button dropdown-toggle"
+                                data-bs-toggle="dropdown"
+                                data-bs-auto-close="outside"
+                                aria-expanded="false"
+                            >
+                                <i class="bi bi-funnel" aria-hidden="true"></i>
+                                Filter
+                            </button>
+
+                            <div class="dropdown-menu dropdown-menu-end dt-column-menu dt-filter-menu p-3">
+
+                                {{-- PENUGASAN --}}
+                                <fieldset class="mb-3">
+                                    <legend class="dt-column-menu__title">
+                                        Penugasan
+                                    </legend>
+
+                                    @foreach ([
+                                        'operator' => 'Operator Sekolah',
+                                        'ppdb' => 'Admin PPDB',
+                                        'wali' => 'Wali Kelas',
+                                        'guru' => 'Guru Bidang Studi',
+                                        'ekskul' => 'Pembina Ekstrakurikuler',
+                                    ] as $value => $label)
+                                        <label class="dt-column-menu__option">
+                                            <input
+                                                type="checkbox"
+                                                value="{{ $value }}"
+                                                data-local-assignment-filter-option
+                                            >
+                                            <span>{{ $label }}</span>
+                                        </label>
+                                    @endforeach
+                                </fieldset>
+
+                                <hr>
+
+                                {{-- STATUS --}}
+                                <fieldset>
+                                    <legend class="dt-column-menu__title">
+                                        Status
+                                    </legend>
+
+                                    @foreach ([
+                                        'Draft' => 'Draft',
+                                        'Aktif' => 'Aktif',
+                                        'Dicabut' => 'Dicabut',
+                                    ] as $value => $label)
+                                        <label class="dt-column-menu__option">
+                                            <input
+                                                type="checkbox"
+                                                value="{{ $value }}"
+                                                data-local-status-filter-option
+                                            >
+                                            <span>{{ $label }}</span>
+                                        </label>
+                                    @endforeach
+                                </fieldset>
+
+                                <div class="dt-column-menu__actions">
+                                    <button
+                                        type="button"
+                                        class="btn btn-outline-secondary btn-sm"
+                                        data-local-filter-reset
+                                    >
+                                        Reset
+                                    </button>
+
+                                    <button
+                                        type="button"
+                                        class="btn btn-primary btn-sm"
+                                        data-local-filter-apply
+                                    >
+                                        Terapkan
+                                    </button>
+                                </div>
+
+                            </div>
+                        </div>
+                    </div>
+                                                                   
                     <x-table.column-controls
                         table-id="dt-superadmin-assignment-table"
                         :column-toggle="true"
@@ -87,7 +166,7 @@
                         <col class="assignment-column-type" data-dt-column="type">
                         <col class="assignment-column-details" data-dt-column="details">
                         <col class="assignment-column-status" data-dt-column="status">
-                        <col class="assignment-column-actions" data-dt-column="actions">
+                        <col class="dt-siswa-col-action" data-dt-column="actions">
                     </colgroup>
                     <thead>
                         <tr>

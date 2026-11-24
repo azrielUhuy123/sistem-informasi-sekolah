@@ -4,7 +4,14 @@
 
 @section('content')
 <div class="container-fluid dt-siswa-page">
-    <x-table.page-header icon="bi-arrow-repeat" eyebrow="Kepala Sekolah / Pegawai" title="Monitoring Pengajuan Perubahan Data" description="Kepala Sekolah memantau progres tanpa persetujuan tahap kedua." />
+    <nav aria-label="Breadcrumb" class="mb-3">
+        <ol class="breadcrumb mb-0">
+            <li class="breadcrumb-item">Kepala Sekolah</li>
+            <li class="breadcrumb-item">Manajemen Kepegawaian</li>
+            <li class="breadcrumb-item active" aria-current="page">Perubahan Data</li>
+        </ol>
+    </nav>
+    <x-table.page-header icon="bi-arrow-repeat" eyebrow="Manajemen Kepegawaian" title="Perubahan Data" description="Pantau pengajuan perubahan data pegawai tanpa persetujuan tahap kedua." />
     <x-table.card title="Pengajuan Perubahan Data" :count="$requests->total()" count-label="pengajuan">
         <x-slot:toolbar>
             <x-table.local-toolbar
@@ -16,6 +23,13 @@
                 :refreshable="true"
                 :refresh-url="request()->fullUrl()"
             >
+                <x-slot:navigation>
+                    <div class="nav nav-pills gap-1" role="tablist">
+                        <a class="nav-link" role="tab" aria-selected="false" href="{{ route('superadmin.pegawai-changes.employees') }}">Data Pegawai</a>
+                        <a class="nav-link" role="tab" aria-selected="false" href="{{ route('superadmin.datakepegawaian.approval') }}">Pegawai Baru</a>
+                        <a class="nav-link active" role="tab" aria-selected="true" href="{{ route('superadmin.pegawai-changes.index') }}">Perubahan Data</a>
+                    </div>
+                </x-slot:navigation>
                 <x-slot:columnMenu>
                     @foreach ([
                         'created' => 'Tanggal',

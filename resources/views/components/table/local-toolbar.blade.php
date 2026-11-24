@@ -12,12 +12,13 @@
 
 @php
     $hasColumnMenu = isset($columnMenu) && $columnMenu->isNotEmpty();
+    $hasNavigation = isset($navigation) && $navigation->isNotEmpty();
     $hasActions = $slot->isNotEmpty()
         || ($columnToggle && $hasColumnMenu)
         || ($refreshable && $refreshUrl);
 @endphp
 
-<div class="dt-toolbar" @if ($searchable) role="search" @else role="group" aria-label="Kontrol tabel" @endif>
+<div class="dt-toolbar {{ $hasNavigation ? 'dt-toolbar--with-navigation' : '' }}" @if ($searchable) role="search" @else role="group" aria-label="Kontrol tabel" @endif>
     @if ($searchable)
         <div class="dt-toolbar__fields">
             <div class="dt-toolbar__search">
@@ -32,6 +33,11 @@
                     @if ($tableId) data-dt-table-id="{{ $tableId }}" @endif
                 >
             </div>
+            @if ($hasNavigation)
+                <nav class="dt-toolbar__navigation" aria-label="Navigasi tab kepegawaian">
+                    {{ $navigation }}
+                </nav>
+            @endif
         </div>
     @endif
     @if ($hasActions)

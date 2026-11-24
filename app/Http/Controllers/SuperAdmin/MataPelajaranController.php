@@ -5,47 +5,35 @@ namespace App\Http\Controllers\SuperAdmin;
 use App\Http\Controllers\Controller;
 use App\Models\MataPelajaran;
 use Illuminate\Http\Request;
+use Illuminate\Pagination\LengthAwarePaginator;
 
 class MataPelajaranController extends Controller
 {
     /**
-     * Index with search and the legacy status query parameter.
+     * Menampilkan daftar mata pelajaran dengan pencarian
+     * dan pagination setelah pengelompokan berdasarkan kode_mapel.
      */
     public function index(Request $request)
     {
-        $deletedValues = $request->input('deleted', []);
-        $deletedValues = is_array($deletedValues) ? $deletedValues : ($request->filled('deleted') ? [$request->deleted] : []);
-        $deleted = in_array('active', $deletedValues, true) ? 'active' : $request->query('deleted', 'active');
-
-        if ($deleted === '') {
-            $deleted = 'all';
-        }
-
-        if (! in_array($deleted, ['active', 'all'], true)) {
-            $query = $request->query();
-            $query['deleted'] = 'active';
-
-            return redirect()->route('superadmin.mapel.index', $query);
-        }
-
         $query = MataPelajaran::query();
 
-        // SEARCH
+        // SEARCH: nama mata pelajaran atau kode mata pelajaran.
         if ($request->filled('q')) {
-            $query->where(function ($q) use ($request) {
-                $q->where('nama_mapel', 'like', '%' . $request->q . '%')
-                ->orWhere('kode_mapel', 'like', '%' . $request->q . '%');
+            $keyword = trim($request->input('q'));
+
+            $query->where(function ($q) use ($keyword) {
+                $q->where('nama_mapel', 'like', '%' . $keyword . '%')
+                    ->orWhere('kode_mapel', 'like', '%' . $keyword . '%');
             });
         }
 
-        // 🔥 AMBIL SEMUA DATA DULU
-        $data = $query->get();
+        /*
+         * Pengelompokan tetap dilakukan sebelum pagination.
+         * Tujuannya agar satu kode_mapel tetap tampil sebagai satu baris.
+         */
+        $grouped = $query->get()->groupBy('kode_mapel');
 
-        // 🔥 GROUP BY kode_mapel (INI INTI FIX)
-        $grouped = $data->groupBy('kode_mapel');
-
-        // 🔥 FORMAT JADI 1 BARIS PER MAPEL
-        $mata_pelajaran = $grouped->map(function ($items) {
+        $mataPelajaran = $grouped->map(function ($items) {
             $first = $items->first();
 
             return (object) [
@@ -53,13 +41,32 @@ class MataPelajaranController extends Controller
                 'nama_mapel' => $first->nama_mapel,
                 'kode_mapel' => $first->kode_mapel,
                 'kkm' => $first->kkm,
-                'fase' => $items->pluck('fase')->join(', '),
+                'fase' => $items->pluck('fase')
+                    ->filter()
+                    ->unique()
+                    ->implode(', '),
                 'count_fase' => $items->count(),
             ];
         })->values();
 
-        return view('superadmin.mapel.index', compact('mata_pelajaran', 'deleted'));
+        // PAGINATION: diterapkan setelah data selesai dikelompokkan.
+        $perPage = 20;
+        $currentPage = LengthAwarePaginator::resolveCurrentPage();
+
+        $mata_pelajaran = new LengthAwarePaginator(
+            $mataPelajaran->forPage($currentPage, $perPage)->values(),
+            $mataPelajaran->count(),
+            $perPage,
+            $currentPage,
+            [
+                'path' => $request->url(),
+                'query' => $request->query(),
+            ]
+        );
+
+        return view('superadmin.mapel.index', compact('mata_pelajaran'));
     }
+
     /**
      * CREATE PAGE
      */
@@ -76,7 +83,7 @@ class MataPelajaranController extends Controller
         $data = $request->validate([
             'nama_mapel' => 'required|string|max:255',
             'kode_mapel' => 'nullable|string|max:100',
-            'kkm'        => 'nullable|integer|min:0|max:100',
+            'kkm' => 'nullable|integer|min:0|max:100',
         ]);
 
         MataPelajaran::create($data);
@@ -109,7 +116,6 @@ class MataPelajaranController extends Controller
     /**
      * UPDATE
      */
-    
     public function update(Request $request, $id)
     {
         $mapel = MataPelajaran::findOrFail($id);
@@ -117,7 +123,7 @@ class MataPelajaranController extends Controller
         $data = $request->validate([
             'nama_mapel' => 'required|string|max:255',
             'kode_mapel' => 'nullable|string|max:100',
-            'kkm'        => 'nullable|integer|min:0|max:100',
+            'kkm' => 'nullable|integer|min:0|max:100',
         ]);
 
         $mapel->update($data);
@@ -144,7 +150,10 @@ class MataPelajaranController extends Controller
      */
     public function restore($id)
     {
-        return back()->with('error', 'Mata pelajaran yang telah dihapus permanen tidak dapat dipulihkan.');
+        return back()->with(
+            'error',
+            'Mata pelajaran yang telah dihapus permanen tidak dapat dipulihkan.'
+        );
     }
 
     /**
@@ -154,7 +163,10 @@ class MataPelajaranController extends Controller
     {
         MataPelajaran::findOrFail($id)->delete();
 
-        return back()->with('success', 'Mata pelajaran berhasil dihapus permanen.');
+        return back()->with(
+            'success',
+            'Mata pelajaran berhasil dihapus permanen.'
+        );
     }
 
     /**
@@ -164,8 +176,8 @@ class MataPelajaranController extends Controller
     {
         $request->validate([
             'action' => 'required|in:delete,restore,forceDelete',
-            'ids'    => 'required|array',
-            'ids.*'  => 'integer',
+            'ids' => 'required|array',
+            'ids.*' => 'integer',
         ]);
 
         $ids = $request->ids;
@@ -178,20 +190,24 @@ class MataPelajaranController extends Controller
 
         MataPelajaran::whereIn('id', $ids)->delete();
 
-        return response()->json(['message' => 'Mata pelajaran berhasil dihapus permanen.']);
+        return response()->json([
+            'message' => 'Mata pelajaran berhasil dihapus permanen.',
+        ]);
     }
 
     /**
-     * AJAX SEARCH (tanpa reload)
+     * AJAX SEARCH (tanpa reload).
      */
     public function ajaxSearch(Request $request)
     {
-        $keyword = $request->q;
+        $keyword = $request->input('q');
 
         $data = MataPelajaran::query()
-            ->where('nama_mapel', 'like', '%' . $keyword . '%')
-            ->orWhere('kode_mapel', 'like', '%' . $keyword . '%')
-            ->orWhere('kelompok', 'like', '%' . $keyword . '%')
+            ->where(function ($query) use ($keyword) {
+                $query->where('nama_mapel', 'like', '%' . $keyword . '%')
+                    ->orWhere('kode_mapel', 'like', '%' . $keyword . '%')
+                    ->orWhere('kelompok', 'like', '%' . $keyword . '%');
+            })
             ->orderBy('nama_mapel')
             ->get();
 

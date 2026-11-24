@@ -21,22 +21,20 @@
         </div>
     </a>
 
-    {{-- DATA KEPEGAWAIAN --}}
+    {{-- MANAJEMEN KEPEGAWAIAN --}}
+    @php
+        $manajemenKepegawaianActive =
+            request()->is('superadmin/data-kepegawaian*') ||
+            request()->is('superadmin/perubahan-data-kepegawaian*') ||
+            request()->is('superadmin/datakepegawaian*');
+    @endphp
     <a
-        class="menu-item
-            {{ request()->is('superadmin/datakepegawaian/approval*') ? 'active' : '' }}"
-        href="{{ route('superadmin.datakepegawaian.approval') }}"
+        class="menu-item {{ $manajemenKepegawaianActive ? 'active' : '' }}"
+        href="{{ route('superadmin.pegawai-changes.employees') }}"
     >
         <div class="menu-left">
-            <i class="bi bi-person-vcard"></i>
-            <span>Data Kepegawaian</span>
-        </div>
-    </a>
-    <a class="menu-item {{ request()->is('superadmin/data-kepegawaian*', 'superadmin/perubahan-data-kepegawaian*') ? 'active' : '' }}"
-        href="{{ route('superadmin.pegawai-changes.employees') }}">
-        <div class="menu-left">
-            <i class="bi bi-clipboard-data"></i>
-            <span>Monitoring Perubahan Pegawai</span>
+            <i class="bi bi-person-gear"></i>
+            <span>Manajemen Kepegawaian</span>
         </div>
     </a>
 
@@ -151,54 +149,6 @@
                 <span>Manajemen Penugasan</span>
             </div>
         </a>
-
-        <a
-            class="menu-item {{ request()->is('superadmin/pengampu-mapel*') ? 'active' : '' }}"
-            href="{{ route('superadmin.pengampu-mapel.index') }}"
-        >
-
-            <div class="menu-left">
-                <i class="bi bi-diagram-3"></i>
-                <span>Pengampu Mapel</span>
-            </div>
-
-        </a>
-
-        <a
-            class="menu-item {{ request()->is('superadmin/wali-kelas*') ? 'active' : '' }}"
-            href="{{ route('superadmin.wali-kelas.index') }}"
-        >
-
-            <div class="menu-left">
-                <i class="bi bi-person-badge"></i>
-                <span>Wali Kelas</span>
-            </div>
-
-        </a>
-
-        <a
-            class="menu-item {{ request()->is('superadmin/pembina-ekskul*') ? 'active' : '' }}"
-            href="{{ route('superadmin.pembina-ekskul.index') }}"
-        >
-
-            <div class="menu-left">
-                <i class="bi bi-trophy"></i>
-                <span>Pembina Ekskul</span>
-            </div>
-
-        </a>
-
-        @if(auth()->user()->hasFeature('superadmin.assignment'))
-            <a
-                class="menu-item {{ request()->is('superadmin/feature-access*') ? 'active' : '' }}"
-                href="{{ route('superadmin.feature-access.index') }}"
-            >
-                <div class="menu-left">
-                    <i class="bi bi-shield-lock"></i>
-                    <span>Akses Fitur Pengguna</span>
-                </div>
-            </a>
-        @endif
 
     </div>
 
@@ -356,8 +306,7 @@
 
             <div
                 class="submenu
-                    {{ request()->is('superadmin/dokumen*') ||
-                    request()->is('superadmin/datakepegawaian/approval*')
+                    {{ request()->is('superadmin/dokumen*')
                     ? 'show'
                     : '' }}"
                 id="menuDokumen"

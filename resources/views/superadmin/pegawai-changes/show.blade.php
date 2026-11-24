@@ -4,6 +4,14 @@
 
 @section('content')
 <div class="container-fluid py-4">
+    <nav aria-label="Breadcrumb" class="mb-3">
+        <ol class="breadcrumb mb-0">
+            <li class="breadcrumb-item">Kepala Sekolah</li>
+            <li class="breadcrumb-item">Manajemen Kepegawaian</li>
+            <li class="breadcrumb-item">Perubahan Data</li>
+            <li class="breadcrumb-item active" aria-current="page">Detail Pengajuan</li>
+        </ol>
+    </nav>
     <div class="mb-4">
         <h3 class="mb-1">Pengajuan #{{ $pegawaiChangeRequest->id }}</h3>
         <p class="text-muted mb-0">

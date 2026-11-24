@@ -3,7 +3,6 @@
 @section('title', 'Mata Pelajaran')
 
 @section('content')
-
 <div class="container-fluid dt-siswa-page">
     <header class="dt-siswa-page-header">
         <div>
@@ -11,7 +10,9 @@
                 <i class="bi bi-book-half" aria-hidden="true"></i>
                 Master Data / Mata Pelajaran
             </p>
+
             <h1 class="dt-siswa-page-title">Mata Pelajaran</h1>
+
             <p class="dt-siswa-page-description">
                 Daftar dan informasi mata pelajaran sekolah.
             </p>
@@ -24,7 +25,7 @@
     <x-table.card
         title="Daftar Mata Pelajaran"
         subtitle="Mata pelajaran yang terdata di sekolah"
-        :count="$mata_pelajaran->count()"
+        :count="$mata_pelajaran->total()"
         count-label="data"
     >
         <x-slot:toolbar>
@@ -36,28 +37,35 @@
                 :search-value="request('q')"
                 search-label="Cari mata pelajaran"
                 search-placeholder="Cari nama atau kode mapel..."
-                filter-name="deleted"
-                :filter-value="$deleted === 'active' ? 'active' : ''"
-                filter-label="Status"
-                filter-menu-title="Filter status"
-                :filter-options="[
-                    ['value' => 'active', 'label' => 'Aktif'],
-                ]"
                 :column-toggle="true"
                 :refreshable="true"
-                refresh-url="{{ request()->fullUrl() }}"
+                :refresh-url="request()->fullUrl()"
             >
                 <x-slot:columnMenu>
                     <label class="dt-column-menu__option">
-                        <input type="checkbox" data-dt-column="number" checked>
+                        <input
+                            type="checkbox"
+                            data-dt-column="number"
+                            checked
+                        >
                         <span>No</span>
                     </label>
+
                     <label class="dt-column-menu__option">
-                        <input type="checkbox" data-dt-column="code" checked>
+                        <input
+                            type="checkbox"
+                            data-dt-column="code"
+                            checked
+                        >
                         <span>Kode</span>
                     </label>
+
                     <label class="dt-column-menu__option">
-                        <input type="checkbox" data-dt-column="name" checked>
+                        <input
+                            type="checkbox"
+                            data-dt-column="name"
+                            checked
+                        >
                         <span>Nama Mata Pelajaran</span>
                     </label>
                 </x-slot:columnMenu>
@@ -71,15 +79,7 @@
                     'label' => 'Search',
                     'value' => request('q'),
                 ],
-                [
-                    'name' => 'deleted',
-                    'label' => 'Status',
-                    'value' => $deleted === 'active' ? $deleted : null,
-                    'display' => 'Aktif',
-                    'removeValue' => 'all',
-                ],
             ]"
-            :clear-all-values="['deleted' => 'all']"
         />
 
         <div
@@ -95,6 +95,7 @@
                 <caption class="visually-hidden">
                     Daftar mata pelajaran
                 </caption>
+
                 <colgroup>
                     <col data-dt-column="number">
                     <col data-dt-column="code">
@@ -103,25 +104,42 @@
 
                 <thead>
                     <tr>
-                        <x-table.heading class="text-center" column="number">
+                        <x-table.heading
+                            class="text-center"
+                            column="number"
+                        >
                             No
                         </x-table.heading>
-                        <x-table.heading column="code">Kode</x-table.heading>
-                        <x-table.heading column="name">Nama Mata Pelajaran</x-table.heading>
+
+                        <x-table.heading column="code">
+                            Kode
+                        </x-table.heading>
+
+                        <x-table.heading column="name">
+                            Nama Mata Pelajaran
+                        </x-table.heading>
                     </tr>
                 </thead>
 
                 <tbody>
                     @forelse ($mata_pelajaran as $row)
                         <tr>
-                            <td class="text-center text-body-secondary" data-dt-column="number">
-                                {{ $loop->iteration }}
+                            <td
+                                class="text-center text-body-secondary"
+                                data-dt-column="number"
+                            >
+                                {{ $loop->iteration + ($mata_pelajaran->currentPage() - 1) * $mata_pelajaran->perPage() }}
                             </td>
-                            <td class="text-nowrap" data-dt-column="code">
+
+                            <td
+                                class="text-nowrap"
+                                data-dt-column="code"
+                            >
                                 <span class="fw-semibold">
                                     {{ $row->kode_mapel ?? '-' }}
                                 </span>
                             </td>
+
                             <td data-dt-column="name">
                                 <span class="fw-semibold">
                                     {{ $row->nama_mapel }}
@@ -148,7 +166,13 @@
                 </tbody>
             </table>
         </div>
+
+        <div class="dt-siswa-pagination">
+            <x-table.pagination
+                :paginator="$mata_pelajaran"
+                :show-summary="true"
+            />
+        </div>
     </x-table.card>
 </div>
-
 @endsection
