@@ -23,7 +23,7 @@
 
     <div class="card-header bg-white border-0 py-4 table-card-header dt-card-header">
 
-        <div class="d-flex justify-content-between align-items-start flex-wrap gap-3">
+        <div class="d-flex justify-content-between align-items-center flex-wrap gap-3">
 
             <div class="table-card-title">
 
@@ -55,6 +55,11 @@
                 @endisset
 
             </div>
+            @isset($headerActions)
+                <div class="dt-card-header-actions">
+                    {{ $headerActions }}
+                </div>
+            @endisset
 
         </div>
 

@@ -26,28 +26,58 @@
 
     {{-- TABLE --}}
     <x-table.card
-        title="Daftar Data Kepegawaian"
+        title="Persetujuan Data Kepegawaian"
         subtitle="Seluruh data pegawai yang menunggu proses validasi oleh Kepala Sekolah"
-        :count="$data->count()"
-    >
+        :count="$data->total()"
 
+    >
+        <x-slot:headerActions>
+            <nav class="dt-employee-navigation" aria-label="Navigasi Manajemen Kepegawaian">
+
+                <a
+                    href="{{ route('superadmin.pegawai-changes.employees') }}"
+                    class="dt-employee-navigation__link {{ request()->routeIs('superadmin.pegawai-changes.employees') ? 'is-active' : '' }}"
+                    @if (request()->routeIs('superadmin.pegawai-changes.employees')) aria-current="page" @endif
+                >
+                    Data Pegawai
+                </a>
+
+                <a
+                    href="{{ route('superadmin.datakepegawaian.approval') }}"
+                    class="dt-employee-navigation__link {{ request()->routeIs('superadmin.datakepegawaian.approval') ? 'is-active' : '' }}"
+                    @if (request()->routeIs('superadmin.datakepegawaian.approval')) aria-current="page" @endif
+                >
+                    Pegawai Baru
+                </a>
+
+                <a
+                    href="{{ route('superadmin.pegawai-changes.index') }}"
+                    class="dt-employee-navigation__link {{ request()->routeIs('superadmin.pegawai-changes.index') ? 'is-active' : '' }}"
+                    @if (request()->routeIs('superadmin.pegawai-changes.index')) aria-current="page" @endif
+                >
+                    Perubahan Data
+                </a>
+
+            </nav>
+        </x-slot:headerActions>
         <x-slot:toolbar>
-            <x-table.local-toolbar
-                search-id="searchInput"
-                search-label="Cari pegawai"
-                search-placeholder="Cari pegawai..."
+            <x-table.toolbar
                 table-id="dt-superadmin-kepegawaian"
+                action="{{ route('superadmin.datakepegawaian.approval') }}"
+                :searchable="true"
+                search-name="search"
+                search-value="{{ $search }}"
+                search-label="Cari pegawai"
+                search-placeholder="Nama, NIP, atau jabatan"
+                filter-name="status"
+                :filter-value="$selectedStatuses"
+                filter-label="Status"
+                filter-menu-title="Filter status kepegawaian"
+                :filter-options="$statusOptions"
                 :column-toggle="true"
                 :refreshable="true"
-                :refresh-url="request()->fullUrl()"
+                refresh-url="{{ request()->fullUrl() }}"
             >
-                <x-slot:navigation>
-                    <div class="nav nav-pills gap-1" role="tablist">
-                        <a class="nav-link" role="tab" aria-selected="false" href="{{ route('superadmin.pegawai-changes.employees') }}">Data Pegawai</a>
-                        <a class="nav-link active" role="tab" aria-selected="true" href="{{ route('superadmin.datakepegawaian.approval') }}">Pegawai Baru</a>
-                        <a class="nav-link" role="tab" aria-selected="false" href="{{ route('superadmin.pegawai-changes.index') }}">Perubahan Data</a>
-                    </div>
-                </x-slot:navigation>
                 <x-slot:columnMenu>
                     @foreach ([
                         'number' => 'No',
@@ -57,173 +87,131 @@
                         'action' => 'Aksi',
                     ] as $column => $label)
                         <label class="dt-column-menu__option">
-                            <input type="checkbox" data-dt-column="{{ $column }}" checked>
+                            <input
+                                type="checkbox"
+                                data-dt-column="{{ $column }}"
+                                checked
+                            >
                             <span>{{ $label }}</span>
                         </label>
                     @endforeach
                 </x-slot:columnMenu>
-            </x-table.local-toolbar>
+            </x-table.toolbar>
         </x-slot:toolbar>
+        <x-table.chips
+            :criteria="array_merge(
+                [
+                    [
+                        'name' => 'search',
+                        'label' => 'Search',
+                        'value' => $search,
+                    ],
+                ],
+                $statusChipCriteria
+            )"
+        />
 
         <div class="table-responsive dt-siswa-table-wrap">
 
-            <table id="dt-superadmin-kepegawaian" class="table table-hover align-middle mb-0 dt-table">
+            <table id="dt-superadmin-kepegawaian" class="table table-hover align-middle dt-table">
                 <caption class="visually-hidden">Data kepegawaian beserta status validasi dan tindakan yang tersedia</caption>
                 <colgroup>
-                    <col data-dt-column="number">
+                    <col data-dt-column="nip">
                     <col data-dt-column="employee">
-                    <col data-dt-column="status">
-                    <col data-dt-column="approval">
+                    <col data-dt-column="status">                    
                     <col data-dt-column="action">
                 </colgroup>
 
                 <thead>
                     <tr>
-
-                        <x-table.heading width="70" column="number">
-                            No
-                        </x-table.heading>
-
-                        <x-table.heading column="employee">
-                            Nama Pegawai & NIP
-                        </x-table.heading>
-
-                        <x-table.heading width="150" column="status">
-                            Status
-                        </x-table.heading>
-
-                        <x-table.heading width="80" column="approval">
-                            Validasi
-                        </x-table.heading>
-
-                        <x-table.heading width="80" column="action">
-                            Aksi
-                        </x-table.heading>
-
-                    </tr>
+                        <th data-dt-column="nip">NIP</th>
+                        <th data-dt-column="employee">Pegawai</th>
+                        <th data-dt-column="status">Status</th>
+                        <th data-dt-column="action">Aksi</th>                        
+                    </tr>                    
                 </thead>
-
-                <tbody id="tablePegawai">
-
+                <tbody>
                     @forelse($data as $row)
-
                         <tr>
-
                             {{-- NOMOR --}}
-                            <td data-dt-column="number">
-
-                                <span class="badge bg-light text-dark rounded-circle">
-                                    {{ $loop->iteration }}
-                                </span>
-
+                            <td data-dt-column="nip">
+                                {{ $row->nip ?? '-' }}
                             </td>
-
                             {{-- PEGAWAI --}}
                             <td data-dt-column="employee">
-
-                                <div class="d-flex align-items-center">
-
-                                    <div
-                                        class="rounded-circle bg-primary-subtle text-primary d-flex align-items-center justify-content-center me-3"
-                                        style="width: 48px; height: 48px;"
-                                    >
-                                        <i class="bi bi-person-fill fs-4"></i>
-                                    </div>
-
-                                    <div>
-
-                                        <div class="fw-semibold">
-                                            {{ $row->nama }}
-                                        </div>
-
-                                        <small class="text-muted">
-                                            NIP : {{ $row->nip ?? '-' }}
-                                        </small>
-
-                                    </div>
-
-                                </div>
-
+                                {{ $row->nama }}
                             </td>
-
                             {{-- STATUS --}}
                             <td data-dt-column="status">
-
                                 @if($row->approval_status == 'approved')
-
                                     <span class="badge-status aktif">
                                         <i class="bi bi-check-circle-fill me-1"></i>
                                         Valid
                                     </span>
-
                                 @elseif($row->approval_status == 'rejected')
-
                                     <span class="badge-status nonaktif">
                                         <i class="bi bi-x-circle-fill me-1"></i>
                                         Ditolak
                                     </span>
-
                                 @else
-
                                     <span class="badge-status pending">
                                         <i class="bi bi-hourglass-split me-1"></i>
                                         Validasi
                                     </span>
-
-                                @endif
-
-                            </td>
-                            <td data-dt-column="approval">
-                            {{-- VALIDASI --}}
-                                @if($row->approval_status != 'approved')                                
-                                    <form
-                                        action="{{ route('superadmin.datakepegawaian.approve', $row->id) }}"
-                                        method="POST"
-                                    >
-                                        @csrf
-                                        @method('PATCH')
-                                        <button
-                                            type="submit"
-                                            class="btn btn-success btm-sm rounded-3 px-3 py-0 btn-confirm"
-                                            data-title="VALIDASI DATA KEPEGAWAIAN INI?"
-                                            data-message="Data kepegawaian ini akan divalidasi dan dinyatakan valid."
-                                            data-button="btn-success"
-                                        >                                            
-                                            <small>Setujui</small>
-                                        </button>
-                                    </form>                                     
-                                @endif                            
-                                @if($row->approval_status != 'rejected')                            
-                                    <button
-                                        type="button"
-                                        class="btn btn-danger btm-sm rounded-3 px-3 py-0"
-                                        data-bs-toggle="modal"
-                                        data-bs-target="#rejectModal{{ $row->id }}"
-                                    >
-                                        <small>Tolak</small>                                                                             
-                                    </button>                                    
                                 @endif
                             </td>
-
-                            {{-- AKSI --}}
                             <td data-dt-column="action">
-                                <a
-                                    class="btn btn-primary btn-sm rounded-pill px-3 py-0"
-                                    href="{{ route('superadmin.datakepegawaian.show', $row->id) }}"
-                                >                                        
-                                    Detail <i class="bi bi-chevron-right ms-1"></i>
-                                </a>                                    
+                            {{-- VALIDASI --}}
+                                <div class="d-flex flex-wrap gap-2">
+                                    @if($row->approval_status != 'rejected')                            
+                                        <button
+                                            type="button"
+                                            class="btn btn-sm btn-outline-danger dt-siswa-detail"
+                                            data-bs-toggle="modal"
+                                            data-bs-target="#rejectModal{{ $row->id }}"
+                                        >
+                                            Tolak <i class="bi bi-x-lg"></i>                                                                             
+                                        </button>                                    
+                                    @endif
+                                    @if($row->approval_status != 'approved')                                
+                                        <form
+                                            action="{{ route('superadmin.datakepegawaian.approve', $row->id) }}"
+                                            method="POST"
+                                        >
+                                            @csrf
+                                            @method('PATCH')
+                                            <button
+                                                type="submit"
+                                                class="btn btn-sm btn-primary dt-siswa-detail btn-confirm"
+                                                data-title="VALIDASI DATA KEPEGAWAIAN INI?"
+                                                data-message="Data kepegawaian ini akan divalidasi dan dinyatakan valid."
+                                                data-button="btn-success"
+                                            >                                            
+                                                Setujui <i class="bi bi-check-lg"></i>
+                                            </button>
+                                        </form>                                     
+                                    @endif                            
+                                    
+                                </div>
                             </td>
-
                         </tr>
 
                     @empty
-
-                        <x-table.empty
-                            :colspan="5"
-                            title="Belum Ada Data Kepegawaian"
-                            description="Tidak terdapat data kepegawaian yang perlu diproses."
-                        />
+                        @if ($search !== '' || ! empty($selectedStatuses))
+                            <x-table.empty
+                                :colspan="5"
+                                state="no-results"
+                                title="Tidak ada data pegawai yang cocok"
+                                description="Ubah status atau kata kunci pencarian, lalu coba lagi."
+                            />
+                        @else
+                            <x-table.empty
+                                :colspan="5"
+                                state="empty"
+                                title="Belum ada data kepegawaian"
+                                description="Data kepegawaian belum tersedia."
+                            />
+                        @endif
 
                     @endforelse
 
@@ -232,6 +220,10 @@
             </table>
 
         </div>
+        <x-table.pagination
+            :paginator="$data"
+            :show-summary="true"
+        />
 
     </x-table.card>
 

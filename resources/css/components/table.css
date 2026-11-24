@@ -1159,3 +1159,64 @@
         width: 100%;
     }
 }
+
+/* Header Actions - Manajemen Kepegawaian */
+.dt-card-header-actions {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    min-width: 0;
+}
+
+.dt-employee-navigation {
+    display: inline-flex;
+    align-items: center;
+    gap: .2rem;
+    padding: .25rem;
+    border: 1px solid var(--dt-color-border);
+    border-radius: .625rem;
+    background: var(--dt-color-surface-subtle);
+}
+
+.dt-employee-navigation__link {
+    display: inline-flex;
+    min-height: 2.125rem;
+    align-items: center;
+    justify-content: center;
+    padding: .4rem .8rem;
+    border-radius: .4rem;
+    color: var(--dt-color-text-secondary);
+    font-size: .8125rem;
+    font-weight: 600;
+    text-decoration: none;
+    white-space: nowrap;
+    transition: background-color .15s ease, color .15s ease;
+}
+
+.dt-employee-navigation__link:hover {
+    color: var(--dt-color-primary);
+    background: var(--dt-color-primary-soft);
+}
+
+.dt-employee-navigation__link.is-active {
+    color: var(--dt-color-primary);
+    background: var(--dt-color-surface);
+    box-shadow: 0 1px 3px rgb(0 0 0 / 8%);
+}
+
+.dt-employee-navigation__link:focus-visible {
+    outline: 2px solid var(--dt-color-focus);
+    outline-offset: 2px;
+}
+
+@media (max-width: 767.98px) {
+    .dt-card-header-actions {
+        width: 100%;
+        justify-content: flex-start;
+    }
+
+    .dt-employee-navigation {
+        max-width: 100%;
+        overflow-x: auto;
+    }
+}

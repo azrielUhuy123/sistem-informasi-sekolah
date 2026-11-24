@@ -11,17 +11,80 @@ use App\Enums\UserRole;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use Carbon\Carbon;
+use Illuminate\Validation\Rule;
 
 class DataKepegawaianApprovalController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
-        $data = DataKepegawaian::all();
+        $statusLabels = [
+            'pending' => 'Validasi',
+            'approved' => 'Valid',
+            'rejected' => 'Ditolak',
+        ];
 
-        return view(
-            'superadmin.datakepegawaian.approval',
-            compact('data')
-        );
+        $validated = $request->validate([
+            'search' => ['nullable', 'string', 'max:100'],
+            'status' => ['nullable', 'array'],
+            'status.*' => [
+                'required',
+                'string',
+                'distinct',
+                Rule::in(array_keys($statusLabels)),
+            ],
+        ]);
+
+        $search = trim($validated['search'] ?? '');
+        $selectedStatuses = $validated['status'] ?? [];
+
+        $query = DataKepegawaian::query();
+
+        $query
+            ->when(
+                ! empty($selectedStatuses),
+                fn ($query) => $query->whereIn(
+                    'approval_status',
+                    $selectedStatuses
+                )
+            )
+            ->when($search !== '', function ($query) use ($search) {
+                $query->where(function ($subQuery) use ($search) {
+                    $subQuery
+                        ->where('nama', 'like', "%{$search}%")
+                        ->orWhere('nip', 'like', "%{$search}%")
+                        ->orWhere('jabatan', 'like', "%{$search}%");
+                });
+            });
+
+        $data = $query
+            ->orderBy('nama')
+            ->paginate(25)
+            ->withQueryString();
+
+        $statusOptions = collect($statusLabels)
+            ->map(fn ($label, $value) => [
+                'value' => $value,
+                'label' => $label,
+            ])
+            ->values()
+            ->all();
+
+        $statusChipCriteria = collect($selectedStatuses)
+            ->map(fn ($status) => [
+                'name' => 'status',
+                'label' => 'Status',
+                'value' => $status,
+                'display' => $statusLabels[$status],
+            ])
+            ->all();
+
+        return view('superadmin.datakepegawaian.approval', compact(
+            'data',
+            'search',
+            'selectedStatuses',
+            'statusOptions',
+            'statusChipCriteria'
+        ));
     }
 
     public function approve($id)
