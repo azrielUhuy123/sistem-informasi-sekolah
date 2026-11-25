@@ -6,11 +6,22 @@
 
     <div class="container-fluid dt-siswa-page">
 
-        <x-table.page-header
-            icon="bi-person"
-            eyebrow="Data Siswa / Detail"
-            title="Detail Siswa"
-            :description="'Informasi profil dan riwayat penempatan ' . $siswa->nama . '.'"
+        <x-table.breadcrumb
+            :items="[
+                [
+                    'label' => 'Kepala Sekolah',                                
+                ],
+                [
+                    'label' => 'Master Data',                
+                ],
+                [
+                    'label' => 'Data Siswa',    
+                    'url' => route('superadmin.siswa.index'),            
+                ],
+                [
+                    'label' => 'Detail Siswa',                
+                ],
+            ]"
         />
 
         <div class="card shadow-sm border-0 overflow-hidden">

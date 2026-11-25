@@ -4,7 +4,24 @@
 
 @section('content')
 
-    <div class="container-fluid">
+    <div class="container-fluid dt-siswa-page">
+        <x-table.breadcrumb
+            :items="[
+                [
+                    'label' => 'Kepala Sekolah',                                
+                ],
+                [
+                    'label' => 'Master Data',                
+                ],
+                [
+                    'label' => 'Guru & Wali Kelas',    
+                    'url' => route('superadmin.guru.index'),            
+                ],
+                [
+                    'label' => 'Detail Guru',                
+                ],
+            ]"
+        />
 
         <div class="card shadow-sm border-0 overflow-hidden">
             <div class="card-body p-4 p-lg-5">

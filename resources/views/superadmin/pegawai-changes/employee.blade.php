@@ -3,15 +3,25 @@
 @section('title', 'Riwayat Perubahan Pegawai')
 
 @section('content')
-<div class="container-fluid py-4">
-    <nav aria-label="Breadcrumb" class="mb-3">
-        <ol class="breadcrumb mb-0">
-            <li class="breadcrumb-item">Kepala Sekolah</li>
-            <li class="breadcrumb-item">Manajemen Kepegawaian</li>
-            <li class="breadcrumb-item">Data Pegawai</li>
-            <li class="breadcrumb-item active" aria-current="page">Riwayat Perubahan</li>
-        </ol>
-    </nav>
+<div class="container-fluid dt-siswa-page">
+    <x-table.breadcrumb
+        :items="[
+            [
+                'label' => 'Kepala Sekolah',                                
+            ],
+            [
+                'label' => 'Data Kepegawaian',
+                'url' => route('superadmin.pegawai-changes.employees'),
+            ],
+            [
+                'label' => 'Monitoring Data Pegawai',
+                'url' => route('superadmin.pegawai-changes.employees'),
+            ],
+            [
+                'label' => 'Riwayat Perubahan Pegawai',                
+            ],
+        ]"
+    />
     <div class="mb-4">
         <h3 class="mb-1">{{ $pegawai->nama }}</h3>
         <p class="text-muted mb-0">{{ $pegawai->nip ?? 'Tanpa NIP' }} · {{ $pegawai->jabatan ?? 'Jabatan tidak tercatat' }}</p>

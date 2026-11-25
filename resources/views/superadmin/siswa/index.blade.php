@@ -4,16 +4,23 @@
 
 @section('content')
 <div class="container-fluid dt-siswa-page">
-    <header class="dt-siswa-page-header">
-        <div>
-            <p class="dt-siswa-eyebrow">
-                <i class="bi bi-people-fill" aria-hidden="true"></i>
-                Direktori siswa
-            </p>
-            <h1 class="dt-siswa-page-title">Data Siswa</h1>
-            <p class="dt-siswa-page-description">Telusuri data siswa, rombongan belajar, dan status keaktifan.</p>
-        </div>
-    </header>
+    <x-table.breadcrumb
+        :items="[
+            [
+                'label' => 'Kepala Sekolah',                                
+            ],
+            [
+                'label' => 'Master Data',                
+            ],
+            [
+                'label' => 'Data Siswa',                
+            ],
+        ]"
+    />
+    <x-table.page-header        
+        title=" Data Siswa"
+        description="Telusuri data siswa, rombongan belajar, dan status keaktifan."
+    />   
 
     <x-alert.flash key="success" type="success" />
     <x-alert.flash key="error" type="danger" />
@@ -47,7 +54,7 @@
             >
                 <x-slot:columnMenu>
                     @foreach ([
-                        'no' => 'No',
+                        'nis' => 'NIS',
                         'name' => 'Siswa',
                         'nisn' => 'NISN',
                         'class' => 'Rombel',
@@ -90,7 +97,7 @@
             <table id="dt-siswa-table" class="table table-hover align-middle dt-table dt-siswa-table">
                 <caption class="visually-hidden">Data siswa, nomor induk, penempatan, status, dan tautan detail</caption>
                 <colgroup>
-                    <col class="dt-siswa-col-number" data-dt-column="no">
+                    <col class="dt-siswa-col-action" data-dt-column="nis">
                     <col class="dt-siswa-col-name" data-dt-column="name">
                     <col class="dt-siswa-col-nisn" data-dt-column="nisn">
                     <col class="dt-siswa-col-class" data-dt-column="class">
@@ -100,7 +107,7 @@
                 </colgroup>
                 <thead>
                     <tr>
-                        <x-table.heading class="text-center" width="4rem" column="no">No</x-table.heading>
+                        <x-table.heading column="nis">NIS</x-table.heading>
                         <x-table.heading width="21rem" column="name">Siswa</x-table.heading>
                         <x-table.heading width="8.5rem" column="nisn">NISN</x-table.heading>
                         <x-table.heading width="8rem" column="class">Rombel</x-table.heading>
@@ -112,18 +119,15 @@
                 <tbody id="tableSiswa">
                     @forelse ($siswa as $row)
                         <tr>
-                            <td class="dt-siswa-row-number" data-dt-column="no">
-                                {{ $loop->iteration + ($siswa->currentPage() - 1) * $siswa->perPage() }}
+                            <td class="dt-siswa-row-number" data-dt-column="nis">
+                                {{ $row->nis }}
                             </td>
                             <th scope="row" class="dt-siswa-identity-cell" data-dt-column="name">
                                 <div class="dt-siswa-identity">
                                     <span class="dt-siswa-avatar" aria-hidden="true">
                                         <i class="bi bi-person-fill"></i>
                                     </span>
-                                    <span class="dt-siswa-identity-copy">
-                                        <span class="dt-siswa-name">{{ $row->nama }}</span>
-                                        <span class="dt-siswa-meta">NIS {{ $row->nis }}</span>
-                                    </span>
+                                    {{ $row->nama }}
                                 </div>
                             </th>
                             <td class="dt-siswa-identifier" data-dt-column="nisn">{{ $row->nisn ?? '-' }}</td>
@@ -135,13 +139,11 @@
                             </td>
                             <td data-dt-column="status">
                                 @if ($row->trashed())
-                                    <span class="badge-status nonaktif dt-siswa-status">
-                                        <i class="bi bi-circle-fill" aria-hidden="true"></i>
+                                    <span class="badge-status nonaktif dt-siswa-status">                                        
                                         Nonaktif
                                     </span>
                                 @else
-                                    <span class="badge-status aktif dt-siswa-status">
-                                        <i class="bi bi-circle-fill" aria-hidden="true"></i>
+                                    <span class="badge-status aktif dt-siswa-status">                                        
                                         Aktif
                                     </span>
                                 @endif

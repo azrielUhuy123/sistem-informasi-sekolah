@@ -35,7 +35,7 @@ class DataKepegawaianApprovalController extends Controller
         ]);
 
         $search = trim($validated['search'] ?? '');
-        $selectedStatuses = $validated['status'] ?? [];
+        $selectedStatuses = $validated['status'] ?? ['pending'];
 
         $query = DataKepegawaian::query();
 
@@ -89,49 +89,57 @@ class DataKepegawaianApprovalController extends Controller
 
     public function approve($id)
     {
-        DB::transaction(function () use ($id) {
+        $approved = DB::transaction(function () use ($id) {
 
-            $pegawai = DataKepegawaian::findOrFail($id);
+            $pegawai = DataKepegawaian::whereKey($id)
+                ->lockForUpdate()
+                ->firstOrFail();
+
+            // Hanya data pending yang boleh disetujui.
+            if ($pegawai->approval_status !== 'pending') {
+                return false;
+            }
 
             $pegawai->update([
                 'approval_status' => 'approved',
                 'rejected_reason' => null,
             ]);
 
-            // Jika sudah punya akun, tidak perlu dibuat lagi
+            // Jika sudah memiliki akun, tidak perlu dibuat lagi.
             if ($pegawai->user) {
-                return;
+                return true;
             }
 
-            // Mapping Role berdasarkan Jabatan
+            // Mapping role berdasarkan jabatan.
             $jabatan = strtolower(trim($pegawai->jabatan));
 
             $role = match (true) {
-
-                str_contains($jabatan, 'guru')
-                    => UserRole::GURU,
-
-                str_contains($jabatan, 'tu')
-                    => UserRole::GURU,
-
-                str_contains($jabatan, 'kepala sekolah')
-                    => UserRole::SUPERADMIN,
-
+                str_contains($jabatan, 'guru') => UserRole::GURU,
+                str_contains($jabatan, 'tu') => UserRole::GURU,
+                str_contains($jabatan, 'kepala sekolah') => UserRole::SUPERADMIN,
                 default => null,
             };
 
-            // Jabatan yang tidak memiliki role
+            // Jabatan yang tidak memiliki role.
             if (!$role) {
-                return;
+                return true;
             }
 
+            return true;
         });
+
+        // Pemeriksaan dilakukan setelah transaksi selesai.
+        if (!$approved) {
+            return redirect()
+                ->route('superadmin.datakepegawaian.approval')
+                ->with('error', 'Data pegawai ini sudah tidak menunggu validasi.');
+        }
 
         return redirect()
             ->route('superadmin.datakepegawaian.approval')
             ->with(
                 'success',
-                'Data pegawai berhasil diapprove dan akun berhasil dibuat.'
+                'Data pegawai berhasil disetujui.'
             );
     }
 

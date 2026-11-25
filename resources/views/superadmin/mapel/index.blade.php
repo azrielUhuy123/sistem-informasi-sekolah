@@ -4,20 +4,23 @@
 
 @section('content')
 <div class="container-fluid dt-siswa-page">
-    <header class="dt-siswa-page-header">
-        <div>
-            <p class="dt-siswa-eyebrow">
-                <i class="bi bi-book-half" aria-hidden="true"></i>
-                Master Data / Mata Pelajaran
-            </p>
-
-            <h1 class="dt-siswa-page-title">Mata Pelajaran</h1>
-
-            <p class="dt-siswa-page-description">
-                Daftar dan informasi mata pelajaran sekolah.
-            </p>
-        </div>
-    </header>
+    <x-table.breadcrumb
+        :items="[
+            [
+                'label' => 'Kepala Sekolah',                                
+            ],
+            [
+                'label' => 'Master Data',                
+            ],
+            [
+                'label' => 'Mata Pelajaran',                
+            ],
+        ]"
+    />
+    <x-table.page-header                
+        title="Mata Pelajaran"
+        description="Daftar dan informasi mata pelajaran sekolah."
+    />   
 
     <x-alert.flash key="success" type="success" />
     <x-alert.flash key="error" type="danger" />
@@ -96,21 +99,13 @@
                     Daftar mata pelajaran
                 </caption>
 
-                <colgroup>
-                    <col data-dt-column="number">
+                <colgroup>                    
                     <col data-dt-column="code">
                     <col data-dt-column="name">
                 </colgroup>
 
                 <thead>
-                    <tr>
-                        <x-table.heading
-                            class="text-center"
-                            column="number"
-                        >
-                            No
-                        </x-table.heading>
-
+                    <tr>                        
                         <x-table.heading column="code">
                             Kode
                         </x-table.heading>
@@ -123,14 +118,7 @@
 
                 <tbody>
                     @forelse ($mata_pelajaran as $row)
-                        <tr>
-                            <td
-                                class="text-center text-body-secondary"
-                                data-dt-column="number"
-                            >
-                                {{ $loop->iteration + ($mata_pelajaran->currentPage() - 1) * $mata_pelajaran->perPage() }}
-                            </td>
-
+                        <tr>                            
                             <td
                                 class="text-nowrap"
                                 data-dt-column="code"
@@ -149,14 +137,14 @@
                     @empty
                         @if (request()->filled('q'))
                             <x-table.empty
-                                :colspan="3"
+                                :colspan="2"
                                 state="no-results"
                                 title="Tidak ada mata pelajaran yang cocok"
                                 description="Ubah kata kunci pencarian, lalu coba lagi."
                             />
                         @else
                             <x-table.empty
-                                :colspan="3"
+                                :colspan="2"
                                 state="empty"
                                 title="Belum ada data mata pelajaran"
                                 description="Data mata pelajaran belum tersedia."

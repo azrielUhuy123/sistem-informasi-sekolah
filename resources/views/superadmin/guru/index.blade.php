@@ -6,10 +6,21 @@
 @section('content')
 
 <div class="container-fluid dt-siswa-page">
+    <x-table.breadcrumb
+        :items="[
+            [
+                'label' => 'Kepala Sekolah',                                
+            ],
+            [
+                'label' => 'Master Data',                
+            ],
+            [
+                'label' => 'Guru & Wali Kelas',                
+            ],
+        ]"
+    />
 
-    <x-table.page-header
-        icon="bi-person-workspace"
-        eyebrow="Data Akademik / Guru"
+    <x-table.page-header        
         title="Guru & Wali Kelas"
         description="Kelola data guru dan wali kelas sekolah."
     />
@@ -185,7 +196,7 @@
 
                 <x-slot:columnMenu>
                     @foreach ([
-                        'number' => 'No',
+                        'nip' => 'NIP',
                         'teacher' => 'Nama Guru',
                         'academic_status' => 'Status Akademik',
                         'subjects' => 'Mata Pelajaran',
@@ -247,54 +258,22 @@
                 </caption>
 
                 <colgroup>
-                    <col class="dt-siswa-col-number" data-dt-column="number">
+                    <col class="dt-siswa-col-action" data-dt-column="nip">
                     <col class="dt-siswa-col-name" data-dt-column="teacher">
-                    <col class="dt-siswa-col-nisn" data-dt-column="academic_status">
+                    <col class="dt-siswa-col-status" data-dt-column="academic_status">
                     <col class="dt-siswa-col-class" data-dt-column="subjects">
-                    <col class="dt-siswa-col-status" data-dt-column="classes">
+                    <col class="dt-siswa-col-nisn" data-dt-column="classes">
                     <col class="dt-siswa-col-action" data-dt-column="action">
                 </colgroup>
 
                 <thead>
                     <tr>
-                        <x-table.heading
-                            width="70px"
-                            column="number"
-                        >
-                            No
-                        </x-table.heading>
-
-                        <x-table.heading column="teacher">
-                            Nama Guru
-                        </x-table.heading>
-
-                        <x-table.heading
-                            width="200px"
-                            column="academic_status"
-                        >
-                            Status Akademik
-                        </x-table.heading>
-
-                        <x-table.heading
-                            width="500px"
-                            column="subjects"
-                        >
-                            Mata Pelajaran
-                        </x-table.heading>
-
-                        <x-table.heading
-                            width="100px"
-                            column="classes"
-                        >
-                            Total Kelas
-                        </x-table.heading>
-
-                        <x-table.heading
-                            width="130px"
-                            column="action"
-                        >
-                            Aksi
-                        </x-table.heading>
+                        <x-table.heading column="nip">NIP</x-table.heading>
+                        <x-table.heading width="21rem" column="teacher">Nama Guru</x-table.heading>
+                        <x-table.heading width="8.5rem" column="academic_status">Status Akademik</x-table.heading>
+                        <x-table.heading width="8rem" column="subjects">Mata Pelajaran</x-table.heading>
+                        <x-table.heading width="7.5rem" column="classes">Total Kelas</x-table.heading>                        
+                        <x-table.heading class="text-center" width="7.5rem" column="action">Aksi</x-table.heading>                                      
                     </tr>
                 </thead>
 
@@ -305,11 +284,10 @@
                         <tr>
 
                             {{-- NOMOR --}}
-                            <td
-                                class="text-center text-body-secondary"
-                                data-dt-column="number"
+                            <td                                
+                                data-dt-column="nip"
                             >
-                                {{ $loop->iteration + ($gurus->currentPage() - 1) * $gurus->perPage() }}
+                                {{ $guru->pegawai?->nip ?? $guru->nip ?? '-' }}
                             </td>
 
                             {{-- NAMA GURU --}}
@@ -318,37 +296,25 @@
                                     <span class="dt-siswa-avatar" aria-hidden="true">
                                         <i class="bi bi-person-fill"></i>
                                     </span>
-
-                                    <span class="dt-siswa-identity-copy">
-                                        <span class="dt-siswa-name">
-                                            {{ $guru->pegawai?->nama ?? $guru->nama ?? '-' }}
-                                        </span>                                        
-                                        <span class="dt-siswa-meta">
-                                            NIP : {{ $guru->pegawai?->nip ?? $guru->nip ?? '-' }}
-                                        </span>
-                                    </span>
-
+                                   
+                                    {{ $guru->pegawai?->nama ?? $guru->nama ?? '-' }}                                     
                                 </div>
                             </th>
 
                             {{-- STATUS AKADEMIK --}}
                             <td data-dt-column="academic_status">
-                                @if ($guru->filter_status === 'Wali Kelas')
-                                    <span class="text-gold fw-semibold">
-                                        Wali Kelas
-                                    </span>
+                                @if ($guru->filter_status === 'Wali Kelas')                                    
+                                    Wali Kelas
+                                @elseif ($guru->filter_status === 'Guru Bidang')                                   
+                                    Guru Bidang                                    
                                 @else
-                                    <span class="text-teal fw-semibold">
-                                        Guru Bidang
-                                    </span>
+                                    -
                                 @endif
                             </td>
 
                             {{-- MATA PELAJARAN --}}
-                            <td data-dt-column="subjects">
-                                <div class="fw-semibold small mb-1">
-                                    {{ $guru->jumlah_mapel }} Mapel
-                                </div>
+                            <td data-dt-column="subjects">                                
+                                {{ $guru->jumlah_mapel }} Mapel                                
                             </td>
 
                             {{-- TOTAL KELAS --}}

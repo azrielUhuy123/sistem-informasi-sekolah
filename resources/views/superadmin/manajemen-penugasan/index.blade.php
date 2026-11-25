@@ -4,6 +4,16 @@
 
 @section('content')
 <div class="container-fluid dt-siswa-page assignment-page">
+    <x-table.breadcrumb
+        :items="[
+            [
+                'label' => 'Kepala Sekolah',                                
+            ],
+            [
+                'label' => 'Manajemen Penugasan',                
+            ],            
+        ]"
+    />
     <x-table.page-header
         icon="bi-person-check"
         eyebrow="Manajemen Penugasan"

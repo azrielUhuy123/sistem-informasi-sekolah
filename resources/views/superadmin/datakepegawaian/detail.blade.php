@@ -4,7 +4,46 @@
 
 @section('content')
 
-    <div class="container-fluid">
+    <div class="container-fluid dt-siswa-page">
+        @php
+            $from = request()->query('from');
+
+            $parent = match ($from) {
+                'pegawai-baru' => [
+                    'label' => 'Persetujuan Pegawai Baru',
+                    'url' => route('superadmin.datakepegawaian.approval'),
+                ],
+
+                'data-pegawai' => [
+                    'label' => 'Monitoring Data Pegawai',
+                    'url' => route('superadmin.pegawai-changes.employees'),
+                ],
+
+                default => [
+                    'label' => 'Data Kepegawaian',
+                    'url' => route('superadmin.pegawai-changes.employees'),
+                ],
+            };
+        @endphp
+
+        <x-table.breadcrumb
+            :items="[
+                [
+                    'label' => 'Kepala Sekolah',
+                ],
+                [
+                    'label' => 'Data Kepegawaian',
+                    'url' => route('superadmin.pegawai-changes.employees'),
+                ],
+                [
+                    'label' => $parent['label'],
+                    'url' => $parent['url'],
+                ],
+                [
+                    'label' => 'Detail Pegawai',
+                ],
+            ]"
+        />
 
         <div class="card shadow-sm border-0 overflow-hidden">
             <div class="card-body p-4 p-lg-5">

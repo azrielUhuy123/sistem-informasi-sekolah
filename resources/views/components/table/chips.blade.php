@@ -64,13 +64,16 @@
             @endphp
             <span class="dt-filter-chip">
                 <span>{{ $criterion['label'] }}: {{ $displayValue }}</span>
-                <a
-                    href="{{ $removeUrl }}"
-                    aria-label="Hapus {{ $criterion['label'] }}"
-                    title="Hapus {{ $criterion['label'] }}"
-                >
-                    <i class="bi bi-x" aria-hidden="true"></i>
-                </a>
+
+                @if ($criterion['removable'] ?? true)
+                    <a
+                        href="{{ $removeUrl }}"
+                        aria-label="Hapus {{ $criterion['label'] }}: {{ $displayValue }}"
+                        title="Hapus {{ $criterion['label'] }}"
+                    >
+                        <i class="bi bi-x" aria-hidden="true"></i>
+                    </a>
+                @endif
             </span>
         @endforeach
 

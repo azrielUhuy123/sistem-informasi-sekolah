@@ -19,24 +19,7 @@
             <i class="bi bi-speedometer2"></i>
             <span>Dashboard</span>
         </div>
-    </a>
-
-    {{-- MANAJEMEN KEPEGAWAIAN --}}
-    @php
-        $manajemenKepegawaianActive =
-            request()->is('superadmin/data-kepegawaian*') ||
-            request()->is('superadmin/perubahan-data-kepegawaian*') ||
-            request()->is('superadmin/datakepegawaian*');
-    @endphp
-    <a
-        class="menu-item {{ $manajemenKepegawaianActive ? 'active' : '' }}"
-        href="{{ route('superadmin.pegawai-changes.employees') }}"
-    >
-        <div class="menu-left">
-            <i class="bi bi-person-gear"></i>
-            <span>Manajemen Kepegawaian</span>
-        </div>
-    </a>
+    </a>    
 
     {{-- Master Data --}}
     <button
@@ -110,47 +93,7 @@
             </div>
         </a>
     </div>
-
-    {{-- PENUGASAN GURU --}}
-    <button
-        class="menu-item border-0 bg-transparent text-start"
-        onclick="toggleMenu('menuPenugasanGuru','arrowPenugasanGuru')"
-    >
-
-        <div class="menu-left">
-            <i class="bi bi-person-check"></i>
-            <span>Penugasan Guru</span>
-        </div>
-
-        <i
-            class="bi bi-chevron-right dropdown-arrow"
-            id="arrowPenugasanGuru"
-        ></i>
-
-    </button>
-
-    <div
-        class="submenu
-        {{ request()->is('superadmin/pengampu-mapel*') ||
-        request()->is('superadmin/wali-kelas*') ||
-        request()->is('superadmin/pembina-ekskul*') ||
-        request()->is('superadmin/manajemen-penugasan*')
-            ? 'show'
-            : '' }}"
-        id="menuPenugasanGuru"
-    >
-
-        <a
-            class="menu-item {{ request()->is('superadmin/manajemen-penugasan*') ? 'active' : '' }}"
-            href="{{ route('superadmin.manajemen-penugasan.index') }}"
-        >
-            <div class="menu-left">
-                <i class="bi bi-sliders"></i>
-                <span>Manajemen Penugasan</span>
-            </div>
-        </a>
-
-    </div>
+    
 
     {{-- MONITORING AKADEMIK --}}
     <button
@@ -222,6 +165,33 @@
 
         </a>
     </div>
+
+    {{-- MANAJEMEN KEPEGAWAIAN --}}
+    @php
+        $manajemenKepegawaianActive =
+            request()->is('superadmin/data-kepegawaian*') ||
+            request()->is('superadmin/perubahan-data-kepegawaian*') ||
+            request()->is('superadmin/datakepegawaian*');
+    @endphp
+    <a
+        class="menu-item {{ $manajemenKepegawaianActive ? 'active' : '' }}"
+        href="{{ route('superadmin.pegawai-changes.employees') }}"
+    >
+        <div class="menu-left">
+            <i class="bi bi-person-gear"></i>
+            <span>Data Kepegawaian</span>
+        </div>
+    </a>
+
+    <a
+        class="menu-item {{ request()->is('superadmin/manajemen-penugasan*') ? 'active' : '' }}"
+        href="{{ route('superadmin.manajemen-penugasan.index') }}"
+    >
+        <div class="menu-left">
+            <i class="bi bi-sliders"></i>
+            <span>Manajemen Penugasan</span>
+        </div>
+    </a>
 
     {{-- APPROVAL USER --}}
     <button

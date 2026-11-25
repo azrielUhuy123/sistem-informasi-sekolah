@@ -1,22 +1,28 @@
 @extends('layouts.app')
 
-@section('title', 'Approval Data Kepegawaian')
+@section('title', 'Persetujuan Pegawai Baru')
 
 @section('content')
 
-<div class="container-fluid dt-siswa-page">
-    <nav aria-label="Breadcrumb" class="mb-3">
-        <ol class="breadcrumb mb-0">
-            <li class="breadcrumb-item">Kepala Sekolah</li>
-            <li class="breadcrumb-item">Manajemen Kepegawaian</li>
-            <li class="breadcrumb-item active" aria-current="page">Pegawai Baru</li>
-        </ol>
-    </nav>
+<div class="container-fluid dt-siswa-page">  
+    <x-table.breadcrumb
+        :items="[
+            [
+                'label' => 'Kepala Sekolah',                                
+            ],
+            [
+                'label' => 'Data Kepegawaian',
+                'url' => route('superadmin.pegawai-changes.employees'),
+            ],
+            [
+                'label' => 'Persetujuan Pegawai Baru',
+                'url' => route('superadmin.datakepegawaian.approval'),
+            ],
+        ]"
+    />
 
-    <x-table.page-header
-        icon="bi-person-vcard"
-        eyebrow="Manajemen Kepegawaian"
-        title="Pegawai Baru"
+    <x-table.page-header                
+        title="Persetujuan Pegawai Baru"
         description="Validasi pengajuan data kepegawaian baru sebelum digunakan dalam sistem."
     />
 
@@ -26,7 +32,7 @@
 
     {{-- TABLE --}}
     <x-table.card
-        title="Persetujuan Data Kepegawaian"
+        title="Data Pegawai Baru"
         subtitle="Seluruh data pegawai yang menunggu proses validasi oleh Kepala Sekolah"
         :count="$data->total()"
 
@@ -118,7 +124,8 @@
                 <colgroup>
                     <col data-dt-column="nip">
                     <col data-dt-column="employee">
-                    <col data-dt-column="status">                    
+                    <col data-dt-column="status"> 
+                    <col data-dt-column="approval">                   
                     <col data-dt-column="action">
                 </colgroup>
 
@@ -127,7 +134,8 @@
                         <th data-dt-column="nip">NIP</th>
                         <th data-dt-column="employee">Pegawai</th>
                         <th data-dt-column="status">Status</th>
-                        <th data-dt-column="action">Aksi</th>                        
+                        <th data-dt-column="approval">Validasi</th>
+                        <th data-dt-column="action">Aksi</th>                            
                     </tr>                    
                 </thead>
                 <tbody>
@@ -144,55 +152,52 @@
                             {{-- STATUS --}}
                             <td data-dt-column="status">
                                 @if($row->approval_status == 'approved')
-                                    <span class="badge-status aktif">
-                                        <i class="bi bi-check-circle-fill me-1"></i>
-                                        Valid
-                                    </span>
+                                    <i class="bi bi-check-lg"></i> Disetujui
                                 @elseif($row->approval_status == 'rejected')
-                                    <span class="badge-status nonaktif">
-                                        <i class="bi bi-x-circle-fill me-1"></i>
-                                        Ditolak
-                                    </span>
-                                @else
-                                    <span class="badge-status pending">
-                                        <i class="bi bi-hourglass-split me-1"></i>
-                                        Validasi
-                                    </span>
+                                    <i class="bi bi-x-lg"></i> Ditolak
+                                @else                                                                        
+                                    <i class="bi bi-clock"></i> Menunggu                             
                                 @endif
                             </td>
-                            <td data-dt-column="action">
-                            {{-- VALIDASI --}}
-                                <div class="d-flex flex-wrap gap-2">
-                                    @if($row->approval_status != 'rejected')                            
-                                        <button
-                                            type="button"
-                                            class="btn btn-sm btn-outline-danger dt-siswa-detail"
-                                            data-bs-toggle="modal"
-                                            data-bs-target="#rejectModal{{ $row->id }}"
-                                        >
-                                            Tolak <i class="bi bi-x-lg"></i>                                                                             
-                                        </button>                                    
-                                    @endif
-                                    @if($row->approval_status != 'approved')                                
+                            <td data-dt-column="approval">
+                                @if ($row->approval_status === 'pending')
+                                    <div class="d-flex flex-wrap gap-2">
+
                                         <form
                                             action="{{ route('superadmin.datakepegawaian.approve', $row->id) }}"
                                             method="POST"
                                         >
                                             @csrf
                                             @method('PATCH')
+
                                             <button
                                                 type="submit"
-                                                class="btn btn-sm btn-primary dt-siswa-detail btn-confirm"
+                                                class="btn btn-sm btn-success dt-siswa-detail btn-confirm"
                                                 data-title="VALIDASI DATA KEPEGAWAIAN INI?"
                                                 data-message="Data kepegawaian ini akan divalidasi dan dinyatakan valid."
                                                 data-button="btn-success"
-                                            >                                            
+                                            >
                                                 Setujui <i class="bi bi-check-lg"></i>
                                             </button>
-                                        </form>                                     
-                                    @endif                            
-                                    
-                                </div>
+                                        </form>
+
+                                        <button
+                                            type="button"
+                                            class="btn btn-sm btn-outline-danger dt-siswa-detail"
+                                            data-bs-toggle="modal"
+                                            data-bs-target="#rejectModal{{ $row->id }}"
+                                        >
+                                            Tolak <i class="bi bi-x-lg"></i>
+                                        </button>                                                                        
+                                    </div>
+                                @endif
+                                
+                            </td>
+                            <td data-dt-column="action">
+                                <a class="btn btn-sm btn-outline-primary dt-siswa-detail" href="{{ route('superadmin.datakepegawaian.show', [
+                                    $row,
+                                    'from' => 'pegawai-baru',
+                                ]) }}">Detail <i class="bi bi-arrow-up-right" aria-hidden="true"></i></a>
                             </td>
                         </tr>
 
@@ -229,7 +234,7 @@
 
 
     {{-- MODAL REJECT --}}
-    @foreach($data as $row)
+    @foreach($data->where('approval_status', 'pending') as $row)
 
         <div
             class="modal fade"

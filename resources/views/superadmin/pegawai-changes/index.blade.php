@@ -4,14 +4,22 @@
 
 @section('content')
 <div class="container-fluid dt-siswa-page">
-    <nav aria-label="Breadcrumb" class="mb-3">
-        <ol class="breadcrumb mb-0">
-            <li class="breadcrumb-item">Kepala Sekolah</li>
-            <li class="breadcrumb-item">Manajemen Kepegawaian</li>
-            <li class="breadcrumb-item active" aria-current="page">Perubahan Data</li>
-        </ol>
-    </nav>
-    <x-table.page-header icon="bi-arrow-repeat" eyebrow="Manajemen Kepegawaian" title="Perubahan Data" description="Pantau pengajuan perubahan data pegawai tanpa persetujuan tahap kedua." />
+    <x-table.breadcrumb
+        :items="[
+            [
+                'label' => 'Kepala Sekolah',                                
+            ],
+            [
+                'label' => 'Data Kepegawaian',
+                'url' => route('superadmin.pegawai-changes.employees'),
+            ],
+            [
+                'label' => 'Monitoring Perubahan Data Kepegawaian',
+                'url' => route('superadmin.pegawai-changes.index'),
+            ],
+        ]"
+    />
+    <x-table.page-header icon="bi-arrow-repeat" eyebrow="Manajemen Kepegawaian" title="Monitoring Perubahan Data Kepegawaian" description="Pantau pengajuan perubahan data pegawai tanpa persetujuan tahap kedua." />
     <x-table.card title="Pengajuan Perubahan Data" subtitle="Informasi pengajuan perubahan data pada kepegawaian" :count="$requests->total()" count-label="pengajuan">
         <x-slot:headerActions>
             <nav class="dt-employee-navigation" aria-label="Navigasi Manajemen Kepegawaian">

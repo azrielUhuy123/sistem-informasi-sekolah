@@ -4,14 +4,22 @@
 
 @section('content')
 <div class="container-fluid dt-siswa-page">
-    <nav aria-label="Breadcrumb" class="mb-3">
-        <ol class="breadcrumb mb-0">
-            <li class="breadcrumb-item">Kepala Sekolah</li>
-            <li class="breadcrumb-item">Manajemen Kepegawaian</li>
-            <li class="breadcrumb-item active" aria-current="page">Data Pegawai</li>
-        </ol>
-    </nav>
-    <x-table.page-header icon="bi-person-lines-fill" eyebrow="Manajemen Kepegawaian" title="Data Pegawai" description="Master data pegawai beserta akses profil dan riwayat perubahan." />
+    <x-table.breadcrumb
+        :items="[
+            [
+                'label' => 'Kepala Sekolah',                                
+            ],
+            [
+                'label' => 'Data Kepegawaian',
+                'url' => route('superadmin.pegawai-changes.employees'),
+            ],
+            [
+                'label' => 'Monitoring Data Pegawai',
+                'url' => route('superadmin.pegawai-changes.employees'),
+            ],
+        ]"
+    />
+    <x-table.page-header icon="bi-person-lines-fill" eyebrow="Manajemen Kepegawaian" title="Monitoring Data Pegawai" description="Master data pegawai beserta akses profil dan riwayat perubahan." />
     <x-table.card 
         title="Data Pegawai" 
         subtitle="Informasi data pegawai"
@@ -120,7 +128,10 @@
                         <td data-dt-column="history">{{ $employee->pegawai_change_requests_count }}</td>
                         <td data-dt-column="action">
                             <div class="d-flex flex-wrap gap-2">
-                                <a class="btn btn-sm btn-outline-primary dt-siswa-detail" href="{{ route('superadmin.datakepegawaian.show', $employee) }}">Detail <i class="bi bi-arrow-up-right" aria-hidden="true"></i></a>
+                                <a class="btn btn-sm btn-outline-primary dt-siswa-detail" href="{{ route('superadmin.datakepegawaian.show', [
+                                        $employee,
+                                        'from' => 'data-pegawai',
+                                    ]) }}">Detail <i class="bi bi-arrow-up-right" aria-hidden="true"></i></a>
                                 <a class="btn btn-sm btn-outline-secondary" href="{{ route('superadmin.pegawai-changes.employee', $employee) }}">Riwayat</a>
                             </div>
                         </td>
