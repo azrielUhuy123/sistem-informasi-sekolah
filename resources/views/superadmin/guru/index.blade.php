@@ -273,7 +273,7 @@
                         <x-table.heading width="8.5rem" column="academic_status">Status Akademik</x-table.heading>
                         <x-table.heading width="8rem" column="subjects">Mata Pelajaran</x-table.heading>
                         <x-table.heading width="7.5rem" column="classes">Total Kelas</x-table.heading>                        
-                        <x-table.heading class="text-center" width="7.5rem" column="action">Aksi</x-table.heading>                                      
+                        <x-table.heading width="7.5rem" column="action">Aksi</x-table.heading>                                      
                     </tr>
                 </thead>
 
@@ -342,7 +342,7 @@
                             <td data-dt-column="action">
                                 <a
                                     href="{{ route('superadmin.guru.show', $guru) }}"
-                                    class="btn btn-outline-primary dt-siswa-detail"
+                                    class="btn btn-sm btn-outline-primary dt-siswa-detail"
                                 >
                                     Detail
                                     <i class="bi bi-arrow-up-right" aria-hidden="true"></i>

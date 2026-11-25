@@ -196,6 +196,56 @@ class User extends Authenticatable
         return false;
     }
 
+    public function getAssignmentModes(): array
+    {
+        if ($this->role !== UserRole::GURU) {
+            return [];
+        }
+
+        $modes = [];
+        foreach (config('assignment_menus.modes', []) as $mode => $definition) {
+            $menuKeys = array_keys(config("assignment_menus.types.{$definition['type']}.menus", []));
+            if (! $this->hasAnyAssignmentMenu($menuKeys)) {
+                continue;
+            }
+
+            $dashboardRoute = $definition['dashboard'];
+            $url = $this->hasFeature($this->dashboardMenuForMode($definition['type']))
+                ? route($dashboardRoute)
+                : null;
+
+            if (! $url) {
+                foreach ($definition['routes'] as $menuKey => $routeName) {
+                    if ($this->hasFeature($menuKey) && \Illuminate\Support\Facades\Route::has($routeName)) {
+                        $url = route($routeName);
+                        break;
+                    }
+                }
+            }
+
+            if ($url) {
+                $modes[$mode] = [
+                    'label' => $definition['label'],
+                    'url' => $url,
+                ];
+            }
+        }
+
+        return $modes;
+    }
+
+    private function dashboardMenuForMode(string $type): string
+    {
+        return match ($type) {
+            'operator' => 'operator.dashboard',
+            'ppdb' => 'ppdb.dashboard',
+            'wali' => 'wali.dashboard',
+            'guru' => 'guru.dashboard',
+            'ekskul' => 'ekskul.dashboard',
+            default => '',
+        };
+    }
+
     public function getNameAttribute()
     {
         if (array_key_exists('name', $this->attributes)) {

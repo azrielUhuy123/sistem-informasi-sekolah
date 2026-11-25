@@ -5,6 +5,16 @@
 @section('content')
 
 <div class="container-fluid dt-siswa-page">
+    <x-table.breadcrumb
+        :items="[
+            [
+                'label' => 'Operator',                                
+            ],
+            [
+                'label' => 'Kelola Tahun Ajaran',                
+            ],            
+        ]"
+    />
 
     <x-table.page-header
         icon="bi-calendar3"

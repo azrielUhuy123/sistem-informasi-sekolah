@@ -34,6 +34,21 @@ Route::prefix('guru')
     ->name('guru.')
     ->middleware(['auth', 'approved', 'role:guru'])
     ->group(function () {
+        Route::get('/switch-assignment/{mode}', function (string $mode) {
+            $user = request()->user();
+            $modes = $user->getAssignmentModes();
+
+            abort_unless(isset($modes[$mode]), 404);
+
+            session([
+                'assignment_mode' => $mode,
+                'guru_mode' => $mode === 'ekskul' ? 'ekskul' : 'akademik',
+                'tu_mode' => $mode === 'ppdb' ? 'ppdb' : 'operasional',
+            ]);
+
+            return redirect($modes[$mode]['url']);
+        })->name('switch-assignment');
+
         Route::get('/pegawai/perubahan', [PegawaiChangeController::class, 'index'])
             ->name('pegawai-changes.index');
         Route::get('/pegawai/perubahan/create', [PegawaiChangeController::class, 'create'])

@@ -1,6 +1,85 @@
 <?php
 
 return [
+    'modes' => [
+        'wali' => [
+            'label' => 'Wali Kelas',
+            'type' => 'wali',
+            'dashboard' => 'guru.dashboard-walikelas',
+            'routes' => [
+                'wali.classes' => 'guru.kelas-saya',
+                'wali.attendance' => 'guru.absensi.index',
+                'wali.grades' => 'guru.nilai.index',
+                'wali.development' => 'guru.perkembangan.index',
+                'wali.report' => 'guru.raport.index',
+                'wali.promotion' => 'guru.kenaikan.index',
+            ],
+        ],
+        'operator' => [
+            'label' => 'Operator',
+            'type' => 'operator',
+            'dashboard' => 'tu.dashboard',
+            'routes' => [
+                'operator.school_year' => 'tu.tahun.index',
+                'operator.classes' => 'tu.kelas.index',
+                'operator.students' => 'tu.siswa.index',
+                'operator.teachers' => 'tu.guru.index',
+                'operator.subjects' => 'tu.mapel.index',
+                'operator.schedule' => 'tu.jadwal-final.index',
+                'operator.extracurriculars' => 'tu.ekskul.index',
+                'operator.documents' => 'tu.dokumen.sekolah',
+                'operator.employees' => 'tu.pegawai-changes.index',
+                'operator.accounts' => 'tu.akun.index',
+                'operator.search' => 'tu.search',
+            ],
+        ],
+        'ppdb' => [
+            'label' => 'PPDB',
+            'type' => 'ppdb',
+            'dashboard' => 'tu.ppdb.dashboard',
+            'routes' => [
+                'ppdb.applicants' => 'tu.ppdb.pendaftar.index',
+                'ppdb.accepted' => 'tu.ppdb.diterima.index',
+                'ppdb.rejected' => 'tu.ppdb.ditolak.index',
+                'ppdb.reenrollment' => 'tu.ppdb.daftar-ulang.index',
+                'ppdb.class_placement' => 'tu.ppdb.penempatan-kelas.index',
+                'ppdb.verification' => 'tu.ppdb.verifikasi.index',
+                'ppdb.settings' => 'tu.ppdb.pengaturan.index',
+            ],
+        ],
+        'guru' => [
+            'label' => 'Guru Bidang',
+            'type' => 'guru',
+            'dashboard' => 'guru.dashboard-gurubidang',
+            'routes' => [
+                'guru.schedule' => 'guru.jadwal-saya.index',
+                'guru.schedule_status' => 'guru.status-validasi.index',
+                'guru.attendance' => 'guru.absensi.index',
+                'guru.grades' => 'guru.nilai.index',
+                'guru.development' => 'guru.perkembangan.index',
+                'guru.documents' => 'guru.dokumen.surat',
+                'guru.letters' => 'guru.pengajuan-surat.index',
+                'guru.letter_numbers' => 'guru.nomor-surat.index',
+                'guru.monthly_report' => 'guru.absensi.rekap-bulanan',
+                'guru.semester_report' => 'guru.absensi.rekap-semester',
+            ],
+        ],
+        'ekskul' => [
+            'label' => 'Pembina Ekskul',
+            'type' => 'ekskul',
+            'dashboard' => 'guru.ekskul.dashboard',
+            'routes' => [
+                'ekskul.schedule' => 'guru.ekskul.jadwal.index',
+                'ekskul.schedule_status' => 'guru.ekskul.validasi.index',
+                'ekskul.registration' => 'guru.ekskul.anggota.index',
+                'ekskul.members' => 'guru.ekskul.daftar-anggota',
+                'ekskul.attendance' => 'guru.ekskul.absensi.index',
+                'ekskul.attendance_report' => 'guru.ekskul.absensi.rekap',
+                'ekskul.journal' => 'guru.ekskul.jurnal.index',
+                'ekskul.coaching' => 'guru.ekskul.pembinaan.index',
+            ],
+        ],
+    ],
     'types' => [
         'operator' => [
             'title' => 'Operator Sekolah',

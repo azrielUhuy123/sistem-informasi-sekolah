@@ -14,17 +14,13 @@
 
 @endphp
 
+@if(empty($sidebarEmbedded))
 <div class="sidebar">
-
     @include('layouts.partials.tahun-ajaran')
+@endif
 
-    @include('layouts.partials.guru-mode')
-
-    <div class="sidebar-title">
-
-        MODE PEMBINA EKSKUL
-
-    </div>
+@if($canEkskul)
+    <div class="sidebar-title">PEMBINA EKSKUL</div>
 
     @if($user->hasFeature('ekskul.dashboard'))
     {{-- DASHBOARD --}}
@@ -49,7 +45,7 @@
     </a>
     @endif
 
-    {{-- PROFILE --}}
+    @if(empty($sidebarEmbedded))
     <a
         class="menu-item"
         href="{{ route('guru.profile') }}"
@@ -75,6 +71,7 @@
             <span>Perubahan Data Pegawai</span>
         </div>
     </a>
+    @endif
 
     @if($canEkskulSchedule)
     {{-- JADWAL --}}
@@ -144,7 +141,6 @@
 
         </a>
         @endif
-
     </div>
     @endif
 
@@ -309,5 +305,8 @@
 
     </div>
     @endif
+@endif
 
+@if(empty($sidebarEmbedded))
 </div>
+@endif

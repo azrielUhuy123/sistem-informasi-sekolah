@@ -54,7 +54,15 @@ class AuthenticatedSessionController extends Controller
         if ($user->role === 'guru') {
             session(['guru_mode' => $user->hasFeature('ekskul.dashboard') ? 'ekskul' : 'akademik']);
 
-            return redirect($user->getDashboardUrl());
+            $dashboardUrl = $user->getDashboardUrl();
+            foreach ($user->getAssignmentModes() as $mode => $assignment) {
+                if ($assignment['url'] === $dashboardUrl) {
+                    session(['assignment_mode' => $mode]);
+                    break;
+                }
+            }
+
+            return redirect($dashboardUrl);
         }
 
         return match ($user->role) {

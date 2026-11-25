@@ -12,12 +12,16 @@
     $canAccounts = $user->hasFeature('operator.accounts');
     $canSearch = $user->hasFeature('operator.search');
     $showSchoolMenu = $canClasses || $canStudents || $canTeachers || $canSubjects || $canSchedule || $canExtracurriculars;
+    $hasOperatorAccess = $user->hasAnyAssignmentMenu(array_keys(config('assignment_menus.types.operator.menus', [])));
 @endphp
 
+@if(empty($sidebarEmbedded))
 <div class="sidebar">
     @include('layouts.partials.tahun-ajaran')
     @include('layouts.partials.tu-mode')
+@endif
 
+@if($hasOperatorAccess)
     <div class="sidebar-title">MAIN OPERATOR</div>
 
     @if($user->hasFeature('operator.dashboard'))
@@ -127,4 +131,8 @@
             <div class="menu-left"><i class="bi bi-search"></i><span>Pencarian Data</span></div>
         </a>
     @endif
+@endif
+
+@if(empty($sidebarEmbedded))
 </div>
+@endif

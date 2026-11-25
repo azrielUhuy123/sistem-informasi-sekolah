@@ -113,7 +113,7 @@
                         <x-table.heading width="8rem" column="class">Rombel</x-table.heading>
                         <x-table.heading width="7.5rem" column="year">Angkatan</x-table.heading>
                         <x-table.heading width="8rem" column="status">Status</x-table.heading>
-                        <x-table.heading class="text-center" width="7.5rem" column="action">Aksi</x-table.heading>
+                        <x-table.heading width="7.5rem" column="action">Aksi</x-table.heading>
                     </tr>
                 </thead>
                 <tbody id="tableSiswa">
@@ -148,11 +148,11 @@
                                     </span>
                                 @endif
                             </td>
-                            <td class="text-center" data-dt-column="action">
+                            <td data-dt-column="action">
                                 @if ($row->trashed())
                                     <button
                                         type="button"
-                                        class="btn btn-outline-secondary dt-siswa-detail"
+                                        class="btn btn-sm btn-outline-secondary dt-siswa-detail"
                                         disabled
                                         title="Detail tidak tersedia untuk siswa nonaktif"
                                     >
@@ -161,7 +161,7 @@
                                 @else
                                     <a
                                         href="{{ route('superadmin.siswa.show', $row) }}"
-                                        class="btn btn-outline-primary dt-siswa-detail"
+                                        class="btn btn-sm btn-outline-primary dt-siswa-detail"
                                     >
                                         Detail
                                         <i class="bi bi-arrow-up-right" aria-hidden="true"></i>

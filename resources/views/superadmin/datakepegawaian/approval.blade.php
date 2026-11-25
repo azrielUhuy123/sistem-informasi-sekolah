@@ -131,11 +131,11 @@
 
                 <thead>
                     <tr>
-                        <th data-dt-column="nip">NIP</th>
-                        <th data-dt-column="employee">Pegawai</th>
-                        <th data-dt-column="status">Status</th>
-                        <th data-dt-column="approval">Validasi</th>
-                        <th data-dt-column="action">Aksi</th>                            
+                        <x-table.heading data-dt-column="nip">NIP</x-table.heading>
+                        <x-table.heading width="21rem" data-dt-column="employee">Pegawai</x-table.heading>
+                        <x-table.heading width="8.5rem" data-dt-column="status">Status</x-table.heading>
+                        <x-table.heading data-dt-column="approval">Validasi</x-table.heading>
+                        <x-table.heading width="7.5rem" data-dt-column="action">Aksi</x-table.heading>                            
                     </tr>                    
                 </thead>
                 <tbody>

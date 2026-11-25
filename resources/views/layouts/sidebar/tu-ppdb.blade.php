@@ -8,13 +8,17 @@
     $canVerification = $user->hasFeature('ppdb.verification');
     $canSettings = $user->hasFeature('ppdb.settings');
     $showPpdbMenu = $canApplicants || $canAccepted || $canRejected || $canReenrollment || $canPlacement || $canVerification;
+    $hasPpdbAccess = $user->hasAnyAssignmentMenu(array_keys(config('assignment_menus.types.ppdb.menus', [])));
 @endphp
 
+@if(empty($sidebarEmbedded))
 <div class="sidebar">
     @include('layouts.partials.tahun-ajaran')
     @include('layouts.partials.tu-mode')
+@endif
 
-    <div class="sidebar-title">MODE PPDB</div>
+@if($hasPpdbAccess)
+    <div class="sidebar-title">PPDB</div>
 
     @if($user->hasFeature('ppdb.dashboard'))
         <a class="menu-item {{ request()->is('tu/ppdb/dashboard*') ? 'active' : '' }}" href="{{ route('tu.ppdb.dashboard') }}">
@@ -67,4 +71,8 @@
             <div class="menu-left"><i class="bi bi-sliders"></i><span>Pengaturan PPDB</span></div>
         </a>
     @endif
+@endif
+
+@if(empty($sidebarEmbedded))
 </div>
+@endif

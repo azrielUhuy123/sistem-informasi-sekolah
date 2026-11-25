@@ -73,6 +73,109 @@ class ManajemenPenugasanTest extends TestCase
         return $assignment;
     }
 
+    public function test_teacher_can_switch_between_assignment_specific_sidebars(): void
+    {
+        $teacher = $this->createAssignedTeacher('operator', ['operator.dashboard', 'operator.employees']);
+        $this->assignTeacherMenus($teacher, 'ppdb', ['ppdb.dashboard', 'ppdb.applicants']);
+        $this->assignTeacherMenus($teacher, 'wali', ['wali.dashboard', 'wali.classes']);
+        $this->assignTeacherMenus($teacher, 'guru', ['guru.dashboard', 'guru.schedule']);
+        $this->assignTeacherMenus($teacher, 'ekskul', ['ekskul.dashboard', 'ekskul.members']);
+        $year = TahunAjaran::create([
+            'tahun' => '2026/2027',
+            'semester' => 'Ganjil',
+            'status' => 'aktif',
+        ]);
+        $class = Kelas::create(['nama_kelas' => 'VII-A']);
+        WaliKelas::create([
+            'guru_id' => $teacher->guru->id,
+            'kelas_id' => $class->id,
+            'tahun_ajaran_id' => $year->id,
+        ]);
+
+        $this->actingAs($teacher)
+            ->get(route('guru.switch-assignment', 'operator'))
+            ->assertRedirect(route('tu.dashboard'))
+            ->assertSessionHas('assignment_mode', 'operator');
+
+        $this->get(route('tu.dashboard'))
+            ->assertOk()
+            ->assertSee('Dashboard Operator')
+            ->assertSee('Verifikasi Perubahan')
+            ->assertSee('Wali Kelas')
+            ->assertSee('Guru Bidang')
+            ->assertSee('Pembina Ekskul')
+            ->assertSee('PPDB')
+            ->assertDontSee('Dashboard Wali Kelas')
+            ->assertDontSee('Dashboard Guru Bidang')
+            ->assertDontSee('Data Pendaftar');
+
+        $this->get(route('guru.switch-assignment', 'wali'))
+            ->assertRedirect(route('guru.dashboard-walikelas'))
+            ->assertSessionHas('assignment_mode', 'wali');
+
+        $this->get(route('guru.dashboard-walikelas'))
+            ->assertOk()
+            ->assertSee('Dashboard Wali Kelas')
+            ->assertSee('Kelas Saya')
+            ->assertDontSee('Dashboard Operator')
+            ->assertDontSee('Dashboard Guru Bidang')
+            ->assertDontSee('Data Pendaftar');
+
+        $this->get(route('guru.switch-assignment', 'ppdb'))
+            ->assertRedirect(route('tu.ppdb.dashboard'))
+            ->assertSessionHas('assignment_mode', 'ppdb');
+
+        $this->get(route('tu.ppdb.dashboard'))
+            ->assertOk()
+            ->assertSee('Data Pendaftar')
+            ->assertDontSee('Dashboard Operator')
+            ->assertDontSee('Dashboard Wali Kelas');
+
+        $this->get(route('guru.switch-assignment', 'guru'))
+            ->assertRedirect(route('guru.dashboard-gurubidang'))
+            ->assertSessionHas('assignment_mode', 'guru');
+
+        $this->get(route('guru.dashboard-gurubidang'))
+            ->assertOk()
+            ->assertSee('Dashboard Guru Bidang')
+            ->assertSee('Jadwal Saya')
+            ->assertDontSee('Dashboard Wali Kelas')
+            ->assertDontSee('Data Pendaftar');
+
+        $this->get(route('guru.switch-assignment', 'ekskul'))
+            ->assertRedirect(route('guru.ekskul.dashboard'))
+            ->assertSessionHas('assignment_mode', 'ekskul');
+
+        $this->get(route('guru.ekskul.dashboard'))
+            ->assertOk()
+            ->assertSee('Daftar Anggota')
+            ->assertDontSee('Dashboard Operator')
+            ->assertDontSee('Dashboard Guru Bidang')
+            ->assertDontSee('Dashboard Wali Kelas');
+    }
+
+    public function test_teacher_cannot_switch_to_an_assignment_they_do_not_have(): void
+    {
+        $teacher = $this->createAssignedTeacher('operator', ['operator.dashboard']);
+
+        $this->actingAs($teacher)
+            ->get(route('guru.switch-assignment', 'ppdb'))
+            ->assertNotFound();
+
+        $this->actingAs($teacher)
+            ->get(route('guru.switch-assignment', 'operator'))
+            ->assertRedirect(route('tu.dashboard'))
+            ->assertSessionHas('assignment_mode', 'operator');
+
+        $this->get(route('tu.dashboard'))
+            ->assertOk()
+            ->assertSee('Dashboard Operator')
+            ->assertDontSee('Data Pendaftar')
+            ->assertDontSee('Kelas Saya')
+            ->assertDontSee('Jadwal Saya')
+            ->assertDontSee('Daftar Anggota');
+    }
+
     public function test_teacher_only_gets_individual_active_menu_rights_and_protected_ajax_routes(): void
     {
         [$employee, , $teacher] = $this->employee();

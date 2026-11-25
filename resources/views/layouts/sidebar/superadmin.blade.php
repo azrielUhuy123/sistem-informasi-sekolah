@@ -193,68 +193,6 @@
         </div>
     </a>
 
-    {{-- APPROVAL USER --}}
-    <button
-        class="menu-item border-0 bg-transparent text-start"
-        onclick="toggleMenu('menuApproval','arrowApproval')"
-    >
-
-        <div class="menu-left">
-            <i class="bi bi-person-check"></i>
-            <span>Approval User</span>
-        </div>
-
-        <i
-            class="bi bi-chevron-right dropdown-arrow"
-            id="arrowApproval"
-        ></i>
-
-    </button>
-
-    <div
-        class="submenu"
-        id="menuApproval"
-    >
-
-        <a
-            class="menu-item {{ request()->is('superadmin/users/pending*') ? 'active' : '' }}"
-            href="{{ route('superadmin.users.pending') }}"
-        >
-
-            <div class="menu-left">
-                <i class="bi bi-hourglass-split"></i>
-                <span>Pending</span>
-            </div>
-
-        </a>
-
-        <a
-            class="menu-item {{ request()->is('superadmin/users/approved*') ? 'active' : '' }}"
-            href="{{ route('superadmin.users.approved') }}"
-        >
-
-            <div class="menu-left">
-                <i class="bi bi-check-circle"></i>
-                <span>Aktif</span>
-            </div>
-
-        </a>
-
-        <a
-            class="menu-item {{ request()->is('superadmin/users/rejected*') ? 'active' : '' }}"
-            href="{{ route('superadmin.users.rejected') }}"
-        >
-
-            <div class="menu-left">
-                <i class="bi bi-x-circle"></i>
-                <span>Ditolak</span>
-            </div>
-
-        </a>
-
-    </div>
-
-
 
         {{-- DOKUMEN --}}
                 <button
